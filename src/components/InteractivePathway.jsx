@@ -9,12 +9,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { 
   CheckCircle, 
   Circle, 
-  ArrowRight,
+  ArrowRight, 
+  ArrowDown,
+  AlertCircle,
   FileText,
   Lightbulb,
   Calculator,
   BookOpen,
   Brain,
+  ExternalLink,
   Sparkles
 } from "lucide-react";
 

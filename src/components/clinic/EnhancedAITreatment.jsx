@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
-  Brain, AlertTriangle, Loader2, CheckCircle, LineChart
+  Brain, Pill, Calculator, AlertTriangle, TrendingDown, TrendingUp,
+  UtensilsCrossed, Activity, Loader2, CheckCircle, LineChart
 } from "lucide-react";
 import { toast } from "sonner";
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,20 @@ import {
   Users, 
   Plus, 
   Search, 
-  Camera,
+  Camera, 
+  FileText,
+  Calendar,
+  Phone,
+  User,
+  Hash,
+  Eye,
   Loader2,
   Hospital,
   AlertCircle,
   Video,
-  TrendingUp
+  TrendingUp,
+  DollarSign,
+  Package
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -28,6 +36,7 @@ import PatientDetailView from "../components/clinic/PatientDetailView";
 import OCRScanner from "../components/clinic/OCRScanner";
 import TelemedicineConsole from "../components/clinic/TelemedicineConsole";
 import RiskStratification from "../components/clinic/RiskStratification";
+import CDSSSidebar from "../components/clinic/CDSSSidebar";
 import BillingDashboard from "../components/clinic/BillingDashboard";
 import InventoryManager from "../components/clinic/InventoryManager";
 import AppointmentCalendar from "../components/clinic/AppointmentCalendar";

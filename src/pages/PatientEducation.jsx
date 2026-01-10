@@ -18,6 +18,7 @@ import {
   Share2, 
   Loader2, 
   Sparkles,
+  Upload,
   Languages,
   BookOpenCheck,
   Info

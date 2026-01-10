@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Flame, AlertTriangle, Droplet, Activity, Calculator } from "lucide-react";
+import { Flame, AlertTriangle, Zap, Droplet, Activity, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 

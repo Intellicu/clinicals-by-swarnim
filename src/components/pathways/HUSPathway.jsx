@@ -6,7 +6,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Activity, AlertTriangle, CheckCircle, Calculator } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle, Droplet, Zap, Info, Calculator, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 
 export default function HUSPathway() {
   const [step, setStep] = useState(1);

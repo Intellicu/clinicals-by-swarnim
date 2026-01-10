@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar, Plus, Clock, User, CheckCircle, XCircle, Copy, PlayCircle } from "lucide-react";
+import { Calendar, Plus, Clock, User, FileText, CheckCircle, XCircle, Copy, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
 import { format, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO } from "date-fns";
 import ReminderDashboard from "./ReminderDashboard";

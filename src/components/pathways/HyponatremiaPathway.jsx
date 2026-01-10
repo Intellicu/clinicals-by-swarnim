@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Activity, AlertTriangle, Zap } from "lucide-react";
+import { Activity, AlertTriangle, Info, Zap, CheckCircle } from "lucide-react";
 
 export default function HyponatremiaPathway() {
   const [sodium, setSodium] = useState("");

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -21,11 +22,14 @@ import {
   ThumbsUp,
   ThumbsDown,
   RefreshCw,
+  Sparkles,
+  Info,
   CheckCircle2,
   Upload,
   Image as ImageIcon,
   Mic,
   MicOff,
+  Volume2,
   VolumeX,
   ArrowLeft
 } from 'lucide-react';

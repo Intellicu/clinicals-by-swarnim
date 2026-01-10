@@ -6,8 +6,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Database, CheckCircle2, AlertCircle, RefreshCw, FileText,
-  User, Loader2, Info
+  Database, CheckCircle2, AlertCircle, RefreshCw, Eye, FileText,
+  User, Activity, TestTube, Pill, Calendar, Loader2, Info
 } from 'lucide-react';
 
 export default function DataExtractor({ patientId, researchForm, onDataExtracted }) {

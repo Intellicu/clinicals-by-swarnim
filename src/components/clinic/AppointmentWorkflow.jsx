@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
-  User, FileText, Activity, Stethoscope, 
-  ChevronRight, ChevronLeft, Upload, CheckCircle 
+  User, Calendar, FileText, Activity, Stethoscope, 
+  ChevronRight, ChevronLeft, Upload, Loader2, CheckCircle 
 } from "lucide-react";
 import { toast } from "sonner";
 

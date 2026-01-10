@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, LineChart, TrendingUp, AlertTriangle, Info, Microscope, Activity, Heart } from "lucide-react";
+import QuickPatientEntry from "../components/QuickPatientEntry";
 import { usePatient } from "../components/PatientContext";
 
 export default function PredictionTools() {

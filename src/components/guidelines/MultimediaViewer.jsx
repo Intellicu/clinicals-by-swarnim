@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   Music, 
   Video, 
   FileText, 
   Image, 
-  Download
+  Download, 
+  Play,
+  Pause,
+  Volume2
 } from 'lucide-react';
 
 export default function MultimediaViewer({ multimedia }) {

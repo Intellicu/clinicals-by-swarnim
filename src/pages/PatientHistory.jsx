@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, ArrowLeft, FileText, Calendar, Phone, Eye } from "lucide-react";
+import { Search, ArrowLeft, FileText, Calendar, Phone, User, Download, Eye } from "lucide-react";
 
 export default function PatientHistory() {
   const [searchQuery, setSearchQuery] = useState("");

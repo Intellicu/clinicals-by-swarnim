@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Shield, Loader2, AlertTriangle, CheckCircle, Brain,
-  Pill, TestTube, TrendingUp, ChevronUp
+  Pill, TestTube, TrendingUp, AlertCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';

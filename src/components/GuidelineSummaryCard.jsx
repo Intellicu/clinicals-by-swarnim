@@ -3,13 +3,18 @@ import { base44 } from "@/api/base44Client";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Award,
+  Users,
   Target,
+  CheckCircle,
   Lightbulb,
+  Calendar,
+  ExternalLink,
   Brain,
   Loader2,
   ChevronDown,

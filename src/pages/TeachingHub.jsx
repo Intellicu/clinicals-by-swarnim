@@ -21,6 +21,7 @@ import {
   BookOpen,
   Target,
   Award,
+  TrendingUp,
   Upload,
   Sparkles,
   Loader2,
@@ -31,6 +32,7 @@ import {
   Brain,
   Lightbulb,
   Route,
+  FileQuestion,
   Zap,
   Info, // Added Info icon
   Edit

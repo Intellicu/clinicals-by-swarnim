@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import MonitoringTemplateUploader from "../components/MonitoringTemplateUploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,7 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
+  Upload,
   Sparkles,
   Loader2
 } from "lucide-react";

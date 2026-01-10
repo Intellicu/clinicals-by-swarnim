@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
-  Video, VideoOff, Mic, MicOff, MonitorUp,
-  Phone, FileText, Shield
+  Video, VideoOff, Mic, MicOff, MonitorUp, MessageSquare,
+  Phone, FileText, Loader2, Shield
 } from 'lucide-react';
 import { toast } from 'sonner';
 import AIScribe from './AIScribe';

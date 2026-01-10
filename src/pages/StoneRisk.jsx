@@ -17,8 +17,19 @@ import {
   Shield,
   Upload,
   Calculator,
+  AlertTriangle,
   Info,
-  Copy
+  CheckCircle,
+  TrendingUp,
+  Droplet,
+  Activity,
+  FileText,
+  Copy,
+  Download,
+  Beaker,
+  Target,
+  Lightbulb,
+  BookOpen
 } from "lucide-react";
 import { usePatient } from "../components/PatientContext";
 import { toast } from "sonner";

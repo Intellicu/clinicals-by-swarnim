@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Heart, Microscope, Info, Activity } from "lucide-react";
+import { Heart, AlertTriangle, Microscope, CheckCircle, Info, Activity } from "lucide-react";
 
 export default function HSPNPathway() {
   const [biopsyGrade, setBiopsyGrade] = useState(null);

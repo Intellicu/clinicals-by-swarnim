@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Rocket, CheckCircle2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Rocket, CheckCircle2, FileText, Users, Calendar } from 'lucide-react';
 
 const STUDY_TEMPLATES = {
   'aki': { name: 'Acute Kidney Injury Registry', fields: ['creatinine', 'urine_output', 'aki_stage', 'etiology', 'dialysis_needed'] },

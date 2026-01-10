@@ -8,10 +8,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
   Calculator,
   BookOpen,
   Brain,
   Info,
+  Pill,
   Activity,
   Microscope,
   ExternalLink

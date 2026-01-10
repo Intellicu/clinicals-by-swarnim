@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Brain, AlertTriangle, TrendingUp, Pill, Loader2, Sparkles } from "lucide-react";
+import { Brain, AlertTriangle, TrendingUp, Pill, Users, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AITreatmentSuggestions({ patient }) {

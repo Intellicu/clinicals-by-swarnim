@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FileText, Upload, Eye, Trash2, Loader2, Search, Edit } from "lucide-react";
+import { FileText, Upload, Download, Eye, Trash2, Loader2, Search, Edit } from "lucide-react";
 import { toast } from "sonner";
 
 export default function DocumentManager({ patientId }) {

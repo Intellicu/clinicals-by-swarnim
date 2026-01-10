@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Video, Phone, MessageSquare, Calendar, Clock, Users } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
 export default function TelemedicinePanel() {

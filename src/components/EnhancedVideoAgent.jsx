@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mic, MicOff, Video, Pause, Play, Square, Volume2, Bookmark } from "lucide-react";
+import { Mic, MicOff, Video, Pause, Play, Square, Volume2, VolumeX, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 
 export default function EnhancedVideoAgent({ onClose }) {

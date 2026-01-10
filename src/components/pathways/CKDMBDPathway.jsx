@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Activity, CheckCircle, TrendingUp } from "lucide-react";
+import { Activity, Info, CheckCircle, TrendingUp, Bone } from "lucide-react";
 
 export default function CKDMBDPathway() {
   const [ckdStage, setCkdStage] = useState("");

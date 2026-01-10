@@ -9,7 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { base44 } from '@/api/base44Client';
 import { 
-  Search, Sparkles, TrendingUp, Loader2, CheckCircle2
+  Search, BookOpen, Sparkles, Download, FileText, TrendingUp,
+  Database, Loader2, CheckCircle2, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 

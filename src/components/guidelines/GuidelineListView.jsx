@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Calendar, Download, Star, Play } from 'lucide-react';
+import { BookOpen, Calendar, ExternalLink, Download, Star, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function GuidelineListView({ guidelines, onOpen, onStar, starredIds = [] }) {

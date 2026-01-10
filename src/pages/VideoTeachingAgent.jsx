@@ -8,8 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Video, Mic, MicOff, Volume2, VolumeX, Pill, Activity, Droplet, BookOpen, User,
+  Video, Mic, MicOff, Volume2, VolumeX, Loader2, AlertCircle,
+  Calculator, Pill, Activity, Droplet, BookOpen, User, Play, Pause,
   Brain, Sparkles, CheckCircle, MessageCircle, Settings, Globe
 } from "lucide-react";
 import { toast } from "sonner";

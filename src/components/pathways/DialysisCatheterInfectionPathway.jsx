@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Activity, AlertTriangle, Info, CheckCircle, Shield } from "lucide-react";
+import { Activity, AlertTriangle, Info, CheckCircle, Droplet, Shield } from "lucide-react";
 
 export default function DialysisCatheterInfectionPathway() {
   const [catheterType, setCatheterType] = useState("");

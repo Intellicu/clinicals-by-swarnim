@@ -39,6 +39,7 @@ import {
   Image as ImageIcon,
   Thermometer,
   Baby,
+  Pill,
   Flame,
   Wind,
   Beaker,

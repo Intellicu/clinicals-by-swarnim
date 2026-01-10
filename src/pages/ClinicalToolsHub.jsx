@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Activity, Heart, Droplet, Pill, TestTube, Calculator, Brain, Sparkles,
-  AlertCircle, TrendingUp, Shield, Beaker, Microscope, Baby, Search, ArrowLeft, Layers, FlaskConical, Wind, Zap
+  AlertCircle, TrendingUp, Shield, Beaker, Microscope, Baby, Syringe,
+  FileText, Search, ArrowLeft, Layers, FlaskConical, Wind, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

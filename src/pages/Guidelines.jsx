@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,15 +19,21 @@ import {
   Plus,
   Upload,
   FileText,
+  ExternalLink,
   Loader2,
   Image as ImageIcon,
   Award,
   Edit,
+  Save,
   X,
   CheckCircle,
   Sparkles,
+  ArrowLeft,
   Lightbulb,
   Target,
+  Users,
+  TrendingUp,
+  Brain,
   Library,
   Trash2
 } from "lucide-react";

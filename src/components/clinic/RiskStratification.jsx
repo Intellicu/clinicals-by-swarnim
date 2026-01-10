@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  TrendingUp, AlertTriangle, Loader2,
+  TrendingUp, AlertTriangle, CheckCircle, Loader2,
   Activity, Clock, Target
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';

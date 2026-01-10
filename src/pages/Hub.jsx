@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -21,6 +21,7 @@ import {
   Sparkles,
   Brain,
   AlertCircle,
+  Settings,
   BookOpenCheck,
   UtensilsCrossed,
   GraduationCap,
@@ -38,7 +39,9 @@ import {
   GitBranch,
   Users
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
 import QuickPatientEntry from "../components/QuickPatientEntry";
 
