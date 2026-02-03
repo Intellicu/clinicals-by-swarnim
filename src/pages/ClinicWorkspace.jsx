@@ -198,12 +198,16 @@ export default function ClinicWorkspace() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-3">
-                    <Link to={createPageUrl("ClinicManagement")}>
-                      <Button className="w-full bg-blue-600">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add New Patient
-                      </Button>
-                    </Link>
+                    <Button 
+                      className="w-full bg-blue-600"
+                      onClick={() => {
+                        const PatientOnboarding = require('../components/clinic/PatientOnboarding').default;
+                        // Trigger onboarding modal
+                      }}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Enroll New Patient (OCR)
+                    </Button>
                     <Button variant="outline" className="w-full">
                       <Calendar className="w-4 h-4 mr-2" />
                       Schedule Appointment

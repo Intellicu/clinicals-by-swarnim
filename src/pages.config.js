@@ -58,7 +58,9 @@ import BPPercentiles from './pages/BPPercentiles';
 import CKDStager from './pages/CKDStager';
 import CKiDGFR from './pages/CKiDGFR';
 import ClinicManagement from './pages/ClinicManagement';
+import ClinicWorkspace from './pages/ClinicWorkspace';
 import ClinicalAlgorithms from './pages/ClinicalAlgorithms';
+import ClinicalDashboard from './pages/ClinicalDashboard';
 import ClinicalSupport from './pages/ClinicalSupport';
 import ClinicalToolsHub from './pages/ClinicalToolsHub';
 import ComingSoon from './pages/ComingSoon';
@@ -80,6 +82,7 @@ import HypertensiveEmergency from './pages/HypertensiveEmergency';
 import KtVCalculator from './pages/KtVCalculator';
 import ModuleView from './pages/ModuleView';
 import MonitoringHub from './pages/MonitoringHub';
+import MonitoringPlanBuilder from './pages/MonitoringPlanBuilder';
 import OsmolarGap from './pages/OsmolarGap';
 import ParentalGuidance from './pages/ParentalGuidance';
 import PatientEducation from './pages/PatientEducation';
@@ -102,9 +105,6 @@ import TeachingHub from './pages/TeachingHub';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import ClinicalDashboard from './pages/ClinicalDashboard';
-import MonitoringPlanBuilder from './pages/MonitoringPlanBuilder';
-import ClinicWorkspace from './pages/ClinicWorkspace';
 import __Layout from './Layout.jsx';
 
 
@@ -120,7 +120,9 @@ export const PAGES = {
     "CKDStager": CKDStager,
     "CKiDGFR": CKiDGFR,
     "ClinicManagement": ClinicManagement,
+    "ClinicWorkspace": ClinicWorkspace,
     "ClinicalAlgorithms": ClinicalAlgorithms,
+    "ClinicalDashboard": ClinicalDashboard,
     "ClinicalSupport": ClinicalSupport,
     "ClinicalToolsHub": ClinicalToolsHub,
     "ComingSoon": ComingSoon,
@@ -142,6 +144,7 @@ export const PAGES = {
     "KtVCalculator": KtVCalculator,
     "ModuleView": ModuleView,
     "MonitoringHub": MonitoringHub,
+    "MonitoringPlanBuilder": MonitoringPlanBuilder,
     "OsmolarGap": OsmolarGap,
     "ParentalGuidance": ParentalGuidance,
     "PatientEducation": PatientEducation,
@@ -164,9 +167,6 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "ClinicalDashboard": ClinicalDashboard,
-    "MonitoringPlanBuilder": MonitoringPlanBuilder,
-    "ClinicWorkspace": ClinicWorkspace,
 }
 
 export const pagesConfig = {
