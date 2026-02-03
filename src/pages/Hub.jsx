@@ -219,13 +219,16 @@ export default function Hub() {
     ]
   };
 
+  const modesSection = [
+    { name: "Clinic Mode", icon: Users, page: "ClinicManagement", description: "Patient records, visits & clinical workflow", color: "bg-purple-600" },
+    { name: "Research Mode", icon: Layers, page: "ResearchHub", description: "REDCap-style research platform with AI analysis", color: "bg-indigo-600" }
+  ];
+
   const resourcesSection = {
     title: "Clinical Resources & Tools",
     icon: FileText,
     description: "Templates, monitoring, drug reference, and custom tools",
     tools: [
-      { name: "Clinic Management", icon: Users, page: "ClinicManagement", description: "Patient records and visit tracking" },
-      { name: "Research Hub", icon: Layers, page: "ResearchHub", description: "REDCap-style research data collection & AI analysis" },
       { name: "Patient History", icon: FileText, page: "PatientHistory", description: "Search all patient records" },
       { name: "Content Manager", icon: FileText, page: "UserContentManager", description: "Upload guidelines, create templates & scenarios" },
       { name: "Drug Database", icon: Pill, page: "DrugCalculator", description: "50+ drugs with Indian formulations" },
@@ -257,6 +260,35 @@ export default function Hub() {
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
         </div>
+
+        {/* Mode Selector */}
+        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 shadow-xl border-2 border-purple-200">
+          <CardContent className="p-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Choose Your Workspace</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {modesSection.map((mode) => {
+                const ModeIcon = mode.icon;
+                return (
+                  <Link key={mode.name} to={createPageUrl(mode.page)}>
+                    <Card className="h-full hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-500 hover:scale-105 group">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4 mb-3">
+                          <div className={`w-16 h-16 ${mode.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}>
+                            <ModeIcon className="w-8 h-8 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-bold text-slate-900">{mode.name}</h3>
+                          </div>
+                        </div>
+                        <p className="text-sm text-slate-600">{mode.description}</p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Quick Patient Entry */}
         <QuickPatientEntry />
