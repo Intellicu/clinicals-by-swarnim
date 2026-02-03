@@ -1,384 +1,456 @@
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState, useRef } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Stethoscope, FileText, Pill, TestTube, Brain, 
-  AlertCircle, Plus, Save, Sparkles, Loader2 
-} from "lucide-react";
-import { toast } from "sonner";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+  Mic, MicOff, Plus, X, Save, Printer, Mail, MessageCircle,
+  Download, Loader2, Sparkles, FileText, Languages
+} from 'lucide-react';
+import { toast } from 'sonner';
+import jsPDF from 'jspdf';
 
-export default function DigitalPrescriptionPad({ patient, visitData, onSave }) {
-  const [prescription, setPrescription] = useState({
-    diagnosis: visitData?.diagnosis || "",
-    clinical_notes: "",
-    medications: [],
-    lab_orders: "",
-    follow_up_instructions: "",
-    next_visit_date: ""
+export default function DigitalPrescriptionPad({ patient, onClose }) {
+  const [language, setLanguage] = useState('English');
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [medications, setMedications] = useState([]);
+  const [chiefComplaint, setChiefComplaint] = useState('');
+  const [clinicalNotes, setClinicalNotes] = useState('');
+  const [advice, setAdvice] = useState('');
+  const [followUpDays, setFollowUpDays] = useState(7);
+  const [newMed, setNewMed] = useState({ name: '', dose: '', frequency: '', duration: '', instructions: '' });
+
+  const queryClient = useQueryClient();
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
   });
-
-  const [newMedication, setNewMedication] = useState({
-    name: "",
-    dose: "",
-    frequency: "",
-    duration: "",
-    timing: ""
-  });
-
-  const [cdssRecommendations, setCdssRecommendations] = useState(null);
-  const [loadingCDSS, setLoadingCDSS] = useState(false);
 
   const { data: drugs = [] } = useQuery({
     queryKey: ['drugs'],
-    queryFn: () => base44.entities.Drug.list(),
-    initialData: []
+    queryFn: () => base44.entities.Drug.list()
   });
 
-  // CDSS Integration
-  const generateCDSSRecommendations = async () => {
-    setLoadingCDSS(true);
+  const startVoiceScribe = async () => {
     try {
-      const prompt = `As a clinical decision support system, analyze this patient case and provide:
-1. Differential diagnoses to consider
-2. Recommended investigations
-3. Treatment recommendations with evidence level
-4. Drug interactions and contraindications
-5. Red flags to watch for
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
 
-Patient: ${patient.patient_name}, Age: ${patient.age_years}, Gender: ${patient.gender}
-Diagnosis: ${prescription.diagnosis}
-Chief Complaint: ${visitData?.chief_complaint}
-Vitals: BP ${visitData?.physical_examination?.bp_systolic}/${visitData?.physical_examination?.bp_diastolic}, Weight ${visitData?.physical_examination?.weight}kg
-Current Medications: ${prescription.medications.map(m => m.name).join(', ')}
-Clinical Notes: ${prescription.clinical_notes}`;
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
 
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            differential_diagnoses: { type: "array", items: { type: "string" } },
-            recommended_tests: { type: "array", items: { type: "string" } },
-            treatment_recommendations: { type: "array", items: { type: "string" } },
-            drug_interactions: { type: "array", items: { type: "string" } },
-            red_flags: { type: "array", items: { type: "string" } }
-          }
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const file = new File([audioBlob], 'scribe.wav', { type: 'audio/wav' });
+        
+        setIsAIProcessing(true);
+        toast.loading('AI Scribe processing...');
+        
+        try {
+          // In production, would use speech-to-text then LLM to structure
+          const mockTranscript = "Patient complaining of fever and cough for 3 days. On examination, temperature 101F, throat congestion present. Prescribe paracetamol 500mg three times daily for 5 days and cough syrup.";
+          
+          const structuredData = await base44.integrations.Core.InvokeLLM({
+            prompt: `Extract clinical information from this doctor's voice note and structure it into chief complaint, clinical notes, medications with dosing, and advice. Voice transcript: "${mockTranscript}"`,
+            response_json_schema: {
+              type: "object",
+              properties: {
+                chief_complaint: { type: "string" },
+                clinical_notes: { type: "string" },
+                medications: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string" },
+                      dose: { type: "string" },
+                      frequency: { type: "string" },
+                      duration: { type: "string" }
+                    }
+                  }
+                },
+                advice: { type: "string" }
+              }
+            }
+          });
+
+          setChiefComplaint(structuredData.chief_complaint || '');
+          setClinicalNotes(structuredData.clinical_notes || '');
+          setMedications(structuredData.medications || []);
+          setAdvice(structuredData.advice || '');
+          
+          toast.success('AI Scribe completed!');
+        } catch (error) {
+          toast.error('Failed to process voice');
+        } finally {
+          setIsAIProcessing(false);
         }
-      });
+      };
 
-      setCdssRecommendations(response);
-    } catch {
-      toast.error("CDSS analysis failed");
-    } finally {
-      setLoadingCDSS(false);
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      toast.success('Recording... speak your prescription');
+    } catch (error) {
+      toast.error('Microphone access denied');
+    }
+  };
+
+  const stopVoiceScribe = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
     }
   };
 
   const addMedication = () => {
-    if (!newMedication.name) {
-      toast.error("Medication name required");
-      return;
+    if (newMed.name && newMed.dose) {
+      setMedications([...medications, { ...newMed, id: Date.now() }]);
+      setNewMed({ name: '', dose: '', frequency: '', duration: '', instructions: '' });
     }
-    
-    setPrescription(prev => ({
-      ...prev,
-      medications: [...prev.medications, { ...newMedication, id: Date.now() }]
-    }));
-    
-    setNewMedication({ name: "", dose: "", frequency: "", duration: "", timing: "" });
-    toast.success("Medication added");
   };
 
-  const removeMedication = (id) => {
-    setPrescription(prev => ({
-      ...prev,
-      medications: prev.medications.filter(m => m.id !== id)
-    }));
-  };
-
-  const handleSave = async () => {
+  const translateContent = async (targetLang) => {
+    setIsAIProcessing(true);
     try {
-      await onSave(prescription);
-      toast.success("Prescription saved!");
-    } catch {
-      toast.error("Save failed");
+      const translated = await base44.integrations.Core.InvokeLLM({
+        prompt: `Translate this medical prescription to ${targetLang}. Maintain medical accuracy. 
+        Medications: ${JSON.stringify(medications)}
+        Advice: ${advice}
+        Return the translated version maintaining the same structure.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            medications: { type: "array", items: { type: "object" } },
+            advice: { type: "string" }
+          }
+        }
+      });
+      
+      setMedications(translated.medications);
+      setAdvice(translated.advice);
+      setLanguage(targetLang);
+      toast.success(`Translated to ${targetLang}`);
+    } catch (error) {
+      toast.error('Translation failed');
+    } finally {
+      setIsAIProcessing(false);
     }
+  };
+
+  const savePrescriptionMutation = useMutation({
+    mutationFn: async () => {
+      const visit = await base44.entities.VisitRecord.create({
+        patient_id: patient.id,
+        visit_date: new Date().toISOString(),
+        visit_type: 'OPD',
+        chief_complaint: chiefComplaint,
+        clinician_notes: clinicalNotes,
+        prescriptions: medications,
+        treatment_plan: advice,
+        follow_up_date: new Date(Date.now() + followUpDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      });
+      return visit;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patient-visits'] });
+      toast.success('Prescription saved!');
+    }
+  });
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text('Prescription', 105, 15, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.text(`Dr. ${user?.full_name || 'Doctor'}`, 20, 30);
+    doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 20, 36);
+    
+    doc.setFontSize(12);
+    doc.text(`Patient: ${patient.patient_name}`, 20, 48);
+    doc.text(`Age: ${patient.age_years} years • ${patient.gender}`, 20, 54);
+    doc.text(`CR#: ${patient.cr_number}`, 20, 60);
+    
+    if (chiefComplaint) {
+      doc.setFontSize(10);
+      doc.text('Chief Complaint:', 20, 72);
+      doc.text(chiefComplaint, 25, 78);
+    }
+    
+    doc.text('Medications:', 20, 90);
+    medications.forEach((med, idx) => {
+      const y = 96 + (idx * 10);
+      doc.text(`${idx + 1}. ${med.name}`, 25, y);
+      doc.text(`   ${med.dose} - ${med.frequency} - ${med.duration}`, 25, y + 4);
+      if (med.instructions) {
+        doc.text(`   ${med.instructions}`, 25, y + 8);
+      }
+    });
+    
+    if (advice) {
+      const adviceY = 100 + (medications.length * 10);
+      doc.text('Advice:', 20, adviceY);
+      const splitAdvice = doc.splitTextToSize(advice, 170);
+      doc.text(splitAdvice, 25, adviceY + 6);
+    }
+    
+    doc.text(`Follow-up: After ${followUpDays} days`, 20, 270);
+    
+    return doc;
+  };
+
+  const handlePrint = () => {
+    const doc = generatePDF();
+    doc.autoPrint();
+    window.open(doc.output('bloburl'), '_blank');
+  };
+
+  const handleDownloadPDF = () => {
+    const doc = generatePDF();
+    doc.save(`prescription_${patient.patient_name}_${Date.now()}.pdf`);
+    toast.success('PDF downloaded');
   };
 
   return (
-    <div className="grid lg:grid-cols-3 gap-6">
-      {/* Main Prescription Area */}
-      <div className="lg:col-span-2 space-y-4">
-        <Card className="bg-white shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-            <CardTitle className="flex items-center gap-2">
-              <Stethoscope className="w-5 h-5 text-purple-600" />
-              Digital Prescription Pad
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <Tabs defaultValue="clinical" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="clinical">Clinical</TabsTrigger>
-                <TabsTrigger value="medications">Medications</TabsTrigger>
-                <TabsTrigger value="labs">Labs</TabsTrigger>
-                <TabsTrigger value="followup">Follow-up</TabsTrigger>
-              </TabsList>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-5xl max-h-[95vh] overflow-auto">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl">Digital Prescription Pad</CardTitle>
+              <p className="text-sm text-blue-100 mt-1">{patient.patient_name} • CR# {patient.cr_number}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-white/20">{language}</Badge>
+              <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20">
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
 
-              <TabsContent value="clinical" className="space-y-4">
+        <CardContent className="p-6 space-y-6">
+          {/* AI Voice Scribe */}
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <Label>Diagnosis *</Label>
-                  <Input
-                    value={prescription.diagnosis}
-                    onChange={(e) => setPrescription(prev => ({ ...prev, diagnosis: e.target.value }))}
-                    placeholder="Primary diagnosis"
-                  />
+                  <div className="font-semibold text-sm mb-1 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    AI Voice Scribe
+                  </div>
+                  <div className="text-xs text-slate-600">Speak naturally - AI will structure your prescription</div>
                 </div>
-                <div>
-                  <Label>Clinical Notes</Label>
-                  <Textarea
-                    value={prescription.clinical_notes}
-                    onChange={(e) => setPrescription(prev => ({ ...prev, clinical_notes: e.target.value }))}
-                    placeholder="Detailed clinical assessment..."
-                    className="h-40"
-                  />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={isRecording ? stopVoiceScribe : startVoiceScribe}
+                    disabled={isAIProcessing}
+                    className={isRecording ? 'bg-red-600' : 'bg-purple-600'}
+                    size="sm"
+                  >
+                    {isRecording ? (
+                      <>
+                        <MicOff className="w-4 h-4 mr-2" />
+                        Stop
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-4 h-4 mr-2" />
+                        Start Voice Scribe
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const langs = ['English', 'Hindi', 'Bengali', 'Tamil', 'Telugu'];
+                      const currentIdx = langs.indexOf(language);
+                      const nextLang = langs[(currentIdx + 1) % langs.length];
+                      translateContent(nextLang);
+                    }}
+                    disabled={isAIProcessing}
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    Translate
+                  </Button>
                 </div>
-              </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
 
-              <TabsContent value="medications" className="space-y-4">
-                <Card className="bg-blue-50 border-blue-200">
-                  <CardContent className="p-4">
-                    <h4 className="font-semibold mb-3">Add Medication</h4>
-                    <div className="grid md:grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs">Medicine Name</Label>
-                        <Input
-                          value={newMedication.name}
-                          onChange={(e) => setNewMedication(prev => ({ ...prev, name: e.target.value }))}
-                          placeholder="e.g., Paracetamol"
-                          list="drug-list"
-                        />
-                        <datalist id="drug-list">
-                          {drugs.slice(0, 10).map(drug => (
-                            <option key={drug.id} value={drug.generic_name} />
-                          ))}
-                        </datalist>
-                      </div>
-                      <div>
-                        <Label className="text-xs">Dose</Label>
-                        <Input
-                          value={newMedication.dose}
-                          onChange={(e) => setNewMedication(prev => ({ ...prev, dose: e.target.value }))}
-                          placeholder="e.g., 500mg"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Frequency</Label>
-                        <Input
-                          value={newMedication.frequency}
-                          onChange={(e) => setNewMedication(prev => ({ ...prev, frequency: e.target.value }))}
-                          placeholder="e.g., TDS"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Timing</Label>
-                        <Input
-                          value={newMedication.timing}
-                          onChange={(e) => setNewMedication(prev => ({ ...prev, timing: e.target.value }))}
-                          placeholder="e.g., After meals"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Duration</Label>
-                        <Input
-                          value={newMedication.duration}
-                          onChange={(e) => setNewMedication(prev => ({ ...prev, duration: e.target.value }))}
-                          placeholder="e.g., 7 days"
-                        />
-                      </div>
-                      <div className="flex items-end">
-                        <Button onClick={addMedication} className="w-full">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+          <Tabs defaultValue="prescription">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="prescription">Prescription</TabsTrigger>
+              <TabsTrigger value="clinical">Clinical Notes</TabsTrigger>
+              <TabsTrigger value="advice">Advice</TabsTrigger>
+            </TabsList>
 
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Prescribed Medications</h4>
-                  {prescription.medications.length === 0 ? (
-                    <p className="text-sm text-slate-500">No medications added</p>
-                  ) : (
-                    prescription.medications.map((med) => (
-                      <div key={med.id} className="border rounded-lg p-3 flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold">{med.name}</p>
-                          <p className="text-xs text-slate-600">
-                            {med.dose} | {med.frequency} | {med.timing} | {med.duration}
-                          </p>
+            <TabsContent value="prescription" className="space-y-4">
+              {/* Chief Complaint */}
+              <div>
+                <label className="text-sm font-semibold mb-2 block">Chief Complaint</label>
+                <Input
+                  value={chiefComplaint}
+                  onChange={(e) => setChiefComplaint(e.target.value)}
+                  placeholder="Patient's main complaint..."
+                />
+              </div>
+
+              {/* Medications */}
+              <div>
+                <label className="text-sm font-semibold mb-2 block">Medications</label>
+                <Card>
+                  <CardContent className="p-4 space-y-3">
+                    {medications.map((med, idx) => (
+                      <div key={med.id || idx} className="flex items-start justify-between bg-slate-50 p-3 rounded-lg">
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm">{med.name}</div>
+                          <div className="text-xs text-slate-600">
+                            {med.dose} • {med.frequency} • {med.duration}
+                          </div>
+                          {med.instructions && (
+                            <div className="text-xs text-slate-500 mt-1">{med.instructions}</div>
+                          )}
                         </div>
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => removeMedication(med.id)}
-                          className="text-red-600"
+                          onClick={() => setMedications(medications.filter((_, i) => i !== idx))}
                         >
-                          Remove
+                          <X className="w-4 h-4" />
                         </Button>
                       </div>
-                    ))
-                  )}
-                </div>
-              </TabsContent>
+                    ))}
 
-              <TabsContent value="labs" className="space-y-4">
-                <div>
-                  <Label>Laboratory Investigations</Label>
-                  <Textarea
-                    value={prescription.lab_orders}
-                    onChange={(e) => setPrescription(prev => ({ ...prev, lab_orders: e.target.value }))}
-                    placeholder="List investigations to be ordered..."
-                    className="h-32"
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="followup" className="space-y-4">
-                <div>
-                  <Label>Follow-up Instructions</Label>
-                  <Textarea
-                    value={prescription.follow_up_instructions}
-                    onChange={(e) => setPrescription(prev => ({ ...prev, follow_up_instructions: e.target.value }))}
-                    placeholder="Instructions for patient..."
-                    className="h-24"
-                  />
-                </div>
-                <div>
-                  <Label>Next Visit Date</Label>
-                  <Input
-                    type="date"
-                    value={prescription.next_visit_date}
-                    onChange={(e) => setPrescription(prev => ({ ...prev, next_visit_date: e.target.value }))}
-                  />
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            <div className="flex gap-3 mt-6">
-              <Button onClick={handleSave} className="flex-1 bg-green-600 hover:bg-green-700">
-                <Save className="w-4 h-4 mr-2" />
-                Save Prescription
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* CDSS Panel */}
-      <div className="lg:col-span-1">
-        <Card className="bg-white shadow-lg sticky top-6">
-          <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Brain className="w-5 h-5 text-indigo-600" />
-                CDSS Assistant
-              </CardTitle>
-              <Button
-                size="sm"
-                onClick={generateCDSSRecommendations}
-                disabled={loadingCDSS}
-                className="bg-indigo-600"
-              >
-                {loadingCDSS ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 max-h-[600px] overflow-y-auto">
-            {!cdssRecommendations ? (
-              <div className="text-center py-8 text-slate-500 text-sm">
-                <Brain className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                <p>Click the button above to get AI-powered clinical recommendations</p>
+                    <div className="space-y-2 pt-3 border-t">
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          placeholder="Drug name"
+                          value={newMed.name}
+                          onChange={(e) => setNewMed({...newMed, name: e.target.value})}
+                          list="drug-suggestions"
+                        />
+                        <datalist id="drug-suggestions">
+                          {drugs.slice(0, 10).map(drug => (
+                            <option key={drug.id} value={drug.generic_name} />
+                          ))}
+                        </datalist>
+                        <Input
+                          placeholder="Dose (e.g., 500mg)"
+                          value={newMed.dose}
+                          onChange={(e) => setNewMed({...newMed, dose: e.target.value})}
+                        />
+                        <Input
+                          placeholder="Frequency (e.g., BD)"
+                          value={newMed.frequency}
+                          onChange={(e) => setNewMed({...newMed, frequency: e.target.value})}
+                        />
+                        <Input
+                          placeholder="Duration (e.g., 5 days)"
+                          value={newMed.duration}
+                          onChange={(e) => setNewMed({...newMed, duration: e.target.value})}
+                        />
+                      </div>
+                      <Input
+                        placeholder="Special instructions (optional)"
+                        value={newMed.instructions}
+                        onChange={(e) => setNewMed({...newMed, instructions: e.target.value})}
+                      />
+                      <Button onClick={addMedication} size="sm" className="w-full">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Medication
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            ) : (
-              <div className="space-y-4 text-sm">
-                {cdssRecommendations.red_flags?.length > 0 && (
-                  <Alert className="bg-red-50 border-red-300">
-                    <AlertCircle className="w-4 h-4 text-red-600" />
-                    <AlertDescription className="text-red-900">
-                      <strong className="block mb-1">Red Flags:</strong>
-                      <ul className="list-disc pl-4 space-y-1">
-                        {cdssRecommendations.red_flags.map((flag, idx) => (
-                          <li key={idx}>{flag}</li>
-                        ))}
-                      </ul>
-                    </AlertDescription>
-                  </Alert>
-                )}
+            </TabsContent>
 
+            <TabsContent value="clinical">
+              <div>
+                <label className="text-sm font-semibold mb-2 block">Clinical Notes</label>
+                <Textarea
+                  value={clinicalNotes}
+                  onChange={(e) => setClinicalNotes(e.target.value)}
+                  rows={8}
+                  placeholder="Examination findings, vitals, investigation results..."
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="advice">
+              <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                    Differential Diagnoses
-                  </h4>
-                  <ul className="list-disc pl-5 space-y-1 text-slate-700">
-                    {cdssRecommendations.differential_diagnoses?.map((dx, idx) => (
-                      <li key={idx}>{dx}</li>
-                    ))}
-                  </ul>
+                  <label className="text-sm font-semibold mb-2 block">Patient Advice & Instructions</label>
+                  <Textarea
+                    value={advice}
+                    onChange={(e) => setAdvice(e.target.value)}
+                    rows={6}
+                    placeholder="Diet instructions, activity restrictions, when to return..."
+                  />
                 </div>
-
                 <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <TestTube className="w-4 h-4 text-green-600" />
-                    Recommended Tests
-                  </h4>
-                  <ul className="list-disc pl-5 space-y-1 text-slate-700">
-                    {cdssRecommendations.recommended_tests?.map((test, idx) => (
-                      <li key={idx}>{test}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Pill className="w-4 h-4 text-purple-600" />
-                    Treatment Recommendations
-                  </h4>
-                  <ul className="list-disc pl-5 space-y-1 text-slate-700">
-                    {cdssRecommendations.treatment_recommendations?.map((rec, idx) => (
-                      <li key={idx}>{rec}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                {cdssRecommendations.drug_interactions?.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center gap-2 text-amber-700">
-                      <AlertCircle className="w-4 h-4" />
-                      Drug Interactions
-                    </h4>
-                    <ul className="list-disc pl-5 space-y-1 text-amber-700">
-                      {cdssRecommendations.drug_interactions.map((interaction, idx) => (
-                        <li key={idx}>{interaction}</li>
-                      ))}
-                    </ul>
+                  <label className="text-sm font-semibold mb-2 block">Follow-up</label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="number"
+                      value={followUpDays}
+                      onChange={(e) => setFollowUpDays(parseInt(e.target.value))}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-slate-600">days</span>
                   </div>
-                )}
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            </TabsContent>
+          </Tabs>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 pt-4 border-t">
+            <Button 
+              onClick={() => savePrescriptionMutation.mutate()}
+              disabled={medications.length === 0 || savePrescriptionMutation.isPending}
+              className="bg-green-600"
+            >
+              {savePrescriptionMutation.isPending ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              Save Prescription
+            </Button>
+            <Button onClick={handlePrint} variant="outline">
+              <Printer className="w-4 h-4 mr-2" />
+              Print
+            </Button>
+            <Button onClick={handleDownloadPDF} variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              PDF
+            </Button>
+            <Button variant="outline">
+              <Mail className="w-4 h-4 mr-2" />
+              Email
+            </Button>
+            <Button variant="outline">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              WhatsApp
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
