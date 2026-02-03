@@ -41,9 +41,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
 import QuickPatientEntry from "../components/QuickPatientEntry";
+import { ChevronDown } from "lucide-react";
 
 export default function Hub() {
   const { data: user } = useQuery({
@@ -239,9 +241,41 @@ export default function Hub() {
     ]
   };
 
+  const [openSections, setOpenSections] = React.useState({});
+
+  const toggleSection = (sectionName) => {
+    setOpenSections(prev => ({ ...prev, [sectionName]: !prev[sectionName] }));
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Top Navigation Tabs */}
+      <div className="bg-white border-b-2 border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex gap-2">
+            <Link to={createPageUrl("Hub")}>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <Calculator className="w-4 h-4 mr-2" />
+                Calc View
+              </Button>
+            </Link>
+            <Link to={createPageUrl("ClinicManagement")}>
+              <Button variant="outline" className="hover:bg-purple-50">
+                <Users className="w-4 h-4 mr-2" />
+                Clinic Mode
+              </Button>
+            </Link>
+            <Link to={createPageUrl("ResearchHub")}>
+              <Button variant="outline" className="hover:bg-indigo-50">
+                <Layers className="w-4 h-4 mr-2" />
+                Research Mode
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-6 p-6">
         {/* Header with Branding */}
         <div className="mb-8 relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 shadow-2xl">
           <div className="relative z-10">
@@ -260,35 +294,6 @@ export default function Hub() {
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
         </div>
-
-        {/* Mode Selector */}
-        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 shadow-xl border-2 border-purple-200">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Choose Your Workspace</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              {modesSection.map((mode) => {
-                const ModeIcon = mode.icon;
-                return (
-                  <Link key={mode.name} to={createPageUrl(mode.page)}>
-                    <Card className="h-full hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-500 hover:scale-105 group">
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-4 mb-3">
-                          <div className={`w-16 h-16 ${mode.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}>
-                            <ModeIcon className="w-8 h-8 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-xl font-bold text-slate-900">{mode.name}</h3>
-                          </div>
-                        </div>
-                        <p className="text-sm text-slate-600">{mode.description}</p>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Quick Patient Entry */}
         <QuickPatientEntry />
@@ -349,8 +354,8 @@ export default function Hub() {
           </div>
         </div>
 
-        {/* Calculator Section with Subsections */}
-        <Card className="bg-white shadow-lg border-2 border-slate-200 hover:border-blue-300 transition-all">
+        {/* Calculator Section with Collapsible Subsections */}
+        <Card className="bg-white shadow-lg border-2 border-slate-200">
           <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
             <div className="flex items-center justify-between">
               <div>
@@ -365,38 +370,51 @@ export default function Hub() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="p-4 space-y-2">
             {calculatorSections.subsections.map((subsection) => {
               const SubsectionIcon = subsection.icon;
+              const isOpen = openSections[subsection.name];
+              
               return (
-                <div key={subsection.name}>
-                  <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center gap-2">
-                    <SubsectionIcon className="w-5 h-5 text-blue-600" />
-                    {subsection.name}
-                  </h3>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {subsection.tools.map((tool) => {
-                      const ToolIcon = tool.icon;
-                      return (
-                        <Link key={tool.name} to={createPageUrl(tool.page)}>
-                          <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-blue-400 group">
-                            <CardContent className="p-4">
-                              <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                                  <ToolIcon className="w-5 h-5 text-blue-600" />
+                <Collapsible key={subsection.name} open={isOpen} onOpenChange={() => toggleSection(subsection.name)}>
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between hover:bg-blue-50 p-4 h-auto"
+                    >
+                      <div className="flex items-center gap-3">
+                        <SubsectionIcon className="w-5 h-5 text-blue-600" />
+                        <span className="font-semibold text-slate-900">{subsection.name}</span>
+                        <Badge variant="outline" className="text-xs">{subsection.tools.length}</Badge>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="px-4 pb-4">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+                      {subsection.tools.map((tool) => {
+                        const ToolIcon = tool.icon;
+                        return (
+                          <Link key={tool.name} to={createPageUrl(tool.page)}>
+                            <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border hover:border-blue-400 group">
+                              <CardContent className="p-3">
+                                <div className="flex items-start gap-2">
+                                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0">
+                                    <ToolIcon className="w-4 h-4 text-blue-600" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="font-semibold text-sm text-slate-900 mb-0.5">{tool.name}</h3>
+                                    <p className="text-xs text-slate-600 line-clamp-2">{tool.description}</p>
+                                  </div>
                                 </div>
-                                <div className="flex-1">
-                                  <h3 className="font-semibold text-slate-900 mb-1">{tool.name}</h3>
-                                  <p className="text-xs text-slate-600">{tool.description}</p>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
+                              </CardContent>
+                            </Card>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               );
             })}
           </CardContent>
@@ -414,130 +432,151 @@ export default function Hub() {
           </div>
         </div>
 
-        {/* Clinical Decision Support Section */}
-        <Card className="bg-white shadow-lg border-2 border-slate-200 hover:border-blue-300 transition-all">
-          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-xl mb-1">
-                  <Brain className="w-6 h-6 text-blue-600" />
-                  {clinicalSupportSection.title}
-                </CardTitle>
-                <p className="text-sm text-slate-600">{clinicalSupportSection.description}</p>
-              </div>
-              <Badge className="bg-blue-100 text-blue-800 text-sm">
-                {clinicalSupportSection.tools.length} Tools
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {clinicalSupportSection.tools.map((tool) => {
-                const ToolIcon = tool.icon;
-                return (
-                  <Link key={tool.name} to={createPageUrl(tool.page)}>
-                    <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-blue-400 group">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <ToolIcon className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-slate-900 mb-1">{tool.name}</h3>
-                            <p className="text-xs text-slate-600">{tool.description}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
-              })}
-            </div>
-          </CardContent>
+        {/* Clinical Decision Support Section - Collapsible */}
+        <Card className="bg-white shadow-lg border-2 border-slate-200">
+          <Collapsible open={openSections['clinical-support']} onOpenChange={() => toggleSection('clinical-support')}>
+            <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b p-0">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full justify-between hover:bg-blue-50 p-4 h-auto rounded-none">
+                  <div className="flex items-center gap-3">
+                    <Brain className="w-6 h-6 text-blue-600" />
+                    <div className="text-left">
+                      <div className="font-semibold text-lg">{clinicalSupportSection.title}</div>
+                      <p className="text-xs text-slate-600">{clinicalSupportSection.description}</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800 text-xs ml-auto mr-2">
+                      {clinicalSupportSection.tools.length}
+                    </Badge>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openSections['clinical-support'] ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="p-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {clinicalSupportSection.tools.map((tool) => {
+                    const ToolIcon = tool.icon;
+                    return (
+                      <Link key={tool.name} to={createPageUrl(tool.page)}>
+                        <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border hover:border-blue-400 group">
+                          <CardContent className="p-3">
+                            <div className="flex items-start gap-2">
+                              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0">
+                                <ToolIcon className="w-4 h-4 text-blue-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm text-slate-900 mb-0.5">{tool.name}</h3>
+                                <p className="text-xs text-slate-600 line-clamp-2">{tool.description}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
-        {/* Education Section */}
-        <Card className="bg-white shadow-lg border-2 border-slate-200 hover:border-blue-300 transition-all">
-          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-xl mb-1">
-                  <GraduationCap className="w-6 h-6 text-blue-600" />
-                  {educationSection.title}
-                </CardTitle>
-                <p className="text-sm text-slate-600">{educationSection.description}</p>
-              </div>
-              <Badge className="bg-blue-100 text-blue-800 text-sm">
-                {educationSection.tools.length} Tools
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {educationSection.tools.map((tool) => {
-                const ToolIcon = tool.icon;
-                return (
-                  <Link key={tool.name} to={createPageUrl(tool.page)}>
-                    <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-blue-400 group">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <ToolIcon className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-slate-900 mb-1">{tool.name}</h3>
-                            <p className="text-xs text-slate-600">{tool.description}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
-              })}
-            </div>
-          </CardContent>
+        {/* Education Section - Collapsible */}
+        <Card className="bg-white shadow-lg border-2 border-slate-200">
+          <Collapsible open={openSections['education']} onOpenChange={() => toggleSection('education')}>
+            <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b p-0">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full justify-between hover:bg-blue-50 p-4 h-auto rounded-none">
+                  <div className="flex items-center gap-3">
+                    <GraduationCap className="w-6 h-6 text-blue-600" />
+                    <div className="text-left">
+                      <div className="font-semibold text-lg">{educationSection.title}</div>
+                      <p className="text-xs text-slate-600">{educationSection.description}</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800 text-xs ml-auto mr-2">
+                      {educationSection.tools.length}
+                    </Badge>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openSections['education'] ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="p-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {educationSection.tools.map((tool) => {
+                    const ToolIcon = tool.icon;
+                    return (
+                      <Link key={tool.name} to={createPageUrl(tool.page)}>
+                        <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border hover:border-blue-400 group">
+                          <CardContent className="p-3">
+                            <div className="flex items-start gap-2">
+                              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0">
+                                <ToolIcon className="w-4 h-4 text-blue-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm text-slate-900 mb-0.5">{tool.name}</h3>
+                                <p className="text-xs text-slate-600 line-clamp-2">{tool.description}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
-        {/* Resources Section */}
-        <Card className="bg-white shadow-lg border-2 border-slate-200 hover:border-blue-300 transition-all">
-          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-xl mb-1">
-                  <FileText className="w-6 h-6 text-blue-600" />
-                  {resourcesSection.title}
-                </CardTitle>
-                <p className="text-sm text-slate-600">{resourcesSection.description}</p>
-              </div>
-              <Badge className="bg-blue-100 text-blue-800 text-sm">
-                {resourcesSection.tools.length} Tools
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {resourcesSection.tools.map((tool) => {
-                const ToolIcon = tool.icon;
-                return (
-                  <Link key={tool.name} to={createPageUrl(tool.page)}>
-                    <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border-2 hover:border-blue-400 group">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <ToolIcon className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-slate-900 mb-1">{tool.name}</h3>
-                            <p className="text-xs text-slate-600">{tool.description}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
-              })}
-            </div>
-          </CardContent>
+        {/* Resources Section - Collapsible */}
+        <Card className="bg-white shadow-lg border-2 border-slate-200">
+          <Collapsible open={openSections['resources']} onOpenChange={() => toggleSection('resources')}>
+            <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b p-0">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full justify-between hover:bg-blue-50 p-4 h-auto rounded-none">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-6 h-6 text-blue-600" />
+                    <div className="text-left">
+                      <div className="font-semibold text-lg">{resourcesSection.title}</div>
+                      <p className="text-xs text-slate-600">{resourcesSection.description}</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800 text-xs ml-auto mr-2">
+                      {resourcesSection.tools.length}
+                    </Badge>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openSections['resources'] ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="p-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {resourcesSection.tools.map((tool) => {
+                    const ToolIcon = tool.icon;
+                    return (
+                      <Link key={tool.name} to={createPageUrl(tool.page)}>
+                        <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer border hover:border-blue-400 group">
+                          <CardContent className="p-3">
+                            <div className="flex items-start gap-2">
+                              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors flex-shrink-0">
+                                <ToolIcon className="w-4 h-4 text-blue-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm text-slate-900 mb-0.5">{tool.name}</h3>
+                                <p className="text-xs text-slate-600 line-clamp-2">{tool.description}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
         <Alert className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 p-6">

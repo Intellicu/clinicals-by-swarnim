@@ -90,14 +90,32 @@ export default function ResearchHub() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <Link to={createPageUrl("Hub")}>
-          <Button variant="outline" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Hub
-          </Button>
-        </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
+      {/* Top Navigation Tabs */}
+      <div className="bg-white border-b-2 border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex gap-2">
+            <Link to={createPageUrl("Hub")}>
+              <Button variant="outline" className="hover:bg-blue-50">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Calc View
+              </Button>
+            </Link>
+            <Link to={createPageUrl("ClinicManagement")}>
+              <Button variant="outline" className="hover:bg-purple-50">
+                <Users className="w-4 h-4 mr-2" />
+                Clinic Mode
+              </Button>
+            </Link>
+            <Button className="bg-indigo-600 hover:bg-indigo-700">
+              <Layers className="w-4 h-4 mr-2" />
+              Research Mode
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-6 p-6">
 
         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl p-8 shadow-2xl text-white">
           <div className="flex items-center gap-4 mb-4">
