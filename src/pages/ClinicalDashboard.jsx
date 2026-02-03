@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -12,11 +12,15 @@ import {
   Users, Search, AlertCircle, TrendingUp, FileText, ArrowLeft,
   CheckCircle2, Activity, Calendar, Download
 } from 'lucide-react';
+import MonitoringTrendsChart from '../components/monitoring/MonitoringTrendsChart';
+import MonitoringAlerts from '../components/monitoring/MonitoringAlerts';
+import { toast } from 'sonner';
 
 export default function ClinicalDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
+  const queryClient = useQueryClient();
 
   const { data: patients = [] } = useQuery({
     queryKey: ['patients-list'],
@@ -113,12 +117,53 @@ export default function ClinicalDashboard() {
             </TabsList>
 
             <TabsContent value="diary">
+              <div className="space-y-4 mb-4">
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm text-slate-600 mb-1">Monitoring Status</div>
+                        <Badge className="bg-blue-600">Active Plan: {getPlanForPatient(selectedPatient.id)?.diagnosis}</Badge>
+                      </div>
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                          const plan = getPlanForPatient(selectedPatient.id);
+                          if (!plan) return;
+                          
+                          const unreviewed = dailyLogs.filter(log => !log.clinician_reviewed);
+                          for (const log of unreviewed) {
+                            await base44.entities.PatientDailyLog.update(log.id, {
+                              clinician_reviewed: true,
+                              clinician_notes: `Reviewed on ${new Date().toLocaleDateString()}`
+                            });
+                          }
+                          queryClient.invalidateQueries({ queryKey: ['daily-logs'] });
+                          toast.success('All logs marked as reviewed');
+                        }}
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-1" />
+                        Mark All Reviewed
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <MonitoringAlerts logs={dailyLogs} monitoringPlan={getPlanForPatient(selectedPatient.id)} />
+              </div>
+
               <Card>
                 <CardHeader className="bg-slate-50 border-b">
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    Digital Proteinuria Record
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-blue-600" />
+                      Patient-Reported Data
+                    </CardTitle>
+                    <Badge variant="outline" className="text-xs">
+                      Non-editable after submission
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
@@ -171,17 +216,12 @@ export default function ClinicalDashboard() {
             </TabsContent>
 
             <TabsContent value="trends">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-purple-600" />
-                    Longitudinal Trends
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600">Trend visualization coming soon...</p>
-                </CardContent>
-              </Card>
+              <div className="space-y-4">
+                <MonitoringTrendsChart logs={dailyLogs} parameterType="Urine_Protein" />
+                <MonitoringTrendsChart logs={dailyLogs} parameterType="Weight" />
+                <MonitoringTrendsChart logs={dailyLogs} parameterType="Blood_Pressure" />
+                <MonitoringTrendsChart logs={dailyLogs} parameterType="Medications" />
+              </div>
             </TabsContent>
 
             <TabsContent value="records">
