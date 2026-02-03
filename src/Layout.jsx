@@ -21,8 +21,9 @@ import {
   UtensilsCrossed,
   Sparkles,
   Mic,
-  Users, // Added Users icon
-  Layers // Added Layers icon
+  Users,
+  Layers,
+  Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -84,6 +85,11 @@ const resourcesNavigation = [
     title: "Clinic Management",
     url: createPageUrl("ClinicManagement"),
     icon: Users,
+  },
+  {
+    title: "Clinic Workspace",
+    url: createPageUrl("ClinicWorkspace"),
+    icon: Building2,
   },
   {
     title: "Content Manager",

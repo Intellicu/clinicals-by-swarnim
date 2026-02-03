@@ -104,6 +104,7 @@ import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
 import ClinicalDashboard from './pages/ClinicalDashboard';
 import MonitoringPlanBuilder from './pages/MonitoringPlanBuilder';
+import ClinicWorkspace from './pages/ClinicWorkspace';
 import __Layout from './Layout.jsx';
 
 
@@ -165,6 +166,7 @@ export const PAGES = {
     "VoiceAgent": VoiceAgent,
     "ClinicalDashboard": ClinicalDashboard,
     "MonitoringPlanBuilder": MonitoringPlanBuilder,
+    "ClinicWorkspace": ClinicWorkspace,
 }
 
 export const pagesConfig = {
