@@ -72,6 +72,10 @@ import SevereEdemaPathway from "../components/pathways/SevereEdemaPathway";
 import SBPPathway from "../components/pathways/SBPPathway";
 import MetabolicAcidosisPathway from "../components/pathways/MetabolicAcidosisPathway";
 import { useQuery } from '@tanstack/react-query';
+import BiopsyAnalyzer from '../components/clinical-ai/BiopsyAnalyzer';
+import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
+import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
+import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
 
 
 // Symptom templates based on chief complaints
@@ -410,6 +414,12 @@ const clinicalScenarios = [
     hasFullPathway: true
   }
 ];
+
+// AI Agent Content Components
+const BiopsyAnalyzerContent = () => <BiopsyAnalyzer />;
+const RadiologyAnalyzerContent = () => <RadiologyAnalyzer />;
+const LabReportAnalyzerContent = () => <LabReportAnalyzer />;
+const ClinicalCaseAnalyzerContent = () => <ClinicalCaseAnalyzer />;
 
 export default function ClinicalSupport() {
   const [activeTab, setActiveTab] = useState("scenarios");
@@ -1416,10 +1426,14 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-100">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-100">
             <TabsTrigger value="diagnostic" className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
               AI Diagnostic Agent
+            </TabsTrigger>
+            <TabsTrigger value="ai-agents" className="flex items-center gap-2">
+              <Microscope className="w-4 h-4" />
+              Clinical AI Agents
             </TabsTrigger>
             <TabsTrigger value="scenarios" className="flex items-center gap-2">
               <Clipboard className="w-4 h-4" />
@@ -1433,6 +1447,54 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
           <TabsContent value="diagnostic">
             {renderDiagnosticAgent()}
+          </TabsContent>
+
+          <TabsContent value="ai-agents">
+            <div className="space-y-6">
+              <Alert className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
+                <Microscope className="w-5 h-5 text-purple-600" />
+                <AlertDescription className="text-purple-800">
+                  <strong>Clinical AI Agents:</strong> Advanced AI analysis for biopsies, radiology, lab reports, and complete case analysis with structured outputs
+                </AlertDescription>
+              </Alert>
+
+              <Tabs defaultValue="biopsy" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 h-auto">
+                  <TabsTrigger value="biopsy" className="flex flex-col items-center gap-2 py-3">
+                    <Microscope className="w-5 h-5" />
+                    <span className="text-xs">Renal Biopsy</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="radiology" className="flex flex-col items-center gap-2 py-3">
+                    <Activity className="w-5 h-5" />
+                    <span className="text-xs">Radiology</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="labs" className="flex flex-col items-center gap-2 py-3">
+                    <TestTube className="w-5 h-5" />
+                    <span className="text-xs">Lab Reports</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="case" className="flex flex-col items-center gap-2 py-3">
+                    <Stethoscope className="w-5 h-5" />
+                    <span className="text-xs">Case Analysis</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="biopsy" className="mt-6">
+                  <BiopsyAnalyzerContent />
+                </TabsContent>
+
+                <TabsContent value="radiology" className="mt-6">
+                  <RadiologyAnalyzerContent />
+                </TabsContent>
+
+                <TabsContent value="labs" className="mt-6">
+                  <LabReportAnalyzerContent />
+                </TabsContent>
+
+                <TabsContent value="case" className="mt-6">
+                  <ClinicalCaseAnalyzerContent />
+                </TabsContent>
+              </Tabs>
+            </div>
           </TabsContent>
 
           <TabsContent value="scenarios">
