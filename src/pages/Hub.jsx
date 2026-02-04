@@ -259,7 +259,7 @@ export default function Hub() {
                 Calc View
               </Button>
             </Link>
-            <Link to={createPageUrl("ClinicManagement")}>
+            <Link to={createPageUrl("ClinicDashboard")}>
               <Button variant="outline" className="hover:bg-purple-50">
                 <Users className="w-4 h-4 mr-2" />
                 Clinic Mode

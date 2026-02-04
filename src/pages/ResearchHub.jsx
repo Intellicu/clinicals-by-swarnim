@@ -23,6 +23,7 @@ import LiteratureSearch from '../components/research/LiteratureSearch';
 import StatisticalAnalysis from '../components/research/StatisticalAnalysis';
 import KnowledgeBase from '../components/research/KnowledgeBase';
 import ProtocolBuilder from '../components/research/ProtocolBuilder';
+import EnhancedProtocolBuilder from '../components/research/EnhancedProtocolBuilder';
 
 export default function ResearchHub() {
   const [activeTab, setActiveTab] = useState("projects");
@@ -149,7 +150,7 @@ export default function ResearchHub() {
           </TabsList>
 
           <TabsContent value="protocol">
-            <ProtocolBuilder />
+            <EnhancedProtocolBuilder />
           </TabsContent>
 
           <TabsContent value="projects" className="space-y-4">

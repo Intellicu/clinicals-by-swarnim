@@ -57,6 +57,7 @@ import AuditLogs from './pages/AuditLogs';
 import BPPercentiles from './pages/BPPercentiles';
 import CKDStager from './pages/CKDStager';
 import CKiDGFR from './pages/CKiDGFR';
+import ClinicDashboard from './pages/ClinicDashboard';
 import ClinicHome from './pages/ClinicHome';
 import ClinicManagement from './pages/ClinicManagement';
 import ClinicWorkspace from './pages/ClinicWorkspace';
@@ -90,6 +91,7 @@ import OsmolarGap from './pages/OsmolarGap';
 import ParentalGuidance from './pages/ParentalGuidance';
 import PatientEducation from './pages/PatientEducation';
 import PatientHistory from './pages/PatientHistory';
+import PatientMonitoringDashboard from './pages/PatientMonitoringDashboard';
 import PotassiumCalculator from './pages/PotassiumCalculator';
 import PredictionTools from './pages/PredictionTools';
 import Proteinuria from './pages/Proteinuria';
@@ -108,8 +110,6 @@ import TeachingHub from './pages/TeachingHub';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import ClinicDashboard from './pages/ClinicDashboard';
-import PatientMonitoringDashboard from './pages/PatientMonitoringDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -124,6 +124,7 @@ export const PAGES = {
     "BPPercentiles": BPPercentiles,
     "CKDStager": CKDStager,
     "CKiDGFR": CKiDGFR,
+    "ClinicDashboard": ClinicDashboard,
     "ClinicHome": ClinicHome,
     "ClinicManagement": ClinicManagement,
     "ClinicWorkspace": ClinicWorkspace,
@@ -157,6 +158,7 @@ export const PAGES = {
     "ParentalGuidance": ParentalGuidance,
     "PatientEducation": PatientEducation,
     "PatientHistory": PatientHistory,
+    "PatientMonitoringDashboard": PatientMonitoringDashboard,
     "PotassiumCalculator": PotassiumCalculator,
     "PredictionTools": PredictionTools,
     "Proteinuria": Proteinuria,
@@ -175,8 +177,6 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "ClinicDashboard": ClinicDashboard,
-    "PatientMonitoringDashboard": PatientMonitoringDashboard,
 }
 
 export const pagesConfig = {

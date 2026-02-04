@@ -33,6 +33,7 @@ import FloatingAIAssistant from "./components/FloatingAIAssistant";
 import IOSCompatibility from "./components/iOSCompatibility";
 import DataChatbot from "./components/DataChatbot";
 import OfflineSync from "./components/OfflineSync";
+import OfflineManager from "./components/OfflineManager";
 
 const mainNavigation = [
   {
@@ -420,7 +421,6 @@ export default function Layout({ children, currentPageName }) {
 
         <FloatingAIAssistant />
         <DataChatbot />
-        <OfflineSync />
         </div>
         </PatientProvider>
         );

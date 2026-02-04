@@ -44,6 +44,8 @@ import WebImporter from "../components/guidelines/WebImporter";
 import SemanticSearch from "../components/guidelines/SemanticSearch";
 import GuidelineListView from "../components/guidelines/GuidelineListView";
 import PathwayGenerator from "../components/guidelines/PathwayGenerator";
+import AutoUpdateManager from "../components/guidelines/AutoUpdateManager";
+import OfflineManager from "../components/OfflineManager";
 
 const categories = [
   "All",
@@ -904,14 +906,15 @@ Also extract:
           </Dialog>
         </div>
 
-        <div className="space-y-6">
-          <SemanticSearch 
-            guidelines={guidelines}
-            onResultsFound={(results, reasoning) => {
-              setSemanticResults(results);
-              setSearchReasoning(reasoning);
-            }}
-          />
+        <div className="grid md:grid-cols-3 gap-4 mb-6">
+          <div className="md:col-span-2 space-y-6">
+            <SemanticSearch 
+              guidelines={guidelines}
+              onResultsFound={(results, reasoning) => {
+                setSemanticResults(results);
+                setSearchReasoning(reasoning);
+              }}
+            />
 
           <div className="relative">
             <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-slate-400" />
@@ -936,7 +939,7 @@ Also extract:
             </Alert>
           )}
 
-          <div className="flex gap-3 overflow-x-auto pb-2">
+            <div className="flex gap-3 overflow-x-auto pb-2">
             {categories.map((cat) => (
               <Button
                 key={cat}
@@ -952,6 +955,12 @@ Also extract:
                 {cat}
               </Button>
             ))}
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <AutoUpdateManager />
+            <OfflineManager />
           </div>
         </div>
 
