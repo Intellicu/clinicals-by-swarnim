@@ -138,14 +138,19 @@ export default function ResearchHub() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="protocol">Protocol</TabsTrigger>
             <TabsTrigger value="forms">Form Builder</TabsTrigger>
             <TabsTrigger value="data">Data Collection</TabsTrigger>
             <TabsTrigger value="literature">Literature</TabsTrigger>
             <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
             <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="protocol">
+            <ProtocolBuilder />
+          </TabsContent>
 
           <TabsContent value="projects" className="space-y-4">
             <div className="flex justify-between items-center">
