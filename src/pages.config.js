@@ -109,6 +109,7 @@ import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
 import ClinicDashboard from './pages/ClinicDashboard';
+import PatientMonitoringDashboard from './pages/PatientMonitoringDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -175,6 +176,7 @@ export const PAGES = {
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
     "ClinicDashboard": ClinicDashboard,
+    "PatientMonitoringDashboard": PatientMonitoringDashboard,
 }
 
 export const pagesConfig = {

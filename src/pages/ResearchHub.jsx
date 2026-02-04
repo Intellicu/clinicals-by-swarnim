@@ -22,6 +22,7 @@ import DataExtractor from '../components/research/DataExtractor';
 import LiteratureSearch from '../components/research/LiteratureSearch';
 import StatisticalAnalysis from '../components/research/StatisticalAnalysis';
 import KnowledgeBase from '../components/research/KnowledgeBase';
+import ProtocolBuilder from '../components/research/ProtocolBuilder';
 
 export default function ResearchHub() {
   const [activeTab, setActiveTab] = useState("projects");
