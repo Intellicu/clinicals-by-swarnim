@@ -289,8 +289,8 @@ export default function ClinicHome() {
                 {filteredPatients.map(patient => (
                   <Link 
                     key={patient.id}
-                    to={createPageUrl("ConsultationView")}
-                    state={{ patient }}
+                    to={createPageUrl("ClinicalEncounterView")}
+                    state={{ patient, workspace: selectedWorkspace }}
                   >
                     <div className="p-4 hover:bg-slate-50 transition-colors cursor-pointer">
                       <div className="flex items-center justify-between">

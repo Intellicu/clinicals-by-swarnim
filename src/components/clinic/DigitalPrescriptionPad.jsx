@@ -7,14 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Mic, MicOff, Plus, X, Save, Printer, Mail, MessageCircle,
-  Download, Loader2, Sparkles, FileText, Languages
+  Download, Loader2, Sparkles, FileText, Languages, AlertTriangle,
+  Calendar, CheckCircle2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 
-export default function DigitalPrescriptionPad({ patient, onClose }) {
+export default function DigitalPrescriptionPad({ patient, encounter, workspace, monitoringPlan, previousPrescription, onClose }) {
   const [language, setLanguage] = useState('English');
   const [isRecording, setIsRecording] = useState(false);
   const [isAIProcessing, setIsAIProcessing] = useState(false);

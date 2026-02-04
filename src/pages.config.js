@@ -57,6 +57,7 @@ import AuditLogs from './pages/AuditLogs';
 import BPPercentiles from './pages/BPPercentiles';
 import CKDStager from './pages/CKDStager';
 import CKiDGFR from './pages/CKiDGFR';
+import ClinicHome from './pages/ClinicHome';
 import ClinicManagement from './pages/ClinicManagement';
 import ClinicWorkspace from './pages/ClinicWorkspace';
 import ClinicalAlgorithms from './pages/ClinicalAlgorithms';
@@ -64,6 +65,7 @@ import ClinicalDashboard from './pages/ClinicalDashboard';
 import ClinicalSupport from './pages/ClinicalSupport';
 import ClinicalToolsHub from './pages/ClinicalToolsHub';
 import ComingSoon from './pages/ComingSoon';
+import ConsultationView from './pages/ConsultationView';
 import CustomToolBuilder from './pages/CustomToolBuilder';
 import DiagnosticQuestionnaire from './pages/DiagnosticQuestionnaire';
 import DietChartGenerator from './pages/DietChartGenerator';
@@ -105,8 +107,6 @@ import TeachingHub from './pages/TeachingHub';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import ClinicHome from './pages/ClinicHome';
-import ConsultationView from './pages/ConsultationView';
 import __Layout from './Layout.jsx';
 
 
@@ -121,6 +121,7 @@ export const PAGES = {
     "BPPercentiles": BPPercentiles,
     "CKDStager": CKDStager,
     "CKiDGFR": CKiDGFR,
+    "ClinicHome": ClinicHome,
     "ClinicManagement": ClinicManagement,
     "ClinicWorkspace": ClinicWorkspace,
     "ClinicalAlgorithms": ClinicalAlgorithms,
@@ -128,6 +129,7 @@ export const PAGES = {
     "ClinicalSupport": ClinicalSupport,
     "ClinicalToolsHub": ClinicalToolsHub,
     "ComingSoon": ComingSoon,
+    "ConsultationView": ConsultationView,
     "CustomToolBuilder": CustomToolBuilder,
     "DiagnosticQuestionnaire": DiagnosticQuestionnaire,
     "DietChartGenerator": DietChartGenerator,
@@ -169,8 +171,6 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "ClinicHome": ClinicHome,
-    "ConsultationView": ConsultationView,
 }
 
 export const pagesConfig = {
