@@ -60,6 +60,7 @@ import CKiDGFR from './pages/CKiDGFR';
 import ClinicHome from './pages/ClinicHome';
 import ClinicManagement from './pages/ClinicManagement';
 import ClinicWorkspace from './pages/ClinicWorkspace';
+import ClinicalAIHub from './pages/ClinicalAIHub';
 import ClinicalAlgorithms from './pages/ClinicalAlgorithms';
 import ClinicalDashboard from './pages/ClinicalDashboard';
 import ClinicalSupport from './pages/ClinicalSupport';
@@ -107,7 +108,7 @@ import TeachingHub from './pages/TeachingHub';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import ClinicalAIHub from './pages/ClinicalAIHub';
+import ClinicDashboard from './pages/ClinicDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -125,6 +126,7 @@ export const PAGES = {
     "ClinicHome": ClinicHome,
     "ClinicManagement": ClinicManagement,
     "ClinicWorkspace": ClinicWorkspace,
+    "ClinicalAIHub": ClinicalAIHub,
     "ClinicalAlgorithms": ClinicalAlgorithms,
     "ClinicalDashboard": ClinicalDashboard,
     "ClinicalSupport": ClinicalSupport,
@@ -172,7 +174,7 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "ClinicalAIHub": ClinicalAIHub,
+    "ClinicDashboard": ClinicDashboard,
 }
 
 export const pagesConfig = {

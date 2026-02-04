@@ -82,14 +82,9 @@ const toolsNavigation = [
 
 const resourcesNavigation = [
   {
-    title: "Clinic Management",
-    url: createPageUrl("ClinicManagement"),
+    title: "Clinic Dashboard",
+    url: createPageUrl("ClinicDashboard"),
     icon: Users,
-  },
-  {
-    title: "Clinic Workspace",
-    url: createPageUrl("ClinicWorkspace"),
-    icon: Building2,
   },
   {
     title: "Content Manager",
