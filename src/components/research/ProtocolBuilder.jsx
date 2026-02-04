@@ -176,7 +176,7 @@ export default function ProtocolBuilder() {
             <div className="bg-white rounded-lg p-4">
               <h4 className="font-bold mb-2">Objectives</h4>
               <p className="text-sm mb-2"><strong>Primary:</strong> {generatedProtocol.objectives?.primary}</p>
-              {generatedProtocol.objectives?.secondary?.length > 0 && (
+              {Array.isArray(generatedProtocol.objectives?.secondary) && generatedProtocol.objectives.secondary.length > 0 && (
                 <div>
                   <p className="text-sm font-semibold mb-1">Secondary:</p>
                   <ul className="space-y-1">
@@ -197,7 +197,7 @@ export default function ProtocolBuilder() {
               <div className="bg-white rounded-lg p-4">
                 <h4 className="font-bold mb-2">Inclusion Criteria</h4>
                 <ul className="space-y-1">
-                  {generatedProtocol.inclusion_criteria?.map((criteria, idx) => (
+                  {Array.isArray(generatedProtocol.inclusion_criteria) && generatedProtocol.inclusion_criteria.map((criteria, idx) => (
                     <li key={idx} className="text-sm text-slate-700">✓ {criteria}</li>
                   ))}
                 </ul>
@@ -205,7 +205,7 @@ export default function ProtocolBuilder() {
               <div className="bg-white rounded-lg p-4">
                 <h4 className="font-bold mb-2">Exclusion Criteria</h4>
                 <ul className="space-y-1">
-                  {generatedProtocol.exclusion_criteria?.map((criteria, idx) => (
+                  {Array.isArray(generatedProtocol.exclusion_criteria) && generatedProtocol.exclusion_criteria.map((criteria, idx) => (
                     <li key={idx} className="text-sm text-slate-700">✗ {criteria}</li>
                   ))}
                 </ul>
