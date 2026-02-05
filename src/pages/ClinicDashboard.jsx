@@ -17,6 +17,7 @@ import { format, parseISO, isSameDay } from 'date-fns';
 import { toast } from 'sonner';
 import WorkspaceWizard from '../components/clinic/WorkspaceWizard';
 import PatientOnboarding from '../components/clinic/PatientOnboarding';
+import PullToRefresh from '../components/PullToRefresh';
 
 export default function ClinicDashboard() {
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
@@ -166,8 +167,18 @@ export default function ClinicDashboard() {
     );
   }
 
+  const handleRefresh = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] }),
+      queryClient.invalidateQueries({ queryKey: ['patients'] }),
+      queryClient.invalidateQueries({ queryKey: ['appointments'] }),
+      queryClient.invalidateQueries({ queryKey: ['prescriptions'] })
+    ]);
+  };
+
   // Main Dashboard
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white border-b-2 border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -437,5 +448,6 @@ export default function ClinicDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+    </PullToRefresh>
   );
 }

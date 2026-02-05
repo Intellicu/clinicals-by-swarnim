@@ -2,6 +2,8 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { User, Phone, Hash, Calendar } from "lucide-react";
+import { useQueryClient } from '@tanstack/react-query';
+import PullToRefresh from '../PullToRefresh';
 
 export default function PatientList({ patients, selectedPatient, onSelect }) {
   const queryClient = useQueryClient();
@@ -19,6 +21,7 @@ export default function PatientList({ patients, selectedPatient, onSelect }) {
   }
 
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="space-y-2 max-h-[600px] overflow-y-auto">
       {patients.map((patient) => (
         <Card

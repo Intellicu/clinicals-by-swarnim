@@ -24,8 +24,10 @@ import {
   Mic,
   Users,
   Layers,
-  Building2
+  Building2,
+  Trash2
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { base44 } from "@/api/base44Client";
