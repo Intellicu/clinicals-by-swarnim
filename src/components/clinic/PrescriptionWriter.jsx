@@ -83,9 +83,34 @@ export default function PrescriptionWriter({ patient, onClose }) {
       });
       return visit;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-visits'] });
+    onMutate: async (newVisit) => {
+      await queryClient.cancelQueries({ queryKey: ['patient-visits'] });
+      
+      const previousVisits = queryClient.getQueryData(['patient-visits']);
+      
+      queryClient.setQueryData(['patient-visits'], (old = []) => [
+        {
+          id: 'temp-' + Date.now(),
+          patient_id: patient.id,
+          visit_date: new Date().toISOString(),
+          visit_type: 'Follow-up',
+          prescriptions: medications,
+          treatment_plan: advice,
+          follow_up_date: new Date(Date.now() + followUpDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        },
+        ...old
+      ]);
+      
       toast.success('Prescription saved!');
+      
+      return { previousVisits };
+    },
+    onError: (err, newVisit, context) => {
+      queryClient.setQueryData(['patient-visits'], context.previousVisits);
+      toast.error('Failed to save prescription');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['patient-visits'] });
     }
   });
 

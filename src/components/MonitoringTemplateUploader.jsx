@@ -26,11 +26,28 @@ export default function MonitoringTemplateUploader() {
 
   const createTemplateMutation = useMutation({
     mutationFn: (data) => base44.entities.MonitoringTemplate.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['monitoring-templates'] });
+    onMutate: async (newTemplate) => {
+      await queryClient.cancelQueries({ queryKey: ['monitoring-templates'] });
+      
+      const previousTemplates = queryClient.getQueryData(['monitoring-templates']);
+      
+      queryClient.setQueryData(['monitoring-templates'], (old = []) => [
+        { ...newTemplate, id: 'temp-' + Date.now() },
+        ...old
+      ]);
+      
       setShowDialog(false);
       setTemplate({ name: "", category: "", description: "", frequency: "", fields: [] });
       toast.success("Template created!");
+      
+      return { previousTemplates };
+    },
+    onError: (err, newTemplate, context) => {
+      queryClient.setQueryData(['monitoring-templates'], context.previousTemplates);
+      toast.error('Failed to create template');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['monitoring-templates'] });
     }
   });
 

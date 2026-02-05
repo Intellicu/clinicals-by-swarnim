@@ -37,6 +37,8 @@ import IOSCompatibility from "./components/iOSCompatibility";
 import DataChatbot from "./components/DataChatbot";
 import OfflineSync from "./components/OfflineSync";
 import OfflineManager from "./components/OfflineManager";
+import PullToRefresh from "./components/PullToRefresh";
+import { useQueryClient } from "@tanstack/react-query";
 
 const mainNavigation = [
   {
@@ -140,8 +142,18 @@ const resourcesNavigation = [
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [user, setUser] = React.useState(null);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  
+  // Tab navigation stacks
+  const [tabStacks, setTabStacks] = React.useState({
+    Hub: [createPageUrl("Hub")],
+    AI: [createPageUrl("AIAssistant")],
+    Clinic: [createPageUrl("ClinicWorkflow")],
+    Research: [createPageUrl("ResearchHub")]
+  });
+  const [currentTab, setCurrentTab] = React.useState("Hub");
 
   React.useEffect(() => {
     let retryCount = 0;
@@ -166,8 +178,47 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.logout();
   };
 
+  // Determine current tab based on location
+  React.useEffect(() => {
+    const hubUrls = [createPageUrl("Hub"), createPageUrl("ClinicalToolsHub"), createPageUrl("ClinicalSupport"), createPageUrl("Guidelines"), createPageUrl("DrugCalculator")];
+    const aiUrls = [createPageUrl("AIAssistant"), createPageUrl("VoiceAgent"), createPageUrl("VideoTeachingAgent")];
+    const clinicUrls = [createPageUrl("ClinicWorkflow"), createPageUrl("ClinicDashboard"), createPageUrl("ClinicManagement"), createPageUrl("ClinicWorkspace")];
+    const researchUrls = [createPageUrl("ResearchHub")];
+    
+    if (hubUrls.some(url => location.pathname.startsWith(url))) {
+      setCurrentTab("Hub");
+    } else if (aiUrls.some(url => location.pathname.startsWith(url))) {
+      setCurrentTab("AI");
+    } else if (clinicUrls.some(url => location.pathname.startsWith(url))) {
+      setCurrentTab("Clinic");
+    } else if (researchUrls.some(url => location.pathname.startsWith(url))) {
+      setCurrentTab("Research");
+    }
+  }, [location.pathname]);
+
+  // Update tab stack on navigation
+  React.useEffect(() => {
+    setTabStacks(prev => {
+      const newStacks = { ...prev };
+      const stack = newStacks[currentTab];
+      
+      if (stack && !stack.includes(location.pathname)) {
+        newStacks[currentTab] = [...stack, location.pathname];
+      }
+      
+      return newStacks;
+    });
+  }, [location.pathname, currentTab]);
+
   const handleBack = () => {
-    navigate(-1);
+    const stack = tabStacks[currentTab];
+    if (stack && stack.length > 1) {
+      const newStack = stack.slice(0, -1);
+      setTabStacks(prev => ({ ...prev, [currentTab]: newStack }));
+      navigate(newStack[newStack.length - 1]);
+    } else {
+      navigate(-1);
+    }
   };
 
   const showBackButton = currentPageName !== "Hub" && location.pathname !== createPageUrl("Hub");
@@ -459,17 +510,24 @@ export default function Layout({ children, currentPageName }) {
           </header>
 
           <div className="flex-1 overflow-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
+            <PullToRefresh 
+              onRefresh={async () => {
+                await queryClient.invalidateQueries();
+                toast.success("Refreshed");
+              }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {children}
+                </motion.div>
+              </AnimatePresence>
+            </PullToRefresh>
           </div>
 
           <footer className="bg-white border-t-2 border-slate-200 px-6 py-4 text-center text-xs text-slate-500">
@@ -483,22 +541,50 @@ export default function Layout({ children, currentPageName }) {
         {/* Mobile Bottom Tab Bar */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t-2 shadow-2xl pb-safe" style={{ backgroundColor: 'var(--sidebar-bg)', borderColor: 'var(--border-color)' }}>
           <div className="grid grid-cols-4 h-16">
-            <Link to={createPageUrl("Hub")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("Hub") ? '#3B82F6' : 'var(--text-secondary)' }}>
+            <button 
+              onClick={() => {
+                const stack = tabStacks.Hub;
+                navigate(stack[stack.length - 1]);
+              }}
+              className="flex flex-col items-center justify-center gap-1 transition-colors" 
+              style={{ color: currentTab === "Hub" ? '#3B82F6' : 'var(--text-secondary)' }}
+            >
               <Home className="w-5 h-5" />
               <span className="text-xs font-semibold">Hub</span>
-            </Link>
-            <Link to={createPageUrl("AIAssistant")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("AIAssistant") ? '#3B82F6' : 'var(--text-secondary)' }}>
+            </button>
+            <button 
+              onClick={() => {
+                const stack = tabStacks.AI;
+                navigate(stack[stack.length - 1]);
+              }}
+              className="flex flex-col items-center justify-center gap-1 transition-colors" 
+              style={{ color: currentTab === "AI" ? '#3B82F6' : 'var(--text-secondary)' }}
+            >
               <Sparkles className="w-5 h-5" />
               <span className="text-xs font-semibold">AI</span>
-            </Link>
-            <Link to={createPageUrl("ClinicWorkflow")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("ClinicWorkflow") ? '#3B82F6' : 'var(--text-secondary)' }}>
+            </button>
+            <button 
+              onClick={() => {
+                const stack = tabStacks.Clinic;
+                navigate(stack[stack.length - 1]);
+              }}
+              className="flex flex-col items-center justify-center gap-1 transition-colors" 
+              style={{ color: currentTab === "Clinic" ? '#3B82F6' : 'var(--text-secondary)' }}
+            >
               <Users className="w-5 h-5" />
               <span className="text-xs font-semibold">Clinic</span>
-            </Link>
-            <Link to={createPageUrl("ResearchHub")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("ResearchHub") ? '#3B82F6' : 'var(--text-secondary)' }}>
+            </button>
+            <button 
+              onClick={() => {
+                const stack = tabStacks.Research;
+                navigate(stack[stack.length - 1]);
+              }}
+              className="flex flex-col items-center justify-center gap-1 transition-colors" 
+              style={{ color: currentTab === "Research" ? '#3B82F6' : 'var(--text-secondary)' }}
+            >
               <Layers className="w-5 h-5" />
               <span className="text-xs font-semibold">Research</span>
-            </Link>
+            </button>
           </div>
         </nav>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,13 +44,36 @@ export default function PatientForm({ initialData, onSuccess }) {
     ...recentPatients.map(p => p.diagnosis).filter(Boolean)
   ])];
 
+  const queryClient = useQueryClient();
+
   const createPatientMutation = useMutation({
     mutationFn: (data) => base44.entities.Patient.create(data),
-    onSuccess: () => {
+    onMutate: async (newPatient) => {
+      // Cancel outgoing queries
+      await queryClient.cancelQueries({ queryKey: ['patients'] });
+      
+      // Snapshot previous value
+      const previousPatients = queryClient.getQueryData(['patients']);
+      
+      // Optimistically update
+      queryClient.setQueryData(['patients'], (old = []) => [
+        { ...newPatient, id: 'temp-' + Date.now(), status: 'Active' },
+        ...old
+      ]);
+      
       toast.success("Patient created!");
       onSuccess?.();
+      
+      return { previousPatients };
     },
-    onError: () => toast.error("Failed to create patient")
+    onError: (err, newPatient, context) => {
+      // Rollback on error
+      queryClient.setQueryData(['patients'], context.previousPatients);
+      toast.error("Failed to create patient");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+    }
   });
 
   const validateForm = () => {
