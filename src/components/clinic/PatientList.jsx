@@ -5,7 +5,7 @@ import { User, Phone, Hash, Calendar } from "lucide-react";
 import { useQueryClient } from '@tanstack/react-query';
 import PullToRefresh from '../PullToRefresh';
 
-export default function PatientList({ patients, selectedPatient, onSelect }) {
+export default function PatientList({ patients = [], selectedPatient, onSelect }) {
   const queryClient = useQueryClient();
   
   const handleRefresh = async () => {
@@ -15,7 +15,7 @@ export default function PatientList({ patients, selectedPatient, onSelect }) {
   return (
     <PullToRefresh onRefresh={handleRefresh}>
       <div className="space-y-2 max-h-[600px] overflow-y-auto">
-        {patients.length === 0 ? (
+        {!patients || patients.length === 0 ? (
           <div className="text-center py-8 text-slate-500">
             <User className="w-12 h-12 mx-auto mb-2 text-slate-300" />
             <p className="text-sm">No patients found</p>
