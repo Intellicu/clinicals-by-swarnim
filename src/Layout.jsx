@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { createPageUrl } from "@/utils";
 import { 
   Activity, 
@@ -200,6 +201,31 @@ export default function Layout({ children, currentPageName }) {
           --safety-green: #10B981;
           --clinical-gray: #64748B;
           --clinical-gray-light: #F1F5F9;
+
+          /* Light Mode Colors */
+          --bg-primary: #FFFFFF;
+          --bg-secondary: #F8FAFC;
+          --bg-gradient-start: #F8FAFC;
+          --bg-gradient-end: #EFF6FF;
+          --text-primary: #0F172A;
+          --text-secondary: #64748B;
+          --border-color: #E2E8F0;
+          --card-bg: #FFFFFF;
+          --sidebar-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-gradient-start: #1E293B;
+            --bg-gradient-end: #334155;
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --border-color: #334155;
+            --card-bg: #1E293B;
+            --sidebar-bg: rgba(30, 41, 59, 0.95);
+          }
         }
 
         /* iOS Compatibility Enhancements */
@@ -207,12 +233,20 @@ export default function Layout({ children, currentPageName }) {
           -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         }
 
+        button, a, [role="button"], .nav-item {
+          user-select: none;
+          -webkit-user-select: none;
+        }
+
         html, body {
           width: 100%;
           height: 100%;
           overflow: auto;
+          overscroll-behavior: none;
           -webkit-text-size-adjust: 100%;
           -webkit-font-smoothing: antialiased;
+          background-color: var(--bg-primary);
+          color: var(--text-primary);
         }
 
         /* Smooth scrolling for iOS */
@@ -238,9 +272,9 @@ export default function Layout({ children, currentPageName }) {
           }
         }
       `}</style>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen flex w-full" style={{ background: `linear-gradient(to bottom right, var(--bg-gradient-start), var(--bg-gradient-end))` }}>
         {/* Desktop Sidebar */}
-        <aside className={`hidden lg:flex flex-col fixed left-6 top-6 bottom-6 w-72 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-slate-200 z-50 overflow-hidden`}>
+        <aside className={`hidden lg:flex flex-col fixed left-6 top-6 bottom-6 w-72 rounded-3xl shadow-2xl border-2 z-50 overflow-hidden`} style={{ backgroundColor: 'var(--sidebar-bg)', borderColor: 'var(--border-color)' }}>
           <div className="border-b-2 border-slate-200 p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-xl">
@@ -280,24 +314,36 @@ export default function Layout({ children, currentPageName }) {
             </div>
           </div>
 
-          <div className="border-t-2 border-slate-200 p-4 bg-slate-50">
+          <div className="border-t-2 p-4" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
                 {user?.full_name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-slate-900 text-sm truncate">
+                <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
                   {user?.full_name || 'Loading...'}
                 </p>
-                <p className="text-xs text-slate-500 truncate">{user?.role || ''}</p>
+                <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{user?.role || ''}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-200 font-medium"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all duration-200 font-medium mb-2"
+              style={{ color: 'var(--text-secondary)' }}
             >
               <LogOut className="w-4 h-4" />
               <span>Sign Out</span>
+            </button>
+            <button
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                  toast.error('Account deletion initiated. Contact support to complete.');
+                }
+              }}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Account</span>
             </button>
           </div>
         </aside>
@@ -373,7 +419,7 @@ export default function Layout({ children, currentPageName }) {
           </>
         )}
 
-        <main className="flex-1 flex flex-col lg:ml-80">
+        <main className="flex-1 flex flex-col lg:ml-80 pb-16 lg:pb-0">
           <header className="bg-white/90 backdrop-blur-md border-b-2 border-slate-200 px-6 py-4 sticky top-0 z-30 shadow-sm">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4">
@@ -411,7 +457,17 @@ export default function Layout({ children, currentPageName }) {
           </header>
 
           <div className="flex-1 overflow-auto">
-            {children}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           <footer className="bg-white border-t-2 border-slate-200 px-6 py-4 text-center text-xs text-slate-500">
@@ -421,6 +477,28 @@ export default function Layout({ children, currentPageName }) {
 
         <FloatingAIAssistant />
         <DataChatbot />
+
+        {/* Mobile Bottom Tab Bar */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t-2 shadow-2xl pb-safe" style={{ backgroundColor: 'var(--sidebar-bg)', borderColor: 'var(--border-color)' }}>
+          <div className="grid grid-cols-4 h-16">
+            <Link to={createPageUrl("Hub")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("Hub") ? '#3B82F6' : 'var(--text-secondary)' }}>
+              <Home className="w-5 h-5" />
+              <span className="text-xs font-semibold">Hub</span>
+            </Link>
+            <Link to={createPageUrl("AIAssistant")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("AIAssistant") ? '#3B82F6' : 'var(--text-secondary)' }}>
+              <Sparkles className="w-5 h-5" />
+              <span className="text-xs font-semibold">AI</span>
+            </Link>
+            <Link to={createPageUrl("ClinicWorkflow")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("ClinicWorkflow") ? '#3B82F6' : 'var(--text-secondary)' }}>
+              <Users className="w-5 h-5" />
+              <span className="text-xs font-semibold">Clinic</span>
+            </Link>
+            <Link to={createPageUrl("ResearchHub")} className="flex flex-col items-center justify-center gap-1 transition-colors" style={{ color: location.pathname === createPageUrl("ResearchHub") ? '#3B82F6' : 'var(--text-secondary)' }}>
+              <Layers className="w-5 h-5" />
+              <span className="text-xs font-semibold">Research</span>
+            </Link>
+          </div>
+        </nav>
         </div>
         </PatientProvider>
         );

@@ -4,6 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { User, Phone, Hash, Calendar } from "lucide-react";
 
 export default function PatientList({ patients, selectedPatient, onSelect }) {
+  const queryClient = useQueryClient();
+  
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['patients'] });
+  };
   if (patients.length === 0) {
     return (
       <div className="text-center py-8 text-slate-500">
@@ -67,5 +72,6 @@ export default function PatientList({ patients, selectedPatient, onSelect }) {
         </Card>
       ))}
     </div>
+    </PullToRefresh>
   );
 }
