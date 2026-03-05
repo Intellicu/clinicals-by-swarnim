@@ -162,6 +162,11 @@ const resourcesNavigation = [
     title: "Lab Results",
     url: createPageUrl("LabResults"),
     icon: TestTube,
+  },
+  {
+    title: "Telemedicine",
+    url: createPageUrl("Telemedicine"),
+    icon: Activity,
   }
 ];
 
