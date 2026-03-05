@@ -45,7 +45,8 @@ import {
   Beaker,
   Edit,
   ClipboardList,
-  TestTube
+  TestTube,
+  Baby
 } from "lucide-react";
 import { toast } from "sonner";
 import HSPNPathway from "../components/pathways/HSPNPathway";
