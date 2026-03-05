@@ -435,6 +435,213 @@ const clinicalScenarios = [
     description: "pH <7.2 or HCO3 <10 - urgent intervention",
     icon: Wind,
     hasFullPathway: true
+  },
+  {
+    id: "contrast-nephropathy",
+    title: "Contrast-Induced AKI Prevention",
+    category: "Acute Kidney Disease",
+    priority: "warning",
+    description: "Risk stratification and hydration protocol before contrast studies",
+    icon: Stethoscope,
+    hasFullPathway: true
+  },
+  {
+    id: "fluid-electrolyte",
+    title: "Fluid & Electrolyte Therapy",
+    category: "Fluids & Electrolytes",
+    priority: "secondary",
+    description: "Holliday-Segar maintenance, deficit replacement, electrolyte principles",
+    icon: Droplet,
+    hasFullPathway: true
+  },
+  {
+    id: "acid-base",
+    title: "Acid-Base Disorder Evaluation",
+    category: "Fluids & Electrolytes",
+    priority: "warning",
+    description: "5-step ABG interpretation, anion gap, MUDPILES, RTA",
+    icon: Wind,
+    hasFullPathway: true
+  },
+  {
+    id: "htn-diagnosis",
+    title: "Approach to Hypertension Diagnosis",
+    category: "Hypertension",
+    priority: "secondary",
+    description: "AAP 2017 classification, evaluation, ABPM, end-organ assessment",
+    icon: Heart,
+    hasFullPathway: true
+  },
+  {
+    id: "htn-treatment",
+    title: "Treatment of Hypertension",
+    category: "Hypertension",
+    priority: "secondary",
+    description: "Lifestyle, antihypertensives, drug table with pediatric doses",
+    icon: Heart,
+    hasFullPathway: true
+  },
+  {
+    id: "vur",
+    title: "Vesicoureteral Reflux (VUR)",
+    category: "Urinary Tract",
+    priority: "secondary",
+    description: "Grading, antibiotic prophylaxis, STING, surgical reimplantation",
+    icon: Activity,
+    hasFullPathway: true
+  },
+  {
+    id: "hydronephrosis",
+    title: "Antenatally Diagnosed Hydronephrosis",
+    category: "Developmental Kidney",
+    priority: "secondary",
+    description: "SFU grading, postnatal management, pyeloplasty indications",
+    icon: Baby,
+    hasFullPathway: true
+  },
+  {
+    id: "childhood-nephrotic",
+    title: "Childhood Nephrotic Syndrome (ISKDC/IPNA)",
+    category: "Nephrotic Syndrome",
+    priority: "secondary",
+    description: "Prednisolone protocol, SSNS/FRNS/SDNS, steroid-sparing agents",
+    icon: Droplet,
+    hasFullPathway: true
+  },
+  {
+    id: "congenital-nephrotic",
+    title: "Congenital Nephrotic Syndrome",
+    category: "Nephrotic Syndrome",
+    priority: "warning",
+    description: "Finnish type, NPHS1/2 mutations, conservative vs transplant",
+    icon: Baby,
+    hasFullPathway: true
+  },
+  {
+    id: "iga-vasculitis",
+    title: "IgA Vasculitis Nephritis (HSPN)",
+    category: "Glomerular Disease",
+    priority: "warning",
+    description: "ISKDC classification, treatment by severity, follow-up",
+    icon: Microscope,
+    hasFullPathway: true
+  },
+  {
+    id: "anca-vasculitis",
+    title: "ANCA-Associated Vasculitis GN",
+    category: "Glomerular Disease",
+    priority: "danger",
+    description: "GPA/MPA, pauci-immune crescentic GN, cyclophosphamide/rituximab",
+    icon: Microscope,
+    hasFullPathway: true
+  },
+  {
+    id: "membranous-nephropathy",
+    title: "Membranous Nephropathy",
+    category: "Glomerular Disease",
+    priority: "secondary",
+    description: "Anti-PLA2R, conservative phase, rituximab vs Ponticelli",
+    icon: Microscope,
+    hasFullPathway: true
+  },
+  {
+    id: "peritoneal-dialysis",
+    title: "Peritoneal Dialysis Management",
+    category: "Peritoneal Dialysis",
+    priority: "secondary",
+    description: "PD prescription, adequacy, peritonitis, exit site infections",
+    icon: Activity,
+    hasFullPathway: true
+  },
+  {
+    id: "hemodialysis",
+    title: "Hemodialysis — Orders & Complications",
+    category: "Hemodialysis",
+    priority: "secondary",
+    description: "HD prescription, Kt/V, vascular access, acute complications",
+    icon: Activity,
+    hasFullPathway: true
+  },
+  {
+    id: "ckd-staging",
+    title: "CKD Staging & Management",
+    category: "CKD",
+    priority: "secondary",
+    description: "Schwartz eGFR, KDIGO stages, renoprotective strategy",
+    icon: TrendingUp,
+    hasFullPathway: true
+  },
+  {
+    id: "ckd-anemia-mbd",
+    title: "CKD Anemia & Mineral Bone Disease",
+    category: "CKD",
+    priority: "secondary",
+    description: "ESA, IV iron, CKD-MBD targets, phosphate binders, calciphylaxis",
+    icon: Activity,
+    hasFullPathway: true
+  },
+  {
+    id: "kidney-transplant",
+    title: "Pediatric Kidney Transplantation",
+    category: "Transplant",
+    priority: "secondary",
+    description: "Pre-transplant workup, immunosuppression, rejection, BK virus, FSGS recurrence",
+    icon: CheckCircle2,
+    hasFullPathway: true
+  },
+  {
+    id: "hematuria-approach",
+    title: "Approach to Hematuria in Children",
+    category: "Glomerular Disease",
+    priority: "secondary",
+    description: "Glomerular vs non-glomerular, workup algorithm, Alport/TBMN",
+    icon: Droplet,
+    hasFullPathway: true
+  },
+  {
+    id: "proteinuria-approach",
+    title: "Approach to Proteinuria in Children",
+    category: "Glomerular Disease",
+    priority: "secondary",
+    description: "PCR calculator, transient vs persistent, orthostatic, workup",
+    icon: Beaker,
+    hasFullPathway: true
+  },
+  {
+    id: "cystic-kidney",
+    title: "Cystic Kidney Diseases in Children",
+    category: "Developmental Kidney",
+    priority: "secondary",
+    description: "ADPKD, ARPKD, NPHP, Bardet-Biedl — comparison and management",
+    icon: Info,
+    hasFullPathway: true
+  },
+  {
+    id: "steroid-resistant-ns",
+    title: "Steroid-Resistant Nephrotic Syndrome",
+    category: "Nephrotic Syndrome",
+    priority: "warning",
+    description: "SRNS workup, genetic testing, biopsy, calcineurin inhibitors",
+    icon: Microscope,
+    hasFullPathway: true
+  },
+  {
+    id: "ckd-comprehensive",
+    title: "CKD Comprehensive Management",
+    category: "CKD",
+    priority: "warning",
+    description: "All stages, complications, RRT preparation, nutrition",
+    icon: TrendingUp,
+    hasFullPathway: true
+  },
+  {
+    id: "hypocalcemia",
+    title: "Hypocalcemia Management",
+    category: "Electrolytes",
+    priority: "warning",
+    description: "Calcium correction, vitamin D, causes and IV calcium protocol",
+    icon: Zap,
+    hasFullPathway: true
   }
 ];
 
