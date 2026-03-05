@@ -147,6 +147,21 @@ const resourcesNavigation = [
     title: "Patient Education",
     url: createPageUrl("PatientEducationHub"),
     icon: GraduationCap,
+  },
+  {
+    title: "Billing",
+    url: createPageUrl("BillingDashboard"),
+    icon: FileText,
+  },
+  {
+    title: "Referral Portal",
+    url: createPageUrl("ReferralPortal"),
+    icon: Activity,
+  },
+  {
+    title: "Lab Results",
+    url: createPageUrl("LabResults"),
+    icon: TestTube,
   }
 ];
 

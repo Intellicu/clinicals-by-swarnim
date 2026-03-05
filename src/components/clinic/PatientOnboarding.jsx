@@ -157,11 +157,11 @@ export default function PatientOnboarding({ workspaceId, onComplete }) {
                   { key: 'ocr', icon: Camera, label: 'Scan Photo (OCR)', desc: 'Take a photo of prescription/ID card', color: 'text-blue-600' },
                   { key: 'doc', icon: FileText, label: 'Upload Document / PDF', desc: 'Upload an existing PDF, image or document', color: 'text-purple-600' },
                   { key: 'manual', icon: Pencil, label: 'Enter Manually', desc: 'Type in patient details directly', color: 'text-green-600' },
-                ].map(({ key, icon: Icon, label, desc, color }) => (
+                ].map(({ key, icon: IconComp, label, desc, color }) => (
                   <button key={key} onClick={() => { setUploadMode(key); if (key === 'manual') setStep(2); }}
                     className="flex items-center gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-left transition-all">
                     <div className={`w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center ${color}`}>
-                      <Icon className="w-5 h-5" />
+                      <IconComp className="w-5 h-5" />
                     </div>
                     <div>
                       <p className="font-semibold text-sm">{label}</p>
