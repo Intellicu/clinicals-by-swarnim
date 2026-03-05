@@ -55,6 +55,7 @@ import AnionGap from './pages/AnionGap';
 import Anthropometry from './pages/Anthropometry';
 import AuditLogs from './pages/AuditLogs';
 import BPPercentiles from './pages/BPPercentiles';
+import BillingDashboard from './pages/BillingDashboard';
 import CKDStager from './pages/CKDStager';
 import CKiDGFR from './pages/CKiDGFR';
 import ClinicDashboard from './pages/ClinicDashboard';
@@ -85,6 +86,7 @@ import Guidelines from './pages/Guidelines';
 import Hub from './pages/Hub';
 import HypertensiveEmergency from './pages/HypertensiveEmergency';
 import KtVCalculator from './pages/KtVCalculator';
+import LabResults from './pages/LabResults';
 import ModuleView from './pages/ModuleView';
 import MonitoringHub from './pages/MonitoringHub';
 import MonitoringPlanBuilder from './pages/MonitoringPlanBuilder';
@@ -102,6 +104,7 @@ import RRTAssistant from './pages/RRTAssistant';
 import RRTTemplates from './pages/RRTTemplates';
 import RTAClassifier from './pages/RTAClassifier';
 import ReferenceRanges from './pages/ReferenceRanges';
+import ReferralPortal from './pages/ReferralPortal';
 import ResearchHub from './pages/ResearchHub';
 import SchwartzGFR from './pages/SchwartzGFR';
 import SodiumCalculator from './pages/SodiumCalculator';
@@ -110,13 +113,10 @@ import StoneRisk from './pages/StoneRisk';
 import TRPCalculator from './pages/TRPCalculator';
 import TTKGCalculator from './pages/TTKGCalculator';
 import TeachingHub from './pages/TeachingHub';
+import Telemedicine from './pages/Telemedicine';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import BillingDashboard from './pages/BillingDashboard';
-import ReferralPortal from './pages/ReferralPortal';
-import LabResults from './pages/LabResults';
-import Telemedicine from './pages/Telemedicine';
 import __Layout from './Layout.jsx';
 
 
@@ -129,6 +129,7 @@ export const PAGES = {
     "Anthropometry": Anthropometry,
     "AuditLogs": AuditLogs,
     "BPPercentiles": BPPercentiles,
+    "BillingDashboard": BillingDashboard,
     "CKDStager": CKDStager,
     "CKiDGFR": CKiDGFR,
     "ClinicDashboard": ClinicDashboard,
@@ -159,6 +160,7 @@ export const PAGES = {
     "Hub": Hub,
     "HypertensiveEmergency": HypertensiveEmergency,
     "KtVCalculator": KtVCalculator,
+    "LabResults": LabResults,
     "ModuleView": ModuleView,
     "MonitoringHub": MonitoringHub,
     "MonitoringPlanBuilder": MonitoringPlanBuilder,
@@ -176,6 +178,7 @@ export const PAGES = {
     "RRTTemplates": RRTTemplates,
     "RTAClassifier": RTAClassifier,
     "ReferenceRanges": ReferenceRanges,
+    "ReferralPortal": ReferralPortal,
     "ResearchHub": ResearchHub,
     "SchwartzGFR": SchwartzGFR,
     "SodiumCalculator": SodiumCalculator,
@@ -184,13 +187,10 @@ export const PAGES = {
     "TRPCalculator": TRPCalculator,
     "TTKGCalculator": TTKGCalculator,
     "TeachingHub": TeachingHub,
+    "Telemedicine": Telemedicine,
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "BillingDashboard": BillingDashboard,
-    "ReferralPortal": ReferralPortal,
-    "LabResults": LabResults,
-    "Telemedicine": Telemedicine,
 }
 
 export const pagesConfig = {
