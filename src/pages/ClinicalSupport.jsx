@@ -1600,6 +1600,29 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         {selectedScenario === "severe-edema-ns" && <SevereEdemaPathway />}
         {selectedScenario === "sbp" && <SBPPathway />}
         {selectedScenario === "metabolic-acidosis" && <MetabolicAcidosisPathway />}
+        {selectedScenario === "contrast-nephropathy" && <ContrastNephropathyPathway />}
+        {selectedScenario === "fluid-electrolyte" && <FluidElectrolytePathway />}
+        {selectedScenario === "acid-base" && <AcidBasePathway />}
+        {selectedScenario === "htn-diagnosis" && <HypertensionDiagnosisPathway />}
+        {selectedScenario === "htn-treatment" && <HypertensionTreatmentPathway />}
+        {selectedScenario === "vur" && <VURPathway />}
+        {selectedScenario === "hydronephrosis" && <HydronephrosisPathway />}
+        {selectedScenario === "childhood-nephrotic" && <NephroticSyndromeChildhoodPathway />}
+        {selectedScenario === "congenital-nephrotic" && <CongenitalNephroticPathway />}
+        {selectedScenario === "iga-vasculitis" && <IgAVasculitisPathway />}
+        {selectedScenario === "anca-vasculitis" && <ANCAbVasculitisPathway />}
+        {selectedScenario === "membranous-nephropathy" && <MembranousNephropathyPathway />}
+        {selectedScenario === "peritoneal-dialysis" && <PeritonealDialysisPathway />}
+        {selectedScenario === "hemodialysis" && <HemodialysisPathway />}
+        {selectedScenario === "ckd-staging" && <CKDStagingPathway />}
+        {selectedScenario === "ckd-anemia-mbd" && <CKDAnemiaMBDPathway />}
+        {selectedScenario === "kidney-transplant" && <KidneyTransplantPathway />}
+        {selectedScenario === "hematuria-approach" && <HematuriaPathway />}
+        {selectedScenario === "proteinuria-approach" && <ProteinuriaPathway />}
+        {selectedScenario === "cystic-kidney" && <CysticKidneyPathway />}
+        {selectedScenario === "steroid-resistant-ns" && <SteroidResistantNSPathway />}
+        {selectedScenario === "ckd-comprehensive" && <ChronicKidneyDiseasePathway />}
+        {selectedScenario === "hypocalcemia" && <HypocalcemiaPathway />}
         {scenario.hasFullPathway && ![
           "nephrotic-syndrome", 
           "iga-nephropathy", 
