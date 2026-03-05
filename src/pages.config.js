@@ -111,6 +111,8 @@ import TeachingHub from './pages/TeachingHub';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
+import NotificationCenter from './pages/NotificationCenter';
+import PatientEducationHub from './pages/PatientEducationHub';
 import __Layout from './Layout.jsx';
 
 
@@ -179,6 +181,8 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
+    "NotificationCenter": NotificationCenter,
+    "PatientEducationHub": PatientEducationHub,
 }
 
 export const pagesConfig = {
