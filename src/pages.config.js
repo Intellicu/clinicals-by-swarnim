@@ -88,9 +88,11 @@ import KtVCalculator from './pages/KtVCalculator';
 import ModuleView from './pages/ModuleView';
 import MonitoringHub from './pages/MonitoringHub';
 import MonitoringPlanBuilder from './pages/MonitoringPlanBuilder';
+import NotificationCenter from './pages/NotificationCenter';
 import OsmolarGap from './pages/OsmolarGap';
 import ParentalGuidance from './pages/ParentalGuidance';
 import PatientEducation from './pages/PatientEducation';
+import PatientEducationHub from './pages/PatientEducationHub';
 import PatientHistory from './pages/PatientHistory';
 import PatientMonitoringDashboard from './pages/PatientMonitoringDashboard';
 import PotassiumCalculator from './pages/PotassiumCalculator';
@@ -111,8 +113,9 @@ import TeachingHub from './pages/TeachingHub';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import NotificationCenter from './pages/NotificationCenter';
-import PatientEducationHub from './pages/PatientEducationHub';
+import BillingDashboard from './pages/BillingDashboard';
+import ReferralPortal from './pages/ReferralPortal';
+import LabResults from './pages/LabResults';
 import __Layout from './Layout.jsx';
 
 
@@ -158,9 +161,11 @@ export const PAGES = {
     "ModuleView": ModuleView,
     "MonitoringHub": MonitoringHub,
     "MonitoringPlanBuilder": MonitoringPlanBuilder,
+    "NotificationCenter": NotificationCenter,
     "OsmolarGap": OsmolarGap,
     "ParentalGuidance": ParentalGuidance,
     "PatientEducation": PatientEducation,
+    "PatientEducationHub": PatientEducationHub,
     "PatientHistory": PatientHistory,
     "PatientMonitoringDashboard": PatientMonitoringDashboard,
     "PotassiumCalculator": PotassiumCalculator,
@@ -181,8 +186,9 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "NotificationCenter": NotificationCenter,
-    "PatientEducationHub": PatientEducationHub,
+    "BillingDashboard": BillingDashboard,
+    "ReferralPortal": ReferralPortal,
+    "LabResults": LabResults,
 }
 
 export const pagesConfig = {
