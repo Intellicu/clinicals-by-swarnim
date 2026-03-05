@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Camera, Upload, Loader2, CheckCircle2, User, FileText, Pencil, Calendar, ChevronRight, X } from 'lucide-react';
+import { Camera, Upload, Loader2, CheckCircle2, User, FileText, Pencil, Calendar, ChevronRight, X, Image } from 'lucide-react';
+
+const TYPE_ICONS = { ocr: Camera, doc: FileText, manual: Pencil };
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
 
