@@ -11,17 +11,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import {
   Users, Calendar, Settings, Inbox, BarChart3, Calculator, Layers,
-  Plus, Search, ChevronDown, Building2, UserPlus, ClipboardList
+  Plus, Search, ChevronDown, Building2, UserPlus, ClipboardList, Sparkles
 } from 'lucide-react';
 import WorkspaceSelector from '../components/clinic/WorkspaceSelector';
 import WorkspaceWizard from '../components/clinic/WorkspaceWizard';
 import PatientList from '../components/clinic/PatientList';
 import AppointmentCalendar from '../components/clinic/AppointmentCalendar';
+import SmartClinicalNotes from '../components/clinic/SmartClinicalNotes';
 
 export default function ClinicWorkspace() {
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
   const [showWorkspaceWizard, setShowWorkspaceWizard] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
+  const [aiPatient, setAiPatient] = useState(null);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -144,6 +146,14 @@ export default function ClinicWorkspace() {
               <BarChart3 className="w-4 h-4 mr-2" />
               Insights
             </Button>
+            <Button
+              variant={activeView === 'ai-notes' ? 'default' : 'ghost'}
+              className="w-full justify-start"
+              onClick={() => setActiveView('ai-notes')}
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI Notes
+            </Button>
           </nav>
 
           <div className="mt-6 pt-6 border-t">
@@ -224,6 +234,29 @@ export default function ClinicWorkspace() {
 
           {activeView === 'calendar' && (
             <AppointmentCalendar workspaceId={selectedWorkspace?.id} />
+          )}
+
+          {activeView === 'ai-notes' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-500" /> AI Clinical Notes
+              </h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="md:col-span-1">
+                  <PatientList
+                    onSelect={(p) => setAiPatient(p)}
+                    selectedPatient={aiPatient}
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Card>
+                    <CardContent className="p-5">
+                      <SmartClinicalNotes patient={aiPatient} />
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
           )}
         </main>
       </div>

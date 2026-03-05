@@ -25,7 +25,8 @@ import {
   Users,
   Layers,
   Building2,
-  Trash2
+  Trash2,
+  Bell
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -136,6 +137,16 @@ const resourcesNavigation = [
     title: "Research Hub",
     url: createPageUrl("ResearchHub"),
     icon: Layers,
+  },
+  {
+    title: "Notification Center",
+    url: createPageUrl("NotificationCenter"),
+    icon: Bell,
+  },
+  {
+    title: "Patient Education",
+    url: createPageUrl("PatientEducationHub"),
+    icon: GraduationCap,
   }
 ];
 
