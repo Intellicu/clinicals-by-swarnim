@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Database, FileBarChart, Download, Brain, FileText, ArrowLeft,
   Plus, Users, TrendingUp, Sparkles, BookOpen, BarChart3, Layers,
-  Rocket, Share2, Clock, CheckCircle2, AlertCircle
+  Rocket, Share2, Clock, CheckCircle2, AlertCircle, Save, HardDrive, Edit2
 } from "lucide-react";
 import { toast } from "sonner";
 import ProjectWizard from '../components/research/ProjectWizard';
@@ -62,6 +62,33 @@ export default function ResearchHub() {
       setActiveTab('forms');
       toast.success('Research project created!');
     }
+  });
+
+  const saveProjectToLocalDrive = async (project) => {
+    try {
+      const projectPatients = patients.filter(p => project.included_patients?.includes(p.id));
+      const exportObj = {
+        project,
+        patients: projectPatients,
+        exported_at: new Date().toISOString(),
+        version: "1.0",
+      };
+      const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${project.title.replace(/\s+/g, '_')}_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Project saved to your computer!');
+    } catch {
+      toast.error('Failed to save backup');
+    }
+  };
+
+  const updateProjectMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.ResearchProject.update(id, { ...data, updated_date: new Date().toISOString() }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['research-projects'] }); toast.success('Project updated!'); }
   });
 
   const exportData = async (projectId, format) => {
@@ -224,22 +251,26 @@ export default function ResearchHub() {
                           <span className="text-slate-600">Study Type:</span>
                           <Badge variant="outline">{project.study_type || 'observational'}</Badge>
                         </div>
-                        <div className="flex gap-2 pt-2 border-t">
-                          <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
-                            e.stopPropagation();
-                            exportData(project.id, "csv");
-                          }}>
-                            <Download className="w-4 h-4 mr-2" />
-                            Export
-                          </Button>
-                          <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedProject(project);
-                            setActiveTab('analysis');
-                          }}>
-                            <BarChart3 className="w-4 h-4 mr-2" />
-                            Analyze
-                          </Button>
+                        <div className="flex gap-2 pt-2 border-t flex-wrap">
+                           <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
+                             e.stopPropagation();
+                             exportData(project.id, "csv");
+                           }}>
+                             <Download className="w-4 h-4 mr-2" />CSV
+                           </Button>
+                           <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
+                             e.stopPropagation();
+                             saveProjectToLocalDrive(project);
+                           }}>
+                             <HardDrive className="w-4 h-4 mr-2" />Backup
+                           </Button>
+                           <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
+                             e.stopPropagation();
+                             setSelectedProject(project);
+                             setActiveTab('analysis');
+                           }}>
+                             <BarChart3 className="w-4 h-4 mr-2" />Analyze
+                           </Button>
                         </div>
                       </div>
                     </CardContent>

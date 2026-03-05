@@ -116,6 +116,7 @@ import VoiceAgent from './pages/VoiceAgent';
 import BillingDashboard from './pages/BillingDashboard';
 import ReferralPortal from './pages/ReferralPortal';
 import LabResults from './pages/LabResults';
+import Telemedicine from './pages/Telemedicine';
 import __Layout from './Layout.jsx';
 
 
@@ -189,6 +190,7 @@ export const PAGES = {
     "BillingDashboard": BillingDashboard,
     "ReferralPortal": ReferralPortal,
     "LabResults": LabResults,
+    "Telemedicine": Telemedicine,
 }
 
 export const pagesConfig = {
