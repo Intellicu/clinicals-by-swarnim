@@ -1647,7 +1647,30 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
           "hypokalemia",
           "severe-edema-ns",
           "sbp",
-          "metabolic-acidosis"
+          "metabolic-acidosis",
+          "contrast-nephropathy",
+          "fluid-electrolyte",
+          "acid-base",
+          "htn-diagnosis",
+          "htn-treatment",
+          "vur",
+          "hydronephrosis",
+          "childhood-nephrotic",
+          "congenital-nephrotic",
+          "iga-vasculitis",
+          "anca-vasculitis",
+          "membranous-nephropathy",
+          "peritoneal-dialysis",
+          "hemodialysis",
+          "ckd-staging",
+          "ckd-anemia-mbd",
+          "kidney-transplant",
+          "hematuria-approach",
+          "proteinuria-approach",
+          "cystic-kidney",
+          "steroid-resistant-ns",
+          "ckd-comprehensive",
+          "hypocalcemia"
         ].includes(selectedScenario) && (
           <Alert className="bg-blue-50 border-blue-200">
             <Info className="w-5 h-5 text-blue-600" />
