@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Baby, Syringe, Scale, TrendingUp, Activity } from "lucide-react";
-import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
-import VaccinationPathway from "../components/pathways/VaccinationPathway.jsx";
+import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway";
+import VaccinationPathway from "../components/pathways/VaccinationPathway";
 import PediatricNutritionPathway from "../components/pathways/PediatricNutritionPathway.jsx";
 
 export default function PediatricsHub() {
