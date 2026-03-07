@@ -6,8 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, AlertTriangle, CheckCircle2, Info, Calculator } from "lucide-react";
+import { TrendingUp, AlertTriangle, CheckCircle2, Info, Calculator, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ReferenceLine, ResponsiveContainer, ScatterChart, Scatter
+} from "recharts";
 
 // WHO/IAP Growth Standards
 // Z-score approximate lookup for weight-for-age (simplified)
