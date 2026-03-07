@@ -117,6 +117,7 @@ import Telemedicine from './pages/Telemedicine';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
+import DietGenerator from './pages/DietGenerator';
 import __Layout from './Layout.jsx';
 
 
@@ -191,6 +192,7 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
+    "DietGenerator": DietGenerator,
 }
 
 export const pagesConfig = {
