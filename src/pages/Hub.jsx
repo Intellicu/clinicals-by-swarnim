@@ -235,7 +235,8 @@ export default function Hub() {
       { name: "Content Manager", icon: FileText, page: "UserContentManager", description: "Upload guidelines, create templates & scenarios" },
       { name: "Drug Database", icon: Pill, page: "DrugCalculator", description: "50+ drugs with Indian formulations" },
       { name: "Monitoring Templates", icon: ClipboardList, page: "MonitoringHub", description: "8+ clinical monitoring charts" },
-      { name: "Diet Chart Generator", icon: UtensilsCrossed, page: "DietChartGenerator", description: "Nutritional guidelines" },
+      { name: "Diet Generator (CKD/NS/IAP)", icon: UtensilsCrossed, page: "DietGenerator", description: "IPNA/KDIGO/IAP diet plans for nephrotic, CKD & healthy children" },
+      { name: "Pediatrics Hub (IAP)", icon: Baby, page: "PediatricsHub", description: "Growth monitoring, IAP vaccination schedule, ICMR nutrition guidelines" },
       { name: "Reference Ranges", icon: FileText, page: "ReferenceRanges", description: "Lab normal values" },
       { name: "Audit Logs", icon: FileText, page: "AuditLogs", description: "Calculation history & tracking" }
     ]
