@@ -182,9 +182,16 @@ export default function GrowthMonitoringPathway() {
               </Select>
             </div>
           </div>
-          <Button onClick={calculate} className="bg-green-600 hover:bg-green-700">
-            <Calculator className="w-4 h-4 mr-2" />Calculate Z-Scores
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={calculate} className="bg-green-600 hover:bg-green-700">
+              <Calculator className="w-4 h-4 mr-2" />Calculate Z-Scores
+            </Button>
+            {result && (
+              <Button onClick={addToTrend} variant="outline" className="border-green-400 text-green-700 hover:bg-green-50">
+                <Plus className="w-4 h-4 mr-1" />Add to Trend
+              </Button>
+            )}
+          </div>
 
           {result && (
             <div className="mt-4 space-y-4">
