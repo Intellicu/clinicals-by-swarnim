@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Syringe, CheckCircle2, AlertTriangle, Clock, Info, BarChart2 } from "lucide-react";
+import { Syringe, CheckCircle2, AlertTriangle, Clock, Info } from "lucide-react";
 import { toast } from "sonner";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const STORAGE_KEY = "iap_vaccination_tracker";
 
@@ -101,6 +101,17 @@ export default function VaccinationPathway() {
 
   const filtered = filter === "all" ? IAP_SCHEDULE : IAP_SCHEDULE.filter(v => v.category === filter);
   const categoryColors = { mandatory: "bg-red-100 text-red-800", recommended: "bg-blue-100 text-blue-800", situational: "bg-amber-100 text-amber-800" };
+
+  // Coverage chart data by category
+  const coverageByCategory = ["mandatory", "recommended", "situational"].map(cat => {
+    const total = IAP_SCHEDULE.filter(v => v.category === cat).length;
+    const given = IAP_SCHEDULE.filter(v => v.category === cat && givenVaccines[v.id]).length;
+    return { name: cat.charAt(0).toUpperCase() + cat.slice(1), total, given, pct: total ? Math.round((given / total) * 100) : 0 };
+  });
+
+  const totalGiven = Object.values(givenVaccines).filter(Boolean).length;
+  const totalAll = IAP_SCHEDULE.length;
+  const overallPct = Math.round((totalGiven / totalAll) * 100);
 
   return (
     <div className="space-y-6">
