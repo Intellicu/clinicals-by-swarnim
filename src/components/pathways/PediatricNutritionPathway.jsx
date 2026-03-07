@@ -1,280 +1,212 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Leaf, Calculator, CheckCircle2, AlertTriangle, Info } from "lucide-react";
-import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Leaf, AlertTriangle, CheckCircle2, Info, Baby, Apple } from "lucide-react";
 
-// ICMR 2020 RDA / IAP Nutritional Requirements
-const ICMR_RDA = [
-  { group: "0–6 months (breastfed)", energy: 108, protein: "Breast milk adequate", calcium: 500, iron: 0, vitD: 400, vitA: 350, iodine: 90 },
-  { group: "6–12 months", energy: 80, protein: "1.6 g/kg", calcium: 500, iron: 9, vitD: 400, vitA: 350, iodine: 90 },
-  { group: "1–3 years", energy: 83, protein: "12.5 g/day", calcium: 600, iron: 9, vitD: 600, vitA: 400, iodine: 90 },
-  { group: "4–6 years", energy: 71, protein: "16 g/day", calcium: 600, iron: 13, vitD: 600, vitA: 400, iodine: 90 },
-  { group: "7–9 years", energy: 66, protein: "23 g/day", calcium: 600, iron: 16, vitD: 600, vitA: 600, iodine: 120 },
-  { group: "10–12 years (Boys)", energy: 66, protein: "32 g/day", calcium: 800, iron: 21, vitD: 600, vitA: 600, iodine: 150 },
-  { group: "10–12 years (Girls)", energy: 57, protein: "33 g/day", calcium: 800, iron: 27, vitD: 600, vitA: 600, iodine: 150 },
-  { group: "13–15 years (Boys)", energy: 55, protein: "45 g/day", calcium: 800, iron: 32, vitD: 600, vitA: 600, iodine: 150 },
-  { group: "13–15 years (Girls)", energy: 50, protein: "40 g/day", calcium: 800, iron: 27, vitD: 600, vitA: 600, iodine: 150 },
+const COMPLEMENTARY_FOODS = [
+  { age: "6 months", foods: "Start semi-solid foods. Rice porridge with dal water, mashed vegetables (lauki, gajar), banana mash, suji porridge.", texture: "Smooth puree", frequency: "2-3x/day, 2-3 teaspoons", notes: "Introduce one new food every 3-5 days. Watch for allergy." },
+  { age: "7-8 months", foods: "Mashed rice+dal (khichdi), mashed potato, soft cooked vegetables, curd, mashed papaya/banana.", texture: "Mashed, lumpy", frequency: "3x/day, 2-3 tablespoons", notes: "Can introduce egg yolk, soft fish, chicken (mashed)." },
+  { age: "9-11 months", foods: "Family foods (soft), finger foods: soft idli pieces, banana pieces, boiled carrot sticks, chapati strips.", texture: "Minced, chopped", frequency: "3-4x/day + 1-2 snacks", notes: "Introduce finger foods. Avoid honey <1 year." },
+  { age: "12-24 months", foods: "Full family food (soft). Dal, sabzi, rice/roti, curd, fruit, egg. Milk 400-500 mL.", texture: "Family texture", frequency: "3 meals + 2 snacks", notes: "Avoid added sugar, salt, junk food. Limit screen time." },
 ];
 
-const COMPLEMENTARY_FEEDING = [
-  { age: "Birth–6 months", recommendation: "Exclusive breastfeeding — NO water, formula, or solids", emphasis: "EBF protects against infection, allergy, obesity. WHO/IAP/NHM mandated." },
-  { age: "6 months", recommendation: "Start complementary feeding with continued breastfeeding", emphasis: "Begin with single-grain cereals: rice, ragi. Soft, pureed. Start 1–2 tsp, increase gradually." },
-  { age: "6–8 months", recommendation: "Pureed/mashed foods 2–3 times/day", emphasis: "Rice + dal khichdi, mashed banana, curd, ragi porridge. Avoid honey, salt, sugar." },
-  { age: "8–12 months", recommendation: "Chopped soft foods 3–4 times/day + 1–2 snacks", emphasis: "Family foods mashed. Egg yolk, paneer, soft chicken. Iron-rich foods essential." },
-  { age: "12–24 months", recommendation: "Family foods, 3 main meals + 2 snacks", emphasis: "Continue breastfeeding up to 2 years. Cow milk can start at 12 months." },
-  { age: ">2 years", recommendation: "Balanced diet with all food groups", emphasis: "Avoid ultra-processed food. Screen time <1h. Eat together as family." },
+const IAP_KEY_MESSAGES = [
+  { title: "Breastfeeding", message: "Exclusive breastfeeding for 6 months. Continue breastfeeding up to 2 years along with family foods.", icon: "🤱", priority: "critical" },
+  { title: "Iron & Vitamin D", message: "Iron drops from 6 weeks (breastfed infants). Vitamin D 400 IU/day from birth. Zinc supplementation in diarrhea.", icon: "💊", priority: "high" },
+  { title: "Anemia Prevention", message: "Iron-rich foods: green leafy vegetables, jaggery, dates, meat. Vitamin C with meals to enhance iron absorption.", icon: "🩸", priority: "high" },
+  { title: "Iodine", message: "Use only iodized salt. Iodine deficiency is still endemic in many Indian states.", icon: "🧂", priority: "medium" },
+  { title: "Calcium & Bone Health", message: "Milk 300-500 mL/day. Ragi (nachni) is excellent calcium source — 344 mg/100g. Sesame (til) seeds.", icon: "🦴", priority: "medium" },
+  { title: "Avoid Junk Food", message: "No ultra-processed snacks, sugar-sweetened beverages, chips, namkeen. IAP 2022: No fast food <5 years.", icon: "🚫", priority: "high" },
+  { title: "Vegetarian Diet", message: "Vegetarian children: ensure protein variety (dal + cereal + dairy). Vitamin B12 supplement if strictly vegan.", icon: "🥗", priority: "medium" },
+  { title: "Food Allergies", message: "Common: milk, egg, peanut, wheat, fish. Introduce early (not delayed) as per LEAP/EAT studies. Seek allergy opinion if reactions.", icon: "⚠️", priority: "medium" },
 ];
 
-const DEFICIENCY_GUIDE = [
-  { 
-    nutrient: "Iron Deficiency Anemia",
-    symptoms: ["Pallor (palm, conjunctiva, tongue)", "Fatigue, reduced activity", "Poor appetite, pica", "Recurrent infections", "Growth faltering"],
-    causes: ["Exclusive cow milk diet", "Low meat/legume intake", "Hookworm/malaria", "Prematurity (low stores)", "Exclusive breastfeeding >6m without complementary iron"],
-    treatment: ["Elemental iron 3–6 mg/kg/day (therapeutic)", "Duration: 3 months after Hb normalization", "Vit C with iron (amla juice)", "IAP recommends iron at 6m for breastfed infants (1 mg/kg/day)"],
-    sources: ["Jaggery (gud)", "Green leafy (palak, methi)", "Liver, egg yolk", "Ragi, jowar", "Legumes (rajma, chana)", "Fortified foods"]
-  },
-  {
-    nutrient: "Vitamin D Deficiency / Rickets",
-    symptoms: ["Bowing of legs", "Delayed dentition", "Craniotabes (infant)", "Hypocalcemia, tetany", "Growth failure", "Rachitic rosary"],
-    causes: ["Exclusive breastfeeding without supplementation", "Dark skin + low sun exposure", "Vegetarian/vegan diet", "Malabsorption", "CKD (renal osteodystrophy)"],
-    treatment: ["Supplementation 1000–2000 IU/day (maintenance)", "Rickets: 2000–4000 IU/day × 12 weeks (ESPGHAN)", "Stoss therapy: 300,000–600,000 IU single dose (IAP)", "Calcium 500–1000 mg/day alongside Vit D"],
-    sources: ["Sunlight: 15–20 min/day (arms/legs, midday)", "Fatty fish (mackerel, sardine)", "Egg yolk", "Fortified milk/cereals", "Cod liver oil (1 tsp = 1360 IU Vit D)"]
-  },
-  {
-    nutrient: "Zinc Deficiency",
-    symptoms: ["Growth stunting", "Recurrent diarrhea/infections", "Poor wound healing", "Dermatitis, alopecia", "Hypogeusia (altered taste)"],
-    causes: ["Low dietary intake (phytate-rich diet)", "Malabsorption", "Prematurity", "Acrodermatitis enteropathica (genetic)"],
-    treatment: ["Therapeutic: 1–2 mg/kg/day elemental zinc × 2–3 months", "Diarrhea supplementation: 10–20 mg/day × 14 days (WHO)"],
-    sources: ["Red meat, poultry", "Shellfish (oysters highest)", "Legumes (after soaking to reduce phytate)", "Nuts, seeds", "Fortified cereals"]
-  },
-  {
-    nutrient: "Vitamin A Deficiency",
-    symptoms: ["Night blindness (first sign)", "Bitot's spots", "Xerophthalmia", "Frequent respiratory/GI infections", "Growth retardation"],
-    causes: ["Low intake of yellow/orange/green vegetables", "Measles (depletes stores)", "Fat malabsorption", "Exclusive breastfeeding without maternal supplementation"],
-    treatment: ["NHM Vit A supplementation: 1 lakh IU at 9m, 2 lakh IU 6-monthly (1–5y)", "Therapeutic: 200,000 IU day 1, 2 and at 2 weeks (WHO protocol)"],
-    sources: ["Egg yolk, liver", "Carrot, pumpkin, sweet potato", "Mango, papaya", "Dark green leafy (spinach, methi)", "Fortified milk/margarine"]
-  },
+const AGE_RDA = [
+  { age: "1-3 years", energy: "1060 kcal", protein: "16.7 g", calcium: "600 mg", iron: "9 mg", vitA: "400 mcg", vitC: "40 mg" },
+  { age: "4-6 years", energy: "1350 kcal", protein: "20.1 g", calcium: "600 mg", iron: "13 mg", vitA: "400 mcg", vitC: "40 mg" },
+  { age: "7-9 years", energy: "1690 kcal", protein: "29.5 g", calcium: "600 mg", iron: "16 mg", vitA: "600 mcg", vitC: "40 mg" },
+  { age: "10-12 years (M)", energy: "2190 kcal", protein: "39.9 g", calcium: "800 mg", iron: "21 mg", vitA: "600 mcg", vitC: "40 mg" },
+  { age: "10-12 years (F)", energy: "2010 kcal", protein: "40.4 g", calcium: "800 mg", iron: "27 mg", vitA: "600 mcg", vitC: "40 mg" },
+  { age: "13-15 years (M)", energy: "2750 kcal", protein: "54.3 g", calcium: "800 mg", iron: "32 mg", vitA: "600 mcg", vitC: "40 mg" },
+  { age: "13-15 years (F)", energy: "2330 kcal", protein: "51.9 g", calcium: "800 mg", iron: "27 mg", vitA: "600 mcg", vitC: "40 mg" },
+];
+
+const INDIAN_FOOD_SOURCES = [
+  { nutrient: "Protein", sources: "Dal (arhar 22g/100g), Chana (17g), Soya (36g), Egg (13g), Paneer (18g), Chicken (25g), Fish (20g)" },
+  { nutrient: "Iron", sources: "Ragi (3.9mg), Palak (2.7mg), Rajma (5.1mg), Jaggery (11mg), Dates (7.3mg), Horse gram (7mg)" },
+  { nutrient: "Calcium", sources: "Ragi (344mg/100g), Sesame til (1474mg!), Milk (120mg/100mL), Paneer (200mg), Rajma (260mg)" },
+  { nutrient: "Vitamin A", sources: "Drumstick leaves (6780 mcg), Carrot (1890 mcg), Pumpkin (1750 mcg), Papaya (47 mcg), Mango (900 mcg)" },
+  { nutrient: "Vitamin C", sources: "Amla (600mg!), Guava (228mg), Orange (63mg), Tomato (27mg), Capsicum (137mg)" },
+  { nutrient: "Zinc", sources: "Wheat germ (17mg), Pumpkin seeds (7mg), Cashew (5mg), Rajma (3mg), Chicken (2mg)" },
+  { nutrient: "Vitamin D", sources: "Sunlight (20 min/day face+arms), Egg yolk (2 mcg), Fortified milk, Fish (salmon, sardine)" },
+  { nutrient: "Omega-3", sources: "Flaxseeds (22g/100g), Walnut (9g), Mustard oil (10%), Rohu/Sardine fish, Hemp seeds" },
+];
+
+const MALNUTRITION_MANAGEMENT = [
+  { stage: "SAM — Severe Acute Malnutrition", criteria: "WHZ < -3 OR MUAC < 11.5 cm OR bilateral pitting edema", management: ["Refer to NRC (Nutrition Rehabilitation Centre)", "F-75 therapeutic milk (75 kcal/100mL) initially", "Treat hypoglycemia, hypothermia, infections", "F-100 or RUTF after stabilization", "Transition to RUTF (ready-to-use therapeutic food)", "Monthly follow-up for 6 months post-discharge"], color: "red" },
+  { stage: "MAM — Moderate Acute Malnutrition", criteria: "WHZ -3 to -2 OR MUAC 11.5-12.5 cm", management: ["Supplementary feeding program (SFP)", "Energy-dense foods: groundnut+jaggery laddoos, chikki", "Micronutrient supplementation (iron, zinc, Vit A)", "Treat underlying infections", "ICDS support, ration card food entitlements", "Monthly growth monitoring"], color: "orange" },
+  { stage: "Stunting — Chronic Malnutrition", criteria: "HAZ < -2 (height-for-age)", management: ["Adequate dietary diversity (7 food groups)", "Improve sanitation and hygiene (WASH)", "Address food security at household level", "Identify and treat infections", "Zinc supplementation (therapeutic)", "Pubertal growth monitoring important"], color: "amber" },
 ];
 
 export default function PediatricNutritionPathway() {
-  const [weight, setWeight] = useState("");
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("Male");
-  const [rdaResult, setRdaResult] = useState(null);
-  const [activeDeficiency, setActiveDeficiency] = useState(null);
+  const [activeTab, setActiveTab] = useState("guidelines");
 
-  const calcRDA = () => {
-    if (!weight || !age) { toast.error("Enter weight and age"); return; }
-    const w = parseFloat(weight);
-    const a = parseFloat(age);
-    
-    // Energy per ICMR 2020
-    let energyPerKg, proteinPerKg;
-    if (a < 0.5) { energyPerKg = 108; proteinPerKg = 2.2; }
-    else if (a < 1) { energyPerKg = 98; proteinPerKg = 1.6; }
-    else if (a < 4) { energyPerKg = 83; proteinPerKg = 1.1; }
-    else if (a < 7) { energyPerKg = 71; proteinPerKg = 1.0; }
-    else if (a < 10) { energyPerKg = 66; proteinPerKg = 1.0; }
-    else if (a < 13) { energyPerKg = gender === "Male" ? 66 : 57; proteinPerKg = 0.95; }
-    else { energyPerKg = gender === "Male" ? 55 : 50; proteinPerKg = 0.85; }
-    
-    const energy = Math.round(w * energyPerKg);
-    const protein = Math.round(w * proteinPerKg * 10) / 10;
-    const carbsG = Math.round((energy * 0.55) / 4);
-    const fatG = Math.round((energy * 0.30) / 9);
-    
-    // Iron
-    let iron;
-    if (a < 0.5) iron = 0;
-    else if (a < 1) iron = 9;
-    else if (a < 4) iron = 9;
-    else if (a < 7) iron = 13;
-    else if (a < 10) iron = 16;
-    else if (a < 13) iron = gender === "Male" ? 21 : 27;
-    else iron = gender === "Male" ? 32 : 27;
-    
-    const calcium = a < 1 ? 500 : a < 10 ? 600 : 800;
-    const vitD = a < 1 ? 400 : 600;
-    
-    setRdaResult({ energy, protein, carbsG, fatG, iron, calcium, vitD, energyPerKg });
-  };
+  const priorityColors = { critical: "bg-red-100 border-red-300", high: "bg-orange-100 border-orange-300", medium: "bg-blue-100 border-blue-200" };
 
   return (
     <div className="space-y-6">
       <Alert className="bg-green-50 border-green-200">
         <Leaf className="w-5 h-5 text-green-600" />
         <AlertDescription className="text-green-800">
-          <strong>ICMR 2020 / IAP Pediatric Nutrition Guidelines:</strong> Based on Indian Recommended Dietary Allowances. Adapted for Indian dietary practices and food availability.
+          <strong>IAP / ICMR 2020 Nutrition Guidelines</strong> for Indian children. RDA values from ICMR-NIN 2020 Nutrient Requirements for Indians.
         </AlertDescription>
       </Alert>
 
-      {/* RDA Calculator */}
-      <Card className="bg-white shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-green-600" />Nutritional Requirements Calculator (ICMR 2020)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div>
-              <Label className="text-xs font-semibold">Age (years)</Label>
-              <Input type="number" value={age} onChange={e => setAge(e.target.value)} placeholder="e.g. 5" className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs font-semibold">Weight (kg)</Label>
-              <Input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="e.g. 18" className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs font-semibold">Gender</Label>
-              <Select value={gender} onValueChange={setGender}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <Button onClick={calcRDA} className="bg-green-600 hover:bg-green-700 w-full">
-            <Calculator className="w-4 h-4 mr-2" />Calculate Daily Requirements
-          </Button>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="guidelines">Key Messages</TabsTrigger>
+          <TabsTrigger value="rda">RDA Table</TabsTrigger>
+          <TabsTrigger value="complementary">Complementary Feeding</TabsTrigger>
+          <TabsTrigger value="malnutrition">Malnutrition Mx</TabsTrigger>
+        </TabsList>
 
-          {rdaResult && (
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { label: "Energy", value: `${rdaResult.energy} kcal`, sub: `(${rdaResult.energyPerKg} kcal/kg)`, color: "bg-green-50 border-green-200" },
-                { label: "Protein", value: `${rdaResult.protein} g`, sub: "ICMR RDA", color: "bg-blue-50 border-blue-200" },
-                { label: "Carbohydrates", value: `${rdaResult.carbsG} g`, sub: "55% of energy", color: "bg-amber-50 border-amber-200" },
-                { label: "Fat", value: `${rdaResult.fatG} g`, sub: "30% of energy", color: "bg-orange-50 border-orange-200" },
-                { label: "Iron", value: `${rdaResult.iron} mg`, sub: "ICMR 2020", color: "bg-red-50 border-red-200" },
-                { label: "Calcium", value: `${rdaResult.calcium} mg`, sub: "ICMR 2020", color: "bg-teal-50 border-teal-200" },
-                { label: "Vitamin D", value: `${rdaResult.vitD} IU`, sub: "IAP 2022", color: "bg-yellow-50 border-yellow-200" },
-              ].map(item => (
-                <div key={item.label} className={`p-2 rounded-lg border text-center ${item.color}`}>
-                  <div className="text-xs text-slate-500 mb-1">{item.label}</div>
-                  <div className="font-bold text-sm">{item.value}</div>
-                  <div className="text-xs text-slate-400">{item.sub}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* ICMR RDA Table */}
-      <Card className="bg-white shadow-lg">
-        <CardHeader className="bg-slate-50 border-b">
-          <CardTitle className="text-base">ICMR 2020 RDA Reference Table</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead><tr className="bg-slate-100">
-                <th className="p-2 text-left">Age Group</th>
-                <th className="p-2">Energy<br/>(kcal/kg)</th>
-                <th className="p-2">Protein</th>
-                <th className="p-2">Calcium<br/>(mg)</th>
-                <th className="p-2">Iron<br/>(mg)</th>
-                <th className="p-2">Vit D<br/>(IU)</th>
-              </tr></thead>
-              <tbody>
-                {ICMR_RDA.map((row, i) => (
-                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                    <td className="p-2 font-medium">{row.group}</td>
-                    <td className="p-2 text-center">{row.energy}</td>
-                    <td className="p-2 text-center">{row.protein}</td>
-                    <td className="p-2 text-center">{row.calcium}</td>
-                    <td className="p-2 text-center">{row.iron || "Breast milk"}</td>
-                    <td className="p-2 text-center">{row.vitD}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Complementary Feeding */}
-      <Card className="bg-white shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-          <CardTitle className="text-base">Complementary Feeding Guide (IAP/WHO)</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 space-y-3">
-          {COMPLEMENTARY_FEEDING.map((cf, i) => (
-            <div key={i} className={`p-3 rounded-lg border ${i === 0 ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-200"}`}>
-              <div className="font-semibold text-sm mb-1">{cf.age}</div>
-              <div className="text-sm text-slate-700 mb-1">{cf.recommendation}</div>
-              <div className="text-xs text-slate-500 italic">{cf.emphasis}</div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Micronutrient Deficiencies */}
-      <Card className="bg-white shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-amber-50 to-orange-50 border-b">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-600" />Common Micronutrient Deficiencies (India)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 space-y-3">
-          {DEFICIENCY_GUIDE.map((def, i) => (
-            <div key={i} className="border rounded-lg overflow-hidden">
-              <button
-                className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 text-left"
-                onClick={() => setActiveDeficiency(activeDeficiency === i ? null : i)}
-              >
-                <span className="font-semibold text-sm">{def.nutrient}</span>
-                <Badge variant="outline" className="text-xs">{def.symptoms.length} symptoms</Badge>
-              </button>
-              {activeDeficiency === i && (
-                <div className="p-4 space-y-3">
-                  <div className="grid md:grid-cols-2 gap-3">
-                    <div>
-                      <h5 className="font-semibold text-xs mb-1.5 text-red-800">Symptoms:</h5>
-                      <ul className="space-y-1">
-                        {def.symptoms.map((s, si) => <li key={si} className="text-xs text-red-700 flex gap-1"><span>•</span>{s}</li>)}
-                      </ul>
-                    </div>
-                    <div>
-                      <h5 className="font-semibold text-xs mb-1.5 text-amber-800">Causes:</h5>
-                      <ul className="space-y-1">
-                        {def.causes.map((c, ci) => <li key={ci} className="text-xs text-amber-700 flex gap-1"><span>•</span>{c}</li>)}
-                      </ul>
-                    </div>
-                    <div>
-                      <h5 className="font-semibold text-xs mb-1.5 text-blue-800">Treatment:</h5>
-                      <ul className="space-y-1">
-                        {def.treatment.map((t, ti) => <li key={ti} className="text-xs text-blue-700 flex gap-1"><span>•</span>{t}</li>)}
-                      </ul>
-                    </div>
-                    <div>
-                      <h5 className="font-semibold text-xs mb-1.5 text-green-800">Dietary Sources:</h5>
-                      <div className="flex flex-wrap gap-1">
-                        {def.sources.map((s, si) => <Badge key={si} className="bg-green-100 text-green-800 text-xs font-normal">{s}</Badge>)}
-                      </div>
-                    </div>
+        <TabsContent value="guidelines" className="space-y-4 mt-4">
+          <div className="grid md:grid-cols-2 gap-3">
+            {IAP_KEY_MESSAGES.map((msg, i) => (
+              <div key={i} className={`p-3 rounded-lg border ${priorityColors[msg.priority]}`}>
+                <div className="flex items-start gap-2">
+                  <span className="text-xl">{msg.icon}</span>
+                  <div>
+                    <h4 className="font-semibold text-sm text-slate-900">{msg.title}</h4>
+                    <p className="text-xs text-slate-700 mt-1">{msg.message}</p>
                   </div>
                 </div>
-              )}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+              </div>
+            ))}
+          </div>
 
-      <Alert className="bg-teal-50 border-teal-200">
-        <CheckCircle2 className="w-4 h-4 text-teal-600" />
-        <AlertDescription className="text-xs text-teal-800">
-          <strong>IAP 2022 Key Points:</strong> Universal salt iodization is mandatory. Vitamin D supplementation from birth for all Indian children (400 IU for infants, 600 IU for children). Iron-folic acid supplementation via weekly school programs (WIFS) for adolescents. Promote millets (ragi, bajra, jowar) for micronutrient density.
-        </AlertDescription>
-      </Alert>
+          <Card className="bg-white shadow-lg">
+            <CardHeader className="bg-green-50 border-b">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Apple className="w-5 h-5 text-green-600" />Indian Food Sources by Nutrient
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-2">
+              {INDIAN_FOOD_SOURCES.map((item, i) => (
+                <div key={i} className="grid grid-cols-3 gap-2 text-sm py-2 border-b last:border-0">
+                  <span className="font-semibold text-slate-800 col-span-1">{item.nutrient}</span>
+                  <span className="text-slate-600 col-span-2 text-xs">{item.sources}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="rda" className="mt-4">
+          <Card className="bg-white shadow-lg">
+            <CardHeader className="bg-blue-50 border-b">
+              <CardTitle className="text-base">ICMR-NIN 2020 Recommended Dietary Allowances (India)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs md:text-sm">
+                  <thead>
+                    <tr className="bg-slate-100">
+                      <th className="p-2 text-left font-semibold">Age Group</th>
+                      <th className="p-2 text-center font-semibold">Energy</th>
+                      <th className="p-2 text-center font-semibold">Protein</th>
+                      <th className="p-2 text-center font-semibold">Calcium</th>
+                      <th className="p-2 text-center font-semibold">Iron</th>
+                      <th className="p-2 text-center font-semibold">Vit A</th>
+                      <th className="p-2 text-center font-semibold">Vit C</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {AGE_RDA.map((row, i) => (
+                      <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                        <td className="p-2 font-medium">{row.age}</td>
+                        <td className="p-2 text-center">{row.energy}</td>
+                        <td className="p-2 text-center">{row.protein}</td>
+                        <td className="p-2 text-center">{row.calcium}</td>
+                        <td className="p-2 text-center">{row.iron}</td>
+                        <td className="p-2 text-center">{row.vitA}</td>
+                        <td className="p-2 text-center">{row.vitC}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-slate-400 mt-2">Source: ICMR-NIN 2020. Nutrient Requirements for Indians.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="complementary" className="mt-4 space-y-4">
+          <Alert className="bg-blue-50 border-blue-200">
+            <Baby className="w-5 h-5 text-blue-600" />
+            <AlertDescription className="text-blue-800 text-sm">
+              <strong>WHO/IAP Rule:</strong> Start complementary foods at exactly 6 months (not before). Continue breastfeeding. Responsive feeding — let child decide quantity.
+            </AlertDescription>
+          </Alert>
+          {COMPLEMENTARY_FOODS.map((item, i) => (
+            <Card key={i} className="bg-white shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b py-3">
+                <CardTitle className="text-base font-bold text-green-900">{item.age}</CardTitle>
+                <div className="flex gap-2 mt-1">
+                  <Badge className="bg-green-100 text-green-800 text-xs">{item.texture}</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 text-xs">{item.frequency}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-700 mb-2"><strong>Foods:</strong> {item.foods}</p>
+                <div className="flex items-start gap-2 text-xs text-amber-800 bg-amber-50 p-2 rounded">
+                  <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                  <span>{item.notes}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          <Alert className="bg-red-50 border-red-200">
+            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <AlertDescription className="text-red-800 text-sm">
+              <strong>Foods to AVOID &lt;1 year:</strong> Honey (botulism), whole nuts (choking), cow's milk as main drink, added salt/sugar, unpasteurized foods, raw eggs. Avoid fruit juices &lt;1y (AAP/IAP).
+            </AlertDescription>
+          </Alert>
+        </TabsContent>
+
+        <TabsContent value="malnutrition" className="mt-4 space-y-4">
+          {MALNUTRITION_MANAGEMENT.map((item, i) => {
+            const borderColors = { red: "border-red-300 bg-red-50", orange: "border-orange-300 bg-orange-50", amber: "border-amber-300 bg-amber-50" };
+            const headerColors = { red: "bg-red-100 border-red-200 text-red-900", orange: "bg-orange-100 border-orange-200 text-orange-900", amber: "bg-amber-100 border-amber-200 text-amber-900" };
+            return (
+              <Card key={i} className={`shadow-lg border-2 ${borderColors[item.color]}`}>
+                <CardHeader className={`border-b ${headerColors[item.color]}`}>
+                  <CardTitle className="text-base">{item.stage}</CardTitle>
+                  <p className="text-xs font-medium mt-1">Criteria: {item.criteria}</p>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <ul className="space-y-1">
+                    {item.management.map((step, j) => (
+                      <li key={j} className="flex items-start gap-2 text-sm">
+                        <span className={`font-bold ${item.color === "red" ? "text-red-600" : item.color === "orange" ? "text-orange-600" : "text-amber-600"}`}>{j+1}.</span>
+                        <span className="text-slate-700">{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            );
+          })}
+          <Alert className="bg-blue-50 border-blue-200">
+            <CheckCircle2 className="w-5 h-5 text-blue-600" />
+            <AlertDescription className="text-blue-800 text-sm">
+              <strong>Micronutrient Supplementation (NFHS/GOI):</strong> Iron-Folic Acid weekly for adolescent girls (WIFS). Vitamin A every 6 months from 9 months to 5 years. Zinc (20 mg/day x 14 days) for all diarrhea episodes in children 6m–5y.
+            </AlertDescription>
+          </Alert>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
