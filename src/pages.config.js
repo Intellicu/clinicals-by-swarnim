@@ -120,7 +120,7 @@ import Telemedicine from './pages/Telemedicine';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import ClinicAnalyticsDashboard from './pages/ClinicAnalyticsDashboard';
+import PatientManager from './pages/PatientManager';
 import __Layout from './Layout.jsx';
 
 
@@ -198,7 +198,7 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "ClinicAnalyticsDashboard": ClinicAnalyticsDashboard,
+    "PatientManager": PatientManager,
 }
 
 export const pagesConfig = {
