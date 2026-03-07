@@ -119,6 +119,7 @@ import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
 import DietGenerator from './pages/DietGenerator';
 import PediatricsHub from './pages/PediatricsHub';
+import OfflineSettings from './pages/OfflineSettings';
 import __Layout from './Layout.jsx';
 
 
@@ -195,6 +196,7 @@ export const PAGES = {
     "VoiceAgent": VoiceAgent,
     "DietGenerator": DietGenerator,
     "PediatricsHub": PediatricsHub,
+    "OfflineSettings": OfflineSettings,
 }
 
 export const pagesConfig = {
