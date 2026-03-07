@@ -82,7 +82,9 @@ export default function Hub() {
     { name: "RRT Assistant", icon: Droplet, color: "bg-cyan-600", page: "RRTAssistant" },
     { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
     { name: "Diet Generator", icon: UtensilsCrossed, color: "bg-green-600", page: "DietGenerator" },
-    { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" }
+    { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
+    { name: "Patient Manager", icon: Users, color: "bg-violet-600", page: "PatientManager" },
+    { name: "Analytics", icon: TrendingUp, color: "bg-orange-600", page: "ClinicAnalyticsDashboard" },
   ];
 
   const toolsNavigation = [
@@ -227,9 +229,7 @@ export default function Hub() {
 
   const modesSection = [
     { name: "Clinic Mode", icon: Users, page: "ClinicManagement", description: "Patient records, visits & clinical workflow", color: "bg-purple-600" },
-    { name: "Research Mode", icon: Layers, page: "ResearchHub", description: "REDCap-style research platform with AI analysis", color: "bg-indigo-600" },
-    { name: "Patient Manager", icon: Users, page: "PatientManager", description: "Create, view, update, and delete patient profiles", color: "bg-blue-600" },
-    { name: "Analytics Dashboard", icon: TrendingUp, page: "ClinicAnalyticsDashboard", description: "Aggregated stats: patients, diagnoses, vaccination & diet metrics", color: "bg-teal-600" }
+    { name: "Research Mode", icon: Layers, page: "ResearchHub", description: "REDCap-style research platform with AI analysis", color: "bg-indigo-600" }
   ];
 
   const resourcesSection = {
@@ -243,6 +243,8 @@ export default function Hub() {
       { name: "Monitoring Templates", icon: ClipboardList, page: "MonitoringHub", description: "8+ clinical monitoring charts" },
       { name: "Diet Generator", icon: UtensilsCrossed, page: "DietGenerator", description: "Nephrotic & CKD diet plans (IPNA/KDIGO/IAP)" },
       { name: "General Pediatrics", icon: Baby, page: "PediatricsHub", description: "Growth, Vaccination, Nutrition (IAP)" },
+      { name: "Patient Manager", icon: Users, page: "PatientManager", description: "Create, view, update & delete patient profiles" },
+      { name: "Analytics Dashboard", icon: TrendingUp, page: "ClinicAnalyticsDashboard", description: "Key stats, charts & compliance metrics" },
       { name: "Offline Data Manager", icon: HardDrive, page: "OfflineSettings", description: "Manage local data & backups" },
       { name: "Reference Ranges", icon: FileText, page: "ReferenceRanges", description: "Lab normal values" },
       { name: "Audit Logs", icon: FileText, page: "AuditLogs", description: "Calculation history & tracking" }
@@ -286,13 +288,13 @@ export default function Hub() {
               </Button>
             </Link>
             <Link to={createPageUrl("PatientManager")}>
-              <Button variant="outline" className="hover:bg-blue-50">
+              <Button variant="outline" className="hover:bg-violet-50">
                 <Users className="w-4 h-4 mr-2" />
-                Patients
+                Patient Manager
               </Button>
             </Link>
             <Link to={createPageUrl("ClinicAnalyticsDashboard")}>
-              <Button variant="outline" className="hover:bg-teal-50">
+              <Button variant="outline" className="hover:bg-orange-50">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Analytics
               </Button>
