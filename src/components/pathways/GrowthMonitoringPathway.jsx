@@ -76,12 +76,17 @@ const MONITORING_FREQUENCY = [
   { age: ">10 years", frequency: "Annually + pubertal staging", who: "IAP" },
 ];
 
+const TREND_KEY = "growth_trend_data";
+
 export default function GrowthMonitoringPathway() {
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("Male");
   const [result, setResult] = useState(null);
+  const [trendData, setTrendData] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(TREND_KEY) || "[]"); } catch { return []; }
+  });
 
   const calculate = () => {
     if (!weight || !height || !age) { toast.error("Please enter all values"); return; }
@@ -97,16 +102,42 @@ export default function GrowthMonitoringPathway() {
     
     const waz = calcZScore(w, medianW, sdW);
     const haz = calcZScore(h, medianH, sdH);
-    const whz = waz; // simplified
+    const whz = waz;
     
     const malnutrition = classifyMalnutrition(parseFloat(waz), parseFloat(haz), parseFloat(whz));
     const bmiClass = classifyBMI(parseFloat(bmi), a);
-    
-    // Mid-upper arm circumference estimation
     const muac = (0.25 * h + 2.1).toFixed(1);
     
     setResult({ w, h, a, bmi, waz, haz, whz, malnutrition, bmiClass, muac });
   };
+
+  const addToTrend = () => {
+    if (!result) { toast.error("Calculate first"); return; }
+    const entry = {
+      age: result.a,
+      weight: result.w,
+      height: result.h,
+      bmi: parseFloat(result.bmi),
+      waz: parseFloat(result.waz),
+      haz: parseFloat(result.haz),
+      date: new Date().toLocaleDateString("en-IN"),
+    };
+    const updated = [...trendData, entry].sort((a, b) => a.age - b.age);
+    setTrendData(updated);
+    try { localStorage.setItem(TREND_KEY, JSON.stringify(updated)); } catch {}
+    toast.success("Added to growth trend");
+  };
+
+  const clearTrend = () => {
+    setTrendData([]);
+    localStorage.removeItem(TREND_KEY);
+    toast.info("Trend data cleared");
+  };
+
+  // WHO reference lines for weight chart
+  const WHO_REF_WEIGHT = Object.entries(WHO_MEDIAN_W).map(([age, median]) => ({
+    age: parseInt(age), median, sd_plus2: median + 2 * WHO_SD_W[age], sd_minus2: median - 2 * WHO_SD_W[age]
+  }));
 
   const colorMap = { red: "bg-red-100 border-red-300 text-red-800", orange: "bg-orange-100 border-orange-300 text-orange-800", amber: "bg-amber-100 border-amber-300 text-amber-800", green: "bg-green-100 border-green-300 text-green-800" };
 
