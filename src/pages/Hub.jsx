@@ -45,6 +45,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
 import QuickPatientEntry from "../components/QuickPatientEntry";
+import OfflineDataManager from "../components/OfflineDataManager";
 import { ChevronDown } from "lucide-react";
 
 export default function Hub() {
