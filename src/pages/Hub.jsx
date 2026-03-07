@@ -45,8 +45,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
 import QuickPatientEntry from "../components/QuickPatientEntry";
-import OfflineDataManager from "../components/OfflineDataManager";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, WifiOff, Wifi, HardDrive } from "lucide-react";
+import { useOnlineStatus } from "../components/OfflineDataManager";
 
 export default function Hub() {
   const { data: user } = useQuery({
@@ -236,8 +236,7 @@ export default function Hub() {
       { name: "Content Manager", icon: FileText, page: "UserContentManager", description: "Upload guidelines, create templates & scenarios" },
       { name: "Drug Database", icon: Pill, page: "DrugCalculator", description: "50+ drugs with Indian formulations" },
       { name: "Monitoring Templates", icon: ClipboardList, page: "MonitoringHub", description: "8+ clinical monitoring charts" },
-      { name: "Diet Generator (CKD/NS/IAP)", icon: UtensilsCrossed, page: "DietGenerator", description: "IPNA/KDIGO/IAP diet plans for nephrotic, CKD & healthy children" },
-      { name: "Pediatrics Hub (IAP)", icon: Baby, page: "PediatricsHub", description: "Growth monitoring, IAP vaccination schedule, ICMR nutrition guidelines" },
+      { name: "Diet Chart Generator", icon: UtensilsCrossed, page: "DietChartGenerator", description: "Nutritional guidelines" },
       { name: "Reference Ranges", icon: FileText, page: "ReferenceRanges", description: "Lab normal values" },
       { name: "Audit Logs", icon: FileText, page: "AuditLogs", description: "Calculation history & tracking" }
     ]
@@ -296,9 +295,6 @@ export default function Hub() {
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
         </div>
-
-        {/* Offline Status */}
-        <OfflineDataManager />
 
         {/* Quick Patient Entry */}
         <QuickPatientEntry />
