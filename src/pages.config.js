@@ -118,6 +118,7 @@ import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
 import DietGenerator from './pages/DietGenerator';
+import PediatricsHub from './pages/PediatricsHub';
 import __Layout from './Layout.jsx';
 
 
@@ -193,6 +194,7 @@ export const PAGES = {
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
     "DietGenerator": DietGenerator,
+    "PediatricsHub": PediatricsHub,
 }
 
 export const pagesConfig = {
