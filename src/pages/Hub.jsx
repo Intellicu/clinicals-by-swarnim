@@ -297,6 +297,9 @@ export default function Hub() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
         </div>
 
+        {/* Offline Status */}
+        <OfflineDataManager />
+
         {/* Quick Patient Entry */}
         <QuickPatientEntry />
         
