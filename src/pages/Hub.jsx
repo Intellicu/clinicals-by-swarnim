@@ -82,7 +82,9 @@ export default function Hub() {
     { name: "RRT Assistant", icon: Droplet, color: "bg-cyan-600", page: "RRTAssistant" },
     { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
     { name: "Diet Generator", icon: UtensilsCrossed, color: "bg-green-600", page: "DietGenerator" },
-    { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" }
+    { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
+    { name: "Patient Manager", icon: Users, color: "bg-violet-600", page: "PatientManager" },
+    { name: "Analytics", icon: TrendingUp, color: "bg-orange-600", page: "ClinicAnalyticsDashboard" },
   ];
 
   const toolsNavigation = [
@@ -227,9 +229,7 @@ export default function Hub() {
 
   const modesSection = [
     { name: "Clinic Mode", icon: Users, page: "ClinicManagement", description: "Patient records, visits & clinical workflow", color: "bg-purple-600" },
-    { name: "Research Mode", icon: Layers, page: "ResearchHub", description: "REDCap-style research platform with AI analysis", color: "bg-indigo-600" },
-    { name: "Patient Manager", icon: Users, page: "PatientManager", description: "Create, view, update, and delete patient profiles", color: "bg-blue-600" },
-    { name: "Analytics Dashboard", icon: TrendingUp, page: "ClinicAnalyticsDashboard", description: "Aggregated stats: patients, diagnoses, vaccination & diet metrics", color: "bg-teal-600" }
+    { name: "Research Mode", icon: Layers, page: "ResearchHub", description: "REDCap-style research platform with AI analysis", color: "bg-indigo-600" }
   ];
 
   const resourcesSection = {
@@ -283,6 +283,18 @@ export default function Hub() {
               <Button variant="outline" className="hover:bg-indigo-50">
                 <Layers className="w-4 h-4 mr-2" />
                 Research Mode
+              </Button>
+            </Link>
+            <Link to={createPageUrl("PatientManager")}>
+              <Button variant="outline" className="hover:bg-violet-50">
+                <Users className="w-4 h-4 mr-2" />
+                Patient Manager
+              </Button>
+            </Link>
+            <Link to={createPageUrl("ClinicAnalyticsDashboard")}>
+              <Button variant="outline" className="hover:bg-orange-50">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Analytics
               </Button>
             </Link>
           </div>
