@@ -295,6 +295,12 @@ export default function Hub() {
               )}
             </div>
             <div className="h-1 w-32 bg-white/40 rounded-full"></div>
+            <div className="mt-4">
+              <span className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100 border border-green-300/30" : "bg-amber-400/20 text-amber-100 border border-amber-300/30"}`}>
+                {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+                {isOnline ? "Online — All features available" : "Offline — Calculators & pathways available locally"}
+              </span>
+            </div>
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
         </div>
