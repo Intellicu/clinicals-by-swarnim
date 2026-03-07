@@ -252,7 +252,11 @@ export default function Hub() {
   });
 
   const toggleSection = (sectionName) => {
-    setOpenSections(prev => ({ ...prev, [sectionName]: !prev[sectionName] }));
+    setOpenSections(prev => {
+      const updated = { ...prev, [sectionName]: !prev[sectionName] };
+      try { localStorage.setItem("clinicals_hub_sections", JSON.stringify(updated)); } catch {}
+      return updated;
+    });
   };
 
   return (
