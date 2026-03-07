@@ -82,7 +82,9 @@ export default function Hub() {
     { name: "RRT Assistant", icon: Droplet, color: "bg-cyan-600", page: "RRTAssistant" },
     { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
     { name: "Diet Generator", icon: UtensilsCrossed, color: "bg-green-600", page: "DietGenerator" },
-    { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" }
+    { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
+    { name: "Patient Manager", icon: Users, color: "bg-violet-600", page: "PatientManager" },
+    { name: "Analytics", icon: TrendingUp, color: "bg-orange-600", page: "ClinicAnalyticsDashboard" },
   ];
 
   const toolsNavigation = [
