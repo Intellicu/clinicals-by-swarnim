@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Syringe, CheckCircle2, AlertTriangle, Clock, Info } from "lucide-react";
+import { Syringe, CheckCircle2, AlertTriangle, Clock, Info, BarChart2 } from "lucide-react";
 import { toast } from "sonner";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
 
 const STORAGE_KEY = "iap_vaccination_tracker";
 
@@ -102,52 +102,34 @@ export default function VaccinationPathway() {
   const filtered = filter === "all" ? IAP_SCHEDULE : IAP_SCHEDULE.filter(v => v.category === filter);
   const categoryColors = { mandatory: "bg-red-100 text-red-800", recommended: "bg-blue-100 text-blue-800", situational: "bg-amber-100 text-amber-800" };
 
-  // Coverage chart data by category
-  const coverageByCategory = ["mandatory", "recommended", "situational"].map(cat => {
-    const total = IAP_SCHEDULE.filter(v => v.category === cat).length;
-    const given = IAP_SCHEDULE.filter(v => v.category === cat && givenVaccines[v.id]).length;
-    return { name: cat.charAt(0).toUpperCase() + cat.slice(1), total, given, pct: total ? Math.round((given / total) * 100) : 0 };
+  // Coverage data for charts
+  const coverageByCategory = ["mandatory","recommended","situational"].map(cat => {
+    const catVaccines = IAP_SCHEDULE.filter(v => v.category === cat);
+    const given = catVaccines.filter(v => givenVaccines[v.id]).length;
+    return { name: cat.charAt(0).toUpperCase() + cat.slice(1), total: catVaccines.length, given, pct: catVaccines.length ? Math.round((given / catVaccines.length) * 100) : 0 };
   });
 
-  const totalGiven = Object.values(givenVaccines).filter(Boolean).length;
-  const totalAll = IAP_SCHEDULE.length;
-  const overallPct = Math.round((totalGiven / totalAll) * 100);
+  const coverageByAgeGroup = [
+    { group: "Birth", range: [0, 0.5] },
+    { group: "0–3 mo", range: [0.5, 3] },
+    { group: "3–6 mo", range: [3, 6] },
+    { group: "6–12 mo", range: [6, 12] },
+    { group: "12–18 mo", range: [12, 18] },
+    { group: "4–6 yr", range: [48, 72] },
+    { group: ">6 yr", range: [72, 200] },
+  ].map(ag => {
+    const group = IAP_SCHEDULE.filter(v => v.ageMonths >= ag.range[0] && v.ageMonths < ag.range[1]);
+    const given = group.filter(v => givenVaccines[v.id]).length;
+    return { name: ag.group, total: group.length, given, pct: group.length ? Math.round((given / group.length) * 100) : 0 };
+  }).filter(ag => ag.total > 0);
+
+  const pieCoverage = [
+    { name: "Given", value: Object.values(givenVaccines).filter(Boolean).length },
+    { name: "Remaining", value: IAP_SCHEDULE.length - Object.values(givenVaccines).filter(Boolean).length },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Coverage Chart */}
-      <Card className="bg-white shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Syringe className="w-5 h-5 text-green-600" />Vaccination Coverage Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-6 mb-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">{overallPct}%</div>
-              <div className="text-xs text-slate-500">Overall Coverage</div>
-              <div className="text-xs text-slate-400">{totalGiven}/{totalAll} doses</div>
-            </div>
-            <div className="flex-1">
-              <ResponsiveContainer width="100%" height={120}>
-                <BarChart data={coverageByCategory} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} tickFormatter={v => `${v}%`} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={80} />
-                  <Tooltip formatter={(v) => `${v}%`} />
-                  <Bar dataKey="pct" radius={[0, 4, 4, 0]} name="Coverage">
-                    {coverageByCategory.map((entry, i) => (
-                      <Cell key={i} fill={entry.pct >= 80 ? "#10b981" : entry.pct >= 50 ? "#f59e0b" : "#ef4444"} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       <Alert className="bg-green-50 border-green-200">
         <Syringe className="w-5 h-5 text-green-600" />
         <AlertDescription className="text-green-800">
@@ -244,6 +226,65 @@ export default function VaccinationPathway() {
             <Button size="sm" variant="outline" onClick={() => { setGivenVaccines({}); localStorage.removeItem(STORAGE_KEY); toast.info("Record cleared"); }}>
               Clear Record
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Coverage Charts */}
+      <Card className="bg-white shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-teal-50 to-green-50 border-b">
+          <CardTitle className="text-base flex items-center gap-2">
+            <BarChart2 className="w-5 h-5 text-teal-600" />Vaccination Coverage Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Overall donut */}
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-xs font-semibold text-slate-600 mb-2">Overall IAP Coverage</p>
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie data={pieCoverage} dataKey="value" cx="50%" cy="50%" innerRadius={45} outerRadius={70} startAngle={90} endAngle={-270}>
+                    <Cell fill="#10b981" />
+                    <Cell fill="#e2e8f0" />
+                  </Pie>
+                  <Tooltip formatter={(v, n) => [v + " doses", n]} />
+                </PieChart>
+              </ResponsiveContainer>
+              <p className="text-2xl font-bold text-green-600">{Math.round((pieCoverage[0].value / IAP_SCHEDULE.length) * 100)}%</p>
+              <p className="text-xs text-slate-500">{pieCoverage[0].value}/{IAP_SCHEDULE.length} doses</p>
+            </div>
+            {/* By Category bar */}
+            <div>
+              <p className="text-xs font-semibold text-slate-600 mb-2">Coverage by Category (%)</p>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={coverageByCategory} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} unit="%" />
+                  <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={80} />
+                  <Tooltip formatter={v => [v + "%", "Coverage"]} />
+                  <Bar dataKey="pct" radius={[0, 4, 4, 0]} name="Coverage %">
+                    {coverageByCategory.map((entry, i) => (
+                      <Cell key={i} fill={entry.pct >= 80 ? "#10b981" : entry.pct >= 50 ? "#f59e0b" : "#ef4444"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            {/* By Age Group */}
+            <div>
+              <p className="text-xs font-semibold text-slate-600 mb-2">Coverage by Age Group</p>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={coverageByAgeGroup}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip formatter={(v, n) => [v, n === "given" ? "Given" : "Total"]} />
+                  <Bar dataKey="total" fill="#dbeafe" name="Total" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="given" fill="#3b82f6" name="Given" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </CardContent>
       </Card>
