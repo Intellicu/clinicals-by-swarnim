@@ -73,6 +73,7 @@ import ConsultationView from './pages/ConsultationView';
 import CustomToolBuilder from './pages/CustomToolBuilder';
 import DiagnosticQuestionnaire from './pages/DiagnosticQuestionnaire';
 import DietChartGenerator from './pages/DietChartGenerator';
+import DietGenerator from './pages/DietGenerator';
 import DoseCalculator from './pages/DoseCalculator';
 import DrugCalculator from './pages/DrugCalculator';
 import DrugDosing from './pages/DrugDosing';
@@ -91,12 +92,14 @@ import ModuleView from './pages/ModuleView';
 import MonitoringHub from './pages/MonitoringHub';
 import MonitoringPlanBuilder from './pages/MonitoringPlanBuilder';
 import NotificationCenter from './pages/NotificationCenter';
+import OfflineSettings from './pages/OfflineSettings';
 import OsmolarGap from './pages/OsmolarGap';
 import ParentalGuidance from './pages/ParentalGuidance';
 import PatientEducation from './pages/PatientEducation';
 import PatientEducationHub from './pages/PatientEducationHub';
 import PatientHistory from './pages/PatientHistory';
 import PatientMonitoringDashboard from './pages/PatientMonitoringDashboard';
+import PediatricsHub from './pages/PediatricsHub';
 import PotassiumCalculator from './pages/PotassiumCalculator';
 import PredictionTools from './pages/PredictionTools';
 import Proteinuria from './pages/Proteinuria';
@@ -117,9 +120,7 @@ import Telemedicine from './pages/Telemedicine';
 import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
-import DietGenerator from './pages/DietGenerator';
-import PediatricsHub from './pages/PediatricsHub';
-import OfflineSettings from './pages/OfflineSettings';
+import ClinicAnalyticsDashboard from './pages/ClinicAnalyticsDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -150,6 +151,7 @@ export const PAGES = {
     "CustomToolBuilder": CustomToolBuilder,
     "DiagnosticQuestionnaire": DiagnosticQuestionnaire,
     "DietChartGenerator": DietChartGenerator,
+    "DietGenerator": DietGenerator,
     "DoseCalculator": DoseCalculator,
     "DrugCalculator": DrugCalculator,
     "DrugDosing": DrugDosing,
@@ -168,12 +170,14 @@ export const PAGES = {
     "MonitoringHub": MonitoringHub,
     "MonitoringPlanBuilder": MonitoringPlanBuilder,
     "NotificationCenter": NotificationCenter,
+    "OfflineSettings": OfflineSettings,
     "OsmolarGap": OsmolarGap,
     "ParentalGuidance": ParentalGuidance,
     "PatientEducation": PatientEducation,
     "PatientEducationHub": PatientEducationHub,
     "PatientHistory": PatientHistory,
     "PatientMonitoringDashboard": PatientMonitoringDashboard,
+    "PediatricsHub": PediatricsHub,
     "PotassiumCalculator": PotassiumCalculator,
     "PredictionTools": PredictionTools,
     "Proteinuria": Proteinuria,
@@ -194,9 +198,7 @@ export const PAGES = {
     "UserContentManager": UserContentManager,
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
-    "DietGenerator": DietGenerator,
-    "PediatricsHub": PediatricsHub,
-    "OfflineSettings": OfflineSettings,
+    "ClinicAnalyticsDashboard": ClinicAnalyticsDashboard,
 }
 
 export const pagesConfig = {
