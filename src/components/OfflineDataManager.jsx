@@ -1,292 +1,265 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  WifiOff, Wifi, Save, Trash2, Download, Upload,
-  Database, CheckCircle2, Clock, RefreshCw, FileText, HardDrive
-} from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { WifiOff, Wifi, Save, Trash2, Download, Upload, HardDrive, CheckCircle2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
-// ============================================================
-// OfflineStorage — unified localStorage + IndexedDB manager
-// ============================================================
-const DB_NAME = "clinicals_offline_v1";
-const DB_VERSION = 1;
-const STORES = ["calculators", "pathways", "documents", "preferences", "ai_cache"];
-
-let _db = null;
-
-async function openDB() {
-  if (_db) return _db;
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      STORES.forEach(store => {
-        if (!db.objectStoreNames.contains(store)) {
-          db.createObjectStore(store, { keyPath: "id", autoIncrement: true });
-        }
-      });
-    };
-    req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
-    req.onerror = reject;
-  });
-}
-
-export async function offlineSave(store, key, data) {
-  try {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(store, "readwrite");
-      const os = tx.objectStore(store);
-      const record = { id: key, data, savedAt: new Date().toISOString() };
-      const req = os.put(record);
-      req.onsuccess = () => resolve(true);
-      req.onerror = reject;
-    });
-  } catch (e) {
-    // Fallback to localStorage
+// ─── localStorage helper ───────────────────────────────────────────────
+export const OfflineStorage = {
+  save(key, data) {
     try {
-      const ns = `idb_${store}`;
-      const existing = JSON.parse(localStorage.getItem(ns) || "{}");
-      existing[key] = { data, savedAt: new Date().toISOString() };
-      localStorage.setItem(ns, JSON.stringify(existing));
+      localStorage.setItem(`clinicals_${key}`, JSON.stringify({ data, ts: Date.now() }));
       return true;
     } catch { return false; }
-  }
-}
-
-export async function offlineLoad(store, key) {
-  try {
-    const db = await openDB();
-    return new Promise((resolve) => {
-      const tx = db.transaction(store, "readonly");
-      const os = tx.objectStore(store);
-      const req = os.get(key);
-      req.onsuccess = (e) => resolve(e.target.result?.data || null);
-      req.onerror = () => resolve(null);
-    });
-  } catch {
+  },
+  load(key, fallback = null) {
     try {
-      const ns = `idb_${store}`;
-      const existing = JSON.parse(localStorage.getItem(ns) || "{}");
-      return existing[key]?.data || null;
+      const raw = localStorage.getItem(`clinicals_${key}`);
+      if (!raw) return fallback;
+      return JSON.parse(raw).data;
+    } catch { return fallback; }
+  },
+  remove(key) {
+    localStorage.removeItem(`clinicals_${key}`);
+  },
+  getTimestamp(key) {
+    try {
+      const raw = localStorage.getItem(`clinicals_${key}`);
+      if (!raw) return null;
+      return new Date(JSON.parse(raw).ts).toLocaleString();
     } catch { return null; }
-  }
-}
-
-export async function offlineLoadAll(store) {
-  try {
-    const db = await openDB();
-    return new Promise((resolve) => {
-      const tx = db.transaction(store, "readonly");
-      const os = tx.objectStore(store);
-      const req = os.getAll();
-      req.onsuccess = (e) => resolve(e.target.result || []);
-      req.onerror = () => resolve([]);
-    });
-  } catch {
-    try {
-      const ns = `idb_${store}`;
-      const existing = JSON.parse(localStorage.getItem(ns) || "{}");
-      return Object.entries(existing).map(([k, v]) => ({ id: k, ...v }));
-    } catch { return []; }
-  }
-}
-
-export async function offlineDelete(store, key) {
-  try {
-    const db = await openDB();
-    return new Promise((resolve) => {
-      const tx = db.transaction(store, "readwrite");
-      const os = tx.objectStore(store);
-      const req = os.delete(key);
-      req.onsuccess = () => resolve(true);
-      req.onerror = () => resolve(false);
-    });
-  } catch { return false; }
-}
-
-// localStorage helpers for preferences
-export function savePreference(key, value) {
-  try { localStorage.setItem(`pref_${key}`, JSON.stringify(value)); } catch {}
-}
-
-export function loadPreference(key, defaultValue = null) {
-  try {
-    const v = localStorage.getItem(`pref_${key}`);
-    return v !== null ? JSON.parse(v) : defaultValue;
-  } catch { return defaultValue; }
-}
-
-// Save calculator result offline
-export async function saveCalcResult(calculatorId, inputs, result) {
-  const key = `${calculatorId}_${Date.now()}`;
-  await offlineSave("calculators", key, { calculatorId, inputs, result, savedAt: new Date().toISOString() });
-}
-
-// Cache AI response offline
-export async function cacheAIResponse(promptHash, response) {
-  await offlineSave("ai_cache", promptHash, { response, cachedAt: new Date().toISOString() });
-}
-
-export async function loadCachedAIResponse(promptHash) {
-  return await offlineLoad("ai_cache", promptHash);
-}
-
-// ============================================================
-// OfflineDataManager UI Component
-// ============================================================
-export default function OfflineDataManager({ compact = false }) {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [storageStats, setStorageStats] = useState(null);
-  const [recentCalcs, setRecentCalcs] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const goOnline = () => { setIsOnline(true); toast.success("Back online"); };
-    const goOffline = () => { setIsOnline(false); toast.warning("You are offline — saved data still accessible"); };
-    window.addEventListener("online", goOnline);
-    window.addEventListener("offline", goOffline);
-    loadStats();
-    return () => { window.removeEventListener("online", goOnline); window.removeEventListener("offline", goOffline); };
-  }, []);
-
-  const loadStats = async () => {
-    setLoading(true);
-    const [calcs, docs, prefs, aiCache] = await Promise.all([
-      offlineLoadAll("calculators"),
-      offlineLoadAll("documents"),
-      offlineLoadAll("preferences"),
-      offlineLoadAll("ai_cache"),
-    ]);
-    
-    // localStorage size estimate
-    let lsSize = 0;
-    for (const key in localStorage) {
-      if (localStorage.hasOwnProperty(key)) lsSize += localStorage[key].length * 2;
+  },
+  getAllKeys() {
+    return Object.keys(localStorage).filter(k => k.startsWith("clinicals_")).map(k => k.replace("clinicals_", ""));
+  },
+  getTotalSizeKB() {
+    let total = 0;
+    for (const k of Object.keys(localStorage)) {
+      if (k.startsWith("clinicals_")) total += (localStorage.getItem(k) || "").length;
     }
-    
-    setStorageStats({ calcs: calcs.length, docs: docs.length, prefs: prefs.length, aiCache: aiCache.length, lsSize: Math.round(lsSize / 1024) });
-    setRecentCalcs(calcs.slice(-5).reverse());
-    setLoading(false);
+    return (total / 1024).toFixed(1);
+  },
+  exportAll() {
+    const out = {};
+    for (const k of Object.keys(localStorage)) {
+      if (k.startsWith("clinicals_")) out[k] = localStorage.getItem(k);
+    }
+    return JSON.stringify(out, null, 2);
+  },
+  importAll(json) {
+    try {
+      const data = JSON.parse(json);
+      let count = 0;
+      for (const [k, v] of Object.entries(data)) {
+        if (k.startsWith("clinicals_")) { localStorage.setItem(k, v); count++; }
+      }
+      return count;
+    } catch { return -1; }
+  },
+  clearAll() {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith("clinicals_"));
+    keys.forEach(k => localStorage.removeItem(k));
+    return keys.length;
+  }
+};
+
+// ─── React hook ────────────────────────────────────────────────────────
+export function useOfflineStorage(key, defaultValue = null) {
+  const [value, setValue] = useState(() => OfflineStorage.load(key, defaultValue));
+
+  const save = (newValue) => {
+    setValue(newValue);
+    OfflineStorage.save(key, newValue);
+  };
+  const clear = () => {
+    setValue(defaultValue);
+    OfflineStorage.remove(key);
   };
 
-  const clearCache = async () => {
-    const db = await openDB();
-    const tx = db.transaction("ai_cache", "readwrite");
-    tx.objectStore("ai_cache").clear();
-    await loadStats();
-    toast.success("AI cache cleared");
+  return [value, save, clear];
+}
+
+// ─── Online status hook ────────────────────────────────────────────────
+export function useOnlineStatus() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    const on = () => setIsOnline(true);
+    const off = () => setIsOnline(false);
+    window.addEventListener("online", on);
+    window.addEventListener("offline", off);
+    return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
+  }, []);
+  return isOnline;
+}
+
+// ─── UI Component ─────────────────────────────────────────────────────
+const DATA_CATEGORIES = [
+  { key: "diet_generator_cache", label: "Diet Plans", icon: "🥗" },
+  { key: "iap_vaccination_tracker", label: "Vaccination Records", icon: "💉" },
+  { key: "calculator_history", label: "Calculator History", icon: "🧮" },
+  { key: "ai_conversation_cache", label: "AI Conversations", icon: "🤖" },
+  { key: "pathway_bookmarks", label: "Pathway Bookmarks", icon: "📌" },
+  { key: "user_preferences", label: "User Preferences", icon: "⚙️" },
+  { key: "patient_quick_entries", label: "Quick Patient Entries", icon: "👤" },
+  { key: "research_backup", label: "Research Project Backup", icon: "🔬" },
+];
+
+export default function OfflineDataManager({ compact = false }) {
+  const isOnline = useOnlineStatus();
+  const [keys, setKeys] = useState([]);
+  const [sizeKB, setSizeKB] = useState("0");
+  const [lastSync, setLastSync] = useState(null);
+
+  const refresh = () => {
+    setKeys(OfflineStorage.getAllKeys());
+    setSizeKB(OfflineStorage.getTotalSizeKB());
+    setLastSync(new Date().toLocaleTimeString());
   };
 
-  const exportAll = async () => {
-    const [calcs, docs] = await Promise.all([offlineLoadAll("calculators"), offlineLoadAll("documents")]);
-    const exportData = {
-      exportDate: new Date().toISOString(),
-      calculators: calcs,
-      documents: docs,
-    };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+  useEffect(() => { refresh(); }, []);
+
+  const exportData = () => {
+    const json = OfflineStorage.exportAll();
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `clinicals_backup_${new Date().toISOString().split("T")[0]}.json`;
+    a.href = url;
+    a.download = `clinicals_backup_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Backup downloaded");
   };
 
+  const importData = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const count = OfflineStorage.importAll(ev.target.result);
+      if (count >= 0) { toast.success(`Imported ${count} data records`); refresh(); }
+      else toast.error("Invalid backup file");
+    };
+    reader.readAsText(file);
+    e.target.value = null;
+  };
+
+  const clearAll = () => {
+    const n = OfflineStorage.clearAll();
+    toast.success(`Cleared ${n} cached items`);
+    refresh();
+  };
+
   if (compact) {
     return (
-      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${isOnline ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
-        {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-        {isOnline ? "Online" : "Offline"}
-        {!isOnline && storageStats && <span>· {storageStats.calcs} saved</span>}
+      <div className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-full border ${isOnline ? "bg-green-50 border-green-200 text-green-800" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
+        {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
+        <span className="font-medium">{isOnline ? "Online" : "Offline"}</span>
+        <span className="text-xs opacity-70">· {sizeKB} KB saved</span>
       </div>
     );
   }
 
   return (
-    <Card className="bg-white shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-base">
-            <HardDrive className="w-5 h-5 text-blue-600" />
-            Offline Data Manager
-          </div>
-          <Badge className={isOnline ? "bg-green-100 text-green-800 border border-green-300" : "bg-amber-100 text-amber-800 border border-amber-300"}>
-            {isOnline ? <><Wifi className="w-3 h-3 mr-1" />Online</> : <><WifiOff className="w-3 h-3 mr-1" />Offline</>}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-4 space-y-4">
-        {!isOnline && (
-          <Alert className="bg-amber-50 border-amber-200">
-            <WifiOff className="w-4 h-4 text-amber-600" />
-            <AlertDescription className="text-amber-800 text-sm">
-              <strong>Offline Mode:</strong> All calculators, pathways, and previously saved data remain fully accessible. New AI queries will use cached responses when available.
-            </AlertDescription>
-          </Alert>
-        )}
+    <div className="space-y-4">
+      {/* Status Banner */}
+      <Alert className={isOnline ? "bg-green-50 border-green-200" : "bg-amber-50 border-amber-300"}>
+        {isOnline ? <Wifi className="w-5 h-5 text-green-600" /> : <WifiOff className="w-5 h-5 text-amber-600" />}
+        <AlertDescription className={isOnline ? "text-green-800" : "text-amber-800"}>
+          <strong>{isOnline ? "Online Mode" : "Offline Mode"}</strong> — {isOnline ? "All features available. Data auto-saved locally." : "Running offline. All calculators & pathways available. AI features require internet."}
+          {lastSync && <span className="text-xs ml-2 opacity-70">Refreshed {lastSync}</span>}
+        </AlertDescription>
+      </Alert>
 
-        {/* Storage Stats */}
-        {storageStats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { label: "Saved Calculations", value: storageStats.calcs, icon: Database, color: "text-blue-600" },
-              { label: "Documents", value: storageStats.docs, icon: FileText, color: "text-purple-600" },
-              { label: "AI Cached Responses", value: storageStats.aiCache, icon: Clock, color: "text-indigo-600" },
-              { label: "Storage Used", value: `${storageStats.lsSize} KB`, icon: HardDrive, color: "text-green-600" },
-            ].map(stat => {
-              const Icon = stat.icon;
+      {/* Storage Summary */}
+      <Card className="bg-white shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b py-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <HardDrive className="w-5 h-5 text-blue-600" />Local Storage Summary
+            <Button size="sm" variant="ghost" onClick={refresh} className="ml-auto">
+              <RefreshCw className="w-3 h-3 mr-1" />Refresh
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1">
+              <div className="flex justify-between text-xs text-slate-500 mb-1">
+                <span>Used: {sizeKB} KB</span><span>~5 MB limit</span>
+              </div>
+              <Progress value={Math.min((parseFloat(sizeKB) / 5000) * 100, 100)} className="h-2" />
+            </div>
+            <Badge className="bg-blue-100 text-blue-800">{keys.length} items</Badge>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {DATA_CATEGORIES.map(cat => {
+              const exists = keys.includes(cat.key) || keys.some(k => k.includes(cat.key.split("_")[0]));
+              const ts = OfflineStorage.getTimestamp(cat.key);
               return (
-                <div key={stat.label} className="bg-slate-50 rounded-lg p-3 text-center border">
-                  <Icon className={`w-5 h-5 mx-auto mb-1 ${stat.color}`} />
-                  <div className="font-bold text-lg">{stat.value}</div>
-                  <div className="text-xs text-slate-500">{stat.label}</div>
+                <div key={cat.key} className={`flex items-center gap-2 p-2 rounded border text-sm ${exists ? "bg-green-50 border-green-200" : "bg-slate-50 border-slate-200 opacity-60"}`}>
+                  <span>{cat.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="font-medium text-xs text-slate-800">{cat.label}</span>
+                    {ts && <div className="text-xs text-slate-400 truncate">{ts}</div>}
+                  </div>
+                  {exists ? <CheckCircle2 className="w-3.5 h-3.5 text-green-600 flex-shrink-0" /> : <span className="w-3.5 h-3.5 text-slate-300 flex-shrink-0">○</span>}
                 </div>
               );
             })}
           </div>
-        )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={loadStats} variant="outline" size="sm" disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} />Refresh
-          </Button>
-          <Button onClick={exportAll} variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-1" />Export Backup
-          </Button>
-          <Button onClick={clearCache} variant="outline" size="sm">
-            <Trash2 className="w-4 h-4 mr-1" />Clear AI Cache
-          </Button>
-        </div>
-
-        {/* Recent Saved Calculations */}
-        {recentCalcs.length > 0 && (
-          <div>
-            <h4 className="text-sm font-semibold mb-2 text-slate-700">Recent Saved Calculations</h4>
-            <div className="space-y-2">
-              {recentCalcs.map((calc, i) => (
-                <div key={i} className="flex items-center justify-between p-2 bg-slate-50 rounded border text-xs">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3 h-3 text-green-500" />
-                    <span className="font-medium">{calc.data?.calculatorId || "Calculation"}</span>
-                  </div>
-                  <span className="text-slate-400">{calc.data?.savedAt ? new Date(calc.data.savedAt).toLocaleDateString() : ""}</span>
-                </div>
-              ))}
-            </div>
+          {/* Actions */}
+          <div className="flex gap-2 mt-4 pt-3 border-t">
+            <Button size="sm" onClick={exportData} className="flex-1 bg-blue-600 hover:bg-blue-700">
+              <Download className="w-3.5 h-3.5 mr-1" />Export Backup
+            </Button>
+            <label className="flex-1">
+              <Button size="sm" variant="outline" className="w-full" asChild>
+                <span><Upload className="w-3.5 h-3.5 mr-1" />Import Backup</span>
+              </Button>
+              <input type="file" accept=".json" className="hidden" onChange={importData} />
+            </label>
+            <Button size="sm" variant="destructive" onClick={clearAll}>
+              <Trash2 className="w-3.5 h-3.5" />
+            </Button>
           </div>
-        )}
+        </CardContent>
+      </Card>
 
-        <p className="text-xs text-slate-400">
-          Data stored locally in IndexedDB + localStorage. Never leaves your device. No server required for offline features.
-        </p>
-      </CardContent>
-    </Card>
+      {/* Offline Feature Status */}
+      <Card className="bg-white shadow-lg">
+        <CardHeader className="border-b py-3">
+          <CardTitle className="text-base">Offline Feature Availability</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="space-y-2">
+            {[
+              { name: "Clinical Calculators (GFR, BP, Fluid, Dose, etc.)", offline: true },
+              { name: "Clinical Pathways (55+ scenarios)", offline: true },
+              { name: "Diet Generator (Nephrotic, CKD, IAP)", offline: true },
+              { name: "Vaccination Tracker (IAP 2023)", offline: true },
+              { name: "Growth Monitoring Calculator", offline: true },
+              { name: "Drug Database (local reference)", offline: true },
+              { name: "Saved Plans & Calculator History", offline: true },
+              { name: "Patient Quick Entry (local draft)", offline: true },
+              { name: "AI Diagnostic Assistant", offline: false },
+              { name: "AI Clinical Notes & Suggestions", offline: false },
+              { name: "Lab Report AI Analyzer", offline: false },
+              { name: "Online Guidelines Sync", offline: false },
+            ].map((feat, i) => (
+              <div key={i} className="flex items-center justify-between text-sm py-1 border-b last:border-0">
+                <span className="text-slate-700">{feat.name}</span>
+                <Badge className={feat.offline ? "bg-green-100 text-green-800" : "bg-slate-100 text-slate-600"}>
+                  {feat.offline ? "✓ Offline" : "Needs Internet"}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
