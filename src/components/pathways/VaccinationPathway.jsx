@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Syringe, CheckCircle2, AlertTriangle, Clock, Save, Info } from "lucide-react";
+import { Syringe, CheckCircle2, AlertTriangle, Clock, Info } from "lucide-react";
 import { toast } from "sonner";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const STORAGE_KEY = "iap_vaccination_tracker";
 
