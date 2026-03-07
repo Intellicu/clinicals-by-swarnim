@@ -247,7 +247,9 @@ export default function Hub() {
     ]
   };
 
-  const [openSections, setOpenSections] = React.useState({});
+  const [openSections, setOpenSections] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem("clinicals_hub_sections") || "{}"); } catch { return {}; }
+  });
 
   const toggleSection = (sectionName) => {
     setOpenSections(prev => ({ ...prev, [sectionName]: !prev[sectionName] }));
