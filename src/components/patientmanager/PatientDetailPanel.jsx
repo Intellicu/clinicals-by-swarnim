@@ -4,7 +4,10 @@ import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit, Trash2, Calculator, Brain, Syringe, UtensilsCrossed, Activity, FileText, User, Heart, Pill, AlertTriangle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Edit, Trash2, Calculator, Brain, Syringe, UtensilsCrossed, Activity, FileText, User, Heart, Pill, AlertTriangle, CalendarDays, Clock } from "lucide-react";
+import AppointmentScheduler from "./AppointmentScheduler";
+import MedicalHistoryTimeline from "./MedicalHistoryTimeline";
 
 export default function PatientDetailPanel({ patient: p, onBack, onEdit, onDelete }) {
   const statusColors = { Active: "bg-green-100 text-green-800", "Follow-up": "bg-blue-100 text-blue-800", Discharged: "bg-slate-100 text-slate-800", Referred: "bg-amber-100 text-amber-800" };
@@ -46,106 +49,128 @@ export default function PatientDetailPanel({ patient: p, onBack, onEdit, onDelet
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-5">
-          {/* Demographics */}
-          <Card className="bg-white shadow-sm">
-            <CardHeader className="pb-2 bg-blue-50 border-b">
-              <CardTitle className="text-sm font-semibold text-blue-800 flex items-center gap-2"><User className="w-4 h-4" />Demographics</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-2 text-sm">
-              {[
-                ["Mobile", p.mobile_number],
-                ["Date of Birth", p.date_of_birth],
-                ["Guardian", p.guardian_name],
-                ["Address", p.address],
-              ].map(([label, val]) => val ? (
-                <div key={label} className="flex gap-2"><span className="text-slate-500 w-28 flex-shrink-0">{label}:</span><span className="text-slate-900 font-medium">{val}</span></div>
-              ) : null)}
-            </CardContent>
-          </Card>
+        {/* Tabs */}
+        <Tabs defaultValue="overview">
+          <TabsList className="bg-white border shadow-sm w-full flex-wrap h-auto gap-1 p-1">
+            <TabsTrigger value="overview" className="flex items-center gap-1 text-xs"><User className="w-3 h-3" />Overview</TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-1 text-xs"><Clock className="w-3 h-3" />Medical History</TabsTrigger>
+            <TabsTrigger value="appointments" className="flex items-center gap-1 text-xs"><CalendarDays className="w-3 h-3" />Appointments</TabsTrigger>
+            <TabsTrigger value="tools" className="flex items-center gap-1 text-xs"><Calculator className="w-3 h-3" />Clinical Tools</TabsTrigger>
+          </TabsList>
 
-          {/* Baseline Vitals */}
-          <Card className="bg-white shadow-sm">
-            <CardHeader className="pb-2 bg-green-50 border-b">
-              <CardTitle className="text-sm font-semibold text-green-800 flex items-center gap-2"><Activity className="w-4 h-4" />Baseline Vitals</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  ["Height", p.baseline_vitals?.height ? `${p.baseline_vitals.height} cm` : "—"],
-                  ["Weight", p.baseline_vitals?.weight ? `${p.baseline_vitals.weight} kg` : "—"],
-                  ["BMI", p.baseline_vitals?.bmi || "—"],
-                  ["Blood Group", p.baseline_vitals?.blood_group || "—"],
-                ].map(([label, val]) => (
-                  <div key={label} className="bg-slate-50 rounded-lg p-3 border text-center">
-                    <div className="text-xs text-slate-500">{label}</div>
-                    <div className="font-bold text-slate-900 mt-0.5">{val}</div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* OVERVIEW TAB */}
+          <TabsContent value="overview" className="mt-4">
+            <div className="grid md:grid-cols-2 gap-5">
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="pb-2 bg-blue-50 border-b">
+                  <CardTitle className="text-sm font-semibold text-blue-800 flex items-center gap-2"><User className="w-4 h-4" />Demographics</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-2 text-sm">
+                  {[
+                    ["Mobile", p.mobile_number],
+                    ["Date of Birth", p.date_of_birth],
+                    ["Guardian", p.guardian_name],
+                    ["Address", p.address],
+                  ].map(([label, val]) => val ? (
+                    <div key={label} className="flex gap-2"><span className="text-slate-500 w-28 flex-shrink-0">{label}:</span><span className="text-slate-900 font-medium">{val}</span></div>
+                  ) : null)}
+                </CardContent>
+              </Card>
 
-          {/* Medical History */}
-          <Card className="bg-white shadow-sm md:col-span-2">
-            <CardHeader className="pb-2 bg-purple-50 border-b">
-              <CardTitle className="text-sm font-semibold text-purple-800 flex items-center gap-2"><Heart className="w-4 h-4" />Medical History</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-3 text-sm">
-              {p.diagnosis && (
-                <div><span className="text-slate-500">Primary Diagnosis: </span><span className="font-semibold text-slate-900">{p.diagnosis}</span></div>
-              )}
-              {p.comorbidities?.length > 0 && (
-                <div>
-                  <span className="text-slate-500 block mb-1">Comorbidities:</span>
-                  <div className="flex flex-wrap gap-1">{p.comorbidities.map((c, i) => <Badge key={i} variant="outline">{c}</Badge>)}</div>
-                </div>
-              )}
-              {p.allergies?.length > 0 && (
-                <div>
-                  <span className="text-slate-500 flex items-center gap-1 mb-1"><AlertTriangle className="w-3 h-3 text-red-500" />Allergies:</span>
-                  <div className="flex flex-wrap gap-1">{p.allergies.map((a, i) => <Badge key={i} className="bg-red-100 text-red-800">{a}</Badge>)}</div>
-                </div>
-              )}
-              {p.current_medications?.length > 0 && (
-                <div>
-                  <span className="text-slate-500 block mb-1">Current Medications:</span>
-                  <div className="flex flex-wrap gap-1">{p.current_medications.map((m, i) => <Badge key={i} className="bg-blue-100 text-blue-800">{m}</Badge>)}</div>
-                </div>
-              )}
-              {p.notes && (
-                <div><span className="text-slate-500">Notes: </span><span className="text-slate-800">{p.notes}</span></div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Clinical Tools */}
-        <Card className="bg-white shadow-sm">
-          <CardHeader className="pb-2 bg-slate-50 border-b">
-            <CardTitle className="text-sm font-semibold text-slate-800 flex items-center gap-2">
-              <Calculator className="w-4 h-4 text-blue-600" />Clinical Tools for this Patient
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {clinicalTools.map(t => {
-                const Icon = t.icon;
-                return (
-                  <Link key={t.label} to={createPageUrl(t.page)}>
-                    <div className={`border rounded-lg p-3 cursor-pointer transition-all ${t.color}`}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Icon className="w-4 h-4" />
-                        <span className="font-semibold text-sm">{t.label}</span>
+              <Card className="bg-white shadow-sm">
+                <CardHeader className="pb-2 bg-green-50 border-b">
+                  <CardTitle className="text-sm font-semibold text-green-800 flex items-center gap-2"><Activity className="w-4 h-4" />Baseline Vitals</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      ["Height", p.baseline_vitals?.height ? `${p.baseline_vitals.height} cm` : "—"],
+                      ["Weight", p.baseline_vitals?.weight ? `${p.baseline_vitals.weight} kg` : "—"],
+                      ["BMI", p.baseline_vitals?.bmi || "—"],
+                      ["Blood Group", p.baseline_vitals?.blood_group || "—"],
+                    ].map(([label, val]) => (
+                      <div key={label} className="bg-slate-50 rounded-lg p-3 border text-center">
+                        <div className="text-xs text-slate-500">{label}</div>
+                        <div className="font-bold text-slate-900 mt-0.5">{val}</div>
                       </div>
-                      <p className="text-xs opacity-75">{t.desc}</p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white shadow-sm md:col-span-2">
+                <CardHeader className="pb-2 bg-purple-50 border-b">
+                  <CardTitle className="text-sm font-semibold text-purple-800 flex items-center gap-2"><Heart className="w-4 h-4" />Medical Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3 text-sm">
+                  {p.diagnosis && (
+                    <div><span className="text-slate-500">Primary Diagnosis: </span><span className="font-semibold text-slate-900">{p.diagnosis}</span></div>
+                  )}
+                  {p.comorbidities?.length > 0 && (
+                    <div>
+                      <span className="text-slate-500 block mb-1">Comorbidities:</span>
+                      <div className="flex flex-wrap gap-1">{p.comorbidities.map((c, i) => <Badge key={i} variant="outline">{c}</Badge>)}</div>
                     </div>
-                  </Link>
-                );
-              })}
+                  )}
+                  {p.allergies?.length > 0 && (
+                    <div>
+                      <span className="text-slate-500 flex items-center gap-1 mb-1"><AlertTriangle className="w-3 h-3 text-red-500" />Allergies:</span>
+                      <div className="flex flex-wrap gap-1">{p.allergies.map((a, i) => <Badge key={i} className="bg-red-100 text-red-800">{a}</Badge>)}</div>
+                    </div>
+                  )}
+                  {p.current_medications?.length > 0 && (
+                    <div>
+                      <span className="text-slate-500 block mb-1">Current Medications:</span>
+                      <div className="flex flex-wrap gap-1">{p.current_medications.map((m, i) => <Badge key={i} className="bg-blue-100 text-blue-800">{m}</Badge>)}</div>
+                    </div>
+                  )}
+                  {p.notes && (
+                    <div><span className="text-slate-500">Notes: </span><span className="text-slate-800">{p.notes}</span></div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
+
+          {/* MEDICAL HISTORY TAB */}
+          <TabsContent value="history" className="mt-4">
+            <MedicalHistoryTimeline patient={p} />
+          </TabsContent>
+
+          {/* APPOINTMENTS TAB */}
+          <TabsContent value="appointments" className="mt-4">
+            <AppointmentScheduler patient={p} />
+          </TabsContent>
+
+          {/* CLINICAL TOOLS TAB */}
+          <TabsContent value="tools" className="mt-4">
+            <Card className="bg-white shadow-sm">
+              <CardHeader className="pb-2 bg-slate-50 border-b">
+                <CardTitle className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                  <Calculator className="w-4 h-4 text-blue-600" />Clinical Tools for this Patient
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {clinicalTools.map(t => {
+                    const Icon = t.icon;
+                    return (
+                      <Link key={t.label} to={createPageUrl(t.page)}>
+                        <div className={`border rounded-lg p-3 cursor-pointer transition-all ${t.color}`}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Icon className="w-4 h-4" />
+                            <span className="font-semibold text-sm">{t.label}</span>
+                          </div>
+                          <p className="text-xs opacity-75">{t.desc}</p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
