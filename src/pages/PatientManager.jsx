@@ -3,15 +3,16 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, Plus, Search, Trash2, Edit, Eye, Calculator, Brain, Syringe, UtensilsCrossed, Activity } from "lucide-react";
+import { ArrowLeft, Users, Plus, Search, Trash2, Edit, Eye, Calculator, Brain, Syringe, UtensilsCrossed, Activity, Download } from "lucide-react";
 import { toast } from "sonner";
 import PatientProfileForm from "../components/patientmanager/PatientProfileForm";
 import PatientDetailPanel from "../components/patientmanager/PatientDetailPanel";
+import PatientExport from "../components/patientmanager/PatientExport";
 
 export default function PatientManager() {
   const qc = useQueryClient();
@@ -68,7 +69,7 @@ export default function PatientManager() {
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <Users className="w-7 h-7 text-blue-600" />Patient Manager
             </h1>
-            <p className="text-sm text-slate-500">{patients.length} patients · Create, view, update & delete profiles</p>
+            <p className="text-sm text-slate-500">{patients.length} patients · Profiles, history, appointments & export</p>
           </div>
           <div className="ml-auto flex gap-2 flex-wrap">
             <Link to={createPageUrl("ClinicAnalyticsDashboard")}>
@@ -107,71 +108,85 @@ export default function PatientManager() {
           </CardContent>
         </Card>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, CR number, diagnosis, or mobile…" className="pl-9 bg-white" />
-        </div>
+        {/* Tabs: Patients list + Export */}
+        <Tabs defaultValue="patients">
+          <TabsList className="bg-white border shadow-sm">
+            <TabsTrigger value="patients" className="flex items-center gap-1 text-sm"><Users className="w-3.5 h-3.5" />Patients</TabsTrigger>
+            <TabsTrigger value="export" className="flex items-center gap-1 text-sm"><Download className="w-3.5 h-3.5" />Export</TabsTrigger>
+          </TabsList>
 
-        {/* Patient List */}
-        {isLoading ? (
-          <div className="text-center py-16 text-slate-400">Loading patients…</div>
-        ) : filtered.length === 0 ? (
-          <Card className="bg-white shadow-sm">
-            <CardContent className="py-16 text-center text-slate-400">
-              <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="font-medium">{search ? "No patients found" : "No patients yet"}</p>
-              {!search && <Button className="mt-4 bg-blue-600 hover:bg-blue-700" onClick={() => setView("create")}><Plus className="w-4 h-4 mr-2" />Add First Patient</Button>}
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map(p => (
-              <Card key={p.id} className="bg-white shadow-sm hover:shadow-md transition-shadow border">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm flex-shrink-0">
-                      {(p.patient_name || "?")[0].toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-slate-900">{p.patient_name}</h3>
-                        <Badge variant="outline" className="text-xs">CR: {p.cr_number}</Badge>
-                        <Badge className={`text-xs ${statusColors[p.status] || "bg-slate-100 text-slate-700"}`}>{p.status || "Active"}</Badge>
-                        {p.gender && <Badge variant="outline" className="text-xs">{p.gender}</Badge>}
-                        {p.age_years && <Badge variant="outline" className="text-xs">{p.age_years}y</Badge>}
-                      </div>
-                      <div className="flex gap-4 mt-1 text-xs text-slate-500 flex-wrap">
-                        {p.diagnosis && <span><strong>Dx:</strong> {p.diagnosis}</span>}
-                        {p.mobile_number && <span>📞 {p.mobile_number}</span>}
-                        {p.guardian_name && <span>Guardian: {p.guardian_name}</span>}
-                      </div>
-                      {p.comorbidities?.length > 0 && (
-                        <div className="flex gap-1 mt-1 flex-wrap">
-                          {p.comorbidities.slice(0, 3).map((c, i) => <Badge key={i} variant="outline" className="text-xs bg-slate-50">{c}</Badge>)}
-                          {p.comorbidities.length > 3 && <Badge variant="outline" className="text-xs">+{p.comorbidities.length - 3}</Badge>}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <Button size="sm" variant="outline" onClick={() => { setSelectedPatient(p); setView("detail"); }}>
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => { setSelectedPatient(p); setEditMode(true); }}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" className="text-red-600 hover:bg-red-50" onClick={() => {
-                        if (confirm(`Delete ${p.patient_name}?`)) deleteMutation.mutate(p.id);
-                      }}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
+          {/* PATIENTS TAB */}
+          <TabsContent value="patients" className="mt-4 space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, CR number, diagnosis, or mobile…" className="pl-9 bg-white" />
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-16 text-slate-400">Loading patients…</div>
+            ) : filtered.length === 0 ? (
+              <Card className="bg-white shadow-sm">
+                <CardContent className="py-16 text-center text-slate-400">
+                  <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p className="font-medium">{search ? "No patients found" : "No patients yet"}</p>
+                  {!search && <Button className="mt-4 bg-blue-600 hover:bg-blue-700" onClick={() => setView("create")}><Plus className="w-4 h-4 mr-2" />Add First Patient</Button>}
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        )}
+            ) : (
+              <div className="space-y-3">
+                {filtered.map(p => (
+                  <Card key={p.id} className="bg-white shadow-sm hover:shadow-md transition-shadow border">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm flex-shrink-0">
+                          {(p.patient_name || "?")[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-semibold text-slate-900">{p.patient_name}</h3>
+                            <Badge variant="outline" className="text-xs">CR: {p.cr_number}</Badge>
+                            <Badge className={`text-xs ${statusColors[p.status] || "bg-slate-100 text-slate-700"}`}>{p.status || "Active"}</Badge>
+                            {p.gender && <Badge variant="outline" className="text-xs">{p.gender}</Badge>}
+                            {p.age_years && <Badge variant="outline" className="text-xs">{p.age_years}y</Badge>}
+                          </div>
+                          <div className="flex gap-4 mt-1 text-xs text-slate-500 flex-wrap">
+                            {p.diagnosis && <span><strong>Dx:</strong> {p.diagnosis}</span>}
+                            {p.mobile_number && <span>📞 {p.mobile_number}</span>}
+                            {p.guardian_name && <span>Guardian: {p.guardian_name}</span>}
+                          </div>
+                          {p.comorbidities?.length > 0 && (
+                            <div className="flex gap-1 mt-1 flex-wrap">
+                              {p.comorbidities.slice(0, 3).map((c, i) => <Badge key={i} variant="outline" className="text-xs bg-slate-50">{c}</Badge>)}
+                              {p.comorbidities.length > 3 && <Badge variant="outline" className="text-xs">+{p.comorbidities.length - 3}</Badge>}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <Button size="sm" variant="outline" onClick={() => { setSelectedPatient(p); setView("detail"); }}>
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { setSelectedPatient(p); setEditMode(true); }}>
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" className="text-red-600 hover:bg-red-50" onClick={() => {
+                            if (confirm(`Delete ${p.patient_name}?`)) deleteMutation.mutate(p.id);
+                          }}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* EXPORT TAB */}
+          <TabsContent value="export" className="mt-4">
+            <PatientExport patients={filtered} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
