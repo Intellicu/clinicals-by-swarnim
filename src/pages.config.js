@@ -123,7 +123,6 @@ import UserContentManager from './pages/UserContentManager';
 import VideoTeachingAgent from './pages/VideoTeachingAgent';
 import VoiceAgent from './pages/VoiceAgent';
 import NotificationDashboard from './pages/NotificationDashboard';
-import EnhancedDietGenerator from './pages/EnhancedDietGenerator';
 import __Layout from './Layout.jsx';
 
 
@@ -204,7 +203,6 @@ export const PAGES = {
     "VideoTeachingAgent": VideoTeachingAgent,
     "VoiceAgent": VoiceAgent,
     "NotificationDashboard": NotificationDashboard,
-    "EnhancedDietGenerator": EnhancedDietGenerator,
 }
 
 export const pagesConfig = {
