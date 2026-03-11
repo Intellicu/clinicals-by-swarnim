@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, UtensilsCrossed, Sparkles, Download, Copy, Save, Edit2, Plus, X, Info, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, UtensilsCrossed, Sparkles, Download, Copy, Save, Edit2, Plus, X, Info, AlertTriangle, CheckCircle, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export default function EnhancedDietGenerator() {
