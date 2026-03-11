@@ -11,10 +11,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Mic, MicOff, Plus, X, Save, Printer, Mail, MessageCircle,
   Download, Loader2, Sparkles, FileText, Languages, AlertTriangle,
-  Calendar, CheckCircle2
+  Calendar, CheckCircle2, Brain
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
+import ClinicalDecisionSupport from './ClinicalDecisionSupport';
 
 export default function DigitalPrescriptionPad({ patient, encounter, workspace, monitoringPlan, previousPrescription, onClose }) {
   const [language, setLanguage] = useState('English');
@@ -290,6 +291,26 @@ export default function DigitalPrescriptionPad({ patient, encounter, workspace, 
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Clinical Decision Support */}
+          <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+            <CardContent className="p-4">
+              <div className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <Brain className="w-4 h-4 text-indigo-600" />
+                AI Clinical Decision Support
+              </div>
+              <ClinicalDecisionSupport 
+                patient={patient} 
+                medications={medications}
+                chiefComplaint={chiefComplaint}
+                onSuggestionAccept={(suggestion) => {
+                  if (suggestion.type === "test") {
+                    toast.success(`Added: ${suggestion.data.test_name}`);
+                  }
+                }}
+              />
             </CardContent>
           </Card>
 

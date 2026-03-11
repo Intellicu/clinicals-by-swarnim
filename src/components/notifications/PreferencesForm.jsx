@@ -25,14 +25,23 @@ export default function PreferencesForm({ onSaved }) {
 
   const [prefs, setPrefs] = useState({
     email_appointment_reminders: true,
+    sms_appointment_reminders: false,
     reminder_advance_hours: 24,
     second_reminder_hours: 2,
     clinician_new_appointment_alert: true,
     clinician_urgent_update_alert: true,
+    critical_lab_alert: true,
+    severe_diagnosis_alert: true,
     patient_education_reminders: true,
+    follow_up_reminders: true,
     reminder_sender_name: "CliniCals by Swarnim",
     clinic_name: "",
+    clinic_phone: "",
     custom_message: "",
+    notification_email: "",
+    notification_phone: "",
+    quiet_hours_start: "",
+    quiet_hours_end: "",
   });
 
   useEffect(() => {
@@ -119,6 +128,20 @@ export default function PreferencesForm({ onSaved }) {
           </div>
           <div className="flex items-center justify-between">
             <div>
+              <p className="font-medium text-sm">🚨 Critical Lab Results</p>
+              <p className="text-xs text-slate-500">Immediate alert for critical laboratory values</p>
+            </div>
+            <Switch checked={prefs.critical_lab_alert} onCheckedChange={() => toggle("critical_lab_alert")} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-sm">⚠️ Severe Diagnosis Alerts</p>
+              <p className="text-xs text-slate-500">Alert when severe/critical diagnosis is added to history</p>
+            </div>
+            <Switch checked={prefs.severe_diagnosis_alert} onCheckedChange={() => toggle("severe_diagnosis_alert")} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
               <p className="font-medium text-sm">Urgent Patient Updates</p>
               <p className="text-xs text-slate-500">Alert on critical monitoring alerts</p>
             </div>
@@ -126,7 +149,14 @@ export default function PreferencesForm({ onSaved }) {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-sm">Patient Education Reminders</p>
+              <p className="font-medium text-sm">Follow-up Reminders</p>
+              <p className="text-xs text-slate-500">Remind about upcoming patient follow-ups</p>
+            </div>
+            <Switch checked={prefs.follow_up_reminders} onCheckedChange={() => toggle("follow_up_reminders")} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-sm">Patient Education Completion</p>
               <p className="text-xs text-slate-500">Notify when patients complete assigned materials</p>
             </div>
             <Switch checked={prefs.patient_education_reminders} onCheckedChange={() => toggle("patient_education_reminders")} />
@@ -136,20 +166,42 @@ export default function PreferencesForm({ onSaved }) {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Email Template</CardTitle>
+          <CardTitle className="text-base">Communication Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
             <Label className="text-xs">Sender Name</Label>
-            <Input value={prefs.reminder_sender_name} onChange={(e) => setPrefs({ ...prefs, reminder_sender_name: e.target.value })} />
+            <Input value={prefs.reminder_sender_name} onChange={(e) => setPrefs({ ...prefs, reminder_sender_name: e.target.value })} placeholder="CliniCals by Swarnim" />
           </div>
           <div>
             <Label className="text-xs">Clinic Name</Label>
             <Input placeholder="e.g., Swarnim Pediatric Nephrology" value={prefs.clinic_name} onChange={(e) => setPrefs({ ...prefs, clinic_name: e.target.value })} />
           </div>
           <div>
+            <Label className="text-xs">Clinic Phone</Label>
+            <Input placeholder="e.g., +91 98765 43210" value={prefs.clinic_phone} onChange={(e) => setPrefs({ ...prefs, clinic_phone: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs">Alternative Notification Email</Label>
+            <Input type="email" placeholder="Optional - for receiving alerts" value={prefs.notification_email} onChange={(e) => setPrefs({ ...prefs, notification_email: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs">SMS Phone Number</Label>
+            <Input placeholder="For SMS notifications (optional)" value={prefs.notification_phone} onChange={(e) => setPrefs({ ...prefs, notification_phone: e.target.value })} />
+          </div>
+          <div>
             <Label className="text-xs">Custom Footer Message</Label>
             <Input placeholder="e.g., Please arrive 10 minutes early." value={prefs.custom_message} onChange={(e) => setPrefs({ ...prefs, custom_message: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Quiet Hours Start (optional)</Label>
+              <Input type="time" value={prefs.quiet_hours_start} onChange={(e) => setPrefs({ ...prefs, quiet_hours_start: e.target.value })} />
+            </div>
+            <div>
+              <Label className="text-xs">Quiet Hours End (optional)</Label>
+              <Input type="time" value={prefs.quiet_hours_end} onChange={(e) => setPrefs({ ...prefs, quiet_hours_end: e.target.value })} />
+            </div>
           </div>
         </CardContent>
       </Card>
