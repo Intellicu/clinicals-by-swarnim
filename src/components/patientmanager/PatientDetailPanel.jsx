@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Trash2, Calculator, Brain, Syringe, UtensilsCrossed, Activity, FileText, User, Heart, Pill, AlertTriangle, CalendarDays, Clock } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Calculator, Brain, Syringe, UtensilsCrossed, Activity, FileText, User, Heart, Pill, AlertTriangle, CalendarDays, Clock, TrendingUp } from "lucide-react";
 import AppointmentScheduler from "./AppointmentScheduler";
 import MedicalHistoryTimeline from "./MedicalHistoryTimeline";
+import GrowthMonitoringEngine from "../GrowthMonitoringEngine";
 
 export default function PatientDetailPanel({ patient: p, onBack, onEdit, onDelete }) {
   const statusColors = { Active: "bg-green-100 text-green-800", "Follow-up": "bg-blue-100 text-blue-800", Discharged: "bg-slate-100 text-slate-800", Referred: "bg-amber-100 text-amber-800" };
@@ -54,6 +55,7 @@ export default function PatientDetailPanel({ patient: p, onBack, onEdit, onDelet
           <TabsList className="bg-white border shadow-sm w-full flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="overview" className="flex items-center gap-1 text-xs"><User className="w-3 h-3" />Overview</TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-1 text-xs"><Clock className="w-3 h-3" />Medical History</TabsTrigger>
+            <TabsTrigger value="growth" className="flex items-center gap-1 text-xs"><TrendingUp className="w-3 h-3" />Growth Monitoring</TabsTrigger>
             <TabsTrigger value="appointments" className="flex items-center gap-1 text-xs"><CalendarDays className="w-3 h-3" />Appointments</TabsTrigger>
             <TabsTrigger value="tools" className="flex items-center gap-1 text-xs"><Calculator className="w-3 h-3" />Clinical Tools</TabsTrigger>
           </TabsList>
@@ -135,6 +137,11 @@ export default function PatientDetailPanel({ patient: p, onBack, onEdit, onDelet
           {/* MEDICAL HISTORY TAB */}
           <TabsContent value="history" className="mt-4">
             <MedicalHistoryTimeline patient={p} />
+          </TabsContent>
+
+          {/* GROWTH MONITORING TAB */}
+          <TabsContent value="growth" className="mt-4">
+            <GrowthMonitoringEngine patient={p} />
           </TabsContent>
 
           {/* APPOINTMENTS TAB */}
