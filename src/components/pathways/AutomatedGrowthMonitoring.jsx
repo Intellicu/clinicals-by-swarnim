@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, AlertTriangle, CheckCircle2, Info, Plus, RefreshCw, Activity } from "lucide-react";
+import { TrendingUp, AlertTriangle, CheckCircle2, Info, Plus, RefreshCw, Activity, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { format } from "date-fns";

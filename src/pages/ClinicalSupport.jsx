@@ -99,6 +99,7 @@ import BiopsyAnalyzer from '../components/clinical-ai/BiopsyAnalyzer';
 import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
 import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
+import GlomerularDiseasesPathway from '../components/pathways/GlomerularDiseasesPathway';
 
 
 // Symptom templates based on chief complaints
@@ -1684,10 +1685,10 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-3 md:p-6">
       <div className="max-w-7xl mx-auto">
         <Link to={createPageUrl("Hub")}>
-          <Button variant="outline" className="mb-4">
+          <Button variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
@@ -1701,28 +1702,36 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
           <p className="text-slate-600">Evidence-based protocols with file upload, guided symptom entry, and comprehensive pathways - {clinicalScenarios.length}+ scenarios</p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-100">
-            <TabsTrigger value="diagnostic" className="flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              AI Diagnostic Agent
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-100 h-auto p-1 gap-1">
+            <TabsTrigger value="diagnostic" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Brain className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">AI Diagnostic</span><span className="sm:hidden">Dx Agent</span>
             </TabsTrigger>
-            <TabsTrigger value="ai-agents" className="flex items-center gap-2">
-              <Microscope className="w-4 h-4" />
-              Clinical AI Agents
+            <TabsTrigger value="glomerular" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Microscope className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Glomerular Diseases</span><span className="sm:hidden">GN</span>
             </TabsTrigger>
-            <TabsTrigger value="scenarios" className="flex items-center gap-2">
-              <Clipboard className="w-4 h-4" />
-              Clinical Scenarios ({clinicalScenarios.length})
+            <TabsTrigger value="ai-agents" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Microscope className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Clinical AI</span><span className="sm:hidden">AI</span>
             </TabsTrigger>
-            <TabsTrigger value="pathways" className="flex items-center gap-2">
-              <GitBranch className="w-4 h-4" />
-              Decision Pathways
+            <TabsTrigger value="scenarios" className="flex items-center gap-1 text-xs sm:text-sm">
+              <Clipboard className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Scenarios ({clinicalScenarios.length})</span><span className="sm:hidden">Cases</span>
             </TabsTrigger>
-          </TabsList>
+            <TabsTrigger value="pathways" className="flex items-center gap-1 text-xs sm:text-sm">
+              <GitBranch className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Pathways</span><span className="sm:hidden">Path</span>
+            </TabsTrigger>
+            </TabsList>
 
           <TabsContent value="diagnostic">
             {renderDiagnosticAgent()}
+          </TabsContent>
+
+          <TabsContent value="glomerular">
+            <GlomerularDiseasesPathway />
           </TabsContent>
 
           <TabsContent value="ai-agents">

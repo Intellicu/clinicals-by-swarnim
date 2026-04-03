@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Baby, Syringe, Scale, TrendingUp, Activity } from "lucide-react";
 import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
-import VaccinationPathway from "../components/pathways/VaccinationPathway.jsx";
+import EnhancedVaccinationPathway from "../components/pathways/EnhancedVaccinationPathway.jsx";
 import PediatricNutritionPathway from "../components/pathways/PediatricNutritionPathway.jsx";
 
 export default function PediatricsHub() {
@@ -43,7 +43,7 @@ export default function PediatricsHub() {
           </TabsList>
 
           <TabsContent value="growth"><GrowthMonitoringPathway /></TabsContent>
-          <TabsContent value="vaccination"><VaccinationPathway /></TabsContent>
+          <TabsContent value="vaccination"><EnhancedVaccinationPathway /></TabsContent>
           <TabsContent value="nutrition"><PediatricNutritionPathway /></TabsContent>
         </Tabs>
       </div>
