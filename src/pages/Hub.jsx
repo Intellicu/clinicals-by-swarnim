@@ -37,7 +37,8 @@ import {
   Microscope,
   Info,
   GitBranch,
-  Users
+  Users,
+  Dna
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -83,8 +84,8 @@ export default function Hub() {
     { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
     { name: "Diet Generator", icon: UtensilsCrossed, color: "bg-green-600", page: "DietGenerator" },
     { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
-    { name: "Patient Manager", icon: Users, color: "bg-violet-600", page: "PatientManager" },
-    { name: "Analytics", icon: TrendingUp, color: "bg-orange-600", page: "ClinicAnalyticsDashboard" },
+    { name: "AI Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub" },
+    { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer" },
   ];
 
   const toolsNavigation = [
