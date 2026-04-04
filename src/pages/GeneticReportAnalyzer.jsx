@@ -93,22 +93,43 @@ export default function GeneticReportAnalyzer() {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  useEffect(() => { initConversation(); }, []);
+  useEffect(() => {
+    let unsubscribe = null;
+    const init = async () => {
+      try {
+        const conv = await base44.agents.createConversation({
+          agent_name: "genetic_report_analyzer",
+          metadata: { name: "Genetic Analysis Session", created: new Date().toISOString() },
+        });
+        setConversation(conv);
+        unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
+          setMessages(data.messages || []);
+        });
+      } catch (e) {
+        console.error("Failed to init conversation:", e);
+        toast.error("Failed to start session — please refresh");
+      }
+    };
+    init();
+    return () => { if (unsubscribe) unsubscribe(); };
+  }, []);
+
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   const initConversation = async () => {
+    let unsubFn = null;
     try {
       const conv = await base44.agents.createConversation({
         agent_name: "genetic_report_analyzer",
         metadata: { name: "Genetic Analysis Session", created: new Date().toISOString() },
       });
       setConversation(conv);
-      const unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
+      unsubFn = base44.agents.subscribeToConversation(conv.id, (data) => {
         setMessages(data.messages || []);
       });
-      return () => unsubscribe();
-    } catch {
-      toast.error("Failed to start session");
+    } catch (e) {
+      console.error("initConversation error:", e);
+      toast.error("Failed to start session — please refresh");
     }
   };
 
@@ -155,7 +176,7 @@ export default function GeneticReportAnalyzer() {
             <p className="text-xs text-slate-500 hidden sm:block">ACMG Variant Classification · Genomic Report Interpretation · Counselling Guidance</p>
           </div>
           <div className="flex gap-1">
-            <Button size="sm" variant="outline" onClick={() => { setMessages([]); setConversation(null); setInput(""); initConversation(); }}>
+            <Button size="sm" variant="outline" onClick={async () => { setMessages([]); setConversation(null); setInput(""); setUploadedFile(null); await initConversation(); }}>
               <Plus className="w-3 h-3 mr-1" />New
             </Button>
           </div>
