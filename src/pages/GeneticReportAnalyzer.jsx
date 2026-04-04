@@ -99,7 +99,7 @@ export default function GeneticReportAnalyzer() {
   const initConversation = async () => {
     try {
       const conv = await base44.agents.createConversation({
-        agent_name: "genetic_analyzer",
+        agent_name: "genetic_report_analyzer",
         metadata: { name: "Genetic Analysis Session", created: new Date().toISOString() },
       });
       setConversation(conv);
