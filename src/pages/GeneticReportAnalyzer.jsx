@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
+import PedigreeVisualizer from "../components/PedigreeVisualizer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Dna, Send, Loader2, Upload, Copy, Plus, Trash2, User, BookOpen, ChevronDown, ChevronUp, GraduationCap, Info, CheckCircle, X, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Dna, Send, Loader2, Upload, Copy, Plus, User, BookOpen, ChevronDown, ChevronUp, GraduationCap, Info, X, Users } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
@@ -83,6 +84,7 @@ const EXAMPLE_QUERIES = [
 export default function GeneticReportAnalyzer() {
   const [activeMainTab, setActiveMainTab] = useState("analyzer");
   const [acmgTab, setAcmgTab] = useState("pathogenic");
+  const activeSubRef = useRef(null);
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -104,7 +106,9 @@ export default function GeneticReportAnalyzer() {
         setConversation(conv);
         unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
           setMessages(data.messages || []);
+          setIsLoading(false);
         });
+        activeSubRef.current = unsubscribe;
       } catch (e) {
         console.error("Failed to init conversation:", e);
         toast.error("Failed to start session — please refresh");
@@ -117,16 +121,18 @@ export default function GeneticReportAnalyzer() {
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   const initConversation = async () => {
-    let unsubFn = null;
+    if (activeSubRef.current) { activeSubRef.current(); activeSubRef.current = null; }
     try {
       const conv = await base44.agents.createConversation({
         agent_name: "genetic_report_analyzer",
         metadata: { name: "Genetic Analysis Session", created: new Date().toISOString() },
       });
       setConversation(conv);
-      unsubFn = base44.agents.subscribeToConversation(conv.id, (data) => {
+      const unsub = base44.agents.subscribeToConversation(conv.id, (data) => {
         setMessages(data.messages || []);
+        setIsLoading(false);
       });
+      activeSubRef.current = unsub;
     } catch (e) {
       console.error("initConversation error:", e);
       toast.error("Failed to start session — please refresh");
@@ -151,13 +157,18 @@ export default function GeneticReportAnalyzer() {
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    e.target.value = "";
     setIsUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setUploadedFile({ name: file.name, url: file_url });
-      toast.success("File uploaded");
-    } catch { toast.error("Upload failed"); }
-    finally { setIsUploading(false); }
+      toast.success(`${file.name} uploaded — click Send to analyze`);
+    } catch (err) {
+      console.error("Upload error:", err);
+      toast.error("Upload failed — please try again");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const userMessages = messages.filter(m => m.role === "user" || m.role === "assistant");
@@ -188,6 +199,7 @@ export default function GeneticReportAnalyzer() {
         <div className="max-w-6xl mx-auto flex gap-1 overflow-x-auto py-1">
           {[
             { id: "analyzer", label: "AI Analyzer", icon: Dna },
+            { id: "pedigree", label: "Pedigree Builder", icon: Users },
             { id: "acmg", label: "ACMG Criteria", icon: BookOpen },
             { id: "genes", label: "Nephrology Gene Panel", icon: GraduationCap },
             { id: "guide", label: "Report Guide", icon: Info },
@@ -313,6 +325,13 @@ export default function GeneticReportAnalyzer() {
               <p className="text-center text-xs text-slate-400 mt-1">Ctrl/Cmd+Enter to send</p>
             </div>
           </div>
+        )}
+
+        {/* ── PEDIGREE TAB ── */}
+        {activeMainTab === "pedigree" && (
+          <PedigreeVisualizer
+            reportVariants={messages.filter(m => m.role === "user").map(m => m.content).join(" ").slice(0, 120)}
+          />
         )}
 
         {/* ── ACMG CRITERIA TAB ── */}
