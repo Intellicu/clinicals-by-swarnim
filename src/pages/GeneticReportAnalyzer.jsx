@@ -142,16 +142,22 @@ export default function GeneticReportAnalyzer() {
   const sendMessage = async (text) => {
     const msg = text || input.trim();
     if (!msg && !uploadedFile) return;
-    if (!conversation) return;
+    if (!conversation) { toast.error("Session not ready — please wait or click New"); return; }
     setIsLoading(true);
     setInput("");
+    const fileToSend = uploadedFile;
+    setUploadedFile(null);
     try {
-      const messageData = { role: "user", content: msg || `Please analyze this genetic report: ${uploadedFile?.name}` };
-      if (uploadedFile) messageData.file_urls = [uploadedFile.url];
+      const content = msg || `Please analyze this genetic report file: ${fileToSend?.name}. Classify any variants found using ACMG criteria, explain gene-disease associations, and provide management guidance.`;
+      const messageData = { role: "user", content };
+      if (fileToSend?.url) messageData.file_urls = [fileToSend.url];
       await base44.agents.addMessage(conversation, messageData);
-      setUploadedFile(null);
-    } catch { toast.error("Failed to send"); }
-    finally { setIsLoading(false); }
+    } catch (e) {
+      console.error("sendMessage error:", e);
+      toast.error("Failed to send message");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFileUpload = async (e) => {
@@ -307,17 +313,17 @@ export default function GeneticReportAnalyzer() {
                 <div className="flex items-center justify-between mt-2 pt-2 border-t">
                   <div className="flex gap-2">
                     <input ref={fileInputRef} type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" onChange={handleFileUpload} className="hidden" />
-                    <Button variant="ghost" size="sm" className="text-xs h-7 text-slate-500" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                      {isUploading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Upload className="w-3 h-3 mr-1" />}
-                      Upload Report
-                    </Button>
+                    <Button variant="ghost" size="sm" className="text-xs h-7 text-slate-500" onClick={() => fileInputRef.current?.click()} disabled={isUploading || !conversation}>
+                       {isUploading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Upload className="w-3 h-3 mr-1" />}
+                       {isUploading ? "Uploading..." : "Upload Report"}
+                      </Button>
                     <Button variant="ghost" size="sm" className="text-xs h-7 text-slate-500"
                       onClick={() => { navigator.clipboard.writeText(userMessages.map(m => `${m.role === "user" ? "CLINICIAN" : "AI"}: ${m.content}`).join("\n\n")); toast.success("Copied"); }}
                       disabled={!messages.length}>
                       <Copy className="w-3 h-3 mr-1" />Copy
                     </Button>
                   </div>
-                  <Button onClick={() => sendMessage()} disabled={isLoading || (!input.trim() && !uploadedFile)} className="bg-purple-600 hover:bg-purple-700 h-8 px-4 text-sm">
+                  <Button onClick={() => sendMessage()} disabled={isLoading || !conversation || (!input.trim() && !uploadedFile)} className="bg-purple-600 hover:bg-purple-700 h-8 px-4 text-sm">
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </Button>
                 </div>
@@ -329,9 +335,7 @@ export default function GeneticReportAnalyzer() {
 
         {/* ── PEDIGREE TAB ── */}
         {activeMainTab === "pedigree" && (
-          <PedigreeVisualizer
-            reportVariants={messages.filter(m => m.role === "user").map(m => m.content).join(" ").slice(0, 120)}
-          />
+          <PedigreeVisualizer reportFindings={messages.filter(m => m.role === "assistant").map(m => m.content).join("\n")} />
         )}
 
         {/* ── ACMG CRITERIA TAB ── */}

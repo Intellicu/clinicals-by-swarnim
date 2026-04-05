@@ -1,417 +1,438 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Users, AlertTriangle, Info, Edit2, Check, X } from "lucide-react";
+import { Plus, Trash2, Info, RefreshCw, Download } from "lucide-react";
+import { toast } from "sonner";
 
-const INHERITANCE_MODES = ["Autosomal Dominant (AD)", "Autosomal Recessive (AR)", "X-Linked Recessive (XLR)", "X-Linked Dominant (XLD)", "Mitochondrial"];
-
-const EMPTY_MEMBER = { id: null, gen: 1, pos: 0, gender: "M", status: "unaffected", name: "", variants: "" };
+const INHERITANCE_PATTERNS = ["AD", "AR", "XL", "XLD", "MT"];
+const VARIANT_COLORS = ["#7c3aed", "#dc2626", "#0891b2", "#16a34a", "#d97706", "#db2777"];
 
 const RISK_CALC = {
-  "Autosomal Dominant (AD)": {
-    carrier_parent: "50% risk to each child",
-    both_carriers: "75% risk per child (50% affected, 25% homozygous)",
-    affected_parent: "50% risk to each child",
-    desc: "One pathogenic variant sufficient to cause disease. AD conditions often show vertical transmission.",
+  AR: (member, members) => {
+    const parents = members.filter(m => member.parentIds?.includes(m.id));
+    const carrierParents = parents.filter(m => m.status === "carrier" || m.status === "affected");
+    const affectedParents = parents.filter(m => m.status === "affected");
+    if (affectedParents.length === 2) return { risk: 100, label: "100% — both parents affected (AR)" };
+    if (carrierParents.length === 2) return { risk: 25, label: "25% affected, 50% carrier (AR carrier × carrier)" };
+    if (carrierParents.length === 1) return { risk: 0, label: "0% affected, 50% carrier risk (AR single carrier parent)" };
+    return null;
   },
-  "Autosomal Recessive (AR)": {
-    carrier_parent: "25% risk if both parents are carriers (carrier × carrier)",
-    one_affected: "100% carriers if other parent unaffected; 50% risk if other parent is carrier",
-    desc: "Two pathogenic variants (biallelic) required. Parents typically unaffected carriers.",
+  AD: (member, members) => {
+    const parents = members.filter(m => member.parentIds?.includes(m.id));
+    const affectedParents = parents.filter(m => m.status === "affected");
+    if (affectedParents.length >= 1) return { risk: 50, label: "50% — one affected parent (AD)" };
+    return null;
   },
-  "X-Linked Recessive (XLR)": {
-    carrier_mother: "50% affected sons, 50% carrier daughters",
-    affected_father: "All daughters obligate carriers; no son-to-son transmission",
-    desc: "Males hemizygous (one X) → affected with one variant. Females usually carriers (protected by normal X).",
-  },
-  "X-Linked Dominant (XLD)": {
-    affected_parent: "50% risk to all children from affected parent",
-    desc: "Heterozygous females affected; hemizygous males often more severely affected or lethal.",
-  },
-  "Mitochondrial": {
-    affected_mother: "All children of an affected mother are at risk; father CANNOT pass to children",
-    desc: "Maternal inheritance only. Variable expressivity due to heteroplasmy.",
+  XL: (member, members) => {
+    const parents = members.filter(m => member.parentIds?.includes(m.id));
+    const carrierMother = parents.find(m => m.gender === "female" && (m.status === "carrier" || m.status === "affected"));
+    const affectedFather = parents.find(m => m.gender === "male" && m.status === "affected");
+    if (member.gender === "male" && carrierMother) return { risk: 50, label: "50% for males — carrier mother (X-linked)" };
+    if (member.gender === "female" && carrierMother) return { risk: 0, label: "Carrier risk 50%, rarely affected (X-linked)" };
+    if (member.gender === "female" && affectedFather) return { risk: 0, label: "Obligate carrier (X-linked, affected father)" };
+    return null;
   },
 };
 
-function MemberSymbol({ member, size = 40, selected, onClick }) {
-  const isAffected = member.status === "affected";
-  const isCarrier = member.status === "carrier";
-  const isProband = member.isProband;
-  const fill = isAffected ? "#7c3aed" : isCarrier ? "url(#carrierGrad)" : "white";
-  const stroke = selected ? "#f59e0b" : isProband ? "#dc2626" : "#475569";
-  const sw = selected || isProband ? 3 : 2;
+const SHAPE_SIZE = 28;
+const H_GAP = 90;
+const V_GAP = 100;
+
+function MemberShape({ member, selected, onClick, onDrag, variantColors }) {
+  const cx = member.x + SHAPE_SIZE;
+  const cy = member.y + SHAPE_SIZE;
+  const r = SHAPE_SIZE;
+  const fill = member.status === "affected" ? "#7c3aed" :
+    member.status === "carrier" ? "url(#halfFill)" :
+    member.status === "deceased" ? "#94a3b8" : "#f8fafc";
+  const stroke = member.status === "proband" ? "#dc2626" : "#475569";
+  const strokeW = member.status === "proband" ? 3 : 1.5;
+
+  const variantDots = (member.variants || []).slice(0, 4).map((v, i) => ({
+    color: variantColors[v] || "#888",
+    x: cx - r + 8 + i * 14,
+    y: cy + r - 4,
+  }));
 
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" onClick={onClick} style={{ cursor: "pointer" }}>
-      <defs>
-        <linearGradient id="carrierGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="50%" stopColor="white" />
-          <stop offset="50%" stopColor="#7c3aed" />
-        </linearGradient>
-      </defs>
-      {member.gender === "M" ? (
-        <rect x="4" y="4" width="32" height="32" rx="3" fill={fill} stroke={stroke} strokeWidth={sw} />
+    <g onClick={() => onClick(member.id)} style={{ cursor: "pointer" }}
+      onMouseDown={e => onDrag(e, member.id)}>
+      {member.gender === "male" ? (
+        <rect x={member.x} y={member.y} width={r * 2} height={r * 2}
+          fill={fill} stroke={stroke} strokeWidth={strokeW} rx={3} />
+      ) : member.gender === "female" ? (
+        <circle cx={cx} cy={cy} r={r} fill={fill} stroke={stroke} strokeWidth={strokeW} />
       ) : (
-        <circle cx="20" cy="20" r="16" fill={fill} stroke={stroke} strokeWidth={sw} />
+        <polygon points={`${cx},${member.y} ${member.x + r * 2},${cy} ${cx},${member.y + r * 2} ${member.x},${cy}`}
+          fill={fill} stroke={stroke} strokeWidth={strokeW} />
       )}
-      {isProband && <text x="20" y="37" textAnchor="middle" fontSize="8" fill="#dc2626" fontWeight="bold">P</text>}
-      {member.isDeceased && <line x1="4" y1="36" x2="36" y2="4" stroke="#475569" strokeWidth="1.5" />}
-    </svg>
+      {member.status === "carrier" && member.gender === "female" && (
+        <circle cx={cx} cy={cy} r={r * 0.5} fill="#7c3aed" opacity={0.7} />
+      )}
+      {member.status === "carrier" && member.gender === "male" && (
+        <rect x={cx - r * 0.5} y={cy - r * 0.5} width={r} height={r}
+          fill="#7c3aed" opacity={0.7} rx={2} />
+      )}
+      {member.status === "deceased" && (
+        <line x1={member.x - 8} y1={member.y + r * 2 + 8} x2={member.x + r * 2 + 8} y2={member.y - 8}
+          stroke="#475569" strokeWidth={1.5} />
+      )}
+      {member.status === "proband" && (
+        <text x={member.x - 8} y={member.y + r * 2 + 12} fontSize={14} fill="#dc2626">↗</text>
+      )}
+      {selected && (
+        <rect x={member.x - 4} y={member.y - 4} width={r * 2 + 8} height={r * 2 + 8}
+          fill="none" stroke="#f59e0b" strokeWidth={2} strokeDasharray="4 2" rx={4} />
+      )}
+      {variantDots.map((d, i) => (
+        <circle key={i} cx={d.x} cy={d.y} r={5} fill={d.color} stroke="white" strokeWidth={1} />
+      ))}
+      <text x={cx} y={member.y + r * 2 + 14} textAnchor="middle" fontSize={10} fill="#475569" fontWeight="500">
+        {member.label || (member.gender === "male" ? "M" : member.gender === "female" ? "F" : "?")}
+      </text>
+      {member.age && (
+        <text x={cx} y={member.y + r * 2 + 25} textAnchor="middle" fontSize={9} fill="#94a3b8">
+          {member.age}y
+        </text>
+      )}
+    </g>
   );
 }
 
-function ConnectorLines({ members }) {
-  // Simple SVG lines connecting gens
+function RelationshipLines({ members }) {
   const lines = [];
-  const byGen = {};
-  members.forEach(m => { if (!byGen[m.gen]) byGen[m.gen] = []; byGen[m.gen].push(m); });
-
-  // Couple lines (same gen, adjacent pos difference of 1)
-  Object.entries(byGen).forEach(([gen, genMembers]) => {
-    const sorted = [...genMembers].sort((a, b) => a.pos - b.pos);
-    for (let i = 0; i < sorted.length - 1; i++) {
-      const a = sorted[i], b = sorted[i + 1];
-      if (b.pos - a.pos === 1 && ((a.gender === "M" && b.gender === "F") || (a.gender === "F" && b.gender === "M"))) {
-        const ax = 80 + a.pos * 100 + 20, ay = (a.gen - 1) * 130 + 60;
-        const bx = 80 + b.pos * 100 + 20, by = (b.gen - 1) * 130 + 60;
-        lines.push(<line key={`couple-${a.id}-${b.id}`} x1={ax} y1={ay} x2={bx} y2={by} stroke="#94a3b8" strokeWidth="2" />);
+  members.forEach(m => {
+    if (m.parentIds?.length === 2) {
+      const p1 = members.find(p => p.id === m.parentIds[0]);
+      const p2 = members.find(p => p.id === m.parentIds[1]);
+      if (p1 && p2) {
+        const midX = (p1.x + p2.x + SHAPE_SIZE * 2) / 2;
+        const parentY = p1.y + SHAPE_SIZE;
+        const childTopX = m.x + SHAPE_SIZE;
+        const childTopY = m.y;
+        lines.push(<line key={`couple-${m.id}`} x1={p1.x + SHAPE_SIZE * 2} y1={parentY} x2={p2.x} y2={parentY} stroke="#94a3b8" strokeWidth={1.5} />);
+        lines.push(<line key={`drop-${m.id}`} x1={midX} y1={parentY} x2={midX} y2={childTopY - 10} stroke="#94a3b8" strokeWidth={1.5} />);
+        lines.push(<line key={`child-${m.id}`} x1={midX} y1={childTopY - 10} x2={childTopX} y2={childTopY - 10} stroke="#94a3b8" strokeWidth={1.5} />);
+        lines.push(<line key={`conn-${m.id}`} x1={childTopX} y1={childTopY - 10} x2={childTopX} y2={childTopY} stroke="#94a3b8" strokeWidth={1.5} />);
       }
     }
   });
-
   return <>{lines}</>;
 }
 
-export default function PedigreeVisualizer({ reportVariants = "" }) {
-  const defaultMembers = [
-    { id: 1, gen: 1, pos: 0, gender: "M", status: "unaffected", name: "Grandfather (P)", variants: "", isProband: false },
-    { id: 2, gen: 1, pos: 1, gender: "F", status: "unaffected", name: "Grandmother (P)", variants: "", isProband: false },
-    { id: 3, gen: 1, pos: 2, gender: "M", status: "unaffected", name: "Grandfather (M)", variants: "", isProband: false },
-    { id: 4, gen: 1, pos: 3, gender: "F", status: "unaffected", name: "Grandmother (M)", variants: "", isProband: false },
-    { id: 5, gen: 2, pos: 0, gender: "M", status: "carrier", name: "Father", variants: "", isProband: false },
-    { id: 6, gen: 2, pos: 1, gender: "F", status: "carrier", name: "Mother", variants: "", isProband: false },
-    { id: 7, gen: 3, pos: 0, gender: "M", status: "affected", name: "Proband", variants: reportVariants, isProband: true },
-  ];
+let nextId = 1;
 
-  const [members, setMembers] = useState(defaultMembers);
+export default function PedigreeVisualizer({ reportFindings = "" }) {
+  const [members, setMembers] = useState([
+    { id: 1, label: "Father", gender: "male", generation: 1, x: 80, y: 60, status: "unaffected", variants: [], parentIds: [] },
+    { id: 2, label: "Mother", gender: "female", generation: 1, x: 220, y: 60, status: "unaffected", variants: [], parentIds: [] },
+    { id: 3, label: "Proband", gender: "male", generation: 2, x: 150, y: 200, status: "proband", variants: [], parentIds: [1, 2] },
+  ]);
+  nextId = Math.max(...members.map(m => m.id)) + 1;
+
   const [selected, setSelected] = useState(null);
-  const [mode, setMode] = useState("Autosomal Recessive (AR)");
-  const [editForm, setEditForm] = useState(null);
-  const [showRisk, setShowRisk] = useState(false);
-  const nextId = useCallback(() => Math.max(0, ...members.map(m => m.id)) + 1, [members]);
+  const [inheritance, setInheritance] = useState("AR");
+  const [variantList, setVariantList] = useState([{ id: 0, label: "Variant 1", color: VARIANT_COLORS[0] }]);
+  const [dragInfo, setDragInfo] = useState(null);
+  const svgRef = useRef(null);
 
   const selectedMember = members.find(m => m.id === selected);
+  const variantColors = Object.fromEntries(variantList.map(v => [v.id, v.color]));
 
-  const addMember = (gen) => {
-    const genMembers = members.filter(m => m.gen === gen);
-    const maxPos = genMembers.length ? Math.max(...genMembers.map(m => m.pos)) + 1 : 0;
-    const nm = { ...EMPTY_MEMBER, id: nextId(), gen, pos: maxPos, name: `Gen ${gen} Member ${maxPos + 1}` };
-    setMembers(prev => [...prev, nm]);
-    setSelected(nm.id);
-    setEditForm({ ...nm });
+  const handleDragStart = useCallback((e, id) => {
+    e.preventDefault();
+    const svgRect = svgRef.current.getBoundingClientRect();
+    const member = members.find(m => m.id === id);
+    setDragInfo({ id, startX: e.clientX - member.x - svgRect.left, startY: e.clientY - member.y - svgRect.top });
+  }, [members]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!dragInfo) return;
+    const svgRect = svgRef.current.getBoundingClientRect();
+    const x = Math.max(0, e.clientX - svgRect.left - dragInfo.startX);
+    const y = Math.max(0, e.clientY - svgRect.top - dragInfo.startY);
+    setMembers(prev => prev.map(m => m.id === dragInfo.id ? { ...m, x, y } : m));
+  }, [dragInfo]);
+
+  const handleMouseUp = useCallback(() => setDragInfo(null), []);
+
+  const addMember = (gender) => {
+    const newId = nextId++;
+    setMembers(prev => [...prev, {
+      id: newId, label: gender === "male" ? "Male" : gender === "female" ? "Female" : "Unknown",
+      gender, generation: 1, x: 60 + Math.random() * 200, y: 60 + Math.random() * 100,
+      status: "unaffected", variants: [], parentIds: [],
+    }]);
+    setSelected(newId);
   };
 
-  const deleteMember = (id) => {
-    setMembers(prev => prev.filter(m => m.id !== id));
-    if (selected === id) { setSelected(null); setEditForm(null); }
+  const updateMember = (field, value) => {
+    setMembers(prev => prev.map(m => m.id === selected ? { ...m, [field]: value } : m));
   };
 
-  const saveEdit = () => {
-    setMembers(prev => prev.map(m => m.id === editForm.id ? { ...editForm } : m));
-    setEditForm(null);
+  const toggleVariant = (variantId) => {
+    setMembers(prev => prev.map(m => {
+      if (m.id !== selected) return m;
+      const has = m.variants.includes(variantId);
+      return { ...m, variants: has ? m.variants.filter(v => v !== variantId) : [...m.variants, variantId] };
+    }));
   };
 
-  const startEdit = (m) => {
-    setSelected(m.id);
-    setEditForm({ ...m });
+  const setParent = (parentId) => {
+    if (!selected || parentId === selected) return;
+    setMembers(prev => prev.map(m => {
+      if (m.id !== selected) return m;
+      const current = m.parentIds || [];
+      if (current.includes(parentId)) return { ...m, parentIds: current.filter(p => p !== parentId) };
+      if (current.length >= 2) { toast.error("Max 2 parents"); return m; }
+      return { ...m, parentIds: [...current, parentId] };
+    }));
   };
 
-  const byGen = {};
-  members.forEach(m => { if (!byGen[m.gen]) byGen[m.gen] = []; byGen[m.gen].push(m); });
-  const maxGen = Math.max(...members.map(m => m.gen), 3);
-  const maxPos = Math.max(...members.map(m => m.pos), 3);
-  const svgW = Math.max(600, (maxPos + 2) * 100 + 100);
-  const svgH = maxGen * 130 + 60;
+  const deleteMember = () => {
+    if (!selected) return;
+    setMembers(prev => prev.filter(m => m.id !== selected).map(m => ({
+      ...m, parentIds: (m.parentIds || []).filter(p => p !== selected)
+    })));
+    setSelected(null);
+  };
 
-  const riskInfo = RISK_CALC[mode] || {};
+  const addVariant = () => {
+    const newId = variantList.length;
+    setVariantList(prev => [...prev, { id: newId, label: `Variant ${newId + 1}`, color: VARIANT_COLORS[newId % VARIANT_COLORS.length] }]);
+  };
 
-  // Calculate affected/carrier counts for risk summary
-  const affectedMembers = members.filter(m => m.status === "affected");
-  const carrierMembers = members.filter(m => m.status === "carrier");
+  const getRiskAssessment = () => {
+    const fn = RISK_CALC[inheritance];
+    if (!fn || !selected) return null;
+    return fn(selectedMember, members);
+  };
+
+  const risk = getRiskAssessment();
+
+  const svgWidth = Math.max(500, ...members.map(m => m.x + SHAPE_SIZE * 2 + 40));
+  const svgHeight = Math.max(350, ...members.map(m => m.y + SHAPE_SIZE * 2 + 60));
 
   return (
     <div className="space-y-4">
       <Alert className="bg-violet-50 border-violet-200">
-        <Users className="w-4 h-4 text-violet-600" />
+        <Info className="w-4 h-4 text-violet-600" />
         <AlertDescription className="text-xs text-violet-900">
-          <strong>Interactive Pedigree Visualizer</strong> — Plot multi-generational family trees, map genetic variants to relatives, and auto-calculate inheritance risk. 
-          <span className="ml-1">Squares = Male · Circles = Female · Purple filled = Affected · Half-purple = Carrier · P = Proband</span>
+          <strong>Interactive Pedigree Builder</strong> — Add family members, drag to position, mark affected/carrier status, assign variants, and set parent-child links. Risk assessment updates automatically based on inheritance pattern.
         </AlertDescription>
       </Alert>
 
       <div className="grid lg:grid-cols-3 gap-4">
-        {/* Controls Panel */}
-        <div className="space-y-3">
-          {/* Inheritance Mode */}
-          <Card>
-            <CardHeader className="pb-2 bg-violet-50 border-b">
-              <CardTitle className="text-sm text-violet-900">Inheritance Mode</CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 space-y-2">
-              <Select value={mode} onValueChange={setMode}>
-                <SelectTrigger className="text-xs h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {INHERITANCE_MODES.map(m => <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-slate-600 leading-relaxed">{riskInfo.desc}</p>
-              <Button size="sm" variant="outline" className="w-full text-xs h-7" onClick={() => setShowRisk(!showRisk)}>
-                {showRisk ? "Hide" : "Show"} Risk Assessment
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Add Members */}
-          <Card>
-            <CardHeader className="pb-2 border-b">
-              <CardTitle className="text-sm">Add Family Members</CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 space-y-2">
-              {[1, 2, 3, 4].map(gen => (
-                <Button key={gen} size="sm" variant="outline" className="w-full text-xs h-7 justify-start"
-                  onClick={() => addMember(gen)}>
-                  <Plus className="w-3 h-3 mr-1" />
-                  Generation {gen} {gen === 1 ? "(Grandparents)" : gen === 2 ? "(Parents)" : gen === 3 ? "(Patient/Siblings)" : "(Children)"}
-                </Button>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Edit Selected */}
-          {editForm && (
-            <Card className="border-amber-300 bg-amber-50">
-              <CardHeader className="pb-2 border-b border-amber-200">
-                <CardTitle className="text-sm text-amber-900 flex items-center gap-2">
-                  <Edit2 className="w-3 h-3" />Edit Member
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3 space-y-2">
-                <div>
-                  <Label className="text-xs">Name</Label>
-                  <Input value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} className="h-7 text-xs mt-0.5" />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-xs">Gender</Label>
-                    <Select value={editForm.gender} onValueChange={v => setEditForm(p => ({ ...p, gender: v }))}>
-                      <SelectTrigger className="h-7 text-xs mt-0.5"><SelectValue /></SelectTrigger>
-                      <SelectContent><SelectItem value="M">Male (□)</SelectItem><SelectItem value="F">Female (○)</SelectItem></SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Status</Label>
-                    <Select value={editForm.status} onValueChange={v => setEditForm(p => ({ ...p, status: v }))}>
-                      <SelectTrigger className="h-7 text-xs mt-0.5"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="unaffected">Unaffected</SelectItem>
-                        <SelectItem value="affected">Affected</SelectItem>
-                        <SelectItem value="carrier">Carrier</SelectItem>
-                        <SelectItem value="deceased">Deceased</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs">Genetic Variants (optional)</Label>
-                  <Input value={editForm.variants} onChange={e => setEditForm(p => ({ ...p, variants: e.target.value }))}
-                    placeholder="e.g. NPHS2 p.Arg229Gln het" className="h-7 text-xs mt-0.5" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" checked={!!editForm.isProband} onChange={e => setEditForm(p => ({ ...p, isProband: e.target.checked }))} className="rounded" />
-                    Mark as Proband
-                  </Label>
-                  <Label className="text-xs flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" checked={!!editForm.isDeceased} onChange={e => setEditForm(p => ({ ...p, isDeceased: e.target.checked }))} className="rounded" />
-                    Deceased
-                  </Label>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" className="flex-1 h-7 text-xs bg-amber-600 hover:bg-amber-700" onClick={saveEdit}>
-                    <Check className="w-3 h-3 mr-1" />Save
+        {/* Canvas */}
+        <div className="lg:col-span-2 space-y-2">
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="pb-2 border-b bg-violet-50">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <CardTitle className="text-sm font-bold text-violet-900">Family Pedigree Canvas</CardTitle>
+                <div className="flex gap-1 flex-wrap">
+                  <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => addMember("male")}>
+                    <Plus className="w-3 h-3 mr-1" />Male ▪
                   </Button>
-                  <Button size="sm" variant="outline" className="h-7 text-xs text-red-600" onClick={() => deleteMember(editForm.id)}>
-                    <Trash2 className="w-3 h-3" />
+                  <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => addMember("female")}>
+                    <Plus className="w-3 h-3 mr-1" />Female ●
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditForm(null); setSelected(null); }}>
-                    <X className="w-3 h-3" />
+                  <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => addMember("unknown")}>
+                    <Plus className="w-3 h-3 mr-1" />Unknown ◆
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Summary */}
-          <Card>
-            <CardHeader className="pb-2 bg-slate-50 border-b">
-              <CardTitle className="text-sm">Family Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 space-y-2">
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-purple-50 rounded p-2 border border-purple-200">
-                  <div className="font-bold text-purple-800 text-lg">{affectedMembers.length}</div>
-                  <div className="text-purple-600">Affected</div>
-                </div>
-                <div className="bg-indigo-50 rounded p-2 border border-indigo-200">
-                  <div className="font-bold text-indigo-800 text-lg">{carrierMembers.length}</div>
-                  <div className="text-indigo-600">Carriers</div>
                 </div>
               </div>
-              {members.filter(m => m.variants).map(m => (
-                <div key={m.id} className="text-xs bg-slate-50 border rounded p-1.5">
-                  <span className="font-semibold text-slate-700">{m.name}: </span>
-                  <span className="text-slate-600">{m.variants}</span>
-                </div>
-              ))}
+            </CardHeader>
+            <CardContent className="p-2 overflow-auto bg-slate-50 rounded-b-xl">
+              <svg
+                ref={svgRef}
+                width={svgWidth} height={svgHeight}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                style={{ minWidth: 480 }}
+              >
+                <defs>
+                  <linearGradient id="halfFill" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="50%" stopColor="#f8fafc" />
+                    <stop offset="50%" stopColor="#7c3aed" stopOpacity={0.7} />
+                  </linearGradient>
+                </defs>
+                <RelationshipLines members={members} />
+                {members.map(m => (
+                  <MemberShape key={m.id} member={m} selected={selected === m.id}
+                    onClick={setSelected} onDrag={handleDragStart} variantColors={variantColors} />
+                ))}
+              </svg>
+            </CardContent>
+          </Card>
+
+          {/* Legend */}
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
+                <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 border-2 border-slate-500 rounded-sm bg-slate-50"></span> Unaffected Male</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 border-2 border-slate-500 rounded-full bg-slate-50"></span> Unaffected Female</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 border-2 border-slate-500 rounded-sm bg-violet-600"></span> Affected</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 border-2 border-red-500 rounded-full bg-slate-50"></span> Proband</span>
+                <span className="flex items-center gap-1"><span className="inline-block w-4 h-4 border-2 border-slate-500 rounded-full bg-violet-300 opacity-70"></span> Carrier</span>
+                <span className="text-slate-400 text-xs">Drag members to reposition • Click to select</span>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Pedigree Canvas */}
-        <div className="lg:col-span-2 space-y-3">
-          <Card>
-            <CardHeader className="pb-2 bg-violet-50 border-b">
-              <CardTitle className="text-sm text-violet-900">Family Pedigree</CardTitle>
-              <p className="text-xs text-slate-500">Click any symbol to select & edit. Proband marked with red border.</p>
+        {/* Right Panel */}
+        <div className="space-y-3">
+          {/* Inheritance Pattern */}
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="pb-1 border-b bg-slate-50">
+              <CardTitle className="text-xs font-bold text-slate-700">Inheritance Pattern</CardTitle>
             </CardHeader>
-            <CardContent className="p-3 overflow-x-auto">
-              <svg width={svgW} height={svgH} style={{ minWidth: "100%", background: "white", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
-                {/* Generation labels */}
-                {[1, 2, 3, 4].filter(g => byGen[g]).map(g => (
-                  <text key={g} x="8" y={(g - 1) * 130 + 65} fontSize="10" fill="#94a3b8" fontWeight="bold">
-                    Gen {["I", "II", "III", "IV"][g - 1]}
-                  </text>
-                ))}
-                {/* Couple connector lines */}
-                {members.map((m, i) => {
-                  const genMems = [...(byGen[m.gen] || [])].sort((a, b) => a.pos - b.pos);
-                  const idx = genMems.findIndex(gm => gm.id === m.id);
-                  if (idx < genMems.length - 1) {
-                    const next = genMems[idx + 1];
-                    const x1 = 80 + m.pos * 100 + 40;
-                    const y1 = (m.gen - 1) * 130 + 40;
-                    const x2 = 80 + next.pos * 100;
-                    const y2 = (next.gen - 1) * 130 + 40;
-                    if (((m.gender === "M" && next.gender === "F") || (m.gender === "F" && next.gender === "M")) && next.pos - m.pos === 1) {
-                      return <line key={`h-${m.id}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#94a3b8" strokeWidth="2" />;
-                    }
-                  }
-                  return null;
-                })}
-                {/* Members */}
-                {members.map(m => {
-                  const x = 80 + m.pos * 100;
-                  const y = (m.gen - 1) * 130 + 20;
-                  const isSelected = selected === m.id;
-                  const isAffected = m.status === "affected";
-                  const isCarrier = m.status === "carrier";
-                  const fill = isAffected ? "#7c3aed" : isCarrier ? "#e9d5ff" : "white";
-                  const stroke = isSelected ? "#f59e0b" : m.isProband ? "#dc2626" : "#475569";
-                  const sw = isSelected || m.isProband ? 3 : 2;
-
-                  return (
-                    <g key={m.id} onClick={() => { setSelected(m.id); setEditForm({ ...m }); }} style={{ cursor: "pointer" }}>
-                      {m.gender === "M" ? (
-                        <rect x={x} y={y} width="40" height="40" rx="3" fill={fill} stroke={stroke} strokeWidth={sw} />
-                      ) : (
-                        <circle cx={x + 20} cy={y + 20} r="20" fill={fill} stroke={stroke} strokeWidth={sw} />
-                      )}
-                      {isCarrier && m.gender === "M" && (
-                        <polygon points={`${x + 20},${y + 5} ${x + 35},${y + 35} ${x + 5},${y + 35}`} fill="#7c3aed" opacity="0.5" />
-                      )}
-                      {m.isDeceased && <line x1={x - 3} y1={y + 43} x2={x + 43} y2={y - 3} stroke="#475569" strokeWidth="1.5" />}
-                      {m.isProband && <text x={x + 20} y={y + 56} textAnchor="middle" fontSize="9" fill="#dc2626" fontWeight="bold">▲ Proband</text>}
-                      <text x={x + 20} y={y + 65} textAnchor="middle" fontSize="9" fill="#475569">
-                        {m.name.length > 12 ? m.name.slice(0, 11) + "…" : m.name}
-                      </text>
-                      {m.variants && <text x={x + 20} y={y + 76} textAnchor="middle" fontSize="7" fill="#7c3aed">🧬</text>}
-                    </g>
-                  );
-                })}
-              </svg>
-              {/* Legend */}
-              <div className="flex flex-wrap gap-3 mt-3 text-xs text-slate-600">
-                {[
-                  { color: "#7c3aed", label: "Affected", shape: "square" },
-                  { color: "#e9d5ff", label: "Carrier", shape: "square" },
-                  { color: "white", label: "Unaffected", shape: "square" },
-                ].map(l => (
-                  <div key={l.label} className="flex items-center gap-1">
-                    <div className={`w-4 h-4 rounded-sm border-2 border-slate-500`} style={{ background: l.color }} />
-                    {l.label}
-                  </div>
-                ))}
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 rounded-full border-2 border-slate-500 bg-white" />Female
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 border-2 border-red-600 bg-white" />Proband
-                </div>
-              </div>
+            <CardContent className="p-3 flex flex-wrap gap-1">
+              {INHERITANCE_PATTERNS.map(p => (
+                <Button key={p} size="sm" variant={inheritance === p ? "default" : "outline"}
+                  className={`text-xs h-7 ${inheritance === p ? "bg-violet-600" : ""}`}
+                  onClick={() => setInheritance(p)}>{p}</Button>
+              ))}
             </CardContent>
           </Card>
 
-          {/* Risk Assessment */}
-          {showRisk && (
-            <Card className="border-orange-200 bg-orange-50">
-              <CardHeader className="pb-2 border-b border-orange-200">
-                <CardTitle className="text-sm text-orange-900 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  Inheritance Risk Assessment — {mode}
-                </CardTitle>
+          {/* Variants */}
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="pb-1 border-b bg-slate-50">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xs font-bold text-slate-700">Variants Tracked</CardTitle>
+                <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={addVariant}>
+                  <Plus className="w-3 h-3 mr-1" />Add
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-3 space-y-1">
+              {variantList.map(v => (
+                <div key={v.id} className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: v.color }}></span>
+                  <input
+                    value={v.label}
+                    onChange={e => setVariantList(prev => prev.map(vv => vv.id === v.id ? { ...vv, label: e.target.value } : vv))}
+                    className="text-xs flex-1 border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-violet-300"
+                  />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Selected Member Editor */}
+          {selectedMember ? (
+            <Card className="bg-white shadow-sm border-2 border-violet-200">
+              <CardHeader className="pb-1 border-b bg-violet-50">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xs font-bold text-violet-900">Edit: {selectedMember.label}</CardTitle>
+                  <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-red-500" onClick={deleteMember}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
               </CardHeader>
-              <CardContent className="p-4 space-y-2">
-                <p className="text-xs text-orange-900 font-medium">{riskInfo.desc}</p>
-                <div className="space-y-2">
-                  {Object.entries(riskInfo).filter(([k]) => k !== "desc").map(([scenario, risk]) => (
-                    <div key={scenario} className="bg-white rounded-lg p-2.5 border border-orange-200">
-                      <div className="text-xs font-semibold text-slate-700 capitalize">{scenario.replace(/_/g, " ")}</div>
-                      <div className="text-xs text-orange-800 mt-0.5">{risk}</div>
-                    </div>
-                  ))}
+              <CardContent className="p-3 space-y-2 text-xs">
+                <div>
+                  <label className="text-slate-600 font-medium">Name/Label</label>
+                  <input value={selectedMember.label} onChange={e => updateMember("label", e.target.value)}
+                    className="w-full mt-0.5 border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-violet-300" />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-slate-600 font-medium">Gender</label>
+                    <select value={selectedMember.gender} onChange={e => updateMember("gender", e.target.value)}
+                      className="w-full mt-0.5 border rounded px-2 py-1 text-xs">
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="unknown">Unknown</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-slate-600 font-medium">Age (yrs)</label>
+                    <input type="number" value={selectedMember.age || ""} onChange={e => updateMember("age", e.target.value)}
+                      className="w-full mt-0.5 border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-violet-300"
+                      placeholder="optional" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-slate-600 font-medium">Status</label>
+                  <select value={selectedMember.status} onChange={e => updateMember("status", e.target.value)}
+                    className="w-full mt-0.5 border rounded px-2 py-1 text-xs">
+                    {["unaffected", "affected", "carrier", "proband", "deceased"].map(s => (
+                      <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-slate-600 font-medium mb-1 block">Variants Carried</label>
+                  <div className="flex flex-wrap gap-1">
+                    {variantList.map(v => (
+                      <button key={v.id} onClick={() => toggleVariant(v.id)}
+                        className={`px-2 py-0.5 rounded-full text-xs border transition-all ${selectedMember.variants?.includes(v.id) ? "text-white" : "bg-white text-slate-600"}`}
+                        style={selectedMember.variants?.includes(v.id) ? { background: v.color, borderColor: v.color } : { borderColor: v.color }}>
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-slate-600 font-medium mb-1 block">Parents (click to link)</label>
+                  <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                    {members.filter(m => m.id !== selected).map(m => (
+                      <button key={m.id} onClick={() => setParent(m.id)}
+                        className={`px-2 py-0.5 rounded text-xs border transition-all ${selectedMember.parentIds?.includes(m.id) ? "bg-violet-100 border-violet-400 text-violet-800 font-semibold" : "bg-white border-slate-200 text-slate-600"}`}>
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Auto-assessed risk based on current pedigree */}
-                {affectedMembers.length > 0 && (
-                  <div className="bg-white rounded-lg p-3 border-2 border-orange-300 mt-2">
-                    <div className="text-xs font-bold text-slate-800 mb-1">📊 Auto-Assessed from Pedigree</div>
-                    {mode === "Autosomal Recessive (AR)" && carrierMembers.filter(m => m.gen === 2).length >= 2 && (
-                      <p className="text-xs text-orange-900">Both parents appear to be carriers → <strong>25% risk per child</strong>. Unaffected siblings have a 2/3 chance of being carriers. Recommend parental carrier testing and genetic counselling.</p>
-                    )}
-                    {mode === "Autosomal Dominant (AD)" && affectedMembers.filter(m => m.gen <= 2).length > 0 && (
-                      <p className="text-xs text-orange-900">Vertical transmission pattern detected → <strong>50% risk per child</strong> of affected parent. Consider predictive testing for at-risk relatives.</p>
-                    )}
-                    {mode === "X-Linked Recessive (XLR)" && affectedMembers.filter(m => m.gender === "M").length > 0 && (
-                      <p className="text-xs text-orange-900">Affected males with likely carrier female → <strong>50% of sons affected, 50% of daughters carriers</strong>. No male-to-male transmission. Test maternal family.</p>
-                    )}
-                    {mode !== "Autosomal Recessive (AR)" && mode !== "Autosomal Dominant (AD)" && mode !== "X-Linked Recessive (XLR)" && (
-                      <p className="text-xs text-slate-600">Add more family members and mark their status to generate specific risk assessment for {mode}.</p>
+                {/* Risk Assessment */}
+                {risk && (
+                  <div className="bg-amber-50 border border-amber-200 rounded p-2">
+                    <p className="font-semibold text-amber-900 text-xs">⚠️ Inheritance Risk ({inheritance})</p>
+                    <p className="text-amber-800 text-xs mt-0.5">{risk.label}</p>
+                    {risk.risk > 0 && (
+                      <div className="mt-1 h-2 bg-amber-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-amber-500 rounded-full transition-all" style={{ width: `${risk.risk}%` }} />
+                      </div>
                     )}
                   </div>
                 )}
-
-                <p className="text-xs text-orange-700 font-medium mt-2">⚠️ Risk estimates are for educational purposes only. Formal genetic counselling required for clinical decisions.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-slate-50 border-dashed border-2 border-slate-200">
+              <CardContent className="p-4 text-center text-xs text-slate-500">
+                Click a family member on the canvas to edit their details, assign variants, and link parents.
               </CardContent>
             </Card>
           )}
+
+          {/* Family Risk Summary */}
+          <Card className="bg-white shadow-sm">
+            <CardHeader className="pb-1 border-b bg-slate-50">
+              <CardTitle className="text-xs font-bold text-slate-700">Family Risk Summary ({inheritance})</CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 space-y-1">
+              {members.map(m => {
+                const fn = RISK_CALC[inheritance];
+                const r = fn ? fn(m, members) : null;
+                return r ? (
+                  <div key={m.id} className="flex items-center justify-between gap-2 text-xs">
+                    <span className="font-medium text-slate-700">{m.label}</span>
+                    <Badge className="bg-amber-100 text-amber-800 text-xs">{r.risk}%</Badge>
+                  </div>
+                ) : null;
+              })}
+              {!members.some(m => { const fn = RISK_CALC[inheritance]; return fn && fn(m, members); }) && (
+                <p className="text-xs text-slate-400">Link parents to members to calculate inheritance risks.</p>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
