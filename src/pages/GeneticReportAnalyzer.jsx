@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import PedigreeVisualizer from "../components/PedigreeVisualizer";
+import CounselingGenerator from "../components/genetic/CounselingGenerator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Dna, Send, Loader2, Upload, Copy, Plus, User, BookOpen, ChevronDown, ChevronUp, GraduationCap, Info, X, Users } from "lucide-react";
+import { ArrowLeft, Dna, Send, Loader2, Upload, Copy, Plus, User, BookOpen, ChevronDown, ChevronUp, GraduationCap, Info, X, Users, Heart, GitBranch } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
@@ -205,7 +206,8 @@ export default function GeneticReportAnalyzer() {
         <div className="max-w-6xl mx-auto flex gap-1 overflow-x-auto py-1">
           {[
             { id: "analyzer", label: "AI Analyzer", icon: Dna },
-            { id: "pedigree", label: "Pedigree Builder", icon: Users },
+            { id: "counseling", label: "Counseling Generator", icon: Heart },
+            { id: "pedigree", label: "Pedigree Builder", icon: GitBranch },
             { id: "acmg", label: "ACMG Criteria", icon: BookOpen },
             { id: "genes", label: "Nephrology Gene Panel", icon: GraduationCap },
             { id: "guide", label: "Report Guide", icon: Info },
@@ -331,6 +333,14 @@ export default function GeneticReportAnalyzer() {
               <p className="text-center text-xs text-slate-400 mt-1">Ctrl/Cmd+Enter to send</p>
             </div>
           </div>
+        )}
+
+        {/* ── COUNSELING TAB ── */}
+        {activeMainTab === "counseling" && (
+          <CounselingGenerator
+            conversation={conversation}
+            onSendMessage={sendMessage}
+          />
         )}
 
         {/* ── PEDIGREE TAB ── */}
