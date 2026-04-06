@@ -1,0 +1,133 @@
+{
+  "name": "OPDQueue",
+  "type": "object",
+  "properties": {
+    "queue_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of OPD session"
+    },
+    "token_number": {
+      "type": "number",
+      "description": "Sequential token number for the day"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity (if registered)"
+    },
+    "walk_in_name": {
+      "type": "string",
+      "description": "Name for walk-in/unregistered patients"
+    },
+    "walk_in_age": {
+      "type": "number"
+    },
+    "walk_in_gender": {
+      "type": "string",
+      "enum": [
+        "Male",
+        "Female",
+        "Other"
+      ]
+    },
+    "contact_number": {
+      "type": "string"
+    },
+    "arrival_time": {
+      "type": "string",
+      "description": "Time of arrival HH:MM"
+    },
+    "registration_time": {
+      "type": "string",
+      "description": "Time token was issued HH:MM"
+    },
+    "chief_complaint": {
+      "type": "string",
+      "description": "Presenting complaint (brief)"
+    },
+    "visit_type": {
+      "type": "string",
+      "enum": [
+        "New Patient",
+        "Follow-up",
+        "Emergency Walk-in",
+        "Referral",
+        "Report Review"
+      ],
+      "default": "Follow-up"
+    },
+    "triage_priority": {
+      "type": "string",
+      "enum": [
+        "Routine",
+        "Urgent",
+        "Emergency"
+      ],
+      "default": "Routine"
+    },
+    "triage_notes": {
+      "type": "string",
+      "description": "Triage assessment notes"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Assigned doctor/clinician email"
+    },
+    "call_time": {
+      "type": "string",
+      "description": "Time patient was called HH:MM"
+    },
+    "consultation_start_time": {
+      "type": "string"
+    },
+    "consultation_end_time": {
+      "type": "string"
+    },
+    "wait_time_minutes": {
+      "type": "number",
+      "description": "Calculated wait time in minutes"
+    },
+    "consultation_duration_minutes": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Waiting",
+        "Called",
+        "In Consultation",
+        "Done",
+        "Referred",
+        "Did Not Wait",
+        "Rescheduled"
+      ],
+      "default": "Waiting"
+    },
+    "encounter_id_on_completion": {
+      "type": "string",
+      "description": "ClinicalEncounter ID created after consultation"
+    },
+    "disposition": {
+      "type": "string",
+      "enum": [
+        "Discharged",
+        "Admitted",
+        "Referred Out",
+        "Procedure Scheduled",
+        "Follow-up Given"
+      ],
+      "description": "Final disposition after consultation"
+    },
+    "workspace_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "queue_date",
+    "token_number",
+    "triage_priority"
+  ]
+}

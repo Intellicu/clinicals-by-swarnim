@@ -1,0 +1,127 @@
+{
+  "name": "FamilyHistory",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "consanguinity": {
+      "type": "boolean",
+      "default": false,
+      "description": "Are parents consanguineous?"
+    },
+    "consanguinity_degree": {
+      "type": "string",
+      "enum": [
+        "First Cousins",
+        "Second Cousins",
+        "Third Cousins",
+        "Distant",
+        "Not Applicable"
+      ],
+      "description": "Degree of consanguinity if present"
+    },
+    "affected_relatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string",
+            "description": "e.g. Father, Maternal Uncle, Sibling 1"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "Male",
+              "Female",
+              "Unknown"
+            ]
+          },
+          "condition": {
+            "type": "string",
+            "description": "Diagnosis or symptom"
+          },
+          "age_at_onset": {
+            "type": "number"
+          },
+          "age_at_death": {
+            "type": "number"
+          },
+          "cause_of_death": {
+            "type": "string"
+          },
+          "genetic_testing_done": {
+            "type": "boolean"
+          },
+          "genetic_result": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Array of affected family members"
+    },
+    "unaffected_relatives_tested": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string"
+          },
+          "test_performed": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "inheritance_pattern_inferred": {
+      "type": "string",
+      "enum": [
+        "AD",
+        "AR",
+        "XLR",
+        "XLD",
+        "Mitochondrial",
+        "Sporadic",
+        "Unclear"
+      ],
+      "description": "Inferred from pedigree data"
+    },
+    "family_genetic_testing_status": {
+      "type": "string",
+      "enum": [
+        "Not Started",
+        "In Progress",
+        "Completed",
+        "Declined"
+      ],
+      "default": "Not Started"
+    },
+    "three_generation_history_taken": {
+      "type": "boolean",
+      "default": false
+    },
+    "pedigree_image_url": {
+      "type": "string",
+      "description": "Uploaded pedigree diagram"
+    },
+    "genetic_risk_summary": {
+      "type": "string",
+      "description": "AI or clinician generated risk summary"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "recorded_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id"
+  ]
+}

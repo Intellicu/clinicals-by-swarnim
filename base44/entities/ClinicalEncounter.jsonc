@@ -1,0 +1,203 @@
+{
+  "name": "ClinicalEncounter",
+  "type": "object",
+  "properties": {
+    "workspace_id": {
+      "type": "string",
+      "description": "Reference to Workspace entity"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "clinician_id": {
+      "type": "string",
+      "description": "Clinician email who conducted encounter"
+    },
+    "encounter_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of encounter"
+    },
+    "encounter_type": {
+      "type": "string",
+      "enum": [
+        "First Visit",
+        "Follow-up",
+        "Emergency",
+        "Routine Check"
+      ],
+      "default": "Follow-up"
+    },
+    "reason_for_visit": {
+      "type": "string",
+      "description": "Chief complaint or reason"
+    },
+    "vitals": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "bp_systolic": {
+          "type": "number"
+        },
+        "bp_diastolic": {
+          "type": "number"
+        },
+        "temperature": {
+          "type": "number"
+        },
+        "heart_rate": {
+          "type": "number"
+        }
+      }
+    },
+    "bp_percentile": {
+      "type": "number",
+      "description": "BP percentile for age/sex/height (auto-calculated)"
+    },
+    "bp_classification": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Elevated",
+        "Stage 1 HTN",
+        "Stage 2 HTN"
+      ],
+      "description": "2017 AAP BP classification"
+    },
+    "edema_grade": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Periorbital Only",
+        "Mild",
+        "Moderate",
+        "Severe",
+        "Anasarca"
+      ],
+      "description": "Edema severity grading"
+    },
+    "edema_sites": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Periorbital",
+          "Ascites",
+          "Scrotal/Labial",
+          "Ankle",
+          "Pleural Effusion",
+          "Pericardial"
+        ]
+      },
+      "description": "Sites of edema"
+    },
+    "ns_status_at_visit": {
+      "type": "string",
+      "enum": [
+        "Remission",
+        "Relapse",
+        "Partial Remission",
+        "Not Applicable"
+      ],
+      "description": "NS disease activity at this visit"
+    },
+    "dipstick_result_at_visit": {
+      "type": "string",
+      "enum": [
+        "Negative",
+        "Trace",
+        "1+",
+        "2+",
+        "3+",
+        "4+"
+      ],
+      "description": "Urine dipstick at visit"
+    },
+    "upcr_at_visit": {
+      "type": "number",
+      "description": "Urine protein:creatinine ratio mg/mg"
+    },
+    "steroid_course_number": {
+      "type": "number",
+      "description": "Sequential steroid course number for this patient"
+    },
+    "tanner_stage": {
+      "type": "string",
+      "enum": [
+        "I",
+        "II",
+        "III",
+        "IV",
+        "V",
+        "Not Assessed"
+      ],
+      "description": "Tanner pubertal staging"
+    },
+    "bp_percentile_documented": {
+      "type": "number"
+    },
+    "neurodevelopmental_notes": {
+      "type": "string",
+      "description": "Neurodevelopmental observations (for CKD/genetic conditions)"
+    },
+    "clinical_notes": {
+      "type": "string",
+      "description": "Examination findings and notes"
+    },
+    "assessment": {
+      "type": "string",
+      "description": "Clinical assessment and diagnosis"
+    },
+    "monitoring_summary": {
+      "type": "object",
+      "properties": {
+        "adherence_percentage": {
+          "type": "number"
+        },
+        "missed_days_count": {
+          "type": "number"
+        },
+        "alerts_triggered": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "protein_trend": {
+          "type": "string"
+        }
+      }
+    },
+    "prescription_id": {
+      "type": "string"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "follow_up_reason": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Active",
+        "Completed",
+        "Cancelled"
+      ],
+      "default": "Active"
+    }
+  },
+  "required": [
+    "workspace_id",
+    "patient_id",
+    "clinician_id",
+    "encounter_date"
+  ]
+}

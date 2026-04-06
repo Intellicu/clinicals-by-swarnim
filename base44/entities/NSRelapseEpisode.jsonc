@@ -1,0 +1,137 @@
+{
+  "name": "NSRelapseEpisode",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "episode_number": {
+      "type": "number",
+      "description": "Sequential relapse episode count for this patient"
+    },
+    "relapse_onset_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "remission_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "time_to_remission_days": {
+      "type": "number"
+    },
+    "relapse_trigger": {
+      "type": "string",
+      "enum": [
+        "Infection (URTI)",
+        "Infection (Gastroenteritis)",
+        "Infection (Other)",
+        "Medication Non-compliance",
+        "Unknown",
+        "Seasonal",
+        "Post-vaccination",
+        "Other"
+      ],
+      "description": "Probable trigger for this relapse"
+    },
+    "trigger_details": {
+      "type": "string",
+      "description": "Free text trigger description"
+    },
+    "dipstick_at_relapse": {
+      "type": "string",
+      "enum": [
+        "Trace",
+        "1+",
+        "2+",
+        "3+",
+        "4+"
+      ],
+      "description": "Urine dipstick protein at relapse detection"
+    },
+    "upcr_at_relapse": {
+      "type": "number",
+      "description": "Urine protein:creatinine ratio at relapse (mg/mg)"
+    },
+    "weight_at_relapse_kg": {
+      "type": "number"
+    },
+    "edema_at_relapse": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Periorbital only",
+        "Mild",
+        "Moderate",
+        "Severe",
+        "Anasarca"
+      ]
+    },
+    "hospitalisation_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "hospital_admission_days": {
+      "type": "number"
+    },
+    "steroid_course_used": {
+      "type": "string",
+      "enum": [
+        "Standard ISKDC",
+        "Daily prednisolone",
+        "Alternate day",
+        "IV methylprednisolone",
+        "Other"
+      ],
+      "description": "Steroid regimen for this episode"
+    },
+    "prednisolone_dose_mgkgday": {
+      "type": "number"
+    },
+    "cumulative_steroid_dose_mg": {
+      "type": "number",
+      "description": "Total prednisolone equivalent for this episode"
+    },
+    "additional_therapy": {
+      "type": "string",
+      "description": "e.g. cyclophosphamide, levamisole, rituximab added"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "Complete Remission",
+        "Partial Remission",
+        "Steroid Resistant",
+        "Steroid Dependent Pattern",
+        "Ongoing"
+      ],
+      "default": "Ongoing"
+    },
+    "classification_at_episode": {
+      "type": "string",
+      "enum": [
+        "SSNS",
+        "FRNS",
+        "SDNS",
+        "SRNS",
+        "Unknown"
+      ],
+      "description": "NS classification at time of this episode"
+    },
+    "albumin_at_relapse": {
+      "type": "number",
+      "description": "Serum albumin g/dL"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "recorded_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "relapse_onset_date"
+  ]
+}

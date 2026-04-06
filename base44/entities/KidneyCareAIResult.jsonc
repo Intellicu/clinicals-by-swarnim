@@ -1,0 +1,124 @@
+{
+  "name": "KidneyCareAIResult",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL of dipstick photo uploaded by patient/caregiver"
+    },
+    "capture_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "model_version": {
+      "type": "string",
+      "description": "KidneyCare AI model version used"
+    },
+    "predicted_result": {
+      "type": "string",
+      "enum": [
+        "Negative",
+        "Trace",
+        "1+",
+        "2+",
+        "3+",
+        "4+"
+      ],
+      "description": "AI model predicted protein result"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Model confidence 0-100"
+    },
+    "image_quality_flag": {
+      "type": "string",
+      "enum": [
+        "Good",
+        "Acceptable",
+        "Poor - retake advised"
+      ],
+      "description": "Image quality assessment by model"
+    },
+    "actual_lab_upcr": {
+      "type": "number",
+      "description": "Laboratory UPCR if available for validation (mg/mg)"
+    },
+    "actual_lab_dipstick": {
+      "type": "string",
+      "enum": [
+        "Negative",
+        "Trace",
+        "1+",
+        "2+",
+        "3+",
+        "4+"
+      ],
+      "description": "Lab dipstick if done same day (for agreement calculation)"
+    },
+    "agreement_with_lab": {
+      "type": "boolean",
+      "description": "Whether AI result agreed with lab result"
+    },
+    "weighted_kappa_contribution": {
+      "type": "number",
+      "description": "Individual result contribution to Cohen weighted kappa"
+    },
+    "study_arm": {
+      "type": "string",
+      "enum": [
+        "Validation",
+        "Routine Monitoring",
+        "Research"
+      ],
+      "default": "Routine Monitoring"
+    },
+    "reviewed_by_clinician": {
+      "type": "boolean",
+      "default": false
+    },
+    "reviewed_by": {
+      "type": "string"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "override_result": {
+      "type": "string",
+      "enum": [
+        "Negative",
+        "Trace",
+        "1+",
+        "2+",
+        "3+",
+        "4+"
+      ],
+      "description": "Clinician-corrected result if override applied"
+    },
+    "override_reason": {
+      "type": "string"
+    },
+    "relapse_alert_triggered": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if 2+ or higher for \u22653 consecutive days"
+    },
+    "alert_acknowledged": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "image_url",
+    "capture_timestamp",
+    "predicted_result"
+  ]
+}

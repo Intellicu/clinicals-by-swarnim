@@ -1,0 +1,118 @@
+{
+  "name": "ImmunizationRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "vaccine_name": {
+      "type": "string",
+      "description": "Vaccine name (e.g., Pneumococcal PCV13, Varicella, MMR)"
+    },
+    "vaccine_type": {
+      "type": "string",
+      "enum": [
+        "Live Attenuated",
+        "Inactivated",
+        "Subunit",
+        "mRNA",
+        "Toxoid",
+        "Conjugate"
+      ],
+      "description": "Vaccine type \u2014 critical for immunosuppressed patients"
+    },
+    "live_vaccine": {
+      "type": "boolean",
+      "default": false,
+      "description": "Is this a live vaccine? (contraindicated when immunosuppressed)"
+    },
+    "dose_number": {
+      "type": "number",
+      "description": "Dose number in series (e.g., 1, 2, 3)"
+    },
+    "date_given": {
+      "type": "string",
+      "format": "date"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "batch_number": {
+      "type": "string"
+    },
+    "route": {
+      "type": "string",
+      "enum": [
+        "IM",
+        "SC",
+        "PO",
+        "Intranasal",
+        "ID"
+      ]
+    },
+    "site": {
+      "type": "string",
+      "description": "Injection site (e.g., Left deltoid)"
+    },
+    "given_by": {
+      "type": "string"
+    },
+    "immunosuppression_status_at_time": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Low-dose Prednisolone",
+        "High-dose Steroids",
+        "Calcineurin Inhibitor",
+        "MMF/Azathioprine",
+        "Rituximab",
+        "Post-Rituximab (within 6m)",
+        "Multiple Agents"
+      ],
+      "description": "Immunosuppression status at time of vaccination"
+    },
+    "contraindicated_currently": {
+      "type": "boolean",
+      "default": false
+    },
+    "contraindication_reason": {
+      "type": "string"
+    },
+    "deferred": {
+      "type": "boolean",
+      "default": false
+    },
+    "deferred_reason": {
+      "type": "string"
+    },
+    "deferred_until_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "next_due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "seroconversion_checked": {
+      "type": "boolean",
+      "default": false
+    },
+    "titer_result": {
+      "type": "string",
+      "description": "Antibody titer result if checked"
+    },
+    "adverse_reaction": {
+      "type": "string",
+      "description": "Any adverse reaction noted"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "vaccine_name",
+    "date_given"
+  ]
+}

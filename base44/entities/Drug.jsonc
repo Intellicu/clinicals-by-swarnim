@@ -1,0 +1,170 @@
+{
+  "name": "Drug",
+  "type": "object",
+  "properties": {
+    "generic_name": {
+      "type": "string",
+      "description": "Generic drug name"
+    },
+    "category": {
+      "type": "string",
+      "description": "Drug category (Antihypertensive, Diuretic, Immunosuppressant, etc.)"
+    },
+    "therapeutic_class": {
+      "type": "string",
+      "description": "Specific class (ACE-I, Loop diuretic, etc.)"
+    },
+    "brands_indian": {
+      "type": "string",
+      "description": "Common Indian brand names (comma-separated)"
+    },
+    "indications": {
+      "type": "string",
+      "description": "Clinical indications"
+    },
+    "dose_weight_based": {
+      "type": "string",
+      "description": "Weight-based dosing (e.g., 0.5-2 mg/kg/dose)"
+    },
+    "dose_age_based": {
+      "type": "string",
+      "description": "Age-based or fixed dosing"
+    },
+    "neonatal_dose": {
+      "type": "string",
+      "description": "Neonatal-specific dosing"
+    },
+    "crrt_dose": {
+      "type": "string",
+      "description": "CRRT-specific dosing (separate from HD/PD)"
+    },
+    "dose_calculation_type": {
+      "type": "string",
+      "enum": [
+        "per_dose",
+        "per_day",
+        "TDM",
+        "per_week",
+        "fixed"
+      ],
+      "description": "How to apply dose calculation"
+    },
+    "frequency": {
+      "type": "string",
+      "description": "Dosing frequency (OD, BID, TID, QID, etc.)"
+    },
+    "max_dose_per_day": {
+      "type": "string",
+      "description": "Maximum daily dose"
+    },
+    "route": {
+      "type": "string",
+      "description": "Route of administration (PO, IV, IM, SC, etc.)"
+    },
+    "iv_preparation_instructions": {
+      "type": "string",
+      "description": "IV dilution, rate, compatibility instructions"
+    },
+    "age_limits": {
+      "type": "string",
+      "description": "Age restrictions or recommendations"
+    },
+    "renal_adjust": {
+      "type": "string",
+      "description": "Renal dose adjustments by eGFR bands"
+    },
+    "hepatic_adjust": {
+      "type": "string",
+      "description": "Hepatic dose adjustments"
+    },
+    "hd_adjust": {
+      "type": "string",
+      "description": "Hemodialysis-specific adjustments"
+    },
+    "pd_adjust": {
+      "type": "string",
+      "description": "Peritoneal dialysis adjustments"
+    },
+    "formulations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "form": {
+            "type": "string"
+          },
+          "strength": {
+            "type": "string"
+          },
+          "pack_info": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Available formulations"
+    },
+    "monitoring": {
+      "type": "string",
+      "description": "Required monitoring parameters"
+    },
+    "monitoring_frequency": {
+      "type": "string",
+      "description": "How often TDM or monitoring labs required"
+    },
+    "contraindications": {
+      "type": "string",
+      "description": "Contraindications"
+    },
+    "key_interactions": {
+      "type": "string",
+      "description": "Major drug interactions"
+    },
+    "adverse_effects": {
+      "type": "string",
+      "description": "Common and serious adverse effects"
+    },
+    "live_vaccine_interaction": {
+      "type": "boolean",
+      "default": false,
+      "description": "Contraindicated with live vaccines (immunosuppressants)"
+    },
+    "clinical_pearls": {
+      "type": "string",
+      "description": "Clinical tips and pearls"
+    },
+    "references": {
+      "type": "string",
+      "description": "Reference sources"
+    },
+    "jan_aushadhi_available": {
+      "type": "boolean",
+      "default": false,
+      "description": "Available at Jan Aushadhi Kendras"
+    },
+    "pmjay_covered": {
+      "type": "boolean",
+      "default": false,
+      "description": "Covered under Ayushman Bharat PMJAY"
+    },
+    "approx_cost_per_unit_inr": {
+      "type": "number",
+      "description": "Approximate cost per tablet/vial in INR"
+    },
+    "biosimilar_available": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indian biosimilar available (for biologics)"
+    },
+    "biosimilar_brands": {
+      "type": "string",
+      "description": "Indian biosimilar brand names"
+    }
+  },
+  "required": [
+    "generic_name",
+    "category",
+    "dose_weight_based",
+    "frequency",
+    "route"
+  ]
+}

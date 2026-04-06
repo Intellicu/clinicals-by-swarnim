@@ -1,0 +1,169 @@
+{
+  "name": "RRTMonitoringData",
+  "type": "object",
+  "properties": {
+    "patient_identifier": {
+      "type": "string",
+      "description": "Patient ID or anonymized identifier"
+    },
+    "modality": {
+      "type": "string",
+      "enum": [
+        "HD",
+        "CRRT",
+        "PD",
+        "SLED"
+      ],
+      "description": "RRT modality"
+    },
+    "session_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Session timestamp"
+    },
+    "session_number": {
+      "type": "number",
+      "description": "Session count"
+    },
+    "pre_weight": {
+      "type": "number",
+      "description": "Pre-dialysis weight (kg)"
+    },
+    "post_weight": {
+      "type": "number",
+      "description": "Post-dialysis weight (kg)"
+    },
+    "uf_achieved": {
+      "type": "number",
+      "description": "Ultrafiltration achieved (mL)"
+    },
+    "ktv": {
+      "type": "number",
+      "description": "Kt/V value"
+    },
+    "urr": {
+      "type": "number",
+      "description": "Urea reduction ratio (%)"
+    },
+    "labs": {
+      "type": "object",
+      "properties": {
+        "pre_bun": {
+          "type": "number"
+        },
+        "post_bun": {
+          "type": "number"
+        },
+        "pre_cr": {
+          "type": "number"
+        },
+        "post_cr": {
+          "type": "number"
+        },
+        "pre_k": {
+          "type": "number"
+        },
+        "post_k": {
+          "type": "number"
+        },
+        "pre_na": {
+          "type": "number"
+        },
+        "post_na": {
+          "type": "number"
+        }
+      }
+    },
+    "access_type": {
+      "type": "string",
+      "enum": [
+        "AVF",
+        "AVG",
+        "CVC Temporary",
+        "Permcath",
+        "PD Catheter"
+      ],
+      "description": "Vascular/peritoneal access used this session"
+    },
+    "access_complication": {
+      "type": "string",
+      "description": "Any access complication this session"
+    },
+    "bp_during_session": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "time_hhmm": {
+            "type": "string"
+          },
+          "systolic": {
+            "type": "number"
+          },
+          "diastolic": {
+            "type": "number"
+          },
+          "event": {
+            "type": "string",
+            "description": "e.g. Hypotension episode, fluid bolus given"
+          }
+        }
+      },
+      "description": "Intradialytic BP readings"
+    },
+    "anticoagulation_used": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Unfractionated Heparin",
+        "LMWH",
+        "Regional Citrate",
+        "Saline Flush Only"
+      ],
+      "description": "Anticoagulation strategy"
+    },
+    "filter_type": {
+      "type": "string",
+      "description": "CRRT filter/membrane type used"
+    },
+    "filter_life_hours": {
+      "type": "number",
+      "description": "Filter lifespan hours (CRRT)"
+    },
+    "effluent_volume_ml": {
+      "type": "number",
+      "description": "Total effluent volume mL (CRRT)"
+    },
+    "dose_achieved_mlkghr": {
+      "type": "number",
+      "description": "CRRT dose achieved mL/kg/hour"
+    },
+    "dose_prescribed_mlkghr": {
+      "type": "number",
+      "description": "CRRT dose prescribed mL/kg/hour"
+    },
+    "machine_alarms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Machine alarms and events logged during session"
+    },
+    "complications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Clinical complications during session"
+    },
+    "entered_by": {
+      "type": "string",
+      "description": "User who entered data"
+    }
+  },
+  "required": [
+    "patient_identifier",
+    "modality",
+    "session_date"
+  ]
+}

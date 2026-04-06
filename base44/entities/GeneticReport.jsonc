@@ -1,0 +1,180 @@
+{
+  "name": "GeneticReport",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "laboratory": {
+      "type": "string",
+      "description": "Testing laboratory name"
+    },
+    "lab_accreditation": {
+      "type": "string",
+      "description": "CAP/CLIA/NABL accreditation number"
+    },
+    "report_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of report"
+    },
+    "ordering_clinician": {
+      "type": "string",
+      "description": "Clinician who ordered the test"
+    },
+    "test_type": {
+      "type": "string",
+      "enum": [
+        "Single Gene",
+        "Multi-Gene Panel",
+        "Whole Exome",
+        "Whole Genome",
+        "Karyotype",
+        "Microarray",
+        "Targeted Familial Variant",
+        "Repeat Expansion",
+        "Mitochondrial"
+      ],
+      "description": "Type of genetic test performed"
+    },
+    "indication": {
+      "type": "string",
+      "description": "Clinical indication / phenotype"
+    },
+    "gene_tested": {
+      "type": "string",
+      "description": "Primary gene(s) tested"
+    },
+    "variant_identified": {
+      "type": "string",
+      "description": "Variant in HGVS notation (c. or p.)"
+    },
+    "hgvs_coding": {
+      "type": "string",
+      "description": "c. notation"
+    },
+    "hgvs_protein": {
+      "type": "string",
+      "description": "p. notation"
+    },
+    "zygosity": {
+      "type": "string",
+      "enum": [
+        "Heterozygous",
+        "Homozygous",
+        "Hemizygous",
+        "Compound Heterozygous",
+        "Not Applicable"
+      ],
+      "description": "Zygosity of the variant"
+    },
+    "acmg_classification": {
+      "type": "string",
+      "enum": [
+        "Pathogenic",
+        "Likely Pathogenic",
+        "VUS",
+        "Likely Benign",
+        "Benign",
+        "Not Reported"
+      ],
+      "description": "ACMG 5-tier classification"
+    },
+    "inheritance_pattern": {
+      "type": "string",
+      "enum": [
+        "AD",
+        "AR",
+        "XLR",
+        "XLD",
+        "Mitochondrial",
+        "De Novo",
+        "Unknown"
+      ]
+    },
+    "de_novo_confirmed": {
+      "type": "boolean",
+      "description": "De novo status confirmed by parental testing",
+      "default": false
+    },
+    "phenotype_match": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "Partial",
+        "No",
+        "Unknown"
+      ],
+      "description": "Does variant explain the patient's phenotype?"
+    },
+    "secondary_findings": {
+      "type": "string",
+      "description": "Any secondary/incidental findings reported"
+    },
+    "technical_limitations": {
+      "type": "string",
+      "description": "What this test cannot detect"
+    },
+    "trio_sequencing_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "parental_testing_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "vus_recontact_due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Next VUS reclassification check date"
+    },
+    "counseling_done": {
+      "type": "boolean",
+      "default": false,
+      "description": "Genetic counseling completed"
+    },
+    "counseling_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "family_testing_recommended": {
+      "type": "boolean",
+      "default": false
+    },
+    "family_testing_plan": {
+      "type": "string",
+      "description": "Who should be tested and how"
+    },
+    "ai_interpretation": {
+      "type": "string",
+      "description": "ClinGen Assist AI interpretation summary"
+    },
+    "report_url": {
+      "type": "string",
+      "description": "URL to uploaded report file"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Pending Review",
+        "Reviewed",
+        "Action Required",
+        "Counseling Scheduled",
+        "Completed"
+      ],
+      "default": "Pending Review"
+    }
+  },
+  "required": [
+    "patient_id",
+    "test_type",
+    "report_date"
+  ]
+}

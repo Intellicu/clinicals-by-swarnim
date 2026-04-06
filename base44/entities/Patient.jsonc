@@ -1,0 +1,237 @@
+{
+  "name": "Patient",
+  "type": "object",
+  "properties": {
+    "cr_number": {
+      "type": "string",
+      "description": "Case Record Number (unique identifier)"
+    },
+    "patient_name": {
+      "type": "string",
+      "description": "Full name of patient"
+    },
+    "mobile_number": {
+      "type": "string",
+      "description": "Contact mobile number"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of birth"
+    },
+    "age_years": {
+      "type": "number",
+      "description": "Age in years"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "Male",
+        "Female",
+        "Other"
+      ],
+      "description": "Patient gender"
+    },
+    "guardian_name": {
+      "type": "string",
+      "description": "Parent/guardian name"
+    },
+    "address": {
+      "type": "string",
+      "description": "Residential address"
+    },
+    "diagnosis": {
+      "type": "string",
+      "description": "Primary diagnosis"
+    },
+    "comorbidities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of comorbidities"
+    },
+    "allergies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Known allergies"
+    },
+    "current_medications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Current medication list"
+    },
+    "scanned_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_url": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "extracted_text": {
+            "type": "string"
+          },
+          "upload_date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "description": "Scanned documents with OCR data"
+    },
+    "baseline_vitals": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "number"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "bmi": {
+          "type": "number"
+        },
+        "blood_group": {
+          "type": "string"
+        }
+      }
+    },
+    "attached_monitoring_templates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Monitoring template IDs attached to patient"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Active",
+        "Follow-up",
+        "Discharged",
+        "Referred"
+      ],
+      "default": "Active",
+      "description": "Patient status"
+    },
+    "notes": {
+      "type": "string",
+      "description": "General clinical notes"
+    },
+    "ns_classification": {
+      "type": "string",
+      "enum": [
+        "SSNS",
+        "FRNS",
+        "SDNS",
+        "SRNS",
+        "Unknown",
+        "Not Applicable"
+      ],
+      "description": "Nephrotic syndrome classification"
+    },
+    "ckd_stage": {
+      "type": "string",
+      "enum": [
+        "G1",
+        "G2",
+        "G3a",
+        "G3b",
+        "G4",
+        "G5",
+        "G5D",
+        "Not Applicable"
+      ],
+      "description": "KDIGO CKD stage"
+    },
+    "consanguinity": {
+      "type": "boolean",
+      "default": false,
+      "description": "Parental consanguinity"
+    },
+    "consanguinity_degree": {
+      "type": "string",
+      "enum": [
+        "First Cousins",
+        "Second Cousins",
+        "Third Cousins",
+        "Distant",
+        "Not Applicable"
+      ]
+    },
+    "gestational_age_weeks": {
+      "type": "number",
+      "description": "Gestational age at birth (for neonates)"
+    },
+    "birth_weight_kg": {
+      "type": "number",
+      "description": "Birth weight in kg"
+    },
+    "socioeconomic_status": {
+      "type": "string",
+      "enum": [
+        "APL",
+        "BPL",
+        "PMJAY Beneficiary",
+        "Unknown"
+      ],
+      "description": "Socioeconomic category"
+    },
+    "ayushman_card_number": {
+      "type": "string",
+      "description": "Ayushman Bharat / PMJAY card number"
+    },
+    "religion": {
+      "type": "string",
+      "description": "Religion (relevant for dietary counseling)"
+    },
+    "language_preference": {
+      "type": "string",
+      "enum": [
+        "Hindi",
+        "English",
+        "Maithili",
+        "Bhojpuri",
+        "Other"
+      ],
+      "default": "Hindi",
+      "description": "Preferred language for communication"
+    },
+    "referring_doctor": {
+      "type": "string"
+    },
+    "referring_hospital": {
+      "type": "string"
+    },
+    "district": {
+      "type": "string",
+      "description": "District of origin (Bihar/Jharkhand geography)"
+    },
+    "research_study_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "ResearchProject IDs this patient is enrolled in"
+    },
+    "genetic_report_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "GeneticReport entity IDs linked to this patient"
+    }
+  },
+  "required": [
+    "patient_name",
+    "cr_number"
+  ]
+}

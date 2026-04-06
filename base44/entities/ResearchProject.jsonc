@@ -1,0 +1,187 @@
+{
+  "name": "ResearchProject",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Research project title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Project description and objectives"
+    },
+    "principal_investigator": {
+      "type": "string",
+      "description": "Lead researcher email"
+    },
+    "collaborators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Collaborator emails"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Planning",
+        "Active",
+        "Analysis",
+        "Writing",
+        "Completed",
+        "Archived"
+      ],
+      "default": "Planning"
+    },
+    "included_patients": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Patient IDs included in study"
+    },
+    "data_fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field_name": {
+            "type": "string"
+          },
+          "field_type": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "ethics_approval": {
+      "type": "object",
+      "properties": {
+        "approved": {
+          "type": "boolean"
+        },
+        "approval_number": {
+          "type": "string"
+        },
+        "approval_date": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "manuscripts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "draft_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "export_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "export_type": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ctri_number": {
+      "type": "string",
+      "description": "CTRI registration number (mandatory for Indian trials)"
+    },
+    "icmr_grant_number": {
+      "type": "string",
+      "description": "ICMR grant/project number"
+    },
+    "grant_amount_inr": {
+      "type": "number",
+      "description": "Total grant amount in INR"
+    },
+    "grant_spent_inr": {
+      "type": "number",
+      "description": "Amount utilized to date"
+    },
+    "sample_size_calculated": {
+      "type": "number",
+      "description": "Calculated sample size"
+    },
+    "sample_size_method": {
+      "type": "string",
+      "description": "Power calculation method and assumptions"
+    },
+    "target_events": {
+      "type": "number",
+      "description": "Number of events required for Cox/survival analysis"
+    },
+    "enrollment_current": {
+      "type": "number",
+      "description": "Current enrollment count",
+      "default": 0
+    },
+    "enrollment_target": {
+      "type": "number"
+    },
+    "primary_outcome": {
+      "type": "string",
+      "description": "Primary endpoint"
+    },
+    "secondary_outcomes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Secondary endpoints"
+    },
+    "biomarker_panel": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Biomarkers being collected"
+    },
+    "data_lock_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Planned data lock date"
+    },
+    "study_design": {
+      "type": "string",
+      "enum": [
+        "Prospective Cohort",
+        "Retrospective Cohort",
+        "RCT",
+        "Case-Control",
+        "Cross-Sectional",
+        "Registry",
+        "Pilot"
+      ],
+      "description": "Study design type"
+    }
+  },
+  "required": [
+    "title",
+    "principal_investigator"
+  ]
+}

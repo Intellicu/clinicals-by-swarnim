@@ -1,0 +1,121 @@
+{
+  "name": "GrowthRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "measurement_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "age_at_measurement_months": {
+      "type": "number",
+      "description": "Age in months at time of measurement"
+    },
+    "weight_kg": {
+      "type": "number"
+    },
+    "height_cm": {
+      "type": "number"
+    },
+    "head_circumference_cm": {
+      "type": "number",
+      "description": "For children under 2 years"
+    },
+    "mid_upper_arm_circumference_cm": {
+      "type": "number",
+      "description": "MUAC"
+    },
+    "bmi": {
+      "type": "number",
+      "description": "Calculated BMI kg/m\u00b2"
+    },
+    "weight_for_age_z": {
+      "type": "number",
+      "description": "WHO WAZ score"
+    },
+    "height_for_age_z": {
+      "type": "number",
+      "description": "WHO HAZ score"
+    },
+    "weight_for_height_z": {
+      "type": "number",
+      "description": "WHO WHZ score"
+    },
+    "bmi_for_age_z": {
+      "type": "number",
+      "description": "WHO BMI-for-age Z score"
+    },
+    "who_centile_weight": {
+      "type": "number",
+      "description": "Weight centile (0-100)"
+    },
+    "who_centile_height": {
+      "type": "number",
+      "description": "Height centile (0-100)"
+    },
+    "growth_velocity_cmyr": {
+      "type": "number",
+      "description": "Height velocity cm/year (calculated from prior measurement)"
+    },
+    "stunting": {
+      "type": "boolean",
+      "description": "HAZ < -2 SD",
+      "default": false
+    },
+    "wasting": {
+      "type": "boolean",
+      "description": "WHZ < -2 SD",
+      "default": false
+    },
+    "underweight": {
+      "type": "boolean",
+      "description": "WAZ < -2 SD",
+      "default": false
+    },
+    "overweight": {
+      "type": "boolean",
+      "description": "BMI-for-age > +1 SD",
+      "default": false
+    },
+    "steroid_impact_flag": {
+      "type": "boolean",
+      "description": "Growth affected by steroids",
+      "default": false
+    },
+    "tanner_stage": {
+      "type": "string",
+      "enum": [
+        "I",
+        "II",
+        "III",
+        "IV",
+        "V",
+        "Not Assessed"
+      ],
+      "description": "Tanner pubertal stage"
+    },
+    "bone_age_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "bone_age_years": {
+      "type": "number",
+      "description": "Bone age (Greulich-Pyle) in years"
+    },
+    "assessed_by": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "measurement_date",
+    "weight_kg",
+    "height_cm"
+  ]
+}
