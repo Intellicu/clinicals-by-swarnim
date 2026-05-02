@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Syringe, CheckCircle2, AlertTriangle, Clock, Info, BarChart2, ExternalLink, Eye } from "lucide-react";
+import { Syringe, CheckCircle2, AlertTriangle, Clock, Info, BarChart2, ExternalLink, Eye, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
 
@@ -110,14 +110,35 @@ export default function VaccinationPathway() {
   const calculateDue = () => {
     if (!patientAge) { toast.error("Enter patient age in months"); return; }
     const ageM = parseFloat(patientAge);
-    const due = COMPLETE_SCHEDULE.filter(v => {
-      const windowStart = v.ageMonths;
-      const windowEnd = v.ageMonths + Math.max(6, v.ageMonths * 0.5);
-      return ageM >= windowStart && ageM <= windowEnd && !givenVaccines[v.id];
+
+    // CATCH-UP LOGIC: any vaccine whose scheduled age has passed and hasn't been given
+    // Group by disease to avoid giving completed series twice
+    const catchUpDue = COMPLETE_SCHEDULE.filter(v => {
+      if (givenVaccines[v.id]) return false;
+      // Skip vaccines that have an upper age limit beyond which catch-up is not meaningful
+      const upperLimits = { bcg: 12, opv0: 0.5, hepb_birth: 1, vita1: 12 };
+      if (upperLimits[v.id] && ageM > upperLimits[v.id]) return false;
+      // Catch-up: vaccine was due at or before current age
+      return v.ageMonths <= ageM;
     });
-    setDueVaccines(due);
-    if (due.length === 0) toast.info("No overdue vaccines");
-    else toast.success(`${due.length} vaccines due`);
+
+    // Also flag vaccines due SOON (within next 2 months)
+    const dueSoon = COMPLETE_SCHEDULE.filter(v => {
+      if (givenVaccines[v.id]) return false;
+      return v.ageMonths > ageM && v.ageMonths <= ageM + 2;
+    });
+
+    const allDue = [
+      ...catchUpDue.map(v => ({ ...v, catchUp: true })),
+      ...dueSoon.map(v => ({ ...v, catchUp: false }))
+    ];
+    // Deduplicate
+    const seen = new Set();
+    const deduped = allDue.filter(v => { if (seen.has(v.id)) return false; seen.add(v.id); return true; });
+
+    setDueVaccines(deduped);
+    if (deduped.length === 0) toast.info("All vaccines up to date for this age");
+    else toast.success(`${catchUpDue.length} catch-up + ${dueSoon.length} due soon`);
   };
 
   const filtered = filter === "all" ? COMPLETE_SCHEDULE : COMPLETE_SCHEDULE.filter(v => v.category === filter);
@@ -164,21 +185,53 @@ export default function VaccinationPathway() {
           </div>
           {dueVaccines.length > 0 && (
             <div className="space-y-2 mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-              <h4 className="font-bold text-sm text-amber-900 flex items-center gap-1"><AlertTriangle className="w-4 h-4" />Due / Overdue Vaccines ({dueVaccines.length})</h4>
-              {dueVaccines.map(v => (
-                <div key={v.id} className="flex items-center justify-between p-2 bg-white rounded border">
-                  <div>
-                    <span className="font-semibold text-sm text-slate-900">{v.name}</span>
-                    <span className="text-xs text-amber-700 ml-2">Due at {v.age}</span>
-                  </div>
-                  <Badge className={categoryColors[v.category]}>{v.category}</Badge>
+              <h4 className="font-bold text-sm text-amber-900 flex items-center gap-1">
+                <AlertTriangle className="w-4 h-4" />
+                Catch-up &amp; Due Vaccines ({dueVaccines.length})
+              </h4>
+              {/* Catch-up group */}
+              {dueVaccines.filter(v => v.catchUp).length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-red-700 mb-1 flex items-center gap-1"><RefreshCw className="w-3 h-3" />CATCH-UP REQUIRED (missed, give now)</p>
+                  {dueVaccines.filter(v => v.catchUp).map(v => (
+                    <div key={v.id} className="flex items-center justify-between p-2 bg-red-50 rounded border border-red-200 mb-1">
+                      <div>
+                        <span className="font-semibold text-sm text-red-900">{v.name}</span>
+                        <span className="text-xs text-red-700 ml-2">Was due at {v.age}</span>
+                        {v.id === "hepb_birth" && <span className="text-xs text-red-600 ml-1">(double dose 40mcg for CKD)</span>}
+                      </div>
+                      <Badge className={categoryColors[v.category]}>{v.category}</Badge>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              {/* Due soon group */}
+              {dueVaccines.filter(v => !v.catchUp).length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-amber-700 mb-1 flex items-center gap-1"><Clock className="w-3 h-3" />DUE SOON (within 2 months)</p>
+                  {dueVaccines.filter(v => !v.catchUp).map(v => (
+                    <div key={v.id} className="flex items-center justify-between p-2 bg-amber-50 rounded border mb-1">
+                      <div>
+                        <span className="font-semibold text-sm text-slate-900">{v.name}</span>
+                        <span className="text-xs text-amber-700 ml-2">Due at {v.age}</span>
+                      </div>
+                      <Badge className={categoryColors[v.category]}>{v.category}</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* IAP Catch-up note */}
+              <Alert className="bg-blue-50 border-blue-200 mt-2">
+                <Info className="w-3 h-3 text-blue-600" />
+                <AlertDescription className="text-xs text-blue-900">
+                  <strong>IAP Catch-up Principle:</strong> Give all missed vaccines simultaneously (different sites). No need to restart series. Minimum intervals: DTP doses ≥4 weeks apart; MMR doses ≥4 weeks apart; Hep B doses: 0, 1, 6 month pattern if restarting.
+                </AlertDescription>
+              </Alert>
               {isNephro && (
                 <Alert className="bg-red-50 border-red-300 mt-2">
                   <AlertTriangle className="w-4 h-4 text-red-600" />
                   <AlertDescription className="text-xs text-red-900 font-semibold">
-                    ⚠️ Nephrology patient — Review special considerations below before administering live vaccines.
+                    ⚠️ Nephrology patient — DEFER live vaccines (Varicella, MMR, OPV) if on high-dose steroids. Check steroid dose before proceeding. Double-dose Hepatitis B (40mcg) if CKD/dialysis.
                   </AlertDescription>
                 </Alert>
               )}

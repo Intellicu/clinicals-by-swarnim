@@ -426,6 +426,172 @@ const DEFAULT_CONDITIONS = [
     ]
   },
   {
+    id: "diabetic_nephropathy",
+    name: "Diabetic Nephropathy / DKD",
+    variants: ["Type 1 DM-related", "Type 2 DM-related", "Non-diabetic GN in DM"],
+    guideline: "KDIGO 2022 Diabetes + CKD Guideline",
+    urgency: "high",
+    tags: ["SGLT2i", "Finerenone", "GLP-1", "KDIGO 2022"],
+    category: "Mixed",
+    pathology: "Mesangial expansion, glomerular basement membrane thickening, nodular sclerosis (Kimmelstiel-Wilson lesions), arteriolar hyalinosis. Class I-IV (Tervaert classification).",
+    genetics: "Polygenic risk. APOL1 variants increase DKD progression in African ancestry. ACE I/D, eNOS polymorphisms associated.",
+    flowchart: [
+      "Screen annually: urine ACR, eGFR, BP from DM diagnosis (T1DM: 5y after onset; T2DM: at diagnosis)",
+      "Optimise glycaemic control: HbA1c target <7% (individualised) — SGLT2i preferred over sulfonylurea",
+      "BP target <130/80 mmHg: ACEi or ARB mandatory if uACR >30 mg/g",
+      "SGLT2i (Empagliflozin/Dapagliflozin): KDIGO 2022 first-line for all CKD + DM (eGFR ≥20)",
+      "Finerenone (non-steroidal MRA): add if persistent albuminuria despite ACEi/SGLT2i",
+    ],
+    decisionNodes: [
+      { q: "eGFR >20 and tolerated?", yes: "SGLT2i (Empagliflozin 10mg or Dapagliflozin 10mg) — first-line", no: "SGLT2i contraindicated; optimise ACEi/ARB + Finerenone" },
+      { q: "ACR >300 mg/g despite ACEi/SGLT2i?", yes: "Add Finerenone (FIDELITY programme, 20mg od) — reduces CKD progression + CV events", no: "Continue current regimen; monitor ACR 3-6 monthly" },
+    ],
+    keyPoints: [
+      "SGLT2i (Empagliflozin/Dapagliflozin 10mg) — first-line for DKD regardless of HbA1c",
+      "ACEi/ARB mandatory for albuminuria >30 mg/g — do NOT combine both",
+      "Finerenone (non-steroidal MRA) — FIDELIO-DKD + FIGARO-DKD trials show 25% CKD progression reduction",
+      "GLP-1 RA (Semaglutide) — cardiovascular and renal benefit, especially with obesity",
+      "BP target <130/80 mmHg",
+      "Avoid nephrotoxins: NSAIDs, gadolinium, contrast (prehydration protocol if unavoidable)",
+      "Biopsy if: atypical features, rapid decline, no retinopathy in T1DM, haematuria",
+      "Referral: eGFR <30 or rapid decline, ACR >300 mg/g, uncontrolled hypertension",
+    ],
+    refs: [{ title: "KDIGO 2022 Diabetes + CKD Guideline", url: "https://kdigo.org/guidelines/diabetes-ckd/" }]
+  },
+  {
+    id: "thin_gbm",
+    name: "Thin GBM Disease / Benign Familial Haematuria",
+    variants: ["Isolated thin GBM", "COL4A3/4 heterozygous (Alport carrier)", "CFHR5 nephropathy"],
+    guideline: "KDIGO 2021 + KDIGO 2024 Alport",
+    urgency: "medium",
+    tags: ["COL4A3/4", "Haematuria", "Genetic Testing"],
+    category: "Haematuria/Mixed",
+    pathology: "EM: diffuse uniform thinning of GBM (<150nm in adults, <180nm in children). LM: normal. IF: normal. Overlap with heterozygous Alport.",
+    genetics: "COL4A3 or COL4A4 heterozygous variants in up to 40% of cases — these patients are NOT simple 'carriers'; some progress to CKD.",
+    flowchart: [
+      "Persistent microscopic haematuria with normal/thin GBM on biopsy",
+      "Genetic testing: COL4A3, COL4A4 (AR Alport carriers), COL4A5",
+      "Family history: haematuria across multiple generations suggests thin GBM / Alport carrier",
+      "Annual monitoring: eGFR, proteinuria, BP — most have benign course",
+      "If proteinuria develops: treat as early Alport — ACEi/ARB",
+    ],
+    decisionNodes: [
+      { q: "COL4A3/4 heterozygous variant found?", yes: "Reclassify as ADAS (Autosomal Dominant Alport) — 20-30% progress to CKD; treat as Alport", no: "True thin GBM — reassure, monitor annually, excellent prognosis" },
+      { q: "Proteinuria >0.5g/day at any point?", yes: "Start ACEi — may delay progression as in Alport", no: "Annual review only — no treatment needed" },
+    ],
+    keyPoints: [
+      "Most patients have excellent long-term prognosis — reassure",
+      "Up to 40% harbour COL4A3/4 heterozygous variants — genetic testing important",
+      "COL4A3/4 het = Autosomal Dominant Alport Syndrome (ADAS) — NOT benign carrier",
+      "ADAS: 20-30% reach ESKD by mid-life — treat as Alport with early ACEi",
+      "Annual monitoring: eGFR, urine PCR, BP — lifelong",
+      "Cascade family testing recommended if COL4A3/4 found",
+      "No specific treatment for true thin GBM; ACEi when proteinuria develops",
+    ],
+    refs: [{ title: "KDIGO 2024 Alport/COL4 Spectrum", url: "https://kdigo.org/guidelines/alport-syndrome/" }]
+  },
+  {
+    id: "igg4_related",
+    name: "IgG4-Related Kidney Disease (IgG4-RKD)",
+    variants: ["Tubulointerstitial nephritis (IgG4-TIN)", "Membranous-like GN with IgG4", "Mass-forming lesion"],
+    guideline: "ACR 2019 IgG4-RD Classification + KDIGO 2021",
+    urgency: "medium",
+    tags: ["IgG4", "Steroids", "Rituximab", "TIN"],
+    category: "Autoimmune",
+    pathology: "Dense lymphoplasmacytic infiltrate rich in IgG4+ plasma cells (>10/HPF); storiform fibrosis; obliterative phlebitis. IF: IgG4 subclass dominant deposits.",
+    genetics: "HLA-DRB1*04:05 association; no single causative gene; autoimmune predisposition.",
+    flowchart: [
+      "Elevated serum IgG4 (>135 mg/dL) + kidney dysfunction / renal mass on imaging",
+      "Kidney biopsy: IgG4+ plasma cells >10/HPF + storiform fibrosis",
+      "Check: serum IgG4, IgG subclasses, complement (often low), ANA, ANCA",
+      "Exclude: lymphoma, plasma cell dyscrasia, other autoimmune conditions",
+      "Prednisone 0.6 mg/kg/day × 4 weeks, then taper — response often dramatic",
+    ],
+    decisionNodes: [
+      { q: "Steroid response (significant improvement in 4 weeks)?", yes: "Taper to maintenance 5-10 mg/day × 6-12 months", no: "Add Rituximab (first-line steroid-sparing); re-biopsy if uncertain" },
+      { q: "Relapse during/after taper?", yes: "Rituximab 1g × 2 doses — superior relapse prevention to steroids alone", no: "Continue maintenance steroids 12 months then cautious discontinuation" },
+    ],
+    keyPoints: [
+      "Dramatic response to corticosteroids — if no response, reconsider diagnosis",
+      "Serum IgG4 elevated in ~60-70% — NOT diagnostic alone (false positives in pancreatic cancer, infections)",
+      "Pathological classification: ACR 2019 criteria require IgG4+/IgG+ cells >40% ratio + >10 IgG4+/HPF",
+      "Extra-renal involvement: pancreas (AIP), bile ducts (PSC-like), orbit, salivary glands — check whole body",
+      "Rituximab 1g × 2 doses: superior for maintenance, especially relapsing disease",
+      "Risk of renal fibrosis with delayed treatment — act promptly",
+      "Serum IgG4 as disease activity marker during treatment",
+    ],
+    refs: [{ title: "ACR/EULAR IgG4-RD Classification Criteria 2019", url: "https://www.rheumatology.org/" }]
+  },
+  {
+    id: "congenital_nephrotic",
+    name: "Congenital Nephrotic Syndrome (CNS)",
+    variants: ["Finnish Type (NPHS1)", "Diffuse Mesangial Sclerosis (NPHS2/WT1)", "Pierson Syndrome (LAMB2)", "Other genetic CNS"],
+    guideline: "IPNA Clinical Guidelines + ESPN CNS Guideline 2021",
+    urgency: "critical",
+    tags: ["NPHS1", "NPHS2", "Genetic", "No Steroids", "Transplant"],
+    category: "Nephrotic",
+    pathology: "Finnish type: microcystic dilation of proximal tubules on LM; massive proteinuria from birth. DMS: mesangial sclerosis, podocyte hypertrophy. LAMB2: laminin beta2 deficiency + ocular abnormalities.",
+    genetics: "NPHS1 (nephrin — Finnish type), NPHS2 (podocin — SRNS), WT1 (DMS + Wilms/gonadal), LAMB2 (Pierson), PLCE1, PODXL, PTPRO. Genetic testing mandatory.",
+    flowchart: [
+      "Nephrotic syndrome at birth to 3 months: massive proteinuria, oedema, low albumin",
+      "Genetic panel: NPHS1, NPHS2, WT1, LAMB2, PLCE1 — guides ALL management",
+      "DO NOT give steroids — genetic CNS does not respond",
+      "Supportive: albumin infusions, nutrition (NG/nasogastric), anticoagulation (VTE risk)",
+      "Bilateral nephrectomy + dialysis bridge to transplant (usually age 1-2y, weight >8kg)",
+    ],
+    decisionNodes: [
+      { q: "WT1 mutation identified?", yes: "Wilms tumour surveillance (renal USS q3mo till age 8) + gonadal dysgenesis assessment", no: "If NPHS1/2: nephrectomy + transplant — excellent outcomes, no recurrence" },
+      { q: "Post-transplant proteinuria (NPHS1)?", yes: "Circulating anti-nephrin antibodies — treat as recurrent focal nephropathy; plasmapheresis/rituximab", no: "Monitor — long-term transplant outcomes excellent for NPHS1/2" },
+    ],
+    keyPoints: [
+      "DO NOT give immunosuppression — genetic CNS does NOT respond to steroids",
+      "Genetic testing MANDATORY before any treatment decision",
+      "Supportive care: albumin infusions 20-25% q12-24h, high-protein feeds via NG",
+      "Anticoagulation: prophylactic heparin/LMWH for VTE risk (albumin <20 g/L)",
+      "Bilateral nephrectomy when medical management no longer sustainable",
+      "Kidney transplant: excellent outcomes for NPHS1 and NPHS2 — near-zero recurrence",
+      "WT1 (DMS): Wilms tumour surveillance + gonadal assessment — DSD management",
+      "LAMB2 (Pierson): microcoria + severe lens abnormalities — ophthalmology from birth",
+      "Indian context: NPHS2 p.Arg229Gln common but low penetrance alone — check for compound het",
+    ],
+    refs: [
+      { title: "IPNA Clinical Practice Recommendations on CNS 2021", url: "https://www.ipna.info/" },
+      { title: "ESPN CNS Working Group Guideline", url: "https://www.espn.eu/" }
+    ]
+  },
+  {
+    id: "fibrillary_gn",
+    name: "Fibrillary GN / Immunotactoid GN",
+    variants: ["Fibrillary GN (random fibrils 10-30nm)", "Immunotactoid GN (organised microtubules >30nm)", "DNAJB9-associated Fibrillary GN"],
+    guideline: "KDIGO 2021 Glomerular Diseases",
+    urgency: "high",
+    tags: ["DNAJB9", "Fibrils", "Rare", "Rituximab"],
+    category: "Mixed",
+    pathology: "EM: randomly arranged fibrils (10-30nm diameter) in fibrillary GN vs organised microtubular deposits (>30nm) in immunotactoid. LM: mesangial/endocapillary proliferation or membranous pattern. IF: polyclonal IgG (fibrillary) vs monoclonal (immunotactoid).",
+    genetics: "DNAJB9 — a heat-shock protein family chaperone — highly specific marker for fibrillary GN on IHC (near 100% sensitivity).",
+    flowchart: [
+      "Biopsy shows non-amyloid fibrillary deposits — EM measurement critical (10-30nm vs >30nm)",
+      "Congo red negative (distinguishes from amyloid)",
+      "DNAJB9 IHC staining: positive confirms fibrillary GN (high sensitivity/specificity)",
+      "Immunotactoid: serum protein electrophoresis, bone marrow biopsy — exclude monoclonal gammopathy",
+      "No standard treatment: Rituximab used most commonly; immunosuppression guided by proteinuria/GFR trajectory",
+    ],
+    decisionNodes: [
+      { q: "Monoclonal protein identified (Immunotactoid GN)?", yes: "Treat haematological disorder — chemotherapy/autologous SCT as appropriate", no: "Fibrillary GN: Rituximab if proteinuria >3.5g/day or declining eGFR" },
+      { q: "Rapidly progressive clinical course?", yes: "Rituximab + steroids; consider plasma exchange if crescents", no: "ACEi/ARB + close monitoring; Rituximab if progressive" },
+    ],
+    keyPoints: [
+      "Congo red NEGATIVE — critical to distinguish from amyloid",
+      "DNAJB9 IHC: novel highly specific marker for fibrillary GN — request routinely",
+      "EM essential: fibrils 10-30nm (fibrillary) vs microtubules >30nm (immunotactoid)",
+      "Immunotactoid: almost always associated with monoclonal gammopathy — MGUS, CLL, myeloma",
+      "No FDA-approved treatment; Rituximab most commonly used for fibrillary GN",
+      "30-50% progress to ESKD within 10 years",
+      "Recurrence post-transplant: possible in fibrillary GN",
+    ],
+    refs: [{ title: "KDIGO 2021 GN Guideline", url: "https://kdigo.org/guidelines/gd/" }]
+  },
+  {
     id: "alport",
     name: "Alport Syndrome / COL4 Nephropathy",
     variants: ["X-linked Alport (XLAS)", "Autosomal Recessive (ARAS)", "Autosomal Dominant (ADAS)"],
@@ -494,7 +660,7 @@ export default function GlomerularDiseasesPathway() {
   const isAdmin = user?.role === "admin";
 
   const allConditions = [...DEFAULT_CONDITIONS, ...customConditions];
-  const categories = ["All", "Nephrotic", "Haematuria/Mixed", "Autoimmune", "TMA", "Mixed", "Genetic"];
+  const categories = ["All", "Nephrotic", "Haematuria/Mixed", "Autoimmune", "TMA", "Mixed", "Genetic", "Rare/Other"];
   const filtered = filterCategory === "All" ? allConditions : allConditions.filter(c => c.category === filterCategory);
 
   const toggle = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));

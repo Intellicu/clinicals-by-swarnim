@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Database, FileBarChart, Download, Brain, FileText, ArrowLeft,
+  Database, FileBarChart, Download, Brain, FileText, ArrowLeft, Microscope,
   Plus, Users, TrendingUp, Sparkles, BookOpen, BarChart3, Layers,
   Rocket, Share2, Clock, CheckCircle2, AlertCircle, Save, HardDrive, Edit2
 } from "lucide-react";
@@ -24,6 +24,7 @@ import StatisticalAnalysis from '../components/research/StatisticalAnalysis';
 import KnowledgeBase from '../components/research/KnowledgeBase';
 import ProtocolBuilder from '../components/research/ProtocolBuilder';
 import EnhancedProtocolBuilder from '../components/research/EnhancedProtocolBuilder';
+import EHRExtractor from '../components/research/EHRExtractor';
 
 export default function ResearchHub() {
   const [activeTab, setActiveTab] = useState("projects");
@@ -166,11 +167,12 @@ export default function ResearchHub() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="protocol">Protocol</TabsTrigger>
             <TabsTrigger value="forms">Form Builder</TabsTrigger>
             <TabsTrigger value="data">Data Collection</TabsTrigger>
+            <TabsTrigger value="ehr">EHR Extractor</TabsTrigger>
             <TabsTrigger value="literature">Literature</TabsTrigger>
             <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
             <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
@@ -342,6 +344,23 @@ export default function ResearchHub() {
                 </AlertDescription>
               </Alert>
             )}
+          </TabsContent>
+
+          <TabsContent value="ehr">
+            <Card className="shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-indigo-600" />
+                    NLP + EHR Registry Extractor
+                  </CardTitle>
+                  <Badge className="bg-indigo-100 text-indigo-800">AI-Powered · Claude Sonnet</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <EHRExtractor />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="literature">
