@@ -12,6 +12,15 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import PreferencesForm from "../components/notifications/PreferencesForm";
 
+const typeIcons = {
+  "Appointment Reminder": Calendar,
+  "Critical Lab Alert": AlertTriangle,
+  "New Appointment": Calendar,
+  "Severe Diagnosis": AlertTriangle,
+  "Follow-up Reminder": Clock,
+  "System Alert": Bell,
+};
+
 export default function NotificationDashboard() {
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState("inbox");
@@ -46,15 +55,6 @@ export default function NotificationDashboard() {
     high: "bg-orange-500 text-white",
     medium: "bg-blue-500 text-white",
     low: "bg-slate-400 text-white",
-  };
-
-  const typeIcons = {
-    "Appointment Reminder": Calendar,
-    "Critical Lab Alert": AlertTriangle,
-    "New Appointment": Calendar,
-    "Severe Diagnosis": AlertTriangle,
-    "Follow-up Reminder": Clock,
-    "System Alert": Bell,
   };
 
   return (

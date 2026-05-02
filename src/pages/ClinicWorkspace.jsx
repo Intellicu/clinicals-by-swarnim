@@ -211,7 +211,6 @@ export default function ClinicWorkspace() {
                     <Button 
                       className="w-full bg-blue-600"
                       onClick={() => {
-                        const PatientOnboarding = require('../components/clinic/PatientOnboarding').default;
                         // Trigger onboarding modal
                       }}
                     >
