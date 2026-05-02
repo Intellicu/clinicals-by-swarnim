@@ -1,300 +1,346 @@
 import React, { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TrendingUp, AlertTriangle, Activity, Plus, RefreshCw, Download, Info } from "lucide-react";
+import { AlertTriangle, TrendingDown, TrendingUp, Activity, Baby, Plus, Loader2, Brain } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { toast } from "sonner";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from "recharts";
-import { format } from "date-fns";
 
-// WHO 2006/2007 Reference Data (simplified for boys — adjust for girls)
-const WHO_BOYS_WT = {1:9.6,2:12.2,3:14.3,4:16.0,5:17.9,6:19.7,7:21.5,8:23.3,9:25.0,10:27.0,11:29.2,12:31.5,13:34.0,14:37.0,15:40.3,16:43.9,17:47.5,18:50.8};
-const WHO_BOYS_HT = {1:75.7,2:87.8,3:96.1,4:102.9,5:109.2,6:115.5,7:121.1,8:126.6,9:131.7,10:137.2,11:143.0,12:149.2,13:156.0,14:163.2,15:169.8,16:175.2,17:178.6,18:180.3};
-const WHO_BOYS_WT_SD = {1:1.3,2:1.5,3:1.7,4:1.9,5:2.2,6:2.5,7:2.8,8:3.2,9:3.6,10:4.1,11:4.8,12:5.6,13:6.5,14:7.5,15:8.4,16:9.1,17:9.5,18:9.7};
-const WHO_BOYS_HT_SD = {1:2.8,2:3.6,3:4.0,4:4.3,5:4.6,6:4.8,7:5.1,8:5.4,9:5.6,10:5.9,11:6.3,12:6.8,13:7.3,14:7.7,15:7.9,16:7.9,17:7.8,18:7.6};
+// WHO Weight-for-Age median and SD values (boys) — simplified lookup by month
+// Source: WHO Child Growth Standards
+const WHO_WAZ_BOYS = {
+  0:{M:3.3,SD:0.46}, 3:{M:6.4,SD:0.74}, 6:{M:7.9,SD:0.86}, 9:{M:9.2,SD:0.94},
+  12:{M:10.2,SD:1.02}, 18:{M:11.5,SD:1.12}, 24:{M:12.5,SD:1.2}, 36:{M:14.3,SD:1.38},
+  48:{M:16.3,SD:1.6}, 60:{M:18.3,SD:1.85}, 72:{M:20.5,SD:2.2}, 84:{M:22.9,SD:2.6},
+  96:{M:25.4,SD:3.1}, 108:{M:28.1,SD:3.7}, 120:{M:31.2,SD:4.4}
+};
+const WHO_WAZ_GIRLS = {
+  0:{M:3.2,SD:0.44}, 3:{M:5.8,SD:0.66}, 6:{M:7.3,SD:0.78}, 9:{M:8.6,SD:0.86},
+  12:{M:9.5,SD:0.94}, 18:{M:10.8,SD:1.04}, 24:{M:11.9,SD:1.12}, 36:{M:13.9,SD:1.3},
+  48:{M:15.9,SD:1.54}, 60:{M:18.0,SD:1.8}, 72:{M:20.2,SD:2.1}, 84:{M:22.5,SD:2.55},
+  96:{M:25.0,SD:3.1}, 108:{M:28.0,SD:3.8}, 120:{M:31.5,SD:4.6}
+};
+// WHO Height-for-Age
+const WHO_HAZ_BOYS = {
+  0:{M:49.9,SD:1.89}, 3:{M:62.0,SD:2.3}, 6:{M:67.6,SD:2.45}, 9:{M:72.3,SD:2.56},
+  12:{M:75.7,SD:2.65}, 18:{M:82.3,SD:2.78}, 24:{M:87.8,SD:3.0}, 36:{M:96.1,SD:3.37},
+  48:{M:103.3,SD:3.66}, 60:{M:110.0,SD:3.94}, 72:{M:116.0,SD:4.2}, 84:{M:121.7,SD:4.5},
+  96:{M:127.3,SD:4.8}, 108:{M:132.6,SD:5.1}, 120:{M:137.5,SD:5.4}
+};
+const WHO_HAZ_GIRLS = {
+  0:{M:49.1,SD:1.86}, 3:{M:60.2,SD:2.2}, 6:{M:65.7,SD:2.35}, 9:{M:70.1,SD:2.46},
+  12:{M:74.0,SD:2.55}, 18:{M:80.7,SD:2.7}, 24:{M:86.4,SD:2.9}, 36:{M:95.1,SD:3.26},
+  48:{M:102.7,SD:3.57}, 60:{M:109.4,SD:3.87}, 72:{M:115.5,SD:4.14}, 84:{M:121.1,SD:4.45},
+  96:{M:126.6,SD:4.75}, 108:{M:132.2,SD:5.1}, 120:{M:137.2,SD:5.4}
+};
 
-// Simplified girls data (about 5-10% lighter/shorter)
-const WHO_GIRLS_WT = Object.fromEntries(Object.entries(WHO_BOYS_WT).map(([k,v]) => [k, +(v*0.92).toFixed(1)]));
-const WHO_GIRLS_HT = Object.fromEntries(Object.entries(WHO_BOYS_HT).map(([k,v]) => [k, +(v*0.96).toFixed(1)]));
-const WHO_GIRLS_WT_SD = WHO_BOYS_WT_SD;
-const WHO_GIRLS_HT_SD = WHO_BOYS_HT_SD;
-
-function calcZScore(value, median, sd) {
-  if (!median || !sd) return 0;
-  return +((value - median) / sd).toFixed(2);
+function getWHORef(ageMonths, gender, type) {
+  const table = type === "weight"
+    ? (gender === "Female" ? WHO_WAZ_GIRLS : WHO_WAZ_BOYS)
+    : (gender === "Female" ? WHO_HAZ_GIRLS : WHO_HAZ_BOYS);
+  const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
+  let closest = keys[0];
+  for (const k of keys) { if (ageMonths >= k) closest = k; else break; }
+  return table[closest];
 }
 
-function classifyGrowth(waz, haz, bmiz) {
-  const issues = [];
-  if (waz < -3) issues.push({ type: "Severe Underweight", severity: "severe", action: "Refer to NRC/Nutritionist" });
-  else if (waz < -2) issues.push({ type: "Moderate Underweight", severity: "moderate", action: "Nutrition counseling" });
-  else if (waz > 2) issues.push({ type: "Overweight", severity: "moderate", action: "Lifestyle counseling" });
-  
-  if (haz < -3) issues.push({ type: "Severe Stunting", severity: "severe", action: "Investigate causes (chronic illness, malnutrition)" });
-  else if (haz < -2) issues.push({ type: "Moderate Stunting", severity: "moderate", action: "Monitor & investigate" });
-  
-  if (bmiz < -3) issues.push({ type: "Severe Wasting (SAM)", severity: "critical", action: "Immediate referral for SAM management" });
-  else if (bmiz < -2) issues.push({ type: "Moderate Wasting (MAM)", severity: "moderate", action: "Nutrition intervention" });
-  else if (bmiz > 2) issues.push({ type: "Obesity", severity: "moderate", action: "Diet + exercise counseling" });
-  
-  if (issues.length === 0) issues.push({ type: "Normal Growth", severity: "normal", action: "Continue healthy nutrition" });
-  return issues;
+function calcZ(value, ref) {
+  if (!ref || !value) return null;
+  return ((value - ref.M) / ref.SD).toFixed(2);
 }
 
-export default function GrowthMonitoringEngine({ patient }) {
-  const qc = useQueryClient();
-  const [weight, setWeight] = useState("");
-  const [height, setHeight] = useState("");
-  const [manualEntry, setManualEntry] = useState(false);
+function zLabel(z) {
+  if (z === null) return null;
+  const n = parseFloat(z);
+  if (n < -3) return { label: "Severe", color: "text-red-700 bg-red-100" };
+  if (n < -2) return { label: "Moderate", color: "text-orange-700 bg-orange-100" };
+  if (n < -1) return { label: "Mild", color: "text-amber-700 bg-amber-100" };
+  if (n <= 1) return { label: "Normal", color: "text-green-700 bg-green-100" };
+  return { label: "Overweight/Tall", color: "text-blue-700 bg-blue-100" };
+}
 
-  const { data: historyEntries = [] } = useQuery({
-    queryKey: ["medical-history", patient.id],
-    queryFn: () => base44.entities.MedicalHistoryEntry.filter({ patient_id: patient.id }, "-entry_date", 200),
+const CENTILE_LINES = [
+  { z: -3, label: "-3SD", color: "#ef4444", dash: "5 5" },
+  { z: -2, label: "-2SD", color: "#f97316", dash: "5 5" },
+  { z: 0,  label: "Median", color: "#10b981", dash: "0" },
+  { z: 2,  label: "+2SD", color: "#3b82f6", dash: "5 5" },
+];
+
+export default function GrowthMonitoringEngine({ patientId, gender = "Male" }) {
+  const [showForm, setShowForm] = useState(false);
+  const [newRecord, setNewRecord] = useState({ weight_kg: "", height_cm: "", measurement_date: new Date().toISOString().split('T')[0], tanner_stage: "Not Assessed", notes: "" });
+  const [aiAlert, setAiAlert] = useState(null);
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [chartType, setChartType] = useState("weight");
+  const [saving, setSaving] = useState(false);
+
+  const { data: patient } = useQuery({
+    queryKey: ['patient', patientId],
+    queryFn: () => base44.entities.Patient.filter({ id: patientId }).then(r => r[0]),
+    enabled: !!patientId
   });
 
-  const createHistoryMutation = useMutation({
-    mutationFn: (data) => base44.entities.MedicalHistoryEntry.create(data),
-    onSuccess: () => { qc.invalidateQueries(["medical-history", patient.id]); toast.success("Growth data logged"); setWeight(""); setHeight(""); },
+  const { data: records = [], refetch } = useQuery({
+    queryKey: ['growth-records', patientId],
+    queryFn: () => base44.entities.GrowthRecord.filter({ patient_id: patientId }, 'measurement_date'),
+    enabled: !!patientId
   });
 
-  // Extract growth measurements from history
-  const growthLogs = historyEntries
-    .filter(e => e.entry_type === "Follow-up Note" && (e.description?.includes("Weight:") || e.description?.includes("Height:")))
-    .map(e => {
-      const wtMatch = e.description.match(/Weight:\s*([\d.]+)/);
-      const htMatch = e.description.match(/Height:\s*([\d.]+)/);
-      const ageMatch = e.description.match(/Age:\s*([\d.]+)/);
-      return {
-        date: e.entry_date,
-        weight: wtMatch ? +wtMatch[1] : null,
-        height: htMatch ? +htMatch[1] : null,
-        age: ageMatch ? +ageMatch[1] : patient.age_years,
-      };
-    })
-    .filter(g => g.weight || g.height)
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  const pt = patient || {};
+  const ptGender = pt.gender || gender;
+  const ptDOB = pt.date_of_birth;
 
-  // Add current baseline if available
-  if (patient.baseline_vitals?.weight || patient.baseline_vitals?.height) {
-    growthLogs.push({
-      date: patient.created_date || new Date().toISOString(),
-      weight: patient.baseline_vitals.weight,
-      height: patient.baseline_vitals.height,
-      age: patient.age_years,
-      isBaseline: true,
-    });
-  }
-
-  const uniqueLogs = growthLogs.filter((log, idx, arr) => 
-    arr.findIndex(l => l.date === log.date) === idx
-  ).sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  const gender = patient.gender === "Female" ? "Female" : "Male";
-  const wtRef = gender === "Female" ? WHO_GIRLS_WT : WHO_BOYS_WT;
-  const htRef = gender === "Female" ? WHO_GIRLS_HT : WHO_BOYS_HT;
-  const wtSD = gender === "Female" ? WHO_GIRLS_WT_SD : WHO_BOYS_WT_SD;
-  const htSD = gender === "Female" ? WHO_GIRLS_HT_SD : WHO_BOYS_HT_SD;
-
-  // Calculate Z-scores for each log
-  const enrichedLogs = uniqueLogs.map(log => {
-    const age = log.age || patient.age_years;
-    const waz = log.weight ? calcZScore(log.weight, wtRef[age], wtSD[age]) : null;
-    const haz = log.height ? calcZScore(log.height, htRef[age], htSD[age]) : null;
-    const bmi = (log.weight && log.height) ? +(log.weight / ((log.height/100)**2)).toFixed(1) : null;
-    const bmiz = bmi ? calcZScore(bmi, 16.5, 2) : null; // Simplified BMI ref
-    return { ...log, age, waz, haz, bmi, bmiz };
+  // Enrich records with Z-scores
+  const enriched = records.map(r => {
+    const ageMonths = ptDOB
+      ? Math.round((new Date(r.measurement_date) - new Date(ptDOB)) / (1000 * 60 * 60 * 24 * 30.44))
+      : (r.age_at_measurement_months || 0);
+    const wRef = getWHORef(ageMonths, ptGender, "weight");
+    const hRef = getWHORef(ageMonths, ptGender, "height");
+    const waz = calcZ(r.weight_kg, wRef);
+    const haz = calcZ(r.height_cm, hRef);
+    return { ...r, ageMonths, waz: parseFloat(waz), haz: parseFloat(haz), wRef, hRef };
   });
 
-  const latestLog = enrichedLogs[enrichedLogs.length - 1];
-  const growthIssues = latestLog ? classifyGrowth(latestLog.waz || 0, latestLog.haz || 0, latestLog.bmiz || 0) : [];
+  // Build chart data with centile reference lines
+  const chartData = enriched.map(r => ({
+    date: r.measurement_date,
+    age: r.ageMonths,
+    value: chartType === "weight" ? r.weight_kg : r.height_cm,
+    zScore: chartType === "weight" ? r.waz : r.haz,
+    p3: chartType === "weight" ? (r.wRef?.M + r.wRef?.SD * -2) : (r.hRef?.M + r.hRef?.SD * -2),
+    p50: chartType === "weight" ? r.wRef?.M : r.hRef?.M,
+    p97: chartType === "weight" ? (r.wRef?.M + r.wRef?.SD * 2) : (r.hRef?.M + r.hRef?.SD * 2),
+  }));
 
-  const logGrowth = () => {
-    if (!weight || !height) { toast.error("Enter both weight and height"); return; }
-    const desc = `Weight: ${weight} kg, Height: ${height} cm, Age: ${patient.age_years} years, BMI: ${(+weight / ((+height/100)**2)).toFixed(1)}`;
-    createHistoryMutation.mutate({
-      patient_id: patient.id,
-      entry_date: format(new Date(), "yyyy-MM-dd"),
-      entry_type: "Follow-up Note",
-      title: "Growth Monitoring",
-      description: desc,
-      tags: ["growth", "vitals"],
-    });
+  // Check for stunting/centile crossing
+  const analyzeGrowth = async () => {
+    if (enriched.length < 2) { toast.info("Need at least 2 measurements for trend analysis"); return; }
+    setLoadingAI(true);
+    try {
+      const last3 = enriched.slice(-3);
+      const wazTrend = last3.map(r => `Age ${r.ageMonths}mo: WAZ=${r.waz}, HAZ=${r.haz}, Wt=${r.weight_kg}kg, Ht=${r.height_cm}cm`).join("; ");
+      const velocityDrops = [];
+      for (let i = 1; i < last3.length; i++) {
+        const prev = last3[i-1], curr = last3[i];
+        const monthDiff = curr.ageMonths - prev.ageMonths;
+        if (monthDiff > 0) {
+          const hVel = (curr.height_cm - prev.height_cm) / (monthDiff / 12);
+          velocityDrops.push(`Height velocity: ${hVel.toFixed(1)} cm/year`);
+        }
+      }
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are a paediatric nephrologist reviewing growth data. Patient: ${pt.patient_name || 'Patient'}, Gender: ${ptGender}, Diagnosis: ${pt.diagnosis || 'Unknown'}.\n\nGrowth data (last 3 visits): ${wazTrend}\nCalculated: ${velocityDrops.join(", ")}\n\nAnalyse: 1) Is there stunting (HAZ<-2)? 2) Wasting (WAZ<-2)? 3) Significant centile crossing (>2 major centiles in any direction)? 4) Growth velocity concern (<4cm/yr age 2-4y, <5cm/yr age 4-10y, <6cm/yr puberty)? 5) Steroid-related growth impairment? Give a 3-5 line clinical summary with specific action recommendations. Use bullet points.`,
+      });
+      setAiAlert(result);
+    } catch {
+      toast.error("AI analysis failed");
+    } finally {
+      setLoadingAI(false);
+    }
   };
 
-  // WHO reference lines for charts
-  const whoWtLine = Object.entries(wtRef).map(([age, median]) => ({
-    age: +age, median, plus2sd: +(median + 2*wtSD[age]).toFixed(1), minus2sd: +(median - 2*wtSD[age]).toFixed(1)
-  }));
-  const whoHtLine = Object.entries(htRef).map(([age, median]) => ({
-    age: +age, median, plus2sd: +(median + 2*htSD[age]).toFixed(1), minus2sd: +(median - 2*htSD[age]).toFixed(1)
-  }));
+  const saveRecord = async () => {
+    if (!patientId) return;
+    if (!newRecord.weight_kg || !newRecord.height_cm) { toast.error("Weight and height are required"); return; }
+    setSaving(true);
+    const ageMonths = ptDOB
+      ? Math.round((new Date(newRecord.measurement_date) - new Date(ptDOB)) / (1000 * 60 * 60 * 24 * 30.44))
+      : 0;
+    const wRef = getWHORef(ageMonths, ptGender, "weight");
+    const hRef = getWHORef(ageMonths, ptGender, "height");
+    const waz = calcZ(parseFloat(newRecord.weight_kg), wRef);
+    const haz = calcZ(parseFloat(newRecord.height_cm), hRef);
+    const bmi = (parseFloat(newRecord.weight_kg) / Math.pow(parseFloat(newRecord.height_cm)/100, 2)).toFixed(1);
+    await base44.entities.GrowthRecord.create({
+      patient_id: patientId,
+      ...newRecord,
+      weight_kg: parseFloat(newRecord.weight_kg),
+      height_cm: parseFloat(newRecord.height_cm),
+      bmi: parseFloat(bmi),
+      age_at_measurement_months: ageMonths,
+      weight_for_age_z: parseFloat(waz),
+      height_for_age_z: parseFloat(haz),
+      stunting: parseFloat(haz) < -2,
+      wasting: parseFloat(waz) < -2,
+    });
+    toast.success("Growth record saved");
+    setShowForm(false);
+    setNewRecord({ weight_kg: "", height_cm: "", measurement_date: new Date().toISOString().split('T')[0], tanner_stage: "Not Assessed", notes: "" });
+    refetch();
+    setSaving(false);
+  };
 
-  const severityColor = { critical: "bg-red-600 text-white", severe: "bg-red-500 text-white", moderate: "bg-amber-500 text-white", normal: "bg-green-600 text-white" };
+  const latest = enriched[enriched.length - 1];
+  const stunted = latest && latest.haz < -2;
+  const wasted = latest && latest.waz < -2;
 
   return (
     <div className="space-y-4">
-      {/* Quick Log Form */}
-      <Card className="bg-white shadow-sm border-2 border-teal-200">
-        <CardHeader className="pb-2 bg-gradient-to-r from-teal-50 to-green-50">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Plus className="w-4 h-4 text-teal-600" />Log New Vitals (Auto Z-Score Calculation)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-3 space-y-2">
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <Label className="text-xs font-semibold">Weight (kg)</Label>
-              <Input type="number" step="0.1" value={weight} onChange={e => setWeight(e.target.value)} placeholder="e.g. 18.5" className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs font-semibold">Height (cm)</Label>
-              <Input type="number" step="0.1" value={height} onChange={e => setHeight(e.target.value)} placeholder="e.g. 110" className="mt-1" />
-            </div>
-            <div className="flex items-end">
-              <Button onClick={logGrowth} disabled={createHistoryMutation.isPending} className="w-full bg-teal-600 hover:bg-teal-700 h-9">
-                <Plus className="w-3 h-3 mr-1" />Log
-              </Button>
-            </div>
-          </div>
-          <p className="text-xs text-slate-500">⚡ Auto-calculates WHO Z-scores and adds to medical history timeline</p>
-        </CardContent>
-      </Card>
+      {/* Alerts */}
+      {(stunted || wasted) && (
+        <Alert className="bg-red-50 border-2 border-red-400">
+          <AlertTriangle className="w-4 h-4 text-red-600" />
+          <AlertDescription className="text-red-900 text-sm font-semibold">
+            ⚠️ Growth Warning: {stunted && "STUNTING (HAZ < -2SD)"} {stunted && wasted && " + "} {wasted && "WASTING (WAZ < -2SD)"}
+            — Immediate nutritional/clinical review required.
+          </AlertDescription>
+        </Alert>
+      )}
 
-      {/* Current Assessment */}
-      {latestLog && (
-        <Card className="bg-white shadow-lg border-2">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Activity className="w-4 h-4 text-blue-600" />Current Growth Assessment (WHO 2006/2007)
-            </CardTitle>
-            <p className="text-xs text-slate-500">Latest: {latestLog.date ? format(new Date(latestLog.date), "dd MMM yyyy") : "Baseline"}</p>
-          </CardHeader>
-          <CardContent className="p-4 space-y-3">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <MetricBox label="Weight" value={`${latestLog.weight} kg`} zscore={latestLog.waz} />
-              <MetricBox label="Height" value={`${latestLog.height} cm`} zscore={latestLog.haz} />
-              <MetricBox label="BMI" value={latestLog.bmi} zscore={latestLog.bmiz} />
-              <MetricBox label="Age" value={`${latestLog.age} y`} />
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <Baby className="w-5 h-5 text-teal-600" />
+          <h3 className="font-bold text-slate-800">Growth Monitoring — WHO Standards</h3>
+          <Badge className="bg-teal-100 text-teal-800">{records.length} measurements</Badge>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={analyzeGrowth} disabled={loadingAI || records.length < 2}>
+            {loadingAI ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Brain className="w-3 h-3 mr-1" />}
+            AI Growth Analysis
+          </Button>
+          <Button size="sm" className="bg-teal-600 hover:bg-teal-700" onClick={() => setShowForm(!showForm)}>
+            <Plus className="w-3 h-3 mr-1" />Add Measurement
+          </Button>
+        </div>
+      </div>
+
+      {/* Add Measurement Form */}
+      {showForm && (
+        <Card className="bg-teal-50 border-teal-200">
+          <CardContent className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-slate-600">Date</label>
+              <Input type="date" value={newRecord.measurement_date} onChange={e => setNewRecord(p => ({...p, measurement_date: e.target.value}))} className="mt-1 text-xs" />
             </div>
-            <div className="space-y-1">
-              {growthIssues.map((issue, i) => (
-                <Alert key={i} className={`${issue.severity === "normal" ? "bg-green-50 border-green-200" : issue.severity === "critical" ? "bg-red-100 border-red-400" : "bg-amber-50 border-amber-300"}`}>
-                  <AlertTriangle className={`w-4 h-4 ${issue.severity === "normal" ? "text-green-600" : issue.severity === "critical" ? "text-red-600" : "text-amber-600"}`} />
-                  <AlertDescription className="text-xs">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <strong>{issue.type}</strong>
-                        <p className="text-slate-600 mt-0.5">{issue.action}</p>
-                      </div>
-                      <Badge className={`${severityColor[issue.severity]} text-xs`}>{issue.severity}</Badge>
-                    </div>
-                  </AlertDescription>
-                </Alert>
-              ))}
+            <div>
+              <label className="text-xs font-semibold text-slate-600">Weight (kg)</label>
+              <Input type="number" step="0.1" placeholder="e.g. 15.5" value={newRecord.weight_kg} onChange={e => setNewRecord(p => ({...p, weight_kg: e.target.value}))} className="mt-1 text-xs" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600">Height (cm)</label>
+              <Input type="number" step="0.1" placeholder="e.g. 95.0" value={newRecord.height_cm} onChange={e => setNewRecord(p => ({...p, height_cm: e.target.value}))} className="mt-1 text-xs" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600">Tanner Stage</label>
+              <Select value={newRecord.tanner_stage} onValueChange={v => setNewRecord(p => ({...p, tanner_stage: v}))}>
+                <SelectTrigger className="mt-1 h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {["Not Assessed","I","II","III","IV","V"].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="col-span-2 md:col-span-3">
+              <label className="text-xs font-semibold text-slate-600">Notes</label>
+              <Input placeholder="e.g. steroid dose, intercurrent illness" value={newRecord.notes} onChange={e => setNewRecord(p => ({...p, notes: e.target.value}))} className="mt-1 text-xs" />
+            </div>
+            <div className="flex items-end gap-2">
+              <Button size="sm" className="bg-teal-600 w-full" onClick={saveRecord} disabled={saving}>
+                {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Save"}
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Growth Charts */}
-      {enrichedLogs.length > 1 && (
-        <Card className="bg-white shadow-lg border-2">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-purple-600" />Growth Trend Charts ({enrichedLogs.length} data points)
+      {/* Chart Toggle */}
+      <div className="flex gap-2">
+        <Button size="sm" variant={chartType === "weight" ? "default" : "outline"} onClick={() => setChartType("weight")} className={chartType === "weight" ? "bg-teal-600" : ""}>
+          Weight-for-Age
+        </Button>
+        <Button size="sm" variant={chartType === "height" ? "default" : "outline"} onClick={() => setChartType("height")} className={chartType === "height" ? "bg-teal-600" : ""}>
+          Height-for-Age
+        </Button>
+      </div>
+
+      {/* Growth Chart */}
+      {chartData.length > 0 ? (
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2 border-b bg-teal-50">
+            <CardTitle className="text-sm font-bold text-teal-900">
+              {chartType === "weight" ? "Weight-for-Age" : "Height-for-Age"} — WHO {ptGender} Reference
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 space-y-5">
-            {/* Weight Chart */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-700 mb-2">Weight-for-Age (kg) vs WHO {gender} Reference</h4>
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="age" label={{ value: "Age (years)", position: "insideBottom", offset: -4, fontSize: 11 }} tick={{ fontSize: 10 }} />
-                  <YAxis label={{ value: "Weight (kg)", angle: -90, position: "insideLeft", fontSize: 11 }} tick={{ fontSize: 10 }} />
-                  <Tooltip formatter={(v, n) => [typeof v === "number" ? v.toFixed(1) : v, n]} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line data={whoWtLine} dataKey="median" stroke="#94a3b8" strokeDasharray="4 2" dot={false} name="WHO Median" />
-                  <Line data={whoWtLine} dataKey="plus2sd" stroke="#fca5a5" strokeDasharray="2 2" dot={false} name="+2 SD" strokeWidth={1.5} />
-                  <Line data={whoWtLine} dataKey="minus2sd" stroke="#fca5a5" strokeDasharray="2 2" dot={false} name="-2 SD" strokeWidth={1.5} />
-                  <ReferenceLine y={0} stroke="#cbd5e1" strokeDasharray="2 2" />
-                  <Line data={enrichedLogs} dataKey="weight" stroke="#10b981" strokeWidth={3} dot={{ r: 5, fill: "#10b981" }} name="Patient Weight" connectNulls />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+          <CardContent className="p-4">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null;
+                    const d = payload[0]?.payload;
+                    return (
+                      <div className="bg-white border rounded shadow p-2 text-xs">
+                        <p className="font-bold">{d.date}</p>
+                        <p>Age: {d.age}mo | Value: {d.value} {chartType === "weight" ? "kg" : "cm"}</p>
+                        <p className={d.zScore < -2 ? "text-red-600 font-bold" : "text-green-600"}>Z-score: {d.zScore?.toFixed(2)}</p>
+                        <p className="text-slate-500">3rd centile: {d.p3?.toFixed(1)} | Median: {d.p50?.toFixed(1)} | 97th: {d.p97?.toFixed(1)}</p>
+                      </div>
+                    );
+                  }}
+                />
+                <Legend />
+                <Line dataKey="p3" name="-2SD (3rd centile)" stroke="#ef4444" strokeDasharray="5 5" strokeWidth={1} dot={false} />
+                <Line dataKey="p50" name="Median (50th)" stroke="#10b981" strokeDasharray="3 3" strokeWidth={1} dot={false} />
+                <Line dataKey="p97" name="+2SD (97th)" stroke="#3b82f6" strokeDasharray="5 5" strokeWidth={1} dot={false} />
+                <Line dataKey="value" name={chartType === "weight" ? "Patient Weight" : "Patient Height"} stroke="#7c3aed" strokeWidth={2.5} dot={{ r: 5, fill: "#7c3aed" }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="bg-slate-50 border-dashed border-2">
+          <CardContent className="p-8 text-center text-slate-400">
+            <Baby className="w-10 h-10 mx-auto mb-2 opacity-30" />
+            <p className="text-sm">No growth records yet — add the first measurement above</p>
+          </CardContent>
+        </Card>
+      )}
 
-            {/* Height Chart */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-700 mb-2">Height-for-Age (cm) vs WHO {gender} Reference</h4>
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="age" label={{ value: "Age (years)", position: "insideBottom", offset: -4, fontSize: 11 }} tick={{ fontSize: 10 }} />
-                  <YAxis label={{ value: "Height (cm)", angle: -90, position: "insideLeft", fontSize: 11 }} tick={{ fontSize: 10 }} />
-                  <Tooltip formatter={(v, n) => [typeof v === "number" ? v.toFixed(1) : v, n]} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line data={whoHtLine} dataKey="median" stroke="#94a3b8" strokeDasharray="4 2" dot={false} name="WHO Median" />
-                  <Line data={whoHtLine} dataKey="plus2sd" stroke="#a78bfa" strokeDasharray="2 2" dot={false} name="+2 SD" strokeWidth={1.5} />
-                  <Line data={whoHtLine} dataKey="minus2sd" stroke="#a78bfa" strokeDasharray="2 2" dot={false} name="-2 SD" strokeWidth={1.5} />
-                  <Line data={enrichedLogs} dataKey="height" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 5, fill: "#8b5cf6" }} name="Patient Height" connectNulls />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Z-Score Trend */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-700 mb-2">Z-Score Trend (WAZ, HAZ, BMI-Z)</h4>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={enrichedLogs}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="age" label={{ value: "Age (years)", position: "insideBottom", offset: -4, fontSize: 11 }} tick={{ fontSize: 10 }} />
-                  <YAxis domain={[-4, 3]} tick={{ fontSize: 10 }} />
-                  <Tooltip formatter={(v) => [v?.toFixed(2) || "—", ""]} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <ReferenceLine y={-2} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: "-2 SD", fontSize: 10, fill: "#f59e0b" }} />
-                  <ReferenceLine y={-3} stroke="#ef4444" strokeDasharray="4 2" label={{ value: "-3 SD", fontSize: 10, fill: "#ef4444" }} />
-                  <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="2 2" />
-                  <ReferenceLine y={2} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: "+2 SD", fontSize: 10, fill: "#f59e0b" }} />
-                  <Line dataKey="waz" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4 }} name="WAZ" connectNulls />
-                  <Line dataKey="haz" stroke="#8b5cf6" strokeWidth={2.5} dot={{ r: 4 }} name="HAZ" connectNulls />
-                  <Line dataKey="bmiz" stroke="#10b981" strokeWidth={2.5} dot={{ r: 4 }} name="BMI-Z" connectNulls />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Data Table */}
-            <div className="overflow-x-auto border rounded-lg">
+      {/* Z-Score Summary Table */}
+      {enriched.length > 0 && (
+        <Card className="bg-white shadow-sm">
+          <CardHeader className="pb-2 border-b"><CardTitle className="text-xs font-bold text-slate-700 uppercase">Z-Score History</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead><tr className="bg-slate-100">
-                  <th className="p-2 text-left">Date</th>
-                  <th className="p-2 text-left">Age (y)</th>
-                  <th className="p-2 text-left">Wt (kg)</th>
-                  <th className="p-2 text-left">WAZ</th>
-                  <th className="p-2 text-left">Ht (cm)</th>
-                  <th className="p-2 text-left">HAZ</th>
-                  <th className="p-2 text-left">BMI</th>
-                  <th className="p-2 text-left">BMI-Z</th>
-                </tr></thead>
+                <thead className="bg-slate-50 border-b">
+                  <tr>
+                    {["Date","Age(mo)","Wt(kg)","Ht(cm)","BMI","WAZ","HAZ","Status"].map(h => (
+                      <th key={h} className="px-3 py-2 text-left font-semibold text-slate-600">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
                 <tbody>
-                  {enrichedLogs.map((log, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                      <td className="p-2">{log.date ? format(new Date(log.date), "dd/MM/yy") : "—"}{log.isBaseline && " (baseline)"}</td>
-                      <td className="p-2">{log.age}</td>
-                      <td className="p-2 font-medium">{log.weight || "—"}</td>
-                      <td className={`p-2 font-bold ${log.waz < -2 ? "text-red-600" : log.waz > 2 ? "text-amber-600" : "text-green-600"}`}>{log.waz?.toFixed(1) || "—"}</td>
-                      <td className="p-2">{log.height || "—"}</td>
-                      <td className={`p-2 font-bold ${log.haz < -2 ? "text-red-600" : "text-green-600"}`}>{log.haz?.toFixed(1) || "—"}</td>
-                      <td className="p-2">{log.bmi || "—"}</td>
-                      <td className={`p-2 font-bold ${log.bmiz < -2 ? "text-red-600" : log.bmiz > 2 ? "text-amber-600" : "text-green-600"}`}>{log.bmiz?.toFixed(1) || "—"}</td>
-                    </tr>
-                  ))}
+                  {enriched.map((r, i) => {
+                    const wLabel = zLabel(r.waz); const hLabel = zLabel(r.haz);
+                    const bmi = r.weight_kg && r.height_cm ? (r.weight_kg / Math.pow(r.height_cm/100, 2)).toFixed(1) : "-";
+                    return (
+                      <tr key={i} className={`border-b ${r.haz < -2 || r.waz < -2 ? "bg-red-50" : ""}`}>
+                        <td className="px-3 py-2">{r.measurement_date}</td>
+                        <td className="px-3 py-2">{r.ageMonths}</td>
+                        <td className="px-3 py-2">{r.weight_kg}</td>
+                        <td className="px-3 py-2">{r.height_cm}</td>
+                        <td className="px-3 py-2">{bmi}</td>
+                        <td className="px-3 py-2"><span className={`px-1.5 py-0.5 rounded text-xs font-medium ${wLabel?.color}`}>{r.waz?.toFixed(2)}</span></td>
+                        <td className="px-3 py-2"><span className={`px-1.5 py-0.5 rounded text-xs font-medium ${hLabel?.color}`}>{r.haz?.toFixed(2)}</span></td>
+                        <td className="px-3 py-2">
+                          {r.haz < -3 ? <Badge className="bg-red-600 text-white text-xs">Severe Stunting</Badge>
+                          : r.haz < -2 ? <Badge className="bg-orange-500 text-white text-xs">Stunting</Badge>
+                          : r.waz < -2 ? <Badge className="bg-amber-500 text-white text-xs">Wasting</Badge>
+                          : <Badge className="bg-green-100 text-green-800 text-xs">Normal</Badge>}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -302,25 +348,17 @@ export default function GrowthMonitoringEngine({ patient }) {
         </Card>
       )}
 
-      {enrichedLogs.length === 0 && (
-        <Alert className="bg-blue-50 border-blue-200">
-          <Info className="w-4 h-4 text-blue-600" />
-          <AlertDescription className="text-xs text-blue-800">
-            No growth data logged yet. Use the form above to log weight/height — WHO Z-scores will be auto-calculated and visualized in interactive charts.
-          </AlertDescription>
-        </Alert>
+      {/* AI Alert */}
+      {aiAlert && (
+        <Card className="bg-violet-50 border-2 border-violet-300">
+          <CardHeader className="pb-2 border-b border-violet-200">
+            <CardTitle className="text-sm font-bold text-violet-900 flex items-center gap-2">
+              <Brain className="w-4 h-4" />AI Growth Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 text-sm text-slate-800 whitespace-pre-line">{aiAlert}</CardContent>
+        </Card>
       )}
-    </div>
-  );
-}
-
-function MetricBox({ label, value, zscore }) {
-  const zColor = zscore ? (zscore < -2 ? "text-red-600" : zscore > 2 ? "text-amber-600" : "text-green-600") : "text-slate-600";
-  return (
-    <div className="bg-slate-50 border rounded-lg p-2 text-center">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className="font-bold text-base text-slate-900 mt-0.5">{value}</div>
-      {zscore !== null && zscore !== undefined && <div className={`text-xs font-bold mt-0.5 ${zColor}`}>Z: {zscore.toFixed(1)}</div>}
     </div>
   );
 }
