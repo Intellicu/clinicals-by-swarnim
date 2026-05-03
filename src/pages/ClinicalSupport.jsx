@@ -1720,7 +1720,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               <Clipboard className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Scenarios ({clinicalScenarios.length})</span><span className="sm:hidden">Cases</span>
             </TabsTrigger>
-            <TabsTrigger value="pathways" className="flex items-center gap-1 text-xs sm:text-sm">
+            <TabsTrigger value="pathways" className="px-3 py-1 text-xs font-medium rounded-xl justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 sm:text-sm">
               <GitBranch className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Pathways</span><span className="sm:hidden">Path</span>
             </TabsTrigger>
