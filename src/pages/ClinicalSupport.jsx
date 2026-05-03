@@ -1703,7 +1703,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-green-100 text-muted-foreground p-1 rounded-lg items-center justify-center grid w-full grid-cols-5 h-auto gap-1">
+          <TabsList className="bg-green-100 text-muted-foreground p-1 rounded-xl items-center justify-center grid w-full grid-cols-5 h-auto gap-1">
             <TabsTrigger value="diagnostic" className="px-3 py-1 text-xs font-medium rounded-2xl justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 sm:text-sm">
               <Brain className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">AI Diagnostic</span><span className="sm:hidden">Dx Agent</span>
