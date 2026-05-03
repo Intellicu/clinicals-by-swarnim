@@ -12,12 +12,12 @@ import NutritionIntakeTracker from "../components/pediatrics/NutritionIntakeTrac
 import InteractiveGrowthChart from "../components/pediatrics/InteractiveGrowthChart.jsx";
 
 const TABS = [
-  { id: "assistant",  label: "AI Assistant",  icon: MessageCircle, color: "bg-green-600",  badge: "AI" },
-  { id: "vaccination",label: "Vaccination",   icon: Syringe,       color: "bg-blue-600"  },
-  { id: "growth",     label: "Growth Charts", icon: TrendingUp,    color: "bg-purple-600" },
-  { id: "nutrition",  label: "Nutrition Log", icon: Apple,         color: "bg-orange-600" },
-  { id: "guidelines", label: "Guidelines",    icon: Scale,         color: "bg-teal-600"  },
-];
+{ id: "assistant", label: "AI Assistant", icon: MessageCircle, color: "bg-green-600", badge: "AI" },
+{ id: "vaccination", label: "Vaccination", icon: Syringe, color: "bg-blue-600" },
+{ id: "growth", label: "Growth Charts", icon: TrendingUp, color: "bg-purple-600" },
+{ id: "nutrition", label: "Nutrition Log", icon: Apple, color: "bg-orange-600" },
+{ id: "guidelines", label: "Guidelines", icon: Scale, color: "bg-teal-600" }];
+
 
 export default function PediatricsHub() {
   const [activeTab, setActiveTab] = useState("assistant");
@@ -48,7 +48,7 @@ export default function PediatricsHub() {
       <div className="bg-slate-900 px-2 py-2 sticky top-[57px] z-10 shadow-lg">
         <div className="max-w-5xl mx-auto overflow-x-auto">
           <div className="flex gap-1.5 min-w-max md:grid md:grid-cols-5 md:min-w-0">
-            {TABS.map(tab => {
+            {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -56,22 +56,22 @@ export default function PediatricsHub() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`relative flex flex-col items-center justify-center gap-0.5 py-2.5 px-3 md:px-1 rounded-xl transition-all duration-200 min-w-[72px] md:min-w-0 ${
-                    isActive
-                      ? `${tab.color} shadow-lg ring-2 ring-white/30`
-                      : "bg-slate-700 hover:bg-slate-600 active:bg-slate-500"
-                  }`}
-                >
+                  isActive ?
+                  `${tab.color} shadow-lg ring-2 ring-white/30` :
+                  "bg-slate-700 hover:bg-slate-600 active:bg-slate-500"}`
+                  }>
+                  
                   <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-300"}`} />
                   <span className={`text-[11px] font-bold leading-tight text-center whitespace-nowrap ${isActive ? "text-white" : "text-slate-300"}`}>
                     {tab.label}
                   </span>
-                  {tab.badge && (
-                    <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">
+                  {tab.badge &&
+                  <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">
                       {tab.badge}
                     </span>
-                  )}
-                </button>
-              );
+                  }
+                </button>);
+
             })}
           </div>
         </div>
@@ -81,9 +81,9 @@ export default function PediatricsHub() {
       <div className="max-w-5xl mx-auto p-4">
 
         {/* ── AI Assistant ── */}
-        {activeTab === "assistant" && (
-          <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-green-200">
-            <div className="bg-gradient-to-r from-green-600 to-teal-600 px-4 py-3 flex items-center justify-between">
+        {activeTab === "assistant" &&
+        <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-green-200">
+            <div className="bg-red-300 px-4 py-3 from-green-600 to-teal-600 flex items-center justify-between">
               <div>
                 <p className="font-bold text-white text-sm flex items-center gap-2">
                   <MessageCircle className="w-5 h-5" />Vaccination & Drug AI Assistant
@@ -97,11 +97,11 @@ export default function PediatricsHub() {
             </div>
             <VaccDrugChatbot />
           </div>
-        )}
+        }
 
         {/* ── Vaccination ── */}
-        {activeTab === "vaccination" && (
-          <div>
+        {activeTab === "vaccination" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-blue-600 rounded-xl shadow">
               <Syringe className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -111,11 +111,11 @@ export default function PediatricsHub() {
             </div>
             <SimpleVaccinationSchedule />
           </div>
-        )}
+        }
 
         {/* ── Growth Charts ── */}
-        {activeTab === "growth" && (
-          <div>
+        {activeTab === "growth" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-purple-600 rounded-xl shadow">
               <TrendingUp className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -125,11 +125,11 @@ export default function PediatricsHub() {
             </div>
             <InteractiveGrowthChart />
           </div>
-        )}
+        }
 
         {/* ── Nutrition Log ── */}
-        {activeTab === "nutrition" && (
-          <div>
+        {activeTab === "nutrition" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-orange-600 rounded-xl shadow">
               <Apple className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -139,11 +139,11 @@ export default function PediatricsHub() {
             </div>
             <NutritionIntakeTracker />
           </div>
-        )}
+        }
 
         {/* ── Guidelines ── */}
-        {activeTab === "guidelines" && (
-          <div>
+        {activeTab === "guidelines" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-teal-600 rounded-xl shadow">
               <Scale className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -153,8 +153,8 @@ export default function PediatricsHub() {
             </div>
             <PediatricNutritionPathway />
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
