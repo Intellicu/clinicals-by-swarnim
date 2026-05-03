@@ -1712,7 +1712,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               <Microscope className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Glomerular Diseases</span><span className="sm:hidden">GN</span>
             </TabsTrigger>
-            <TabsTrigger value="ai-agents" className="flex items-center gap-1 text-xs sm:text-sm">
+            <TabsTrigger value="ai-agents" className="px-3 py-1 text-xs font-medium rounded-xl justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 sm:text-sm">
               <Microscope className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Clinical AI</span><span className="sm:hidden">AI</span>
             </TabsTrigger>
