@@ -54,12 +54,12 @@ export default function PediatricsHub() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex flex-col items-center justify-center gap-0.5 py-2.5 px-3 md:px-1 rounded-xl transition-all duration-200 min-w-[72px] md:min-w-0 ${
-                  isActive ?
-                  `${tab.color} shadow-lg ring-2 ring-white/30` :
-                  "bg-slate-700 hover:bg-slate-600 active:bg-slate-500"}`
-                  }>
+                  onClick={() => setActiveTab(tab.id)} className="bg-green-600 px-3 py-2.5 rounded relative flex flex-col items-center justify-center gap-0.5 md:px-1 transition-all duration-200 min-w-[72px] md:min-w-0 shadow-lg ring-2 ring-white/30">
+
+
+
+
+                  
                   
                   <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-300"}`} />
                   <span className={`text-[11px] font-bold leading-tight text-center whitespace-nowrap ${isActive ? "text-white" : "text-slate-300"}`}>
