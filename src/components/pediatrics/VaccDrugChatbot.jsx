@@ -74,23 +74,23 @@ export default function VaccDrugChatbot() {
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] min-h-[500px] max-h-[800px]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-green-600 to-teal-600 rounded-t-xl hidden">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
-            <Baby className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="font-bold text-white text-sm">Vacc & Drug Assistant</p>
-            <p className="text-green-100 text-xs">IAP 2023 · NIS 2023 · WHO</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge className="bg-white/20 text-white border-white/30 text-xs">AI</Badge>
-          <Button size="sm" variant="ghost" onClick={reset} className="text-white hover:bg-white/20 h-8 w-8 p-0">
-            <RotateCcw className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
 
       {/* Quick prompts */}
       <div className="px-3 py-2 bg-green-50 border-x border-green-100 overflow-x-auto">
