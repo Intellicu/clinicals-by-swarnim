@@ -8,15 +8,15 @@ import { Send, Syringe, Pill, RotateCcw, Loader2, Baby, ChevronDown } from "luci
 import ReactMarkdown from "react-markdown";
 
 const QUICK_PROMPTS = [
-  "What vaccines are due for a 6-month-old?",
-  "Next vaccines for a 15-month child who missed MMR",
-  "Amoxicillin dose for a 12 kg child with ear infection",
-  "Treatment plan for nephrotic syndrome first episode, weight 18 kg",
-  "Catch-up schedule for a 2-year-old with no previous vaccines",
-  "Prednisolone dose for nephrotic relapse, 20 kg child",
-  "UTI treatment in a 3-year-old girl, weight 14 kg",
-  "Vaccines contraindicated in immunosuppressed children",
-];
+"What vaccines are due for a 6-month-old?",
+"Next vaccines for a 15-month child who missed MMR",
+"Amoxicillin dose for a 12 kg child with ear infection",
+"Treatment plan for nephrotic syndrome first episode, weight 18 kg",
+"Catch-up schedule for a 2-year-old with no previous vaccines",
+"Prednisolone dose for nephrotic relapse, 20 kg child",
+"UTI treatment in a 3-year-old girl, weight 14 kg",
+"Vaccines contraindicated in immunosuppressed children"];
+
 
 export default function VaccDrugChatbot() {
   const [conversation, setConversation] = useState(null);
@@ -60,7 +60,7 @@ export default function VaccDrugChatbot() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    if (e.key === "Enter" && !e.shiftKey) {e.preventDefault();sendMessage();}
   };
 
   const reset = async () => {
@@ -69,12 +69,12 @@ export default function VaccDrugChatbot() {
     await initConversation();
   };
 
-  const visibleMessages = messages.filter(m => m.role === "user" || m.role === "assistant");
+  const visibleMessages = messages.filter((m) => m.role === "user" || m.role === "assistant");
 
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] min-h-[500px] max-h-[800px]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-green-600 to-teal-600 rounded-t-xl">
+      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-green-600 to-teal-600 rounded-t-xl hidden">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
             <Baby className="w-5 h-5 text-white" />
@@ -95,28 +95,28 @@ export default function VaccDrugChatbot() {
       {/* Quick prompts */}
       <div className="px-3 py-2 bg-green-50 border-x border-green-100 overflow-x-auto">
         <div className="flex gap-2 whitespace-nowrap">
-          {QUICK_PROMPTS.map((p, i) => (
-            <button
-              key={i}
-              onClick={() => sendMessage(p)}
-              disabled={loading || initializing}
-              className="text-xs px-3 py-1.5 bg-white border border-green-300 rounded-full text-green-800 hover:bg-green-100 transition-colors flex-shrink-0 font-medium"
-            >
+          {QUICK_PROMPTS.map((p, i) =>
+          <button
+            key={i}
+            onClick={() => sendMessage(p)}
+            disabled={loading || initializing}
+            className="text-xs px-3 py-1.5 bg-white border border-green-300 rounded-full text-green-800 hover:bg-green-100 transition-colors flex-shrink-0 font-medium">
+            
               {p.length > 35 ? p.slice(0, 35) + "…" : p}
             </button>
-          ))}
+          )}
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 border-x border-slate-200">
-        {initializing ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-400">
+        {initializing ?
+        <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-400">
             <Loader2 className="w-8 h-8 animate-spin text-green-500" />
             <p className="text-sm">Loading assistant...</p>
-          </div>
-        ) : visibleMessages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-center px-4">
+          </div> :
+        visibleMessages.length === 0 ?
+        <div className="flex flex-col items-center justify-center h-full gap-4 text-center px-4">
             <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-teal-100 rounded-2xl flex items-center justify-center">
               <Syringe className="w-8 h-8 text-green-600" />
             </div>
@@ -142,26 +142,26 @@ export default function VaccDrugChatbot() {
                 Vaccines on steroids
               </button>
             </div>
-          </div>
-        ) : (
-          visibleMessages.map((msg, i) => (
-            <MessageBubble key={i} message={msg} />
-          ))
-        )}
-        {loading && (
-          <div className="flex gap-2 items-start">
+          </div> :
+
+        visibleMessages.map((msg, i) =>
+        <MessageBubble key={i} message={msg} />
+        )
+        }
+        {loading &&
+        <div className="flex gap-2 items-start">
             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
               <Baby className="w-4 h-4 text-green-600" />
             </div>
             <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 shadow-sm border border-slate-200">
               <div className="flex gap-1">
-                {[0,1,2].map(j => (
-                  <div key={j} className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: `${j * 0.15}s` }} />
-                ))}
+                {[0, 1, 2].map((j) =>
+              <div key={j} className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: `${j * 0.15}s` }} />
+              )}
               </div>
             </div>
           </div>
-        )}
+        }
         <div ref={messagesEndRef} />
       </div>
 
@@ -169,55 +169,55 @@ export default function VaccDrugChatbot() {
       <div className="px-3 py-3 bg-white border border-slate-200 rounded-b-xl flex gap-2">
         <Input
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask about vaccines, drug doses, treatment plans..."
           disabled={loading || initializing}
-          className="flex-1 text-sm border-slate-300 focus-visible:ring-green-400"
-        />
+          className="flex-1 text-sm border-slate-300 focus-visible:ring-green-400" />
+        
         <Button
           onClick={() => sendMessage()}
           disabled={!input.trim() || loading || initializing}
-          className="bg-green-600 hover:bg-green-700 px-3"
-        >
+          className="bg-green-600 hover:bg-green-700 px-3">
+          
           <Send className="w-4 h-4" />
         </Button>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 function MessageBubble({ message }) {
   const isUser = message.role === "user";
   return (
     <div className={`flex gap-2 items-start ${isUser ? "flex-row-reverse" : ""}`}>
-      {!isUser && (
-        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+      {!isUser &&
+      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
           <Baby className="w-4 h-4 text-green-600" />
         </div>
-      )}
+      }
       <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isUser ? "bg-green-600 text-white rounded-tr-none" : "bg-white border border-slate-200 text-slate-800 rounded-tl-none"}`}>
-        {isUser ? (
-          <p>{message.content}</p>
-        ) : (
-          <ReactMarkdown
-            className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 prose-headings:text-slate-800 prose-strong:text-slate-900"
-            components={{
-              p: ({ children }) => <p className="my-1 leading-relaxed">{children}</p>,
-              ul: ({ children }) => <ul className="my-1 ml-4 list-disc space-y-0.5">{children}</ul>,
-              ol: ({ children }) => <ol className="my-1 ml-4 list-decimal space-y-0.5">{children}</ol>,
-              li: ({ children }) => <li className="text-sm">{children}</li>,
-              strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
-              h1: ({ children }) => <h1 className="text-base font-bold text-green-800 mt-2 mb-1">{children}</h1>,
-              h2: ({ children }) => <h2 className="text-sm font-bold text-green-700 mt-2 mb-1">{children}</h2>,
-              h3: ({ children }) => <h3 className="text-sm font-semibold text-slate-800 mt-1.5 mb-0.5">{children}</h3>,
-              code: ({ children }) => <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">{children}</code>,
-            }}
-          >
+        {isUser ?
+        <p>{message.content}</p> :
+
+        <ReactMarkdown
+          className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 prose-headings:text-slate-800 prose-strong:text-slate-900"
+          components={{
+            p: ({ children }) => <p className="my-1 leading-relaxed">{children}</p>,
+            ul: ({ children }) => <ul className="my-1 ml-4 list-disc space-y-0.5">{children}</ul>,
+            ol: ({ children }) => <ol className="my-1 ml-4 list-decimal space-y-0.5">{children}</ol>,
+            li: ({ children }) => <li className="text-sm">{children}</li>,
+            strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
+            h1: ({ children }) => <h1 className="text-base font-bold text-green-800 mt-2 mb-1">{children}</h1>,
+            h2: ({ children }) => <h2 className="text-sm font-bold text-green-700 mt-2 mb-1">{children}</h2>,
+            h3: ({ children }) => <h3 className="text-sm font-semibold text-slate-800 mt-1.5 mb-0.5">{children}</h3>,
+            code: ({ children }) => <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">{children}</code>
+          }}>
+          
             {message.content}
           </ReactMarkdown>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
