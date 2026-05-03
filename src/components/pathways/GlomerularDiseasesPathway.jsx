@@ -6,10 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { AlertTriangle, RefreshCw, ChevronDown, ChevronUp, ExternalLink, Loader2, CheckCircle, BookOpen, Edit2, Save, X, Plus, Trash2, GitBranch, FileText, Dna } from "lucide-react";
+import { AlertTriangle, RefreshCw, ChevronDown, ChevronUp, ExternalLink, Loader2, CheckCircle, BookOpen, Edit2, Save, X, Plus, Trash2, GitBranch, FileText, Dna, Zap } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
+import GlomerularDecisionEngine from "../nephrology/GlomerularDecisionEngine";
+import LabTrendIntelligence from "../nephrology/LabTrendIntelligence";
+import DialysisDecisionSupport from "../nephrology/DialysisDecisionSupport";
 
 // ── Flowchart component (pure CSS/div based) ─────────────────────────────────
 const FlowStep = ({ step, index, total, color = "blue" }) => {
@@ -649,12 +652,13 @@ export default function GlomerularDiseasesPathway() {
   const [activeTab, setActiveTab] = useState({});
   const [aiUpdates, setAiUpdates] = useState({});
   const [loadingUpdate, setLoadingUpdate] = useState({});
-  const [editMode, setEditMode] = useState(null); // condition id being edited
+  const [editMode, setEditMode] = useState(null);
   const [editData, setEditData] = useState({});
   const [customConditions, setCustomConditions] = useState(() => {
     try { return JSON.parse(localStorage.getItem("glom_custom") || "[]"); } catch { return []; }
   });
   const [filterCategory, setFilterCategory] = useState("All");
+  const [mainTab, setMainTab] = useState("diseases");
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const isAdmin = user?.role === "admin";
@@ -710,10 +714,32 @@ export default function GlomerularDiseasesPathway() {
       <Alert className="bg-blue-50 border-blue-200">
         <BookOpen className="w-4 h-4 text-blue-600" />
         <AlertDescription className="text-xs text-blue-900">
-          <strong>Glomerular Disease Clinical Pathways</strong> — KDIGO 2021/2024, ACR/EULAR, IPNA guidelines. Includes visual algorithms, diagnostic flowcharts, and live evidence updates.
+          <strong>Glomerular Disease Clinical Pathways</strong> — KDIGO 2021/2024, ACR/EULAR, IPNA guidelines. Includes decision engine, lab trends, dialysis support, and live evidence updates.
           {isAdmin && <span className="ml-2 text-purple-700 font-semibold">Admin: edit any pathway using the ✏️ button.</span>}
         </AlertDescription>
       </Alert>
+
+      {/* Main Tabs */}
+      <div className="flex gap-1.5 flex-wrap bg-slate-100 p-1 rounded-xl">
+        {[
+          { id: "diseases", label: "📋 Disease Pathways" },
+          { id: "decision", label: "🧠 Decision Engine" },
+          { id: "labs", label: "📈 Lab Trends" },
+          { id: "dialysis", label: "💧 Dialysis Support" },
+        ].map(t => (
+          <button key={t.id} onClick={() => setMainTab(t.id)}
+            className={`text-xs px-3 py-2 rounded-lg font-semibold transition-all ${mainTab === t.id ? "bg-blue-600 text-white shadow" : "text-slate-600 hover:bg-white hover:text-slate-900"}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {mainTab === "decision" && <GlomerularDecisionEngine />}
+      {mainTab === "labs" && <LabTrendIntelligence />}
+      {mainTab === "dialysis" && <DialysisDecisionSupport />}
+
+      {/* Disease Pathways tab content */}
+      {mainTab === "diseases" && <>
 
       {/* Category Filter */}
       <div className="flex gap-2 flex-wrap">
@@ -872,6 +898,7 @@ export default function GlomerularDiseasesPathway() {
           </Card>
         );
       })}
+      </> /* end diseases tab */}
     </div>
   );
 }
