@@ -45,7 +45,7 @@ export default function PediatricsHub() {
       </div>
 
       {/* Tab Bar — high contrast dark background, fully visible on mobile */}
-      <div className="bg-slate-900 px-2 py-2 sticky top-[57px] z-10 shadow-lg">
+      <div className="bg-green-50 px-2 py-2 sticky top-[57px] z-10 shadow-lg">
         <div className="max-w-5xl mx-auto overflow-x-auto">
           <div className="flex gap-1.5 min-w-max md:grid md:grid-cols-5 md:min-w-0">
             {TABS.map((tab) => {
