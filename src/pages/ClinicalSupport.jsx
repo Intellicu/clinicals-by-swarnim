@@ -45,8 +45,8 @@ import {
   Beaker,
   Edit,
   ClipboardList,
-  TestTube
-} from "lucide-react";
+  TestTube } from
+"lucide-react";
 import { toast } from "sonner";
 import HSPNPathway from "../components/pathways/HSPNPathway";
 import EnhancedNephroticPathway from "../components/pathways/EnhancedNephroticPathway";
@@ -140,511 +140,511 @@ const SYMPTOM_TEMPLATES = {
 
 
 const clinicalScenarios = [
-  {
-    id: "nephrotic-syndrome",
-    title: "Nephrotic Syndrome - Initial Presentation",
-    category: "Nephrotic Syndrome",
-    priority: "secondary",
-    description: "New onset edema, proteinuria, hypoalbuminemia",
-    icon: Droplet,
-    hasFullPathway: true
-  },
-  {
-    id: "aki-prifle",
-    title: "Acute Kidney Injury (pRIFLE/KDIGO)",
-    category: "Acute Kidney Disease",
-    priority: "danger",
-    description: "Acute rise in creatinine or decreased urine output",
-    icon: AlertTriangle,
-    hasFullPathway: true
-  },
-  {
-    id: "iga-nephropathy",
-    title: "IgA Nephropathy (Oxford MEST-C)",
-    category: "Glomerular Disease",
-    priority: "secondary",
-    description: "Management based on Oxford classification",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "hspn",
-    title: "HSP Nephritis (HSPN)",
-    category: "Glomerular Disease",
-    priority: "secondary",
-    description: "Renal involvement in Henoch-Schönlein Purpura (ISKDC 2023)",
-    icon: Heart,
-    hasFullPathway: true
-  },
-  {
-    id: "htn-emergency",
-    title: "Hypertensive Emergency",
-    category: "Hypertension",
-    priority: "danger",
-    description: "Severe HTN with end-organ damage",
-    icon: Heart,
-    hasFullPathway: true
-  },
-  {
-    id: "hyperkalemia",
-    title: "Severe Hyperkalemia (K+ >6.0)",
-    category: "Electrolytes",
-    priority: "danger",
-    description: "Life-threatening hyperkalemia - immediate treatment",
-    icon: Zap,
-    hasFullPathway: true
-  },
-  {
-    id: "uti-febrile",
-    title: "Febrile UTI - Evaluation & Imaging",
-    category: "Infection",
-    priority: "warning",
-    description: "Post-febrile UTI workup, DMSA timing, VUR evaluation",
-    icon: Thermometer,
-    hasFullPathway: true
-  },
-  {
-    id: "ckd-progression",
-    title: "CKD Progression Risk Stratification",
-    category: "CKD",
-    priority: "warning",
-    description: "Risk assessment and intervention planning",
-    icon: TrendingUp,
-    hasFullPathway: true
-  },
-  {
-    id: "steroid-resistant-ns",
-    title: "Steroid-Resistant Nephrotic Syndrome",
-    category: "Nephrotic Syndrome",
-    priority: "warning",
-    description: "SRNS workup, biopsy, immunosuppression options",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "hemolytic-uremic",
-    title: "Hemolytic Uremic Syndrome (HUS)",
-    category: "Acute Kidney Disease",
-    priority: "danger",
-    description: "Microangiopathic hemolytic anemia, thrombocytopenia, AKI",
-    icon: Activity,
-    hasFullPathway: true
-  },
-  {
-    id: "hyponatremia",
-    title: "Hyponatremia (<130 mmol/L)",
-    category: "Electrolytes",
-    priority: "danger",
-    description: "Symptomatic hyponatremia - correction protocol",
-    icon: Droplet,
-    hasFullPathway: true
-  },
-  {
-    id: "rta-workup",
-    title: "Renal Tubular Acidosis (RTA) Diagnosis",
-    category: "Tubular Disorders",
-    priority: "secondary",
-    description: "Diagnostic approach to classify RTA type I, II, IV",
-    icon: Beaker,
-    hasFullPathway: true
-  },
-  {
-    id: "ckd-mbd",
-    title: "CKD-Mineral Bone Disease Management",
-    category: "CKD",
-    priority: "secondary",
-    description: "Secondary hyperparathyroidism prevention and treatment",
-    icon: Activity,
-    hasFullPathway: true
-  },
-  {
-    id: "transplant-rejection",
-    title: "Acute Transplant Rejection",
-    category: "Transplant",
-    priority: "danger",
-    description: "Rising creatinine post-transplant - evaluation and treatment",
-    icon: AlertTriangle,
-    hasFullPathway: true
-  },
-  {
-    id: "lupus-nephritis",
-    title: "Lupus Nephritis (Pediatric)",
-    category: "Glomerular Disease",
-    priority: "warning",
-    description: "Classification and treatment per ISN/RPS class",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "aki-dialysis-timing",
-    title: "AKI - When to Initiate Dialysis",
-    category: "Acute Kidney Disease",
-    priority: "danger",
-    description: "Indications for urgent RRT in pediatric AKI",
-    icon: Droplet,
-    hasFullPathway: true
-  },
-  {
-    id: "hypercalcemia",
-    title: "Severe Hypercalcemia (>12 mg/dL)",
-    category: "Electrolytes",
-    priority: "danger",
-    description: "Hypercalcemia crisis - evaluation and management",
-    icon: Zap,
-    hasFullPathway: true
-  },
-  {
-    id: "tumor-lysis",
-    title: "Tumor Lysis Syndrome",
-    category: "Acute Kidney Disease",
-    priority: "danger",
-    description: "Prevention and management in high tumor burden",
-    icon: Flame,
-    hasFullPathway: true
-  },
-  {
-    id: "post-strep-gn",
-    title: "Post-Streptococcal Glomerulonephritis",
-    category: "Glomerular Disease",
-    priority: "secondary",
-    description: "PSGN diagnosis and supportive management",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "congenital-nephrotic",
-    title: "Congenital Nephrotic Syndrome",
-    category: "Nephrotic Syndrome",
-    priority: "warning",
-    description: "Nephrotic syndrome <3 months - genetic workup",
-    icon: Baby,
-    hasFullPathway: true
-  },
-  {
-    id: "aki-cardiac-surgery",
-    title: "Post-Cardiac Surgery AKI",
-    category: "Acute Kidney Disease",
-    priority: "warning",
-    description: "AKI after cardiopulmonary bypass - fluid management",
-    icon: Heart,
-    hasFullPathway: true
-  },
-  {
-    id: "hypophosphatemia",
-    title: "Severe Hypophosphatemia (<1.5 mg/dL)",
-    category: "Electrolytes",
-    priority: "warning",
-    description: "Refeeding syndrome, dialysis-associated",
-    icon: Wind,
-    hasFullPathway: true
-  },
-  {
-    id: "contrast-nephropathy",
-    title: "Contrast-Induced Nephropathy Prevention",
-    category: "Acute Kidney Disease",
-    priority: "secondary",
-    description: "Risk stratification and prophylaxis before contrast studies",
-    icon: Stethoscope,
-    hasFullPathway: true
-  },
-  {
-    id: "thrombotic-microangiopathy",
-    title: "Thrombotic Microangiopathy (TMA)",
-    category: "Glomerular Disease",
-    priority: "danger",
-    description: "TTP, HUS, aHUS - differential diagnosis and treatment",
-    icon: Activity,
-    hasFullPathway: true
-  },
-  {
-    id: "dialysis-catheter-infection",
-    title: "Dialysis Catheter-Related Bacteremia",
-    category: "Infection",
-    priority: "danger",
-    description: "Central line infection - antibiotics and catheter management",
-    icon: Thermometer,
-    hasFullPathway: true
-  },
-  {
-    id: "renal-stone",
-    title: "Renal Stone Analysis & Prevention",
-    category: "Tubular Disorders",
-    priority: "secondary",
-    description: "Metabolic stone workup and prevention strategies",
-    icon: Beaker,
-    hasFullPathway: true
-  },
-  {
-    id: "bladder-dysfunction",
-    title: "Bladder Dysfunction Evaluation",
-    category: "Lower Urinary Tract",
-    priority: "secondary",
-    description: "Voiding diary interpretation and management per ICCS guidelines",
-    icon: ClipboardList,
-    hasFullPathway: true
-  },
-  {
-    id: "rta-diagnosis",
-    title: "Renal Tubular Acidosis Diagnosis",
-    category: "Tubular Disorders",
-    priority: "secondary",
-    description: "Classify RTA type 1, 2, or 4 with treatment protocols",
-    icon: Beaker,
-    hasFullPathway: true
-  },
-  {
-    id: "tubular-function",
-    title: "Tubular Function Assessment",
-    category: "Tubular Disorders",
-    priority: "secondary",
-    description: "FENa, TRP, TmP/GFR, FECa - complete tubular workup",
-    icon: TestTube,
-    hasFullPathway: true
-  },
-  {
-    id: "hypokalemia",
-    title: "Severe Hypokalemia (K+ <3.0)",
-    category: "Electrolytes",
-    priority: "danger",
-    description: "Cardiac arrhythmia risk - urgent K+ replacement",
-    icon: Zap,
-    hasFullPathway: true
-  },
-  {
-    id: "severe-edema-ns",
-    title: "Severe Edema in Nephrotic Syndrome",
-    category: "Nephrotic Syndrome",
-    priority: "danger",
-    description: "Diuretic resistance, albumin + diuretic therapy",
-    icon: Droplet,
-    hasFullPathway: true
-  },
-  {
-    id: "sbp",
-    title: "Spontaneous Bacterial Peritonitis (SBP)",
-    category: "Infection",
-    priority: "danger",
-    description: "Infected ascites in nephrotic syndrome - empiric antibiotics",
-    icon: AlertTriangle,
-    hasFullPathway: true
-  },
-  {
-    id: "metabolic-acidosis",
-    title: "Severe Metabolic Acidosis",
-    category: "Electrolytes",
-    priority: "danger",
-    description: "pH <7.2 or HCO3 <10 - urgent intervention",
-    icon: Wind,
-    hasFullPathway: true
-  },
-  {
-    id: "contrast-nephropathy",
-    title: "Contrast-Induced AKI Prevention",
-    category: "Acute Kidney Disease",
-    priority: "warning",
-    description: "Risk stratification and hydration protocol before contrast studies",
-    icon: Stethoscope,
-    hasFullPathway: true
-  },
-  {
-    id: "fluid-electrolyte",
-    title: "Fluid & Electrolyte Therapy",
-    category: "Fluids & Electrolytes",
-    priority: "secondary",
-    description: "Holliday-Segar maintenance, deficit replacement, electrolyte principles",
-    icon: Droplet,
-    hasFullPathway: true
-  },
-  {
-    id: "acid-base",
-    title: "Acid-Base Disorder Evaluation",
-    category: "Fluids & Electrolytes",
-    priority: "warning",
-    description: "5-step ABG interpretation, anion gap, MUDPILES, RTA",
-    icon: Wind,
-    hasFullPathway: true
-  },
-  {
-    id: "htn-diagnosis",
-    title: "Approach to Hypertension Diagnosis",
-    category: "Hypertension",
-    priority: "secondary",
-    description: "AAP 2017 classification, evaluation, ABPM, end-organ assessment",
-    icon: Heart,
-    hasFullPathway: true
-  },
-  {
-    id: "htn-treatment",
-    title: "Treatment of Hypertension",
-    category: "Hypertension",
-    priority: "secondary",
-    description: "Lifestyle, antihypertensives, drug table with pediatric doses",
-    icon: Heart,
-    hasFullPathway: true
-  },
-  {
-    id: "vur",
-    title: "Vesicoureteral Reflux (VUR)",
-    category: "Urinary Tract",
-    priority: "secondary",
-    description: "Grading, antibiotic prophylaxis, STING, surgical reimplantation",
-    icon: Activity,
-    hasFullPathway: true
-  },
-  {
-    id: "hydronephrosis",
-    title: "Antenatally Diagnosed Hydronephrosis",
-    category: "Developmental Kidney",
-    priority: "secondary",
-    description: "SFU grading, postnatal management, pyeloplasty indications",
-    icon: Baby,
-    hasFullPathway: true
-  },
-  {
-    id: "childhood-nephrotic",
-    title: "Childhood Nephrotic Syndrome (ISKDC/IPNA)",
-    category: "Nephrotic Syndrome",
-    priority: "secondary",
-    description: "Prednisolone protocol, SSNS/FRNS/SDNS, steroid-sparing agents",
-    icon: Droplet,
-    hasFullPathway: true
-  },
-  {
-    id: "congenital-nephrotic",
-    title: "Congenital Nephrotic Syndrome",
-    category: "Nephrotic Syndrome",
-    priority: "warning",
-    description: "Finnish type, NPHS1/2 mutations, conservative vs transplant",
-    icon: Baby,
-    hasFullPathway: true
-  },
-  {
-    id: "iga-vasculitis",
-    title: "IgA Vasculitis Nephritis (HSPN)",
-    category: "Glomerular Disease",
-    priority: "warning",
-    description: "ISKDC classification, treatment by severity, follow-up",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "anca-vasculitis",
-    title: "ANCA-Associated Vasculitis GN",
-    category: "Glomerular Disease",
-    priority: "danger",
-    description: "GPA/MPA, pauci-immune crescentic GN, cyclophosphamide/rituximab",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "membranous-nephropathy",
-    title: "Membranous Nephropathy",
-    category: "Glomerular Disease",
-    priority: "secondary",
-    description: "Anti-PLA2R, conservative phase, rituximab vs Ponticelli",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "peritoneal-dialysis",
-    title: "Peritoneal Dialysis Management",
-    category: "Peritoneal Dialysis",
-    priority: "secondary",
-    description: "PD prescription, adequacy, peritonitis, exit site infections",
-    icon: Activity,
-    hasFullPathway: true
-  },
-  {
-    id: "hemodialysis",
-    title: "Hemodialysis — Orders & Complications",
-    category: "Hemodialysis",
-    priority: "secondary",
-    description: "HD prescription, Kt/V, vascular access, acute complications",
-    icon: Activity,
-    hasFullPathway: true
-  },
-  {
-    id: "ckd-staging",
-    title: "CKD Staging & Management",
-    category: "CKD",
-    priority: "secondary",
-    description: "Schwartz eGFR, KDIGO stages, renoprotective strategy",
-    icon: TrendingUp,
-    hasFullPathway: true
-  },
-  {
-    id: "ckd-anemia-mbd",
-    title: "CKD Anemia & Mineral Bone Disease",
-    category: "CKD",
-    priority: "secondary",
-    description: "ESA, IV iron, CKD-MBD targets, phosphate binders, calciphylaxis",
-    icon: Activity,
-    hasFullPathway: true
-  },
-  {
-    id: "kidney-transplant",
-    title: "Pediatric Kidney Transplantation",
-    category: "Transplant",
-    priority: "secondary",
-    description: "Pre-transplant workup, immunosuppression, rejection, BK virus, FSGS recurrence",
-    icon: CheckCircle2,
-    hasFullPathway: true
-  },
-  {
-    id: "hematuria-approach",
-    title: "Approach to Hematuria in Children",
-    category: "Glomerular Disease",
-    priority: "secondary",
-    description: "Glomerular vs non-glomerular, workup algorithm, Alport/TBMN",
-    icon: Droplet,
-    hasFullPathway: true
-  },
-  {
-    id: "proteinuria-approach",
-    title: "Approach to Proteinuria in Children",
-    category: "Glomerular Disease",
-    priority: "secondary",
-    description: "PCR calculator, transient vs persistent, orthostatic, workup",
-    icon: Beaker,
-    hasFullPathway: true
-  },
-  {
-    id: "cystic-kidney",
-    title: "Cystic Kidney Diseases in Children",
-    category: "Developmental Kidney",
-    priority: "secondary",
-    description: "ADPKD, ARPKD, NPHP, Bardet-Biedl — comparison and management",
-    icon: Info,
-    hasFullPathway: true
-  },
-  {
-    id: "steroid-resistant-ns",
-    title: "Steroid-Resistant Nephrotic Syndrome",
-    category: "Nephrotic Syndrome",
-    priority: "warning",
-    description: "SRNS workup, genetic testing, biopsy, calcineurin inhibitors",
-    icon: Microscope,
-    hasFullPathway: true
-  },
-  {
-    id: "ckd-comprehensive",
-    title: "CKD Comprehensive Management",
-    category: "CKD",
-    priority: "warning",
-    description: "All stages, complications, RRT preparation, nutrition",
-    icon: TrendingUp,
-    hasFullPathway: true
-  },
-  {
-    id: "hypocalcemia",
-    title: "Hypocalcemia Management",
-    category: "Electrolytes",
-    priority: "warning",
-    description: "Calcium correction, vitamin D, causes and IV calcium protocol",
-    icon: Zap,
-    hasFullPathway: true
-  }
-];
+{
+  id: "nephrotic-syndrome",
+  title: "Nephrotic Syndrome - Initial Presentation",
+  category: "Nephrotic Syndrome",
+  priority: "secondary",
+  description: "New onset edema, proteinuria, hypoalbuminemia",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "aki-prifle",
+  title: "Acute Kidney Injury (pRIFLE/KDIGO)",
+  category: "Acute Kidney Disease",
+  priority: "danger",
+  description: "Acute rise in creatinine or decreased urine output",
+  icon: AlertTriangle,
+  hasFullPathway: true
+},
+{
+  id: "iga-nephropathy",
+  title: "IgA Nephropathy (Oxford MEST-C)",
+  category: "Glomerular Disease",
+  priority: "secondary",
+  description: "Management based on Oxford classification",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "hspn",
+  title: "HSP Nephritis (HSPN)",
+  category: "Glomerular Disease",
+  priority: "secondary",
+  description: "Renal involvement in Henoch-Schönlein Purpura (ISKDC 2023)",
+  icon: Heart,
+  hasFullPathway: true
+},
+{
+  id: "htn-emergency",
+  title: "Hypertensive Emergency",
+  category: "Hypertension",
+  priority: "danger",
+  description: "Severe HTN with end-organ damage",
+  icon: Heart,
+  hasFullPathway: true
+},
+{
+  id: "hyperkalemia",
+  title: "Severe Hyperkalemia (K+ >6.0)",
+  category: "Electrolytes",
+  priority: "danger",
+  description: "Life-threatening hyperkalemia - immediate treatment",
+  icon: Zap,
+  hasFullPathway: true
+},
+{
+  id: "uti-febrile",
+  title: "Febrile UTI - Evaluation & Imaging",
+  category: "Infection",
+  priority: "warning",
+  description: "Post-febrile UTI workup, DMSA timing, VUR evaluation",
+  icon: Thermometer,
+  hasFullPathway: true
+},
+{
+  id: "ckd-progression",
+  title: "CKD Progression Risk Stratification",
+  category: "CKD",
+  priority: "warning",
+  description: "Risk assessment and intervention planning",
+  icon: TrendingUp,
+  hasFullPathway: true
+},
+{
+  id: "steroid-resistant-ns",
+  title: "Steroid-Resistant Nephrotic Syndrome",
+  category: "Nephrotic Syndrome",
+  priority: "warning",
+  description: "SRNS workup, biopsy, immunosuppression options",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "hemolytic-uremic",
+  title: "Hemolytic Uremic Syndrome (HUS)",
+  category: "Acute Kidney Disease",
+  priority: "danger",
+  description: "Microangiopathic hemolytic anemia, thrombocytopenia, AKI",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "hyponatremia",
+  title: "Hyponatremia (<130 mmol/L)",
+  category: "Electrolytes",
+  priority: "danger",
+  description: "Symptomatic hyponatremia - correction protocol",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "rta-workup",
+  title: "Renal Tubular Acidosis (RTA) Diagnosis",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "Diagnostic approach to classify RTA type I, II, IV",
+  icon: Beaker,
+  hasFullPathway: true
+},
+{
+  id: "ckd-mbd",
+  title: "CKD-Mineral Bone Disease Management",
+  category: "CKD",
+  priority: "secondary",
+  description: "Secondary hyperparathyroidism prevention and treatment",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "transplant-rejection",
+  title: "Acute Transplant Rejection",
+  category: "Transplant",
+  priority: "danger",
+  description: "Rising creatinine post-transplant - evaluation and treatment",
+  icon: AlertTriangle,
+  hasFullPathway: true
+},
+{
+  id: "lupus-nephritis",
+  title: "Lupus Nephritis (Pediatric)",
+  category: "Glomerular Disease",
+  priority: "warning",
+  description: "Classification and treatment per ISN/RPS class",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "aki-dialysis-timing",
+  title: "AKI - When to Initiate Dialysis",
+  category: "Acute Kidney Disease",
+  priority: "danger",
+  description: "Indications for urgent RRT in pediatric AKI",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "hypercalcemia",
+  title: "Severe Hypercalcemia (>12 mg/dL)",
+  category: "Electrolytes",
+  priority: "danger",
+  description: "Hypercalcemia crisis - evaluation and management",
+  icon: Zap,
+  hasFullPathway: true
+},
+{
+  id: "tumor-lysis",
+  title: "Tumor Lysis Syndrome",
+  category: "Acute Kidney Disease",
+  priority: "danger",
+  description: "Prevention and management in high tumor burden",
+  icon: Flame,
+  hasFullPathway: true
+},
+{
+  id: "post-strep-gn",
+  title: "Post-Streptococcal Glomerulonephritis",
+  category: "Glomerular Disease",
+  priority: "secondary",
+  description: "PSGN diagnosis and supportive management",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "congenital-nephrotic",
+  title: "Congenital Nephrotic Syndrome",
+  category: "Nephrotic Syndrome",
+  priority: "warning",
+  description: "Nephrotic syndrome <3 months - genetic workup",
+  icon: Baby,
+  hasFullPathway: true
+},
+{
+  id: "aki-cardiac-surgery",
+  title: "Post-Cardiac Surgery AKI",
+  category: "Acute Kidney Disease",
+  priority: "warning",
+  description: "AKI after cardiopulmonary bypass - fluid management",
+  icon: Heart,
+  hasFullPathway: true
+},
+{
+  id: "hypophosphatemia",
+  title: "Severe Hypophosphatemia (<1.5 mg/dL)",
+  category: "Electrolytes",
+  priority: "warning",
+  description: "Refeeding syndrome, dialysis-associated",
+  icon: Wind,
+  hasFullPathway: true
+},
+{
+  id: "contrast-nephropathy",
+  title: "Contrast-Induced Nephropathy Prevention",
+  category: "Acute Kidney Disease",
+  priority: "secondary",
+  description: "Risk stratification and prophylaxis before contrast studies",
+  icon: Stethoscope,
+  hasFullPathway: true
+},
+{
+  id: "thrombotic-microangiopathy",
+  title: "Thrombotic Microangiopathy (TMA)",
+  category: "Glomerular Disease",
+  priority: "danger",
+  description: "TTP, HUS, aHUS - differential diagnosis and treatment",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "dialysis-catheter-infection",
+  title: "Dialysis Catheter-Related Bacteremia",
+  category: "Infection",
+  priority: "danger",
+  description: "Central line infection - antibiotics and catheter management",
+  icon: Thermometer,
+  hasFullPathway: true
+},
+{
+  id: "renal-stone",
+  title: "Renal Stone Analysis & Prevention",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "Metabolic stone workup and prevention strategies",
+  icon: Beaker,
+  hasFullPathway: true
+},
+{
+  id: "bladder-dysfunction",
+  title: "Bladder Dysfunction Evaluation",
+  category: "Lower Urinary Tract",
+  priority: "secondary",
+  description: "Voiding diary interpretation and management per ICCS guidelines",
+  icon: ClipboardList,
+  hasFullPathway: true
+},
+{
+  id: "rta-diagnosis",
+  title: "Renal Tubular Acidosis Diagnosis",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "Classify RTA type 1, 2, or 4 with treatment protocols",
+  icon: Beaker,
+  hasFullPathway: true
+},
+{
+  id: "tubular-function",
+  title: "Tubular Function Assessment",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "FENa, TRP, TmP/GFR, FECa - complete tubular workup",
+  icon: TestTube,
+  hasFullPathway: true
+},
+{
+  id: "hypokalemia",
+  title: "Severe Hypokalemia (K+ <3.0)",
+  category: "Electrolytes",
+  priority: "danger",
+  description: "Cardiac arrhythmia risk - urgent K+ replacement",
+  icon: Zap,
+  hasFullPathway: true
+},
+{
+  id: "severe-edema-ns",
+  title: "Severe Edema in Nephrotic Syndrome",
+  category: "Nephrotic Syndrome",
+  priority: "danger",
+  description: "Diuretic resistance, albumin + diuretic therapy",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "sbp",
+  title: "Spontaneous Bacterial Peritonitis (SBP)",
+  category: "Infection",
+  priority: "danger",
+  description: "Infected ascites in nephrotic syndrome - empiric antibiotics",
+  icon: AlertTriangle,
+  hasFullPathway: true
+},
+{
+  id: "metabolic-acidosis",
+  title: "Severe Metabolic Acidosis",
+  category: "Electrolytes",
+  priority: "danger",
+  description: "pH <7.2 or HCO3 <10 - urgent intervention",
+  icon: Wind,
+  hasFullPathway: true
+},
+{
+  id: "contrast-nephropathy",
+  title: "Contrast-Induced AKI Prevention",
+  category: "Acute Kidney Disease",
+  priority: "warning",
+  description: "Risk stratification and hydration protocol before contrast studies",
+  icon: Stethoscope,
+  hasFullPathway: true
+},
+{
+  id: "fluid-electrolyte",
+  title: "Fluid & Electrolyte Therapy",
+  category: "Fluids & Electrolytes",
+  priority: "secondary",
+  description: "Holliday-Segar maintenance, deficit replacement, electrolyte principles",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "acid-base",
+  title: "Acid-Base Disorder Evaluation",
+  category: "Fluids & Electrolytes",
+  priority: "warning",
+  description: "5-step ABG interpretation, anion gap, MUDPILES, RTA",
+  icon: Wind,
+  hasFullPathway: true
+},
+{
+  id: "htn-diagnosis",
+  title: "Approach to Hypertension Diagnosis",
+  category: "Hypertension",
+  priority: "secondary",
+  description: "AAP 2017 classification, evaluation, ABPM, end-organ assessment",
+  icon: Heart,
+  hasFullPathway: true
+},
+{
+  id: "htn-treatment",
+  title: "Treatment of Hypertension",
+  category: "Hypertension",
+  priority: "secondary",
+  description: "Lifestyle, antihypertensives, drug table with pediatric doses",
+  icon: Heart,
+  hasFullPathway: true
+},
+{
+  id: "vur",
+  title: "Vesicoureteral Reflux (VUR)",
+  category: "Urinary Tract",
+  priority: "secondary",
+  description: "Grading, antibiotic prophylaxis, STING, surgical reimplantation",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "hydronephrosis",
+  title: "Antenatally Diagnosed Hydronephrosis",
+  category: "Developmental Kidney",
+  priority: "secondary",
+  description: "SFU grading, postnatal management, pyeloplasty indications",
+  icon: Baby,
+  hasFullPathway: true
+},
+{
+  id: "childhood-nephrotic",
+  title: "Childhood Nephrotic Syndrome (ISKDC/IPNA)",
+  category: "Nephrotic Syndrome",
+  priority: "secondary",
+  description: "Prednisolone protocol, SSNS/FRNS/SDNS, steroid-sparing agents",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "congenital-nephrotic",
+  title: "Congenital Nephrotic Syndrome",
+  category: "Nephrotic Syndrome",
+  priority: "warning",
+  description: "Finnish type, NPHS1/2 mutations, conservative vs transplant",
+  icon: Baby,
+  hasFullPathway: true
+},
+{
+  id: "iga-vasculitis",
+  title: "IgA Vasculitis Nephritis (HSPN)",
+  category: "Glomerular Disease",
+  priority: "warning",
+  description: "ISKDC classification, treatment by severity, follow-up",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "anca-vasculitis",
+  title: "ANCA-Associated Vasculitis GN",
+  category: "Glomerular Disease",
+  priority: "danger",
+  description: "GPA/MPA, pauci-immune crescentic GN, cyclophosphamide/rituximab",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "membranous-nephropathy",
+  title: "Membranous Nephropathy",
+  category: "Glomerular Disease",
+  priority: "secondary",
+  description: "Anti-PLA2R, conservative phase, rituximab vs Ponticelli",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "peritoneal-dialysis",
+  title: "Peritoneal Dialysis Management",
+  category: "Peritoneal Dialysis",
+  priority: "secondary",
+  description: "PD prescription, adequacy, peritonitis, exit site infections",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "hemodialysis",
+  title: "Hemodialysis — Orders & Complications",
+  category: "Hemodialysis",
+  priority: "secondary",
+  description: "HD prescription, Kt/V, vascular access, acute complications",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "ckd-staging",
+  title: "CKD Staging & Management",
+  category: "CKD",
+  priority: "secondary",
+  description: "Schwartz eGFR, KDIGO stages, renoprotective strategy",
+  icon: TrendingUp,
+  hasFullPathway: true
+},
+{
+  id: "ckd-anemia-mbd",
+  title: "CKD Anemia & Mineral Bone Disease",
+  category: "CKD",
+  priority: "secondary",
+  description: "ESA, IV iron, CKD-MBD targets, phosphate binders, calciphylaxis",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "kidney-transplant",
+  title: "Pediatric Kidney Transplantation",
+  category: "Transplant",
+  priority: "secondary",
+  description: "Pre-transplant workup, immunosuppression, rejection, BK virus, FSGS recurrence",
+  icon: CheckCircle2,
+  hasFullPathway: true
+},
+{
+  id: "hematuria-approach",
+  title: "Approach to Hematuria in Children",
+  category: "Glomerular Disease",
+  priority: "secondary",
+  description: "Glomerular vs non-glomerular, workup algorithm, Alport/TBMN",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "proteinuria-approach",
+  title: "Approach to Proteinuria in Children",
+  category: "Glomerular Disease",
+  priority: "secondary",
+  description: "PCR calculator, transient vs persistent, orthostatic, workup",
+  icon: Beaker,
+  hasFullPathway: true
+},
+{
+  id: "cystic-kidney",
+  title: "Cystic Kidney Diseases in Children",
+  category: "Developmental Kidney",
+  priority: "secondary",
+  description: "ADPKD, ARPKD, NPHP, Bardet-Biedl — comparison and management",
+  icon: Info,
+  hasFullPathway: true
+},
+{
+  id: "steroid-resistant-ns",
+  title: "Steroid-Resistant Nephrotic Syndrome",
+  category: "Nephrotic Syndrome",
+  priority: "warning",
+  description: "SRNS workup, genetic testing, biopsy, calcineurin inhibitors",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "ckd-comprehensive",
+  title: "CKD Comprehensive Management",
+  category: "CKD",
+  priority: "warning",
+  description: "All stages, complications, RRT preparation, nutrition",
+  icon: TrendingUp,
+  hasFullPathway: true
+},
+{
+  id: "hypocalcemia",
+  title: "Hypocalcemia Management",
+  category: "Electrolytes",
+  priority: "warning",
+  description: "Calcium correction, vitamin D, causes and IV calcium protocol",
+  icon: Zap,
+  hasFullPathway: true
+}];
+
 
 // AI Agent Content Components
 const BiopsyAnalyzerContent = () => <BiopsyAnalyzer />;
@@ -655,7 +655,7 @@ const ClinicalCaseAnalyzerContent = () => <ClinicalCaseAnalyzer />;
 export default function ClinicalSupport() {
   const [activeTab, setActiveTab] = useState("scenarios");
   const [selectedScenario, setSelectedScenario] = useState(null);
-  
+
   // Diagnostic AI state
   const [diagnosticStep, setDiagnosticStep] = useState(1);
   const [patientAge, setPatientAge] = useState("");
@@ -694,7 +694,7 @@ export default function ClinicalSupport() {
     } else {
       const template = SYMPTOM_TEMPLATES[complaint];
       setSymptomTemplate(template);
-      
+
       if (template) {
         // Adjust promptText formatting for better readability
         const promptText = `${template.prompt}\n\n${template.fields.map((f, i) => `${i + 1}. ${f}:\n   `).join('\n')}`;
@@ -720,8 +720,8 @@ export default function ClinicalSupport() {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         uploadedUrls.push({ name: file.name, url: file_url, type: file.type });
       }
-      
-      setUploadedFiles(prev => [...prev, ...uploadedUrls]);
+
+      setUploadedFiles((prev) => [...prev, ...uploadedUrls]);
       toast.success(`${files.length} file(s) uploaded!`, { id: "file-upload" });
     } catch (error) {
       console.error("File upload error:", error);
@@ -734,11 +734,11 @@ export default function ClinicalSupport() {
 
   const generateDifferentialDx = async () => {
     setIsGeneratingDx(true);
-    
+
     try {
-      const filesContext = uploadedFiles.length > 0 
-        ? `UPLOADED FILES:\n${uploadedFiles.map(f => `- ${f.name} (${f.type})`).join('\n')}\n\n`
-        : '';
+      const filesContext = uploadedFiles.length > 0 ?
+      `UPLOADED FILES:\n${uploadedFiles.map((f) => `- ${f.name} (${f.type})`).join('\n')}\n\n` :
+      '';
 
       const prompt = `You are an expert pediatric nephrologist. Analyze this case and provide structured differential diagnosis.
 
@@ -762,7 +762,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: prompt,
-        file_urls: uploadedFiles.length > 0 ? uploadedFiles.map(f => f.url) : undefined, // Pass file URLs
+        file_urls: uploadedFiles.length > 0 ? uploadedFiles.map((f) => f.url) : undefined, // Pass file URLs
         response_json_schema: {
           type: "object",
           properties: {
@@ -817,8 +817,8 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
     setDiagnosticResults(null);
   };
 
-  const renderDiagnosticAgent = () => (
-    <div className="space-y-6">
+  const renderDiagnosticAgent = () =>
+  <div className="space-y-6">
       <Alert className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
         <Brain className="w-5 h-5 text-purple-600" />
         <AlertDescription className="text-purple-800">
@@ -826,8 +826,8 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         </AlertDescription>
       </Alert>
 
-      {!diagnosticResults ? (
-        <Card className="bg-white shadow-lg">
+      {!diagnosticResults ?
+    <Card className="bg-white shadow-lg">
           <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Stethoscope className="w-5 h-5 text-purple-600" />
@@ -835,17 +835,17 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            {diagnosticStep === 1 && (
-              <div className="space-y-4">
+            {diagnosticStep === 1 &&
+        <div className="space-y-4">
                 <div>
                   <Label>Age (years) *</Label> {/* Label text changed, removed htmlFor */}
                   <Input
-                    type="number"
-                    value={patientAge}
-                    onChange={(e) => setPatientAge(e.target.value)}
-                    placeholder="e.g., 8"
-                    className="mt-1"
-                  />
+              type="number"
+              value={patientAge}
+              onChange={(e) => setPatientAge(e.target.value)}
+              placeholder="e.g., 8"
+              className="mt-1" />
+            
                 </div>
 
                 <div>
@@ -868,53 +868,53 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                       <SelectValue placeholder="Select chief complaint for guided prompts" /> {/* Updated placeholder */}
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.keys(SYMPTOM_TEMPLATES).map(key => (
-                        <SelectItem key={key} value={key}>{key}</SelectItem>
-                      ))}
+                      {Object.keys(SYMPTOM_TEMPLATES).map((key) =>
+                <SelectItem key={key} value={key}>{key}</SelectItem>
+                )}
                       <SelectItem value="Other">Other (free text)</SelectItem> {/* Added "Other" option */}
                     </SelectContent>
                   </Select>
                   {/* Conditional input for "Other" if needed for custom input */}
-                  {chiefComplaint === "Other" && (
-                    <Input
-                      value={symptoms} // Use symptoms for "Other"
-                      onChange={(e) => setSymptoms(e.target.value)}
-                      placeholder="Describe the chief complaint in detail"
-                      className="mt-2"
-                    />
-                  )}
+                  {chiefComplaint === "Other" &&
+            <Input
+              value={symptoms} // Use symptoms for "Other"
+              onChange={(e) => setSymptoms(e.target.value)}
+              placeholder="Describe the chief complaint in detail"
+              className="mt-2" />
+
+            }
                 </div>
 
                 <Button
-                  onClick={() => setDiagnosticStep(2)}
-                  disabled={!patientAge || !patientGender || !chiefComplaint || (chiefComplaint === "Other" && !symptoms.trim())} // Added condition for "Other"
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
+            onClick={() => setDiagnosticStep(2)}
+            disabled={!patientAge || !patientGender || !chiefComplaint || chiefComplaint === "Other" && !symptoms.trim()} // Added condition for "Other"
+            className="w-full bg-purple-600 hover:bg-purple-700">
+            
                   Next: Symptoms
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
-            )}
+        }
 
-            {diagnosticStep === 2 && (
-              <div className="space-y-4">
-                {symptomTemplate && ( // Alert for guided template
-                  <Alert className="bg-blue-50 border-blue-200">
+            {diagnosticStep === 2 &&
+        <div className="space-y-4">
+                {symptomTemplate && // Alert for guided template
+          <Alert className="bg-blue-50 border-blue-200">
                     <Info className="w-4 h-4 text-blue-600" />
                     <AlertDescription className="text-blue-800">
                       <strong>Guided Template for {chiefComplaint}:</strong> Fill in each numbered field below
                     </AlertDescription>
                   </Alert>
-                )}
+          }
                 <div>
                   <Label htmlFor="symptoms">Symptoms & History * (Use template or free text)</Label> {/* Updated label */}
                   <Textarea
-                    id="symptoms"
-                    value={symptoms}
-                    onChange={(e) => setSymptoms(e.target.value)}
-                    placeholder="Describe symptoms, duration, progression..."
-                    className="mt-1 h-56 font-mono text-sm" // Increased height and added font styling
-                  />
+              id="symptoms"
+              value={symptoms}
+              onChange={(e) => setSymptoms(e.target.value)}
+              placeholder="Describe symptoms, duration, progression..."
+              className="mt-1 h-56 font-mono text-sm" // Increased height and added font styling
+            />
                   {symptomTemplate && <p className="text-xs text-slate-500 mt-1">Template fields pre-filled above - just add details after each number</p>} {/* Added helper text */}
                 </div>
 
@@ -929,19 +929,19 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                   </Button>
                 </div>
               </div>
-            )}
+        }
 
-            {diagnosticStep === 3 && (
-              <div className="space-y-4">
+            {diagnosticStep === 3 &&
+        <div className="space-y-4">
                 <div>
                   <Label htmlFor="labValues">Laboratory Values *</Label>
                   <Textarea
-                    id="labValues"
-                    value={labValues}
-                    onChange={(e) => setLabValues(e.target.value)}
-                    placeholder="e.g., BUN, Cr, Na, K, Ca, PO4, Albumin, CBC, Urinalysis (protein, RBC, WBC, casts), C3/C4, ANA..." // Updated placeholder
-                    className="mt-1 h-48"
-                  />
+              id="labValues"
+              value={labValues}
+              onChange={(e) => setLabValues(e.target.value)}
+              placeholder="e.g., BUN, Cr, Na, K, Ca, PO4, Albumin, CBC, Urinalysis (protein, RBC, WBC, casts), C3/C4, ANA..." // Updated placeholder
+              className="mt-1 h-48" />
+            
                   <p className="text-xs text-slate-500 mt-1">Include all available lab results - format doesn't matter</p> {/* Added helper text */}
                 </div>
 
@@ -956,19 +956,19 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                   </Button>
                 </div>
               </div>
-            )}
+        }
 
-            {diagnosticStep === 4 && (
-              <div className="space-y-4">
+            {diagnosticStep === 4 &&
+        <div className="space-y-4">
                 <div>
                   <Label htmlFor="clinicalFindings">Physical Examination *</Label>
                   <Textarea
-                    id="clinicalFindings"
-                    value={clinicalFindings}
-                    onChange={(e) => setClinicalFindings(e.target.value)}
-                    placeholder={`e.g., Vitals (HR, BP, RR, Temp, SpO2, Weight)\nGeneral: Well/ill-appearing, hydration, growth\nSkin: Rash, purpura, edema location\nCardiovascular: Heart sounds, murmurs, pulses\nRespiratory: Breath sounds, work of breathing\nAbdomen: Tenderness, masses, organomegaly\nExtremities: Edema, joint swelling\nNeurological: Mental status, focal deficits`} // Updated placeholder with structured example
-                    className="mt-1 h-56 font-mono text-sm" // Increased height and added font styling
-                  />
+              id="clinicalFindings"
+              value={clinicalFindings}
+              onChange={(e) => setClinicalFindings(e.target.value)}
+              placeholder={`e.g., Vitals (HR, BP, RR, Temp, SpO2, Weight)\nGeneral: Well/ill-appearing, hydration, growth\nSkin: Rash, purpura, edema location\nCardiovascular: Heart sounds, murmurs, pulses\nRespiratory: Breath sounds, work of breathing\nAbdomen: Tenderness, masses, organomegaly\nExtremities: Edema, joint swelling\nNeurological: Mental status, focal deficits`} // Updated placeholder with structured example
+              className="mt-1 h-56 font-mono text-sm" // Increased height and added font styling
+            />
                 </div>
 
                 <div className="flex gap-2">
@@ -982,10 +982,10 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                   </Button>
                 </div>
               </div>
-            )}
+        }
 
-            {diagnosticStep === 5 && ( // New diagnostic step for file uploads
-              <div className="space-y-4">
+            {diagnosticStep === 5 && // New diagnostic step for file uploads
+        <div className="space-y-4">
                 <Alert className="bg-blue-50 border-blue-200">
                   <Upload className="w-4 h-4 text-blue-600" />
                   <AlertDescription className="text-blue-800">
@@ -1004,37 +1004,37 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                       Supported: PDF, JPG, PNG, DOC, DOCX
                     </p>
                     <input
-                      type="file"
-                      multiple
-                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                      onChange={handleFileUpload}
-                      disabled={isUploadingFiles}
-                      className="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 file:cursor-pointer" // Added file:cursor-pointer
-                    />
-                    {isUploadingFiles && ( // Show uploading indicator
-                      <div className="mt-4 flex items-center gap-2 text-purple-700">
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                onChange={handleFileUpload}
+                disabled={isUploadingFiles}
+                className="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 file:cursor-pointer" // Added file:cursor-pointer
+              />
+                    {isUploadingFiles && // Show uploading indicator
+              <div className="mt-4 flex items-center gap-2 text-purple-700">
                         <Loader2 className="w-5 h-5 animate-spin" />
                         <span>Uploading files...</span>
                       </div>
-                    )}
+              }
                   </div>
                 </div>
 
-                {uploadedFiles.length > 0 && (
-                  <Card className="bg-purple-50 border-purple-200"> {/* Styled uploaded files section */}
+                {uploadedFiles.length > 0 &&
+          <Card className="bg-purple-50 border-purple-200"> {/* Styled uploaded files section */}
                     <CardContent className="p-4">
                       <h4 className="font-semibold text-sm mb-3 text-purple-900">Uploaded Files ({uploadedFiles.length}):</h4>
                       <div className="flex flex-wrap gap-2">
-                        {uploadedFiles.map((file, idx) => (
-                          <Badge key={idx} className="bg-purple-600 text-white flex items-center gap-1"> {/* Styled badge */}
+                        {uploadedFiles.map((file, idx) =>
+                <Badge key={idx} className="bg-purple-600 text-white flex items-center gap-1"> {/* Styled badge */}
                             <FileText className="w-3 h-3" />
                             {file.name}
                           </Badge>
-                        ))}
+                )}
                       </div>
                     </CardContent>
                   </Card>
-                )}
+          }
 
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setDiagnosticStep(4)} className="flex-1">
@@ -1042,44 +1042,44 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                     Back
                   </Button>
                   <Button
-                    onClick={generateDifferentialDx}
-                    disabled={isGeneratingDx} // Disable only if AI is generating
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold" // Styled button
-                  >
-                    {isGeneratingDx ? (
-                      <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Analyzing with AI...</> // Updated text and icon size
-                    ) : (
-                      <><Brain className="w-5 h-5 mr-2" />Generate Diagnosis</> // Updated icon size
-                    )}
+              onClick={generateDifferentialDx}
+              disabled={isGeneratingDx} // Disable only if AI is generating
+              className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold" // Styled button
+            >
+                    {isGeneratingDx ?
+              <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Analyzing with AI...</> // Updated text and icon size
+              :
+              <><Brain className="w-5 h-5 mr-2" />Generate Diagnosis</> // Updated icon size
+              }
                   </Button>
                 </div>
               </div>
-            )}
+        }
           </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {diagnosticResults.red_flags && diagnosticResults.red_flags.length > 0 && (
-            <Alert className="bg-red-50 border-red-300 border-2 shadow-lg"> {/* Improved styling */}
+        </Card> :
+
+    <div className="space-y-6">
+          {diagnosticResults.red_flags && diagnosticResults.red_flags.length > 0 &&
+      <Alert className="bg-red-50 border-red-300 border-2 shadow-lg"> {/* Improved styling */}
               <AlertTriangle className="w-5 h-5 text-red-600" />
               <AlertDescription>
                 <div className="text-red-900">
                   <strong className="block mb-2 text-lg">⚠️ RED FLAGS - Immediate Attention Required:</strong> {/* Increased font size */}
                   <ul className="space-y-2 mt-3"> {/* Added margin top */}
-                    {diagnosticResults.red_flags.map((flag, idx) => (
-                      <li key={idx} className="flex items-start gap-2 bg-red-100 p-2 rounded"> {/* Styled list item */}
+                    {diagnosticResults.red_flags.map((flag, idx) =>
+              <li key={idx} className="flex items-start gap-2 bg-red-100 p-2 rounded"> {/* Styled list item */}
                         <span className="text-red-600 font-bold text-lg">•</span>
                         <span className="font-medium">{flag}</span>
                       </li>
-                    ))}
+              )}
                   </ul>
                 </div>
               </AlertDescription>
             </Alert>
-          )}
+      }
 
-          {diagnosticResults.image_findings && ( // Render image_findings if available
-            <Card className="bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200 border-2"> {/* New styling */}
+          {diagnosticResults.image_findings && // Render image_findings if available
+      <Card className="bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200 border-2"> {/* New styling */}
               <CardHeader className="bg-cyan-100 border-b border-cyan-200">
                 <CardTitle className="flex items-center gap-2 text-lg text-cyan-900">
                   <ImageIcon className="w-5 h-5 text-cyan-600" />
@@ -1090,23 +1090,23 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                 <p className="text-sm text-cyan-900 leading-relaxed whitespace-pre-line">{diagnosticResults.image_findings}</p> {/* Added whitespace-pre-line */}
               </CardContent>
             </Card>
-          )}
+      }
 
-          {diagnosticResults.editable && !diagnosticResults.isEditing && (
-            <div className="flex justify-end">
+          {diagnosticResults.editable && !diagnosticResults.isEditing &&
+      <div className="flex justify-end">
               <Button
-                onClick={() => setDiagnosticResults({...diagnosticResults, isEditing: true})}
-                variant="outline"
-                size="sm"
-              >
+          onClick={() => setDiagnosticResults({ ...diagnosticResults, isEditing: true })}
+          variant="outline"
+          size="sm">
+          
                 <Edit className="w-4 h-4 mr-2" />
                 Edit AI Output (Admin)
               </Button>
             </div>
-          )}
+      }
 
-          {diagnosticResults.isEditing && (
-            <Card className="border-2 border-purple-300">
+          {diagnosticResults.isEditing &&
+      <Card className="border-2 border-purple-300">
               <CardHeader className="bg-purple-50">
                 <CardTitle className="text-lg">Edit AI Response</CardTitle>
               </CardHeader>
@@ -1114,25 +1114,25 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                 <div>
                   <Label>Clinical Reasoning</Label>
                   <Textarea
-                    value={diagnosticResults.clinical_reasoning}
-                    onChange={(e) => setDiagnosticResults({...diagnosticResults, clinical_reasoning: e.target.value})}
-                    className="min-h-[100px]"
-                  />
+              value={diagnosticResults.clinical_reasoning}
+              onChange={(e) => setDiagnosticResults({ ...diagnosticResults, clinical_reasoning: e.target.value })}
+              className="min-h-[100px]" />
+            
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={() => setDiagnosticResults({...diagnosticResults, isEditing: false})} className="bg-green-600">
+                  <Button onClick={() => setDiagnosticResults({ ...diagnosticResults, isEditing: false })} className="bg-green-600">
                     Save Changes
                   </Button>
                   <Button variant="outline" onClick={() => {
-                    setDiagnosticResults({...diagnosticResults, isEditing: false});
-                    toast.info('Edit cancelled');
-                  }}>
+              setDiagnosticResults({ ...diagnosticResults, isEditing: false });
+              toast.info('Edit cancelled');
+            }}>
                     Cancel
                   </Button>
                 </div>
               </CardContent>
             </Card>
-          )}
+      }
 
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 border-2"> {/* Improved styling */}
             <CardHeader className="bg-blue-100 border-b border-blue-200">
@@ -1154,22 +1154,22 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
             <div className="space-y-4">
               {diagnosticResults.differential_diagnoses.map((dx, idx) => {
-                const probabilityColors = {
-                  High: "from-green-500 to-emerald-600", // Darker gradient
-                  Medium: "from-amber-500 to-orange-600", // Darker gradient
-                  Low: "from-slate-400 to-slate-600" // Darker gradient
-                };
+            const probabilityColors = {
+              High: "from-green-500 to-emerald-600", // Darker gradient
+              Medium: "from-amber-500 to-orange-600", // Darker gradient
+              Low: "from-slate-400 to-slate-600" // Darker gradient
+            };
 
-                const probabilityBadges = {
-                  High: "bg-green-500 text-white", // Solid color badges
-                  Medium: "bg-amber-500 text-white",
-                  Low: "bg-slate-500 text-white"
-                };
+            const probabilityBadges = {
+              High: "bg-green-500 text-white", // Solid color badges
+              Medium: "bg-amber-500 text-white",
+              Low: "bg-slate-500 text-white"
+            };
 
-                const canLinkToPathway = clinicalScenarios.some(s => s.id === dx.related_pathway); // Changed variable name to 's' to avoid conflict
+            const canLinkToPathway = clinicalScenarios.some((s) => s.id === dx.related_pathway); // Changed variable name to 's' to avoid conflict
 
-                return (
-                  <Card key={idx} className="bg-white shadow-lg border-2 hover:border-purple-400 transition-all">
+            return (
+              <Card key={idx} className="bg-white shadow-lg border-2 hover:border-purple-400 transition-all">
                     <CardHeader className="bg-gradient-to-r from-slate-50 to-purple-50 border-b">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3 flex-1">
@@ -1183,18 +1183,18 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                             </Badge>
                           </div>
                         </div>
-                        {canLinkToPathway && (
-                          <Button
-                            onClick={() => {
-                              setSelectedScenario(dx.related_pathway);
-                              setActiveTab("pathways");
-                            }}
-                            className="bg-purple-600 hover:bg-purple-700 flex-shrink-0" // Styled button
-                          >
+                        {canLinkToPathway &&
+                    <Button
+                      onClick={() => {
+                        setSelectedScenario(dx.related_pathway);
+                        setActiveTab("pathways");
+                      }}
+                      className="bg-purple-600 hover:bg-purple-700 flex-shrink-0" // Styled button
+                    >
                             View Pathway
                             <ChevronRight className="w-4 h-4 ml-2" />
                           </Button>
-                        )}
+                    }
                       </div>
                     </CardHeader>
                     <CardContent className="p-6">
@@ -1214,59 +1214,59 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                               Supporting Features
                             </h4>
                             <ul className="space-y-1">
-                              {dx.key_supporting_features.map((feature, fidx) => (
-                                <li key={fidx} className="flex items-start gap-2 text-sm bg-green-50 p-2 rounded"> {/* Styled list item */}
+                              {dx.key_supporting_features.map((feature, fidx) =>
+                          <li key={fidx} className="flex items-start gap-2 text-sm bg-green-50 p-2 rounded"> {/* Styled list item */}
                                   <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                                   <span className="text-slate-700">{feature}</span>
                                 </li>
-                              ))}
+                          )}
                             </ul>
                           </div>
 
-                          {dx.key_missing_features && dx.key_missing_features.length > 0 && (
-                            <div>
+                          {dx.key_missing_features && dx.key_missing_features.length > 0 &&
+                      <div>
                               <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
                                 <Circle className="w-4 h-4 text-amber-600" />
                                 Missing/Against {/* Updated label */}
                               </h4>
                               <ul className="space-y-1">
-                                {dx.key_missing_features.map((feature, fidx) => (
-                                  <li key={fidx} className="flex items-start gap-2 text-sm bg-amber-50 p-2 rounded"> {/* Styled list item */}
+                                {dx.key_missing_features.map((feature, fidx) =>
+                          <li key={fidx} className="flex items-start gap-2 text-sm bg-amber-50 p-2 rounded"> {/* Styled list item */}
                                     <Circle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                                     <span className="text-slate-700">{feature}</span>
                                 </li>
-                                ))}
+                          )}
                               </ul>
                             </div>
-                          )}
+                      }
                         </div>
 
-                        {dx.next_steps && dx.next_steps.length > 0 && ( // Render next_steps if available
-                          <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                        {dx.next_steps && dx.next_steps.length > 0 && // Render next_steps if available
+                    <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
                             <h4 className="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
                               <ChevronRight className="w-4 h-4" />
                               Recommended Next Steps
                             </h4>
                             <ul className="space-y-1">
-                              {dx.next_steps.map((step, sidx) => (
-                                <li key={sidx} className="text-sm text-indigo-800 flex items-start gap-2">
+                              {dx.next_steps.map((step, sidx) =>
+                        <li key={sidx} className="text-sm text-indigo-800 flex items-start gap-2">
                                   <span className="font-bold">{sidx + 1}.</span>
                                   <span>{step}</span>
                                 </li>
-                              ))}
+                        )}
                             </ul>
                           </div>
-                        )}
+                    }
                       </div>
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>);
+
+          })}
             </div>
           </div>
 
-          {diagnosticResults.recommended_workup && diagnosticResults.recommended_workup.length > 0 && (
-            <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-300 border-2"> {/* Improved styling */}
+          {diagnosticResults.recommended_workup && diagnosticResults.recommended_workup.length > 0 &&
+      <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-300 border-2"> {/* Improved styling */}
               <CardHeader className="bg-indigo-100 border-b border-indigo-200">
                 <CardTitle className="text-lg flex items-center gap-2 text-indigo-900">
                   <Microscope className="w-5 h-5 text-indigo-600" />
@@ -1275,18 +1275,18 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid md:grid-cols-2 gap-3">
-                  {diagnosticResults.recommended_workup.map((test, idx) => (
-                    <div key={idx} className="flex items-start gap-3 bg-white p-4 rounded-lg border-2 border-indigo-200 shadow-sm"> {/* Styled list item */}
+                  {diagnosticResults.recommended_workup.map((test, idx) =>
+            <div key={idx} className="flex items-start gap-3 bg-white p-4 rounded-lg border-2 border-indigo-200 shadow-sm"> {/* Styled list item */}
                       <div className="w-7 h-7 bg-indigo-500 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"> {/* Styled number icon */}
                         {idx + 1}
                       </div>
                       <span className="text-sm text-slate-800 font-medium">{test}</span>
                     </div>
-                  ))}
+            )}
                 </div>
               </CardContent>
             </Card>
-          )}
+      }
 
           <div className="flex gap-3">
             <Button onClick={resetDiagnosticAgent} variant="outline" className="flex-1">
@@ -1294,15 +1294,15 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               New Case
             </Button>
             <Button
-              onClick={() => {
-                // Improved copy report functionality
-                const report = `DIFFERENTIAL DIAGNOSIS REPORT\n\nPATIENT INFORMATION:\n- Age: ${patientAge} years\n- Gender: ${patientGender}\n- Chief Complaint: ${chiefComplaint}\n\nCLINICAL PRESENTATION:\n${symptoms}\n\nLABORATORY VALUES:\n${labValues}\n\nPHYSICAL EXAMINATION & CLINICAL FINDINGS:\n${clinicalFindings}\n\n${JSON.stringify(diagnosticResults, null, 2)}`;
-                navigator.clipboard.writeText(report);
-                toast.success("Diagnostic report copied!");
-              }}
-              variant="outline"
-              className="flex-1"
-            >
+          onClick={() => {
+            // Improved copy report functionality
+            const report = `DIFFERENTIAL DIAGNOSIS REPORT\n\nPATIENT INFORMATION:\n- Age: ${patientAge} years\n- Gender: ${patientGender}\n- Chief Complaint: ${chiefComplaint}\n\nCLINICAL PRESENTATION:\n${symptoms}\n\nLABORATORY VALUES:\n${labValues}\n\nPHYSICAL EXAMINATION & CLINICAL FINDINGS:\n${clinicalFindings}\n\n${JSON.stringify(diagnosticResults, null, 2)}`;
+            navigator.clipboard.writeText(report);
+            toast.success("Diagnostic report copied!");
+          }}
+          variant="outline"
+          className="flex-1">
+          
               <Copy className="w-4 h-4 mr-2" />
               Copy Report
             </Button>
@@ -1315,66 +1315,66 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
             </AlertDescription>
           </Alert>
         </div>
-      )}
-    </div>
-  );
+    }
+    </div>;
+
 
   const groupedScenarios = {
-    "Emergency": clinicalScenarios.filter(s => s.priority === "danger"),
-    "Urgent": clinicalScenarios.filter(s => s.priority === "warning"),
-    "Routine": clinicalScenarios.filter(s => s.priority === "secondary")
+    "Emergency": clinicalScenarios.filter((s) => s.priority === "danger"),
+    "Urgent": clinicalScenarios.filter((s) => s.priority === "warning"),
+    "Routine": clinicalScenarios.filter((s) => s.priority === "secondary")
   };
 
-  const renderScenarioList = () => (
-    <div className="space-y-6">
-      {Object.entries(groupedScenarios).map(([group, scenarios]) => (
-        <div key={group}>
+  const renderScenarioList = () =>
+  <div className="space-y-6">
+      {Object.entries(groupedScenarios).map(([group, scenarios]) =>
+    <div key={group}>
           <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
             <Badge className={
-              group === "Emergency" ? "bg-red-600" :
-              group === "Urgent" ? "bg-amber-600" :
-              "bg-blue-600"
-            }>
+        group === "Emergency" ? "bg-red-600" :
+        group === "Urgent" ? "bg-amber-600" :
+        "bg-blue-600"
+        }>
               {group}
             </Badge>
             <span className="text-slate-600 text-sm">({scenarios.length} scenarios)</span>
           </h3>
           <div className="space-y-3">
       {scenarios.map((scenario) => {
-        const IconComponent = scenario.icon;
-        const priorityColors = {
-          danger: "bg-red-50 border-red-300 hover:bg-red-100 hover:shadow-lg", // Added hover effects
-          warning: "bg-amber-50 border-amber-300 hover:bg-amber-100 hover:shadow-lg",
-          secondary: "bg-blue-50 border-blue-300 hover:bg-blue-100 hover:shadow-lg"
-        };
-        const priorityBadges = {
-          danger: "bg-red-500 text-white", // Solid color badges
-          warning: "bg-amber-500 text-white",
-          secondary: "bg-blue-500 text-white"
-        };
+          const IconComponent = scenario.icon;
+          const priorityColors = {
+            danger: "bg-red-50 border-red-300 hover:bg-red-100 hover:shadow-lg", // Added hover effects
+            warning: "bg-amber-50 border-amber-300 hover:bg-amber-100 hover:shadow-lg",
+            secondary: "bg-blue-50 border-blue-300 hover:bg-blue-100 hover:shadow-lg"
+          };
+          const priorityBadges = {
+            danger: "bg-red-500 text-white", // Solid color badges
+            warning: "bg-amber-500 text-white",
+            secondary: "bg-blue-500 text-white"
+          };
 
-        return (
-          <Card
-            key={scenario.id}
-            className={`${priorityColors[scenario.priority]} border-2 cursor-pointer transition-all`} // Removed hover:shadow-lg from here as it's in priorityColors
-            onClick={() => {
-              setSelectedScenario(scenario.id);
-              setActiveTab("pathways");
-            }}
-          >
+          return (
+            <Card
+              key={scenario.id}
+              className={`${priorityColors[scenario.priority]} border-2 cursor-pointer transition-all`} // Removed hover:shadow-lg from here as it's in priorityColors
+              onClick={() => {
+                setSelectedScenario(scenario.id);
+                setActiveTab("pathways");
+              }}>
+              
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${ // Increased size, added shadow
                     scenario.priority === "danger" ? "bg-red-200" :
                     scenario.priority === "warning" ? "bg-amber-200" :
-                    "bg-blue-200"
-                  }`}>
+                    "bg-blue-200"}`
+                    }>
                     <IconComponent className={`w-7 h-7 ${ // Increased icon size
                       scenario.priority === "danger" ? "text-red-700" :
                       scenario.priority === "warning" ? "text-amber-700" :
-                      "text-blue-700"
-                    }`} />
+                      "text-blue-700"}`
+                      } />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-slate-900 mb-1 text-lg">{scenario.title}</h3> {/* Increased font size */}
@@ -1384,33 +1384,33 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                       <Badge className={`${priorityBadges[scenario.priority]} text-xs px-2 py-1`}> {/* Styled badge */}
                         {scenario.priority.toUpperCase()} {/* Uppercase priority */}
                       </Badge>
-                      {scenario.hasFullPathway && ( // New badge for full pathway
+                      {scenario.hasFullPathway && // New badge for full pathway
                         <Badge className="bg-green-500 text-white text-xs">
                           <CheckCircle2 className="w-3 h-3 mr-1" />
                           Full Pathway
                         </Badge>
-                      )}
+                        }
                     </div>
                   </div>
                 </div>
                 <ChevronRight className="w-6 h-6 text-slate-400" /> {/* Increased icon size */}
               </div>
             </CardContent>
-          </Card>
-          );
-          })}
-          </div>
-          </div>
-          ))}
-          </div>
-          );
+          </Card>);
 
-  const renderNephroticSyndromePathway = () => (
-    <EnhancedNephroticPathway onAIPrompt={handleAIPromptFromPathway} />
-  );
+        })}
+          </div>
+          </div>
+    )}
+          </div>;
 
-  const renderIgANephropathyPathway = () => (
-    <div className="space-y-6">
+
+  const renderNephroticSyndromePathway = () =>
+  <EnhancedNephroticPathway onAIPrompt={handleAIPromptFromPathway} />;
+
+
+  const renderIgANephropathyPathway = () =>
+  <div className="space-y-6">
       <Alert className="bg-purple-50 border-purple-200">
         <Microscope className="w-5 h-5 text-purple-600" />
         <AlertDescription className="text-purple-800">
@@ -1428,36 +1428,36 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         <CardContent className="p-6">
           <div className="space-y-4">
             {[
-              { key: 'M', title: 'Mesangial Hypercellularity', options: ['M0: Less than 50%', 'M1: 50% or more'] },
-              { key: 'E', title: 'Endocapillary Hypercellularity', options: ['E0: Absent', 'E1: Present'] },
-              { key: 'S', title: 'Segmental Glomerulosclerosis', options: ['S0: Absent', 'S1: Present'] },
-              { key: 'T', title: 'Tubular Atrophy/Fibrosis', options: ['T0: 0-25%', 'T1: 26-50%', 'T2: Over 50%'] },
-              { key: 'C', title: 'Crescents', options: ['C0: Absent', 'C1: Less than 25%', 'C2: 25% or more'] }
-            ].map((item) => (
-              <Card key={item.key} className="bg-slate-50 border-2 border-slate-300">
+          { key: 'M', title: 'Mesangial Hypercellularity', options: ['M0: Less than 50%', 'M1: 50% or more'] },
+          { key: 'E', title: 'Endocapillary Hypercellularity', options: ['E0: Absent', 'E1: Present'] },
+          { key: 'S', title: 'Segmental Glomerulosclerosis', options: ['S0: Absent', 'S1: Present'] },
+          { key: 'T', title: 'Tubular Atrophy/Fibrosis', options: ['T0: 0-25%', 'T1: 26-50%', 'T2: Over 50%'] },
+          { key: 'C', title: 'Crescents', options: ['C0: Absent', 'C1: Less than 25%', 'C2: 25% or more'] }].
+          map((item) =>
+          <Card key={item.key} className="bg-slate-50 border-2 border-slate-300">
                 <CardContent className="p-4">
                   <h4 className="font-bold text-slate-900 mb-3">{item.key}: {item.title}</h4>
                   <div className="space-y-2">
-                    {item.options.map((option, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
+                    {item.options.map((option, idx) =>
+                <div key={idx} className="flex items-center gap-3">
                         <Checkbox
-                          id={`${item.key}-${idx}`}
-                          checked={mestC[item.key] === idx}
-                          onCheckedChange={() => setMestC({...mestC, [item.key]: idx})}
-                        />
+                    id={`${item.key}-${idx}`}
+                    checked={mestC[item.key] === idx}
+                    onCheckedChange={() => setMestC({ ...mestC, [item.key]: idx })} />
+                  
                         <Label htmlFor={`${item.key}-${idx}`} className="text-sm cursor-pointer">
                           {option}
                         </Label>
                       </div>
-                    ))}
+                )}
                   </div>
                 </CardContent>
               </Card>
-            ))}
+          )}
           </div>
 
-          {Object.values(mestC).every(v => v !== null) && (
-            <Card className="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300">
+          {Object.values(mestC).every((v) => v !== null) &&
+        <Card className="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300">
               <CardHeader className="bg-purple-100 border-b">
                 <CardTitle className="text-lg">MEST-C Score & Treatment</CardTitle>
               </CardHeader>
@@ -1469,22 +1469,22 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                 </div>
 
                 <Card className={`${
-                  (mestC.E === 1 || mestC.S === 1 || mestC.T >= 1 || mestC.C >= 1) 
-                    ? "bg-red-50 border-red-300" 
-                    : "bg-green-50 border-green-300"
-                } border-2 mb-4`}>
+            mestC.E === 1 || mestC.S === 1 || mestC.T >= 1 || mestC.C >= 1 ?
+            "bg-red-50 border-red-300" :
+            "bg-green-50 border-green-300"} border-2 mb-4`
+            }>
                   <CardContent className="p-4">
                     <h4 className="font-bold mb-2">
-                      {(mestC.E === 1 || mestC.S === 1 || mestC.T >= 1 || mestC.C >= 1) 
-                        ? "High-Risk Features Present" 
-                        : "Low-Risk Profile"}
+                      {mestC.E === 1 || mestC.S === 1 || mestC.T >= 1 || mestC.C >= 1 ?
+                  "High-Risk Features Present" :
+                  "Low-Risk Profile"}
                     </h4>
                     <ul className="text-sm space-y-1">
                       {mestC.E === 1 && <li>• Endocapillary proliferation: Consider immunosuppression</li>}
                       {mestC.T >= 1 && <li>• Significant fibrosis: Poor prognosis indicator</li>}
                       {mestC.C >= 1 && <li>• Crescents present: Urgent treatment needed</li>}
-                      {!(mestC.E === 1 || mestC.S === 1 || mestC.T >= 1 || mestC.C >= 1) && 
-                        <li>• Conservative management with ACE-I/ARB recommended</li>}
+                      {!(mestC.E === 1 || mestC.S === 1 || mestC.T >= 1 || mestC.C >= 1) &&
+                  <li>• Conservative management with ACE-I/ARB recommended</li>}
                     </ul>
                   </CardContent>
                 </Card>
@@ -1501,8 +1501,8 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                     </CardContent>
                   </Card>
 
-                  {(mestC.E === 1 || mestC.C >= 1 || mestC.T >= 1) && (
-                    <Card className="bg-purple-50 border-purple-200">
+                  {(mestC.E === 1 || mestC.C >= 1 || mestC.T >= 1) &&
+              <Card className="bg-purple-50 border-purple-200">
                       <CardContent className="p-4">
                         <h5 className="font-bold text-purple-900 mb-2">Immunosuppressive Therapy</h5>
                         <p className="text-sm text-purple-800 mb-2">
@@ -1513,24 +1513,24 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                             <strong className="text-sm">Corticosteroids:</strong>
                             <p className="text-xs mt-1">Methylprednisolone pulse + oral prednisone</p>
                           </div>
-                          {mestC.C >= 1 && (
-                            <div className="bg-red-100 p-3 rounded border border-red-300">
+                          {mestC.C >= 1 &&
+                    <div className="bg-red-100 p-3 rounded border border-red-300">
                               <strong className="text-sm">Crescentic IgAN - Urgent:</strong>
                               <p className="text-xs mt-1">High-dose steroids + cyclophosphamide</p>
                             </div>
-                          )}
+                    }
                         </div>
                       </CardContent>
                     </Card>
-                  )}
+              }
                 </div>
               </CardContent>
             </Card>
-          )}
+        }
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
+
 
   const renderSelectedPathway = () => {
     if (!selectedScenario) {
@@ -1539,27 +1539,27 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
           <GitBranch className="w-16 h-16 text-slate-300 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-slate-700 mb-2">Select a Clinical Scenario</h3>
           <p className="text-slate-500">Choose a scenario to view detailed evidence-based management pathways</p>
-        </div>
-      );
+        </div>);
+
     }
 
-    const scenario = clinicalScenarios.find(s => s.id === selectedScenario);
-    
+    const scenario = clinicalScenarios.find((s) => s.id === selectedScenario);
+
     return (
       <div>
         <div className="mb-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-start gap-3">
               <div className={`w-14 h-14 rounded-xl flex items-center justify-center shadow-lg ${
-                scenario.priority === "danger" ? "bg-red-200" :
-                scenario.priority === "warning" ? "bg-amber-200" :
-                "bg-blue-200"
-              }`}>
+              scenario.priority === "danger" ? "bg-red-200" :
+              scenario.priority === "warning" ? "bg-amber-200" :
+              "bg-blue-200"}`
+              }>
                 <scenario.icon className={`w-8 h-8 ${
-                  scenario.priority === "danger" ? "text-red-700" :
-                  scenario.priority === "warning" ? "text-amber-700" :
-                  "text-blue-700"
-                }`} />
+                scenario.priority === "danger" ? "text-red-700" :
+                scenario.priority === "warning" ? "text-amber-700" :
+                "text-blue-700"}`
+                } />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 mb-1">{scenario.title}</h2>
@@ -1625,63 +1625,63 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         {selectedScenario === "ckd-comprehensive" && <ChronicKidneyDiseasePathway />}
         {selectedScenario === "hypocalcemia" && <HypocalcemiaPathway />}
         {scenario.hasFullPathway && ![
-          "nephrotic-syndrome", 
-          "iga-nephropathy", 
-          "hspn",
-          "aki-prifle",
-          "htn-emergency",
-          "hyperkalemia",
-          "uti-febrile",
-          "hemolytic-uremic",
-          "tumor-lysis",
-          "lupus-nephritis",
-          "post-strep-gn",
-          "hyponatremia",
-          "hypercalcemia",
-          "transplant-rejection",
-          "dialysis-catheter-infection",
-          "ckd-mbd",
-          "renal-stone",
-          "bladder-dysfunction",
-          "rta-diagnosis",
-          "tubular-function",
-          "hypokalemia",
-          "severe-edema-ns",
-          "sbp",
-          "metabolic-acidosis",
-          "contrast-nephropathy",
-          "fluid-electrolyte",
-          "acid-base",
-          "htn-diagnosis",
-          "htn-treatment",
-          "vur",
-          "hydronephrosis",
-          "childhood-nephrotic",
-          "congenital-nephrotic",
-          "iga-vasculitis",
-          "anca-vasculitis",
-          "membranous-nephropathy",
-          "peritoneal-dialysis",
-          "hemodialysis",
-          "ckd-staging",
-          "ckd-anemia-mbd",
-          "kidney-transplant",
-          "hematuria-approach",
-          "proteinuria-approach",
-          "cystic-kidney",
-          "steroid-resistant-ns",
-          "ckd-comprehensive",
-          "hypocalcemia"
-        ].includes(selectedScenario) && (
-          <Alert className="bg-blue-50 border-blue-200">
+        "nephrotic-syndrome",
+        "iga-nephropathy",
+        "hspn",
+        "aki-prifle",
+        "htn-emergency",
+        "hyperkalemia",
+        "uti-febrile",
+        "hemolytic-uremic",
+        "tumor-lysis",
+        "lupus-nephritis",
+        "post-strep-gn",
+        "hyponatremia",
+        "hypercalcemia",
+        "transplant-rejection",
+        "dialysis-catheter-infection",
+        "ckd-mbd",
+        "renal-stone",
+        "bladder-dysfunction",
+        "rta-diagnosis",
+        "tubular-function",
+        "hypokalemia",
+        "severe-edema-ns",
+        "sbp",
+        "metabolic-acidosis",
+        "contrast-nephropathy",
+        "fluid-electrolyte",
+        "acid-base",
+        "htn-diagnosis",
+        "htn-treatment",
+        "vur",
+        "hydronephrosis",
+        "childhood-nephrotic",
+        "congenital-nephrotic",
+        "iga-vasculitis",
+        "anca-vasculitis",
+        "membranous-nephropathy",
+        "peritoneal-dialysis",
+        "hemodialysis",
+        "ckd-staging",
+        "ckd-anemia-mbd",
+        "kidney-transplant",
+        "hematuria-approach",
+        "proteinuria-approach",
+        "cystic-kidney",
+        "steroid-resistant-ns",
+        "ckd-comprehensive",
+        "hypocalcemia"].
+        includes(selectedScenario) &&
+        <Alert className="bg-blue-50 border-blue-200">
             <Info className="w-5 h-5 text-blue-600" />
             <AlertDescription className="text-blue-800">
               <strong>{scenario.title} Pathway:</strong> Detailed clinical pathway available in Guidelines section. Check related protocols and use AI Assistant for management guidance.
             </AlertDescription>
           </Alert>
-        )}
-      </div>
-    );
+        }
+      </div>);
+
   };
 
   return (
@@ -1703,7 +1703,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-100 h-auto p-1 gap-1">
+          <TabsList className="bg-green-100 text-muted-foreground p-1 rounded-lg items-center justify-center grid w-full grid-cols-5 h-auto gap-1">
             <TabsTrigger value="diagnostic" className="flex items-center gap-1 text-xs sm:text-sm">
               <Brain className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">AI Diagnostic</span><span className="sm:hidden">Dx Agent</span>
@@ -1809,6 +1809,6 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
           </AlertDescription>
         </Alert>
       </div>
-    </div>
-  );
+    </div>);
+
 }
