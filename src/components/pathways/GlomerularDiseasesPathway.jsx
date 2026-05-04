@@ -727,8 +727,8 @@ export default function GlomerularDiseasesPathway() {
         { id: "ns-detail", label: "🩺 NS Protocol" },
         { id: "dialysis", label: "💧 Dialysis Support" }].
         map((t) =>
-        <button key={t.id} onClick={() => setMainTab(t.id)} className="bg-blue-600 text-white px-3 py-2 text-xs font-semibold rounded-[20px] transition-all shadow">
-          
+        <button key={t.id} onClick={() => setMainTab(t.id)}
+          className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all ${mainTab === t.id ? "bg-blue-600 text-white shadow" : "bg-white text-slate-600 hover:bg-slate-200"}`}>
             {t.label}
           </button>
         )}

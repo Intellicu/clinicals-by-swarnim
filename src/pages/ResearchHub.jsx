@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Database, FileBarChart, Download, Brain, FileText, ArrowLeft, Microscope,
   Plus, Users, TrendingUp, Sparkles, BookOpen, BarChart3, Layers,
-  Rocket, Share2, Clock, CheckCircle2, AlertCircle, Save, HardDrive, Edit2
+  Rocket, Share2, Clock, CheckCircle2, AlertCircle, Save, HardDrive, Edit2, FlaskConical
 } from "lucide-react";
 import { toast } from "sonner";
 import ProjectWizard from '../components/research/ProjectWizard';
@@ -39,8 +39,14 @@ export default function ResearchHub() {
   });
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['research-projects'],
-    queryFn: () => base44.entities.ResearchProject.list('-created_date')
+    queryKey: ['research-projects', user?.email],
+    queryFn: async () => {
+      const all = await base44.entities.ResearchProject.list('-created_date');
+      // Show only own projects unless admin
+      if (user?.role === 'admin') return all;
+      return all.filter(p => p.principal_investigator === user?.email || p.collaborators?.includes(user?.email));
+    },
+    enabled: !!user
   });
 
   const { data: patients = [] } = useQuery({
@@ -163,11 +169,16 @@ export default function ResearchHub() {
             <Badge className="bg-white/20 backdrop-blur">📚 Literature Search</Badge>
             <Badge className="bg-white/20 backdrop-blur">🤖 Study Design Assistant</Badge>
             <Badge className="bg-white/20 backdrop-blur">📈 Publication Ready</Badge>
+            <Link to={createPageUrl("ResearchMethodsHub")}>
+              <Badge className="bg-white/30 backdrop-blur cursor-pointer hover:bg-white/40 border border-white/50">
+                📐 Study Design & PRISMA Guide →
+              </Badge>
+            </Link>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="protocol">Protocol</TabsTrigger>
             <TabsTrigger value="forms">Form Builder</TabsTrigger>
