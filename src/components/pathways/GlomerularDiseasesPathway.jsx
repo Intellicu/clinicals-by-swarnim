@@ -12,6 +12,7 @@ import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
 import GlomerularDecisionEngine from "../nephrology/GlomerularDecisionEngine";
 import DialysisDecisionSupport from "../nephrology/DialysisDecisionSupport";
+import NephroticSyndromePathwayDetail from "../nephrology/NephroticSyndromePathwayDetail";
 
 // ── Flowchart component (pure CSS/div based) ─────────────────────────────────
 const FlowStep = ({ step, index, total, color = "blue" }) => {
@@ -723,6 +724,7 @@ export default function GlomerularDiseasesPathway() {
         {[
         { id: "diseases", label: "📋 Disease Pathways" },
         { id: "decision", label: "🧠 Decision Engine" },
+        { id: "ns-detail", label: "🩺 NS Protocol" },
         { id: "dialysis", label: "💧 Dialysis Support" }].
         map((t) =>
         <button key={t.id} onClick={() => setMainTab(t.id)} className="bg-blue-600 text-white px-3 py-2 text-xs font-semibold rounded-[20px] transition-all shadow">
@@ -733,6 +735,7 @@ export default function GlomerularDiseasesPathway() {
       </div>
 
       {mainTab === "decision" && <GlomerularDecisionEngine />}
+      {mainTab === "ns-detail" && <NephroticSyndromePathwayDetail />}
       {mainTab === "dialysis" && <DialysisDecisionSupport />}
 
       {/* Disease Pathways tab content */}

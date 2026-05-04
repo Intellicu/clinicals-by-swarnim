@@ -34,8 +34,9 @@ import {
   Route,
   FileQuestion,
   Zap,
-  Info, // Added Info icon
-  Edit
+  Info,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -122,6 +123,14 @@ export default function TeachingHub() {
       return paths[0] || null;
     },
     enabled: !!user?.email
+  });
+
+  const deleteModuleMutation = useMutation({
+    mutationFn: (moduleId) => base44.entities.TeachingModule.delete(moduleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teachingModules'] });
+      toast.success("Module deleted.");
+    }
   });
 
   const createModuleMutation = useMutation({
@@ -904,17 +913,31 @@ ${aiPrompt || "Realistic pediatric nephrology scenarios. Include questions and m
                       </Button>
                     </Link>
                     {user?.role === 'admin' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedModuleForAI(module);
-                          setAiDialogOpen(true);
-                        }}
-                        className="border-purple-300"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                      </Button>
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedModuleForAI(module);
+                            setAiDialogOpen(true);
+                          }}
+                          className="border-purple-300"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            if (window.confirm(`Delete "${module.title}"? This cannot be undone.`)) {
+                              deleteModuleMutation.mutate(module.id);
+                            }
+                          }}
+                          className="border-red-300 text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </CardContent>

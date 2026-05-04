@@ -86,6 +86,7 @@ export default function Hub() {
     { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
     { name: "AI Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub" },
     { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer" },
+    { name: "Research Methods", icon: Layers, color: "bg-rose-700", page: "ResearchMethodsHub" },
   ];
 
   const toolsNavigation = [

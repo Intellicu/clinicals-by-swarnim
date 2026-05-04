@@ -8,6 +8,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import GeneticReportAnalyzer from './pages/GeneticReportAnalyzer';
+import ResearchMethodsHub from './pages/ResearchMethodsHub';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -60,6 +61,7 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/GeneticReportAnalyzer" element={<LayoutWrapper currentPageName="GeneticReportAnalyzer"><GeneticReportAnalyzer /></LayoutWrapper>} />
+      <Route path="/ResearchMethodsHub" element={<LayoutWrapper currentPageName="ResearchMethodsHub"><ResearchMethodsHub /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
