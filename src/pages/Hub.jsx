@@ -87,6 +87,8 @@ export default function Hub() {
     { name: "AI Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub" },
     { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer" },
     { name: "Research Methods", icon: Layers, color: "bg-rose-700", page: "ResearchMethodsHub" },
+    { name: "AI Pathway", icon: Brain, color: "bg-indigo-700", page: "AIClinicalPathway" },
+    { name: "Rx Workflow", icon: FileText, color: "bg-pink-700", page: "PrescriptionWorkflow" },
   ];
 
   const toolsNavigation = [

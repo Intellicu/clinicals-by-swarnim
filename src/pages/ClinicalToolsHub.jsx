@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Activity, Heart, Droplet, Pill, TestTube, Calculator, Brain, Sparkles,
-  AlertCircle, TrendingUp, Shield, Beaker, Microscope, Baby, Syringe,
+  AlertCircle, TrendingUp, Shield, Beaker, Microscope, Baby,
   FileText, Search, ArrowLeft, Layers, FlaskConical, Wind, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,8 @@ export default function ClinicalToolsHub() {
       icon: Pill,
       color: "bg-purple-50 border-purple-200",
       tools: [
+        { name: "AI Clinical Pathway", page: "AIClinicalPathway", icon: Brain, description: "AI-driven diagnosis → drug plan → safety checks", tags: ["AI", "Pathway", "Essential"] },
+        { name: "Prescription Workflow", page: "PrescriptionWorkflow", icon: FileText, description: "Drug selection → dose calc → print/share Rx", tags: ["Prescription", "Essential"] },
         { name: "Drug Database", page: "DrugCalculator", icon: Pill, description: "100+ drugs with renal dosing", tags: ["Drugs", "Essential"] },
         { name: "Dose Calculator", page: "DoseCalculator", icon: Calculator, description: "Weight & BSA-based dosing", tags: ["Drugs", "Essential"] }
       ]
@@ -201,7 +203,7 @@ export default function ClinicalToolsHub() {
               <TabsTrigger value="kidney">Kidney Fx</TabsTrigger>
               <TabsTrigger value="cardio">BP/Cardio</TabsTrigger>
               <TabsTrigger value="fluids">Fluids/Lytes</TabsTrigger>
-              <TabsTrigger value="drugs">Drugs</TabsTrigger>
+              <TabsTrigger value="drugDosing">AI/Drugs</TabsTrigger>
               <TabsTrigger value="dialysis">Dialysis</TabsTrigger>
               <TabsTrigger value="growth">Growth</TabsTrigger>
               <TabsTrigger value="prediction">Risk/Pred</TabsTrigger>
