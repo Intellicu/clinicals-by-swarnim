@@ -70,9 +70,9 @@ export default function ClinicalToolsHub() {
       icon: Pill,
       color: "bg-purple-50 border-purple-200",
       tools: [
+        { name: "Drugs & Dosing", page: "DrugsDosing", icon: Pill, description: "Full dosing system: search, calculate, interactions, Rx builder", tags: ["Drugs", "Dosing", "Essential"] },
         { name: "AI Clinical Pathway", page: "AIClinicalPathway", icon: Brain, description: "AI-driven diagnosis → drug plan → safety checks", tags: ["AI", "Pathway", "Essential"] },
-        { name: "Prescription Workflow", page: "PrescriptionWorkflow", icon: FileText, description: "Drug selection → dose calc → print/share Rx", tags: ["Prescription", "Essential"] },
-        { name: "Drug Database", page: "DrugCalculator", icon: Pill, description: "100+ drugs with renal dosing", tags: ["Drugs", "Essential"] },
+        { name: "Drug Database", page: "DrugCalculator", icon: Pill, description: "100+ drugs with renal dosing reference", tags: ["Drugs", "Essential"] },
         { name: "Dose Calculator", page: "DoseCalculator", icon: Calculator, description: "Weight & BSA-based dosing", tags: ["Drugs", "Essential"] }
       ]
     },

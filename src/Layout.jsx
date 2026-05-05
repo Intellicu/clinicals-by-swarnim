@@ -82,6 +82,11 @@ const toolsNavigation = [
     icon: BookOpen,
   },
   {
+    title: "Drugs & Dosing",
+    url: createPageUrl("DrugsDosing"),
+    icon: Pill,
+  },
+  {
     title: "Drug Database",
     url: createPageUrl("DrugCalculator"),
     icon: Pill,
