@@ -1,0 +1,120 @@
+{
+  "name": "PatientDocument",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "Lab Report",
+        "Prescription",
+        "Imaging",
+        "Referral Letter",
+        "Insurance Card",
+        "Consent Form",
+        "Discharge Summary",
+        "Other"
+      ],
+      "description": "Type of document"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL to uploaded file"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Original file name"
+    },
+    "file_type": {
+      "type": "string",
+      "description": "MIME type"
+    },
+    "ocr_extracted_text": {
+      "type": "string",
+      "description": "OCR extracted content"
+    },
+    "ocr_edited": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether OCR text has been manually edited"
+    },
+    "document_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of document"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Document tags for filtering"
+    },
+    "uploaded_by": {
+      "type": "string",
+      "description": "User who uploaded"
+    }
+  },
+  "required": [
+    "patient_id",
+    "document_type",
+    "file_url"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.uploaded_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.uploaded_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.uploaded_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
