@@ -1,0 +1,98 @@
+{
+  "name": "UserPreferences",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User's email"
+    },
+    "selected_specialty_id": {
+      "type": "string",
+      "description": "Currently selected specialty"
+    },
+    "favorite_tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of favorite tool IDs"
+    },
+    "ai_assistant_enabled": {
+      "type": "boolean",
+      "description": "Whether AI assistant is visible",
+      "default": true
+    },
+    "ai_persona": {
+      "type": "string",
+      "enum": [
+        "empathetic",
+        "concise",
+        "technical",
+        "balanced"
+      ],
+      "default": "empathetic",
+      "description": "AI communication style"
+    },
+    "guideline_preference": {
+      "type": "string",
+      "description": "Preferred guideline sources (comma-separated: KDIGO,IPNA,AUA,etc)",
+      "default": "KDIGO,IPNA,IAP"
+    },
+    "drug_info_depth": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "detailed",
+        "comprehensive"
+      ],
+      "default": "detailed",
+      "description": "Level of drug information detail"
+    },
+    "include_generic_availability": {
+      "type": "boolean",
+      "default": true,
+      "description": "Include Indian generic availability in drug info"
+    },
+    "include_side_effects": {
+      "type": "boolean",
+      "default": true,
+      "description": "Include detailed side effect profiles"
+    },
+    "drug_interaction_severity": {
+      "type": "string",
+      "enum": [
+        "major_only",
+        "major_moderate",
+        "all"
+      ],
+      "default": "major_moderate",
+      "description": "Which drug interactions to show"
+    },
+    "theme": {
+      "type": "string",
+      "enum": [
+        "light",
+        "dark",
+        "auto"
+      ],
+      "default": "light"
+    }
+  },
+  "required": [
+    "user_email"
+  ],
+  "rls": {
+    "create": {
+      "data.user_email": "{{user.email}}"
+    },
+    "read": {
+      "data.user_email": "{{user.email}}"
+    },
+    "update": {
+      "data.user_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.user_email": "{{user.email}}"
+    }
+  }
+}
