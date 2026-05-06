@@ -1,0 +1,110 @@
+{
+  "name": "NotificationPreference",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "email_appointment_reminders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Send email reminders for appointments"
+    },
+    "sms_appointment_reminders": {
+      "type": "boolean",
+      "default": false,
+      "description": "Send SMS reminders for appointments"
+    },
+    "reminder_advance_hours": {
+      "type": "number",
+      "default": 24,
+      "description": "Hours before appointment to send first reminder"
+    },
+    "second_reminder_hours": {
+      "type": "number",
+      "default": 2,
+      "description": "Hours before for second reminder (0 = disabled)"
+    },
+    "clinician_new_appointment_alert": {
+      "type": "boolean",
+      "default": true,
+      "description": "Alert clinician when new appointment is scheduled"
+    },
+    "clinician_urgent_update_alert": {
+      "type": "boolean",
+      "default": true,
+      "description": "Alert on critical lab results or severe diagnoses"
+    },
+    "critical_lab_alert": {
+      "type": "boolean",
+      "default": true,
+      "description": "Immediate alert for critical lab values"
+    },
+    "severe_diagnosis_alert": {
+      "type": "boolean",
+      "default": true,
+      "description": "Alert when severe/critical diagnosis is added"
+    },
+    "patient_education_reminders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notify when patients complete educational materials"
+    },
+    "follow_up_reminders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Remind about upcoming patient follow-ups"
+    },
+    "reminder_sender_name": {
+      "type": "string",
+      "description": "Sender name shown on emails",
+      "default": "CliniCals by Swarnim"
+    },
+    "clinic_name": {
+      "type": "string",
+      "description": "Clinic name shown on emails"
+    },
+    "clinic_phone": {
+      "type": "string",
+      "description": "Clinic contact number for reminders"
+    },
+    "custom_message": {
+      "type": "string",
+      "description": "Custom footer message for reminder emails"
+    },
+    "notification_email": {
+      "type": "string",
+      "description": "Alternative email for receiving notifications (if different from user_email)"
+    },
+    "notification_phone": {
+      "type": "string",
+      "description": "Phone number for SMS notifications"
+    },
+    "quiet_hours_start": {
+      "type": "string",
+      "description": "Start of quiet hours (24h format, e.g., 22:00)"
+    },
+    "quiet_hours_end": {
+      "type": "string",
+      "description": "End of quiet hours (24h format, e.g., 08:00)"
+    }
+  },
+  "required": [
+    "user_email"
+  ],
+  "rls": {
+    "create": {
+      "data.user_email": "{{user.email}}"
+    },
+    "read": {
+      "data.user_email": "{{user.email}}"
+    },
+    "update": {
+      "data.user_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.user_email": "{{user.email}}"
+    }
+  }
+}
