@@ -1,0 +1,108 @@
+{
+  "name": "LiteratureReference",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Paper title"
+    },
+    "authors": {
+      "type": "string",
+      "description": "Author list"
+    },
+    "journal": {
+      "type": "string",
+      "description": "Journal name"
+    },
+    "year": {
+      "type": "number",
+      "description": "Publication year"
+    },
+    "doi": {
+      "type": "string",
+      "description": "DOI identifier"
+    },
+    "pmid": {
+      "type": "string",
+      "description": "PubMed ID"
+    },
+    "abstract": {
+      "type": "string",
+      "description": "Paper abstract"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "URL to PDF file"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for categorization"
+    },
+    "notes": {
+      "type": "string",
+      "description": "User notes"
+    },
+    "project_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Associated research projects"
+    },
+    "key_findings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key findings extracted"
+    }
+  },
+  "required": [
+    "title",
+    "authors"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
