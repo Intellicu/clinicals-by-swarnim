@@ -1,0 +1,79 @@
+{
+  "name": "Specialty",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Specialty name (e.g., Pediatric Nephrology, Pediatric Neurology)"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon name from lucide-react"
+    },
+    "color": {
+      "type": "string",
+      "description": "Primary color for the specialty"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the specialty"
+    },
+    "is_default": {
+      "type": "boolean",
+      "description": "Whether this is a default specialty",
+      "default": false
+    },
+    "created_by_user": {
+      "type": "string",
+      "description": "Email of user who created this (blank for default)"
+    }
+  },
+  "required": [
+    "name",
+    "description"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.is_default": true
+        },
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
