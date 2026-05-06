@@ -1,0 +1,204 @@
+{
+  "name": "ResearchKnowledgeBase",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Knowledge base item title"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Variable_Dictionary",
+        "Study_Protocol",
+        "Dataset",
+        "Recruitment_Template",
+        "Analysis_Template"
+      ],
+      "description": "Type of knowledge base item"
+    },
+    "category": {
+      "type": "string",
+      "description": "Research category (e.g., Nephrotic Syndrome, CKD, AKI)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Search tags"
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Main content (flexible structure)"
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "validation_rules": {
+            "type": "object"
+          }
+        }
+      },
+      "description": "Variable definitions (for Variable_Dictionary type)"
+    },
+    "study_design": {
+      "type": "object",
+      "properties": {
+        "design_type": {
+          "type": "string"
+        },
+        "sample_size": {
+          "type": "number"
+        },
+        "duration_months": {
+          "type": "number"
+        },
+        "inclusion_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclusion_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Study protocol details"
+    },
+    "usage_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times this has been reused"
+    },
+    "success_metrics": {
+      "type": "object",
+      "properties": {
+        "studies_using_this": {
+          "type": "number"
+        },
+        "avg_recruitment_rate": {
+          "type": "number"
+        },
+        "completion_rate": {
+          "type": "number"
+        }
+      }
+    },
+    "ai_insights": {
+      "type": "object",
+      "properties": {
+        "feasibility_score": {
+          "type": "number"
+        },
+        "similar_studies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "suggested_improvements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "research_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "de_identified_data": {
+      "type": "object",
+      "properties": {
+        "dataset_url": {
+          "type": "string"
+        },
+        "sample_size": {
+          "type": "number"
+        },
+        "data_dictionary_url": {
+          "type": "string"
+        }
+      }
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": false
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    }
+  },
+  "required": [
+    "title",
+    "type",
+    "created_by"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.is_public": true
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
