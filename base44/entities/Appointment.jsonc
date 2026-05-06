@@ -1,0 +1,112 @@
+{
+  "name": "Appointment",
+  "type": "object",
+  "properties": {
+    "workspace_id": {
+      "type": "string",
+      "description": "Reference to Workspace"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient"
+    },
+    "patient_name": {
+      "type": "string",
+      "description": "Patient name for quick display"
+    },
+    "appointment_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Appointment date and time"
+    },
+    "appointment_type": {
+      "type": "string",
+      "enum": [
+        "First Visit",
+        "Follow-up",
+        "Emergency",
+        "Consultation",
+        "Procedure",
+        "Lab Review"
+      ],
+      "default": "Follow-up"
+    },
+    "doctor_name": {
+      "type": "string",
+      "description": "Assigned doctor"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "default": 30
+    },
+    "chief_complaint": {
+      "type": "string",
+      "description": "Reason for visit"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Appointment notes"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Scheduled",
+        "Confirmed",
+        "Completed",
+        "Cancelled",
+        "No-Show",
+        "Rescheduled"
+      ],
+      "default": "Scheduled"
+    },
+    "encounter_id": {
+      "type": "string",
+      "description": "Reference to created ClinicalEncounter"
+    }
+  },
+  "required": [
+    "patient_id",
+    "appointment_date"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
