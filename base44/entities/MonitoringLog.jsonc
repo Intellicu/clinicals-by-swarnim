@@ -1,0 +1,165 @@
+{
+  "name": "MonitoringLog",
+  "type": "object",
+  "properties": {
+    "patient_identifier": {
+      "type": "string",
+      "description": "Patient ID or name (anonymized)"
+    },
+    "monitoring_type": {
+      "type": "string",
+      "enum": [
+        "Nephrotic Syndrome",
+        "Hemodialysis",
+        "Peritoneal Dialysis",
+        "Blood Pressure",
+        "Fluid Balance",
+        "Growth",
+        "Medication Adherence",
+        "Bladder Diary",
+        "Other"
+      ],
+      "description": "Type of monitoring"
+    },
+    "date_range": {
+      "type": "string",
+      "description": "Date range of data"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of uploaded monitoring file"
+    },
+    "raw_data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "description": "Extracted monitoring data"
+    },
+    "ai_analysis": {
+      "type": "object",
+      "properties": {
+        "data_summary": {
+          "type": "string"
+        },
+        "trends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "parameter": {
+                "type": "string"
+              },
+              "trend": {
+                "type": "string"
+              },
+              "significance": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "critical_values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "parameter": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string"
+              },
+              "action_required": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "urgent_alerts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "analyzed_by": {
+      "type": "string",
+      "description": "User who uploaded and analyzed"
+    }
+  },
+  "required": [
+    "monitoring_type",
+    "file_url"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.analyzed_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.analyzed_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.analyzed_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
