@@ -1,0 +1,79 @@
+{
+  "name": "ToolLog",
+  "type": "object",
+  "properties": {
+    "tool_id": {
+      "type": "string",
+      "description": "Tool identifier"
+    },
+    "user_hash": {
+      "type": "string",
+      "description": "Anonymized user identifier"
+    },
+    "patient_id_hash": {
+      "type": "string",
+      "description": "Anonymized patient identifier (optional)"
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Input parameters (JSON)",
+      "additionalProperties": true
+    },
+    "outputs": {
+      "type": "object",
+      "description": "Calculation outputs (JSON)",
+      "additionalProperties": true
+    },
+    "calculation_trace": {
+      "type": "string",
+      "description": "Step-by-step calculation for audit"
+    },
+    "override_applied": {
+      "type": "boolean",
+      "description": "Did clinician override recommendation"
+    },
+    "override_reason": {
+      "type": "string",
+      "description": "Reason for override"
+    },
+    "clinician_initials": {
+      "type": "string",
+      "description": "Clinician who performed calculation"
+    },
+    "safety_alerts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Safety warnings generated"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Calculation timestamp"
+    }
+  },
+  "required": [
+    "tool_id",
+    "inputs",
+    "outputs"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
