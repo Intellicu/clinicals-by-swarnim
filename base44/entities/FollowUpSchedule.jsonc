@@ -1,0 +1,126 @@
+{
+  "name": "FollowUpSchedule",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient"
+    },
+    "workspace_id": {
+      "type": "string",
+      "description": "Reference to Workspace"
+    },
+    "clinician_id": {
+      "type": "string",
+      "description": "Assigned doctor"
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Follow-up date"
+    },
+    "scheduled_time": {
+      "type": "string",
+      "description": "Preferred time slot"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Reason for follow-up"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Routine",
+        "Important",
+        "Urgent"
+      ],
+      "default": "Routine"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "reminder_dates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "date"
+      },
+      "description": "When reminders were sent"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Scheduled",
+        "Reminded",
+        "Completed",
+        "Missed",
+        "Rescheduled"
+      ],
+      "default": "Scheduled"
+    },
+    "completed_encounter_id": {
+      "type": "string",
+      "description": "Reference to completed encounter"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "patient_id",
+    "workspace_id",
+    "scheduled_date"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.clinician_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.clinician_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.clinician_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
