@@ -1,0 +1,122 @@
+{
+  "name": "SavedRRTTemplate",
+  "type": "object",
+  "properties": {
+    "template_name": {
+      "type": "string",
+      "description": "Custom template name"
+    },
+    "modality": {
+      "type": "string",
+      "enum": [
+        "HD",
+        "CRRT",
+        "PD_Acute",
+        "PD_Chronic",
+        "SLED"
+      ],
+      "description": "RRT modality"
+    },
+    "based_on_template": {
+      "type": "string",
+      "description": "Original template ID if customized from existing"
+    },
+    "indication": {
+      "type": "string",
+      "description": "Clinical indication/scenario"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "All prescription parameters (blood flow, dialysate, UF, etc)"
+    },
+    "prescription_text": {
+      "type": "string",
+      "description": "Full prescription template text"
+    },
+    "institution": {
+      "type": "string",
+      "description": "Institution name (if institutional protocol)"
+    },
+    "is_public": {
+      "type": "boolean",
+      "description": "Share with other users",
+      "default": false
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Search tags (e.g., emergency, pediatric, toxin)"
+    },
+    "audit_trail": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_email": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Track all modifications"
+    }
+  },
+  "required": [
+    "template_name",
+    "modality",
+    "parameters"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.is_public": true
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
