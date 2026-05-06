@@ -1,0 +1,296 @@
+{
+  "name": "Guideline",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Guideline title"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "AKI",
+        "CKD",
+        "Nephrotic Syndrome",
+        "Hypertension",
+        "Electrolytes",
+        "Acid-Base",
+        "RTA",
+        "Stones",
+        "Dialysis",
+        "Transplant",
+        "Glomerular Diseases",
+        "Tubular Disorders",
+        "Immunisation",
+        "General Pediatrics",
+        "Neonatology",
+        "Infection",
+        "General"
+      ],
+      "description": "Guideline category"
+    },
+    "source": {
+      "type": "string",
+      "description": "Guideline source (KDIGO, IAP, ESPGHAN, IPNA, ISPD, etc.)"
+    },
+    "organization": {
+      "type": "string",
+      "description": "Full organization name"
+    },
+    "region": {
+      "type": "string",
+      "enum": [
+        "Global",
+        "India",
+        "Europe",
+        "North America",
+        "Asia-Pacific"
+      ],
+      "description": "Geographic applicability",
+      "default": "Global"
+    },
+    "year": {
+      "type": "number",
+      "description": "Year of publication"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Comprehensive guideline overview"
+    },
+    "scope_and_population": {
+      "type": "string",
+      "description": "Target population and clinical scope"
+    },
+    "key_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Sequential management steps"
+    },
+    "practice_pearls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Clinical implementation tips"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "URL to downloadable PDF guideline"
+    },
+    "external_link": {
+      "type": "string",
+      "description": "External link to original guideline"
+    },
+    "multimedia": {
+      "type": "object",
+      "properties": {
+        "audio_overview_url": {
+          "type": "string"
+        },
+        "video_overview_url": {
+          "type": "string"
+        },
+        "slides_url": {
+          "type": "string"
+        },
+        "infographics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "caption": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "podcast_episodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "audio_url": {
+                "type": "string"
+              },
+              "duration": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "transcript": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "description": "Multimedia content attachments"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "table",
+              "flowchart",
+              "diagram",
+              "algorithm",
+              "figure"
+            ]
+          }
+        }
+      },
+      "description": "Images, tables, flowcharts"
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "heading": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "key_points": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Search keywords"
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "import_source": {
+          "type": "string"
+        },
+        "import_url": {
+          "type": "string"
+        },
+        "import_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rights_confirmation": {
+          "type": "boolean"
+        },
+        "license": {
+          "type": "string"
+        }
+      },
+      "description": "Content provenance tracking"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Published",
+        "Archived"
+      ],
+      "default": "Draft"
+    },
+    "version": {
+      "type": "string",
+      "description": "Version number"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "User who created/uploaded"
+    },
+    "is_editable": {
+      "type": "boolean",
+      "description": "Whether editable by users",
+      "default": false
+    },
+    "usage_count": {
+      "type": "number",
+      "description": "Number of times accessed",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "source",
+    "scope_and_population"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.is_editable": false
+        },
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
