@@ -1,0 +1,159 @@
+{
+  "name": "MedicalHistoryEntry",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "entry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the history entry"
+    },
+    "entry_type": {
+      "type": "string",
+      "enum": [
+        "Diagnosis",
+        "Treatment",
+        "Medication",
+        "Allergy",
+        "Lab Report",
+        "Prescription",
+        "Surgery",
+        "Hospitalization",
+        "Follow-up Note",
+        "Other"
+      ],
+      "description": "Type of history entry"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short summary title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the entry"
+    },
+    "doctor_name": {
+      "type": "string",
+      "description": "Doctor/clinician who recorded this"
+    },
+    "facility": {
+      "type": "string",
+      "description": "Hospital or clinic name"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "Mild",
+        "Moderate",
+        "Severe",
+        "Critical"
+      ],
+      "description": "Severity if applicable"
+    },
+    "outcome": {
+      "type": "string",
+      "description": "Outcome or result of the treatment/event"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_url": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Attached documents or images"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Searchable tags"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this condition/medication is still active"
+    },
+    "reference_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Reference articles or guidelines"
+    }
+  },
+  "required": [
+    "patient_id",
+    "entry_date",
+    "entry_type",
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.doctor_name": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.doctor_name": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.doctor_name": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
