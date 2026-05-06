@@ -1,0 +1,124 @@
+{
+  "name": "MonitoringPlan",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "diagnosis": {
+      "type": "string",
+      "enum": [
+        "Nephrotic Syndrome",
+        "CKD",
+        "Transplant",
+        "AKI",
+        "Hypertension",
+        "Other"
+      ],
+      "description": "Primary diagnosis for monitoring"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Clinician email who created plan"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this plan is currently active"
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "module_type": {
+            "type": "string",
+            "enum": [
+              "Urine_Protein",
+              "Medications",
+              "Weight",
+              "Blood_Pressure",
+              "Symptoms",
+              "Urine_Output",
+              "Fluid_Intake",
+              "Lab_Reports",
+              "Edema",
+              "Swelling_Photos"
+            ]
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "Daily",
+              "Weekly",
+              "Monthly",
+              "Conditional",
+              "As_Needed"
+            ]
+          },
+          "mandatory": {
+            "type": "boolean"
+          },
+          "display_order": {
+            "type": "number"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Monitoring modules configured for this plan"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Clinician notes about monitoring plan"
+    }
+  },
+  "required": [
+    "patient_id",
+    "diagnosis",
+    "created_by"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
