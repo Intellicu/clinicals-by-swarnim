@@ -1,0 +1,77 @@
+{
+  "name": "LearningPath",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Student's email"
+    },
+    "assessment_type": {
+      "type": "string",
+      "enum": [
+        "goals_based",
+        "quiz_based",
+        "mixed"
+      ],
+      "description": "How path was created",
+      "default": "goals_based"
+    },
+    "learning_goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Student's learning objectives"
+    },
+    "recommended_modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "module_id": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "AI-recommended module sequence"
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Suggested focus areas"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_email",
+    "learning_goals"
+  ],
+  "rls": {
+    "create": {
+      "data.user_email": "{{user.email}}"
+    },
+    "read": {
+      "data.user_email": "{{user.email}}"
+    },
+    "update": {
+      "data.user_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.user_email": "{{user.email}}"
+    }
+  }
+}
