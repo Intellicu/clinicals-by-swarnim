@@ -1,0 +1,127 @@
+{
+  "name": "CustomTool",
+  "type": "object",
+  "properties": {
+    "specialty_id": {
+      "type": "string",
+      "description": "Reference to Specialty entity"
+    },
+    "name": {
+      "type": "string",
+      "description": "Tool name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Tool description"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category (Calculators, Guidelines, Reference, etc.)"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon name from lucide-react"
+    },
+    "input_fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "reference_range": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Input fields configuration"
+    },
+    "calculation_logic": {
+      "type": "string",
+      "description": "JavaScript formula or AI prompt for calculation"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Reference links"
+    },
+    "is_public": {
+      "type": "boolean",
+      "description": "Whether other users can see/use this tool",
+      "default": false
+    }
+  },
+  "required": [
+    "specialty_id",
+    "name",
+    "description",
+    "category"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.is_public": true
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
