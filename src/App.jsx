@@ -12,6 +12,7 @@ import ResearchMethodsHub from './pages/ResearchMethodsHub';
 import AIClinicalPathway from './pages/AIClinicalPathway';
 import PrescriptionWorkflow from './pages/PrescriptionWorkflow';
 import DrugsDosing from './pages/DrugsDosing';
+import AIPrescriber from './pages/AIPrescriber';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -68,6 +69,7 @@ const AuthenticatedApp = () => {
       <Route path="/AIClinicalPathway" element={<LayoutWrapper currentPageName="AIClinicalPathway"><AIClinicalPathway /></LayoutWrapper>} />
       <Route path="/PrescriptionWorkflow" element={<LayoutWrapper currentPageName="PrescriptionWorkflow"><PrescriptionWorkflow /></LayoutWrapper>} />
       <Route path="/DrugsDosing" element={<LayoutWrapper currentPageName="DrugsDosing"><DrugsDosing /></LayoutWrapper>} />
+      <Route path="/AIPrescriber" element={<LayoutWrapper currentPageName="AIPrescriber"><AIPrescriber /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -89,6 +89,7 @@ export default function Hub() {
     { name: "Research Methods", icon: Layers, color: "bg-rose-700", page: "ResearchMethodsHub" },
     { name: "AI Pathway", icon: Brain, color: "bg-indigo-700", page: "AIClinicalPathway" },
     { name: "Drugs & Dosing", icon: Pill, color: "bg-pink-700", page: "DrugsDosing" },
+    { name: "AI Prescriber", icon: Sparkles, color: "bg-violet-700", page: "AIPrescriber" },
   ];
 
   const toolsNavigation = [
