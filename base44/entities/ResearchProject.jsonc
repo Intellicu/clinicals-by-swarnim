@@ -183,5 +183,49 @@
   "required": [
     "title",
     "principal_investigator"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "data.principal_investigator": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.principal_investigator": "{{user.email}}"
+        },
+        {
+          "data.collaborators": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.principal_investigator": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.principal_investigator": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }
