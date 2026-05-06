@@ -1,0 +1,69 @@
+{
+  "name": "StudentProgress",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Student's email"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "TeachingModule ID"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "quiz_scores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "quiz_index": {
+            "type": "number"
+          },
+          "selected_answer": {
+            "type": "number"
+          },
+          "is_correct": {
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "time_spent_minutes": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string",
+      "description": "Student's notes"
+    },
+    "last_accessed": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_email",
+    "module_id"
+  ],
+  "rls": {
+    "create": {
+      "data.user_email": "{{user.email}}"
+    },
+    "read": {
+      "data.user_email": "{{user.email}}"
+    },
+    "update": {
+      "data.user_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.user_email": "{{user.email}}"
+    }
+  }
+}
