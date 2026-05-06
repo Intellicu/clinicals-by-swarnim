@@ -1,0 +1,189 @@
+{
+  "name": "VisitRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "visit_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Visit date and time"
+    },
+    "visit_type": {
+      "type": "string",
+      "enum": [
+        "First Visit",
+        "Follow-up",
+        "Emergency",
+        "Consultation"
+      ],
+      "description": "Type of visit"
+    },
+    "chief_complaint": {
+      "type": "string",
+      "description": "Primary reason for visit"
+    },
+    "history": {
+      "type": "string",
+      "description": "Clinical history"
+    },
+    "physical_examination": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "bmi": {
+          "type": "number"
+        },
+        "bp_systolic": {
+          "type": "number"
+        },
+        "bp_diastolic": {
+          "type": "number"
+        },
+        "temperature": {
+          "type": "number"
+        },
+        "heart_rate": {
+          "type": "number"
+        },
+        "respiratory_rate": {
+          "type": "number"
+        },
+        "general_examination": {
+          "type": "string"
+        },
+        "systemic_examination": {
+          "type": "string"
+        }
+      }
+    },
+    "lab_results": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Laboratory test results"
+    },
+    "imaging": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "findings": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "diagnosis": {
+      "type": "string",
+      "description": "Visit diagnosis"
+    },
+    "treatment_plan": {
+      "type": "string",
+      "description": "Management plan"
+    },
+    "prescriptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "drug_name": {
+            "type": "string"
+          },
+          "dose": {
+            "type": "string"
+          },
+          "frequency": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Next follow-up date"
+    },
+    "scanned_documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_url": {
+            "type": "string"
+          },
+          "ocr_text": {
+            "type": "string"
+          },
+          "document_type": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "clinician_notes": {
+      "type": "string",
+      "description": "Private clinician notes"
+    }
+  },
+  "required": [
+    "patient_id",
+    "visit_date"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
