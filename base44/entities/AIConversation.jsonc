@@ -1,0 +1,77 @@
+{
+  "name": "AIConversation",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User's email"
+    },
+    "specialty_id": {
+      "type": "string",
+      "description": "Specialty context for this conversation"
+    },
+    "title": {
+      "type": "string",
+      "description": "Conversation title (auto-generated from first message)"
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "context": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "string"
+              },
+              "patient_data": {
+                "type": "object"
+              },
+              "calculation_results": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "description": "Conversation messages with context"
+    },
+    "is_active": {
+      "type": "boolean",
+      "description": "Whether this is the active conversation",
+      "default": true
+    }
+  },
+  "required": [
+    "user_email"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}
