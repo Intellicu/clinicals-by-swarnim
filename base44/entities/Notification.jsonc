@@ -1,0 +1,101 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "recipient_email": {
+      "type": "string",
+      "description": "Email of recipient"
+    },
+    "notification_type": {
+      "type": "string",
+      "enum": [
+        "Appointment Reminder",
+        "Critical Lab Alert",
+        "New Appointment",
+        "Severe Diagnosis",
+        "Patient Education",
+        "Follow-up Reminder",
+        "System Alert"
+      ],
+      "description": "Type of notification"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Email subject"
+    },
+    "body": {
+      "type": "string",
+      "description": "Email body content"
+    },
+    "related_patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity if applicable"
+    },
+    "related_appointment_id": {
+      "type": "string",
+      "description": "Reference to Appointment entity if applicable"
+    },
+    "sent_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When notification was sent"
+    },
+    "delivery_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "delivered",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "delivery_method": {
+      "type": "string",
+      "enum": [
+        "email",
+        "sms",
+        "in-app"
+      ],
+      "default": "email"
+    },
+    "read_status": {
+      "type": "boolean",
+      "default": false
+    },
+    "read_date": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "recipient_email",
+    "notification_type",
+    "subject",
+    "body"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "data.recipient_email": "{{user.email}}"
+    },
+    "update": {
+      "data.recipient_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.recipient_email": "{{user.email}}"
+    }
+  }
+}
