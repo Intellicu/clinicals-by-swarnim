@@ -1,0 +1,97 @@
+{
+  "name": "Inventory",
+  "type": "object",
+  "properties": {
+    "item_name": {
+      "type": "string",
+      "description": "Name of item"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Medicine",
+        "Consumable",
+        "Equipment",
+        "Other"
+      ],
+      "description": "Item category"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Current quantity in stock"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measurement (tablets, boxes, etc)"
+    },
+    "unit_cost": {
+      "type": "number",
+      "description": "Cost per unit"
+    },
+    "reorder_level": {
+      "type": "number",
+      "description": "Quantity threshold for reordering"
+    },
+    "supplier": {
+      "type": "string",
+      "description": "Supplier name"
+    },
+    "last_restocked": {
+      "type": "string",
+      "format": "date",
+      "description": "Last restock date"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expiry date"
+    }
+  },
+  "required": [
+    "item_name",
+    "quantity",
+    "unit_cost",
+    "reorder_level"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
