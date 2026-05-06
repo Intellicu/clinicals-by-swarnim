@@ -1,0 +1,149 @@
+{
+  "name": "PatientDailyLog",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "log_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of log entry"
+    },
+    "module_type": {
+      "type": "string",
+      "enum": [
+        "Urine_Protein",
+        "Medications",
+        "Weight",
+        "Blood_Pressure",
+        "Symptoms",
+        "Urine_Output",
+        "Fluid_Intake",
+        "Lab_Reports",
+        "Edema",
+        "Swelling_Photos"
+      ],
+      "description": "Type of monitoring module"
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Log value (flexible structure)"
+    },
+    "protein_result": {
+      "type": "string",
+      "enum": [
+        "Negative",
+        "Trace",
+        "1+",
+        "2+",
+        "3+",
+        "4+"
+      ],
+      "description": "Urine protein result (if module_type is Urine_Protein)"
+    },
+    "prednisolone_dose": {
+      "type": "number",
+      "description": "Prednisolone dose in mg (if module_type is Medications)"
+    },
+    "weight_kg": {
+      "type": "number",
+      "description": "Weight in kg (if module_type is Weight)"
+    },
+    "bp_systolic": {
+      "type": "number",
+      "description": "Systolic BP (if module_type is Blood_Pressure)"
+    },
+    "bp_diastolic": {
+      "type": "number",
+      "description": "Diastolic BP (if module_type is Blood_Pressure)"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "AI",
+        "Manual",
+        "Photo",
+        "Auto"
+      ],
+      "description": "How data was captured"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Photo of dipstick/medication/swelling"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "AI confidence score (0-100)"
+    },
+    "remarks": {
+      "type": "string",
+      "description": "Auto-generated or manual remarks"
+    },
+    "completion_status": {
+      "type": "string",
+      "enum": [
+        "Complete",
+        "Partial",
+        "Skipped"
+      ],
+      "default": "Complete"
+    },
+    "clinician_reviewed": {
+      "type": "boolean",
+      "default": false
+    },
+    "clinician_notes": {
+      "type": "string",
+      "description": "Clinician's private notes"
+    }
+  },
+  "required": [
+    "patient_id",
+    "log_date",
+    "module_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
