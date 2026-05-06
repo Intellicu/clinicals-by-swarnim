@@ -1,0 +1,176 @@
+{
+  "name": "Prescription",
+  "type": "object",
+  "properties": {
+    "clinical_encounter_id": {
+      "type": "string",
+      "description": "Reference to ClinicalEncounter"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "prescribed_by": {
+      "type": "string",
+      "description": "Clinician email"
+    },
+    "prescription_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "diagnosis": {
+      "type": "string",
+      "description": "Current diagnosis"
+    },
+    "medications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "drug_name": {
+            "type": "string"
+          },
+          "generic_name": {
+            "type": "string"
+          },
+          "dose": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "frequency": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interactions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "active": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "advice": {
+      "type": "string",
+      "description": "Patient advice and instructions"
+    },
+    "red_flags": {
+      "type": "string",
+      "description": "Warning signs to watch for"
+    },
+    "diet_instructions": {
+      "type": "string",
+      "description": "Dietary advice"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Next follow-up date"
+    },
+    "follow_up_instructions": {
+      "type": "string",
+      "description": "What to monitor before follow-up"
+    },
+    "language": {
+      "type": "string",
+      "default": "English",
+      "description": "Language of prescription"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "Generated prescription PDF"
+    },
+    "monitoring_updates": {
+      "type": "object",
+      "properties": {
+        "modules_enabled": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frequency_changes": {
+          "type": "object"
+        },
+        "new_thresholds": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "required": [
+    "patient_id",
+    "prescribed_by",
+    "prescription_date"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.prescribed_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.prescribed_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.prescribed_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
