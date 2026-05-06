@@ -1,0 +1,125 @@
+{
+  "name": "ReferralLetter",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "referring_doctor": {
+      "type": "string"
+    },
+    "referred_to_name": {
+      "type": "string"
+    },
+    "referred_to_specialty": {
+      "type": "string"
+    },
+    "referred_to_hospital": {
+      "type": "string"
+    },
+    "referred_to_email": {
+      "type": "string"
+    },
+    "referred_to_phone": {
+      "type": "string"
+    },
+    "reason_for_referral": {
+      "type": "string"
+    },
+    "clinical_summary": {
+      "type": "string"
+    },
+    "letter_content": {
+      "type": "string"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": [
+        "Routine",
+        "Urgent",
+        "Emergency"
+      ],
+      "default": "Routine"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Sent",
+        "Accepted",
+        "Declined",
+        "Completed"
+      ],
+      "default": "Draft"
+    },
+    "sent_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "response_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "response_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "referred_to_specialty",
+    "reason_for_referral"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.referring_doctor": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.referring_doctor": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.referring_doctor": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
