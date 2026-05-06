@@ -1,0 +1,419 @@
+{
+  "name": "RenalBiopsyRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Reference to Patient entity"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "biopsy_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "indication": {
+      "type": "string",
+      "description": "Clinical indication for biopsy"
+    },
+    "indication_category": {
+      "type": "string",
+      "enum": [
+        "SRNS",
+        "Nephrotic Syndrome atypical",
+        "Haematuria with proteinuria",
+        "Isolated haematuria persistent",
+        "AKI unexplained",
+        "CKD unexplained",
+        "Lupus nephritis staging",
+        "Transplant dysfunction",
+        "Hypertension unexplained",
+        "Familial nephropathy workup",
+        "Other"
+      ],
+      "description": "Standardised indication category"
+    },
+    "pre_biopsy_bp_systolic": {
+      "type": "number"
+    },
+    "pre_biopsy_bp_diastolic": {
+      "type": "number"
+    },
+    "pre_biopsy_creatinine": {
+      "type": "number"
+    },
+    "pre_biopsy_pt_inr": {
+      "type": "number"
+    },
+    "pre_biopsy_platelet_count": {
+      "type": "number"
+    },
+    "pre_biopsy_upcr": {
+      "type": "number"
+    },
+    "pre_biopsy_ultrasound_findings": {
+      "type": "string"
+    },
+    "procedure_type": {
+      "type": "string",
+      "enum": [
+        "Percutaneous US-guided",
+        "Open surgical biopsy",
+        "Laparoscopic",
+        "Transplant biopsy"
+      ],
+      "default": "Percutaneous US-guided"
+    },
+    "needle_gauge": {
+      "type": "string",
+      "enum": [
+        "16G",
+        "18G",
+        "20G"
+      ]
+    },
+    "number_of_passes": {
+      "type": "number"
+    },
+    "cores_obtained": {
+      "type": "number"
+    },
+    "glomeruli_total_lm": {
+      "type": "number",
+      "description": "Total glomeruli on light microscopy"
+    },
+    "glomeruli_globally_sclerosed": {
+      "type": "number"
+    },
+    "glomeruli_segmentally_sclerosed": {
+      "type": "number"
+    },
+    "lm_findings": {
+      "type": "string",
+      "description": "Full light microscopy findings from report"
+    },
+    "if_findings": {
+      "type": "string",
+      "description": "Full immunofluorescence findings from report"
+    },
+    "em_findings": {
+      "type": "string",
+      "description": "Electron microscopy findings from report"
+    },
+    "if_deposits": {
+      "type": "object",
+      "properties": {
+        "IgG": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        },
+        "IgA": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        },
+        "IgM": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        },
+        "C3": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        },
+        "C1q": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        },
+        "Kappa": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        },
+        "Lambda": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        },
+        "PLA2R": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Positive"
+          ]
+        },
+        "Fibrinogen": {
+          "type": "string",
+          "enum": [
+            "Negative",
+            "Trace",
+            "1+",
+            "2+",
+            "3+"
+          ]
+        }
+      },
+      "description": "Structured IF staining results"
+    },
+    "deposit_location": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Mesangial",
+          "Subendothelial",
+          "Subepithelial",
+          "Intramembranous",
+          "Tubular basement membrane",
+          "Interstitial"
+        ]
+      },
+      "description": "Location of immune deposits"
+    },
+    "primary_diagnosis": {
+      "type": "string",
+      "description": "Primary histopathological diagnosis"
+    },
+    "secondary_diagnosis": {
+      "type": "string",
+      "description": "Secondary or incidental findings"
+    },
+    "classification_used": {
+      "type": "string",
+      "enum": [
+        "ISN/RPS Lupus",
+        "Oxford MEST-C IgAN",
+        "Columbia FSGS",
+        "WHO Membranous stages",
+        "Tervaert Diabetic",
+        "Banff Transplant",
+        "None applicable",
+        "Other"
+      ],
+      "description": "Classification system applied"
+    },
+    "classification_score": {
+      "type": "string",
+      "description": "Full classification score (e.g. MEST-C M1E0S1T0C0, ISN Class IV-G)"
+    },
+    "oxford_mest_c": {
+      "type": "object",
+      "properties": {
+        "M": {
+          "type": "number",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "E": {
+          "type": "number",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "S": {
+          "type": "number",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "T": {
+          "type": "number",
+          "enum": [
+            0,
+            1,
+            2
+          ]
+        },
+        "C": {
+          "type": "number",
+          "enum": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "description": "Oxford MEST-C score for IgAN"
+    },
+    "isn_rps_class": {
+      "type": "string",
+      "enum": [
+        "I",
+        "II",
+        "III",
+        "III+V",
+        "IV-G",
+        "IV-S",
+        "IV+V",
+        "V",
+        "VI"
+      ],
+      "description": "ISN/RPS class for lupus nephritis"
+    },
+    "activity_index": {
+      "type": "number",
+      "description": "Activity index if scored (0-24 for lupus)"
+    },
+    "chronicity_index": {
+      "type": "number",
+      "description": "Chronicity index if scored (0-12 for lupus)"
+    },
+    "ai_interpretation": {
+      "type": "string",
+      "description": "Renal Biopsy Agent AI interpretation output"
+    },
+    "clinical_pathological_correlation": {
+      "type": "string",
+      "description": "Clinician correlation note"
+    },
+    "management_implications": {
+      "type": "string",
+      "description": "Management changes triggered by biopsy findings"
+    },
+    "post_biopsy_complications": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "None",
+          "Haematuria > 24 hours",
+          "Haematoma (subcapsular)",
+          "Haematoma (perirenal)",
+          "Arteriovenous fistula",
+          "Blood transfusion required",
+          "Angiographic embolisation",
+          "Nephrectomy",
+          "Death"
+        ]
+      },
+      "description": "Post-biopsy complications"
+    },
+    "post_biopsy_monitoring_hours": {
+      "type": "number",
+      "default": 24
+    },
+    "report_pdf_url": {
+      "type": "string"
+    },
+    "laboratory": {
+      "type": "string"
+    },
+    "reviewing_pathologist": {
+      "type": "string"
+    },
+    "second_opinion_requested": {
+      "type": "boolean",
+      "default": false
+    },
+    "second_opinion_institution": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Procedure Done - Awaiting Report",
+        "Report Received - Pending Interpretation",
+        "Interpreted - Action Planned",
+        "Completed"
+      ],
+      "default": "Procedure Done - Awaiting Report"
+    },
+    "genetic_test_triggered": {
+      "type": "boolean",
+      "default": false,
+      "description": "Did biopsy result trigger genetic testing?"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "biopsy_date",
+    "indication"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
