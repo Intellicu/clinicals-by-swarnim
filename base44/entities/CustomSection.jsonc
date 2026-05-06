@@ -1,0 +1,83 @@
+{
+  "name": "CustomSection",
+  "type": "object",
+  "properties": {
+    "specialty_id": {
+      "type": "string",
+      "description": "Reference to Specialty entity"
+    },
+    "name": {
+      "type": "string",
+      "description": "Section name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Section description"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon name from lucide-react"
+    },
+    "color": {
+      "type": "string",
+      "description": "Background color class"
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of CustomTool IDs in this section"
+    },
+    "order": {
+      "type": "number",
+      "description": "Display order"
+    }
+  },
+  "required": [
+    "specialty_id",
+    "name",
+    "description"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
