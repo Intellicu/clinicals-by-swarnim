@@ -1,0 +1,235 @@
+{
+  "name": "TeachingModule",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Module title"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Dialysis",
+        "AKI",
+        "CKD",
+        "Glomerular Diseases",
+        "Electrolytes",
+        "Hypertension",
+        "Transplant",
+        "General Nephrology",
+        "Procedures",
+        "Pathology"
+      ],
+      "description": "Module category"
+    },
+    "difficulty_level": {
+      "type": "string",
+      "enum": [
+        "Beginner",
+        "Intermediate",
+        "Advanced"
+      ],
+      "description": "Difficulty level"
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "overview": {
+          "type": "string",
+          "description": "Module overview/introduction"
+        },
+        "learning_objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Learning objectives"
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "heading": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "key_points": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "diagrams": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "clinical_pearls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "common_pitfalls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "quizzes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correct_answer": {
+            "type": "number"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": [
+              "Easy",
+              "Medium",
+              "Hard"
+            ]
+          }
+        }
+      }
+    },
+    "practice_cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_description": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PDF",
+              "Video",
+              "Article",
+              "Guideline"
+            ]
+          }
+        }
+      }
+    },
+    "estimated_duration": {
+      "type": "string",
+      "description": "Estimated time to complete (e.g., '2 hours')"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "User who created module"
+    },
+    "is_default": {
+      "type": "boolean",
+      "description": "Default module (not deletable)",
+      "default": false
+    },
+    "uploaded_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs of uploaded teaching materials"
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "difficulty_level"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.is_default": true
+        },
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
