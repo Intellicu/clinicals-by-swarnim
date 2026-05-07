@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Building2, Users, Calendar, Stethoscope, FileText, 
-  Plus, ArrowRight, CheckCircle, Play, Home, Clock
+  Plus, ArrowRight, CheckCircle, Play, Home, Clock, ChevronRight, ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -18,6 +18,7 @@ import WorkspaceWizard from '../components/clinic/WorkspaceWizard';
 import PatientOnboarding from '../components/clinic/PatientOnboarding';
 import AppointmentScheduler from '../components/clinic/AppointmentScheduler';
 import EnhancedClinicalEncounter from '../components/clinic/EnhancedClinicalEncounter';
+import DataChatbot from '../components/DataChatbot';
 
 export default function ClinicWorkflow() {
   const [currentStep, setCurrentStep] = useState('workspace');
@@ -65,10 +66,8 @@ export default function ClinicWorkflow() {
   }, [location.state]);
 
   useEffect(() => {
-    if (workspaces.length > 0 && !selectedWorkspace) {
-      setSelectedWorkspace(workspaces[0]);
-      setCurrentStep('dashboard');
-    } else if (workspaces.length === 0) {
+    // Only show workspace selection — never auto-force a workspace
+    if (workspaces.length === 0) {
       setCurrentStep('workspace');
     }
   }, [workspaces]);
@@ -113,26 +112,43 @@ export default function ClinicWorkflow() {
     </div>
   );
 
+  // Breadcrumb helper
+  const breadcrumbs = [
+    { label: 'Hub', onClick: () => navigate(createPageUrl('Hub')) },
+    { label: 'Clinic', onClick: () => { setCurrentStep('workspace'); setSelectedWorkspace(null); } },
+    ...(selectedWorkspace ? [{ label: selectedWorkspace.name, onClick: () => setCurrentStep('dashboard') }] : []),
+    ...(currentStep === 'consult' ? [{ label: 'Consultation' }] : []),
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white border-b-2 border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm" onClick={() => navigate(createPageUrl('Hub'))}>
-                <Home className="w-4 h-4 mr-2" />
-                Calculator Mode
-              </Button>
-              {selectedWorkspace && (
-                <Badge className="bg-purple-100 text-purple-800 text-sm px-3 py-1">
-                  <Building2 className="w-3 h-3 mr-1" />
-                  {selectedWorkspace.name}
-                </Badge>
-              )}
-            </div>
+            {/* Breadcrumbs */}
+            <nav className="flex items-center gap-1 text-sm">
+              {breadcrumbs.map((crumb, i) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <ChevronRight className="w-4 h-4 text-slate-400" />}
+                  {crumb.onClick ? (
+                    <button onClick={crumb.onClick} className="text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                      {i === 0 ? <span className="flex items-center gap-1"><Home className="w-3.5 h-3.5" />{crumb.label}</span> : crumb.label}
+                    </button>
+                  ) : (
+                    <span className="text-slate-700 font-semibold">{crumb.label}</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </nav>
             <div className="flex items-center gap-2">
-              <Badge className="bg-blue-100 text-blue-800">
+              {selectedWorkspace && currentStep !== 'workspace' && (
+                <Button variant="outline" size="sm" className="text-purple-700 border-purple-300 hidden sm:flex" onClick={() => { setCurrentStep('workspace'); setSelectedWorkspace(null); }}>
+                  <Building2 className="w-3.5 h-3.5 mr-1" />
+                  Switch Workspace
+                </Button>
+              )}
+              <Badge className="bg-blue-100 text-blue-800 text-xs">
                 <Clock className="w-3 h-3 mr-1" />
                 {format(new Date(), 'MMM d, yyyy')}
               </Badge>
@@ -141,54 +157,80 @@ export default function ClinicWorkflow() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Clinic Workflow</h1>
-          <p className="text-slate-600">Seamless patient care from enrollment to prescription</p>
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
+        {/* Back + Title row */}
+        <div className="flex items-center gap-3 mb-6">
+          {currentStep === 'dashboard' && selectedWorkspace && (
+            <Button variant="outline" size="sm" onClick={() => { setCurrentStep('workspace'); setSelectedWorkspace(null); }}>
+              <ArrowLeft className="w-4 h-4 mr-1" /> Workspaces
+            </Button>
+          )}
+          {currentStep === 'consult' && (
+            <Button variant="outline" size="sm" onClick={() => setCurrentStep('dashboard')}>
+              <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard
+            </Button>
+          )}
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {currentStep === 'workspace' ? 'Select Workspace' : currentStep === 'consult' ? 'Consultation' : selectedWorkspace?.name || 'Clinic Workflow'}
+            </h1>
+            <p className="text-sm text-slate-500">
+              {currentStep === 'workspace' ? 'Choose a workspace to continue, or create a new one' : 'Seamless patient care from enrollment to prescription'}
+            </p>
+          </div>
         </div>
 
         <WorkflowSteps />
 
         {/* Workspace Selection / Creation */}
         {(!selectedWorkspace || currentStep === 'workspace') && (
-          <Card className="mb-6">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50">
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-6 h-6 text-purple-600" />
-                Your Workspaces
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {workspaces.length === 0 ? (
-                <div className="text-center py-12">
-                  <Building2 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-slate-700 mb-2">No Workspace Yet</h3>
-                  <p className="text-slate-600 mb-6">Create your first clinic workspace to get started</p>
-                  <Button onClick={() => setShowWorkspaceWizard(true)} className="bg-purple-600">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Workspace
-                  </Button>
-                </div>
-              ) : (
-                <div className="grid md:grid-cols-3 gap-4">
-                  {workspaces.map(ws => (
-                    <Card key={ws.id} className={`cursor-pointer hover:shadow-lg transition-shadow ${selectedWorkspace?.id === ws.id ? 'border-2 border-blue-500' : ''}`} onClick={() => { setSelectedWorkspace(ws); setCurrentStep('dashboard'); }}>
-                      <CardContent className="p-4">
-                        <h3 className="font-bold mb-1">{ws.name}</h3>
-                        <p className="text-sm text-slate-600">{ws.description}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  <Card className="cursor-pointer hover:shadow-lg border-2 border-dashed" onClick={() => setShowWorkspaceWizard(true)}>
-                    <CardContent className="p-4 flex flex-col items-center justify-center h-full">
-                      <Plus className="w-8 h-8 text-slate-400 mb-2" />
-                      <p className="text-sm font-semibold">Add Workspace</p>
+          <div className="mb-6">
+            {workspaces.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-2xl shadow border-2 border-dashed border-purple-200">
+                <Building2 className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-slate-700 mb-2">No Workspaces Yet</h3>
+                <p className="text-slate-500 mb-6">Create your first clinic workspace (e.g. "Pediatric Nephrology OPD") to get started</p>
+                <Button onClick={() => setShowWorkspaceWizard(true)} className="bg-purple-600 hover:bg-purple-700 text-base px-6 py-3 h-auto">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Create Your First Workspace
+                </Button>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-4">
+                {workspaces.map(ws => (
+                  <Card
+                    key={ws.id}
+                    className="cursor-pointer hover:shadow-xl transition-all border-2 hover:border-purple-400 group"
+                    onClick={() => { setSelectedWorkspace(ws); setCurrentStep('dashboard'); }}
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                          <Building2 className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-purple-500 transition-colors" />
+                      </div>
+                      <h3 className="font-bold text-slate-900 mt-3 mb-1">{ws.name}</h3>
+                      <p className="text-sm text-slate-500 line-clamp-2">{ws.description || 'Click to open workspace'}</p>
                     </CardContent>
                   </Card>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                ))}
+                {/* Prominent Add Workspace card */}
+                <Card
+                  className="cursor-pointer hover:shadow-xl border-2 border-dashed border-purple-300 hover:border-purple-500 transition-all bg-purple-50 hover:bg-purple-100 group"
+                  onClick={() => setShowWorkspaceWizard(true)}
+                >
+                  <CardContent className="p-5 flex flex-col items-center justify-center h-full min-h-[120px] gap-2">
+                    <div className="w-12 h-12 bg-purple-200 rounded-xl flex items-center justify-center group-hover:bg-purple-300 transition-colors">
+                      <Plus className="w-6 h-6 text-purple-700" />
+                    </div>
+                    <p className="text-sm font-bold text-purple-700">Add New Workspace</p>
+                    <p className="text-xs text-purple-500 text-center">e.g. Pediatric Nephrology, NICU, OPD</p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Dashboard View */}
@@ -337,6 +379,9 @@ export default function ClinicWorkflow() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Patient Monitor chatbot — Clinic mode only */}
+      <DataChatbot />
 
       <Dialog open={showScheduler} onOpenChange={setShowScheduler}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">

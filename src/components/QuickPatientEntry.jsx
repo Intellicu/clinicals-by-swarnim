@@ -6,13 +6,58 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { User, Save, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { User, Save, Trash2, ChevronDown, ChevronUp, Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { base44 } from "@/api/base44Client";
 
 export default function QuickPatientEntry({ compact = false }) {
   const { patientData, updatePatientData, clearPatientData } = usePatient();
   const [isExpanded, setIsExpanded] = useState(false);
   const [localData, setLocalData] = useState(patientData);
+  const [ocrLoading, setOcrLoading] = useState(false);
+
+  const handleOCR = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setOcrLoading(true);
+    toast.info('Scanning image with OCR...');
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Extract the following clinical values from this medical document/lab report image. Return only values that are clearly visible. For each field, if not found, return null.`,
+        file_urls: [file_url],
+        response_json_schema: {
+          type: "object",
+          properties: {
+            weight: { type: "number", description: "Weight in kg" },
+            height: { type: "number", description: "Height in cm" },
+            age: { type: "number", description: "Age in years" },
+            gender: { type: "string", description: "Male or Female" },
+            serumCreatinine: { type: "number", description: "Serum creatinine in mg/dL" },
+            systolicBP: { type: "number", description: "Systolic blood pressure mmHg" },
+            diastolicBP: { type: "number", description: "Diastolic blood pressure mmHg" },
+            hemoglobin: { type: "number", description: "Hemoglobin in g/dL" },
+            albumin: { type: "number", description: "Albumin in g/dL" },
+            serumSodium: { type: "number", description: "Sodium mEq/L" },
+            serumPotassium: { type: "number", description: "Potassium mEq/L" }
+          }
+        }
+      });
+      // Merge non-null extracted values
+      const merged = { ...localData };
+      Object.entries(result).forEach(([key, val]) => {
+        if (val !== null && val !== undefined) merged[key] = String(val);
+      });
+      setLocalData(merged);
+      const found = Object.entries(result).filter(([, v]) => v !== null).length;
+      toast.success(`OCR extracted ${found} value(s). Review and save.`);
+    } catch (err) {
+      toast.error('OCR failed. Try a clearer image.');
+    } finally {
+      setOcrLoading(false);
+      e.target.value = '';
+    }
+  };
 
   const handleSave = () => {
     updatePatientData(localData);
@@ -103,9 +148,20 @@ export default function QuickPatientEntry({ compact = false }) {
             </Button>
           )}
         </div>
-        <p className="text-xs text-slate-600 mt-1">
-          Enter patient data once - it will auto-fill in all calculators
-        </p>
+        <div className="flex items-center justify-between mt-1">
+          <p className="text-xs text-slate-600">Enter patient data once — auto-fills all calculators</p>
+          <div>
+            <input type="file" accept="image/*" capture="environment" id="qpe-ocr" className="hidden" onChange={handleOCR} />
+            <label htmlFor="qpe-ocr">
+              <Button type="button" size="sm" variant="outline" className="cursor-pointer border-green-300 text-green-700 hover:bg-green-50 h-7 text-xs gap-1" asChild disabled={ocrLoading}>
+                <span>
+                  {ocrLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
+                  {ocrLoading ? 'Scanning...' : 'Scan / Upload'}
+                </span>
+              </Button>
+            </label>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Demographics */}

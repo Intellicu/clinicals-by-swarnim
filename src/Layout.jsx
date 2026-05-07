@@ -40,7 +40,6 @@ import { base44 } from "@/api/base44Client";
 import { PatientProvider } from "./components/PatientContext";
 import FloatingAIAssistant from "./components/FloatingAIAssistant";
 import IOSCompatibility from "./components/iOSCompatibility";
-import DataChatbot from "./components/DataChatbot";
 import PullToRefresh from "./components/PullToRefresh";
 import NotificationEngine from "./components/notifications/NotificationEngine";
 import FloatingHubButton from "./components/FloatingHubButton";
@@ -454,7 +453,6 @@ export default function Layout({ children, currentPageName }) {
         </main>
 
         <FloatingAIAssistant />
-        <DataChatbot />
         <NotificationEngine />
         <FloatingHubButton />
 

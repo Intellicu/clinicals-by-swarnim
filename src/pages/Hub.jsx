@@ -50,7 +50,7 @@ import QuickPatientEntry from "../components/QuickPatientEntry";
 import { ChevronDown, WifiOff, Wifi, HardDrive } from "lucide-react";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
-import QuickActionsPanel from "../components/QuickActionsPanel";
+
 import StickyToolNav from "../components/StickyToolNav";
 
 export default function Hub() {
@@ -318,8 +318,7 @@ export default function Hub() {
         {/* Global Search */}
         <GlobalSearch placeholder="Search pathways, drugs, calculators, research..." className="w-full" />
 
-        {/* Quick Actions */}
-        <QuickActionsPanel />
+        {/* Quick Actions removed — tools consolidated into Quick Access Tools below */}
 
         {/* Quick Patient Entry */}
         <QuickPatientEntry />

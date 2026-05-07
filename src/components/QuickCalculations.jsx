@@ -19,8 +19,11 @@ import {
   Info,
   Pill,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Camera,
+  Loader2
 } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const COMMON_DRUGS = [
   { 
@@ -135,12 +138,49 @@ const COMMON_DRUGS = [
 ];
 
 export default function QuickCalculations() {
-  const { patientData } = usePatient();
+  const { patientData, updatePatientData } = usePatient();
   const [calculations, setCalculations] = useState(null);
   const [showBPDialog, setShowBPDialog] = useState(false);
   const [bpDetails, setBpDetails] = useState(null);
   const [selectedDrug, setSelectedDrug] = useState(null);
   const [showDrugCalc, setShowDrugCalc] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
+
+  const handleOCR = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setOcrLoading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: 'Extract clinical values from this medical document/lab report image. Return null for any not found.',
+        file_urls: [file_url],
+        response_json_schema: {
+          type: "object",
+          properties: {
+            weight: { type: "number" },
+            height: { type: "number" },
+            serumCreatinine: { type: "number" },
+            systolicBP: { type: "number" },
+            diastolicBP: { type: "number" },
+            hemoglobin: { type: "number" }
+          }
+        }
+      });
+      const updates = {};
+      Object.entries(result).forEach(([k, v]) => { if (v !== null && v !== undefined) updates[k] = String(v); });
+      updatePatientData({ ...patientData, ...updates });
+      const count = Object.keys(updates).length;
+      if (count > 0) {
+        import('sonner').then(({ toast }) => toast.success(`OCR filled ${count} value(s)`));
+      }
+    } catch {
+      import('sonner').then(({ toast }) => toast.error('OCR failed. Try a clearer image.'));
+    } finally {
+      setOcrLoading(false);
+      e.target.value = '';
+    }
+  };
 
   useEffect(() => {
     if (patientData.weight && patientData.height && patientData.age) {
@@ -352,9 +392,20 @@ export default function QuickCalculations() {
             <CheckCircle2 className="w-6 h-6 text-green-600" />
             Quick Calculations - CliniCals by Swarnim
           </CardTitle>
-          <p className="text-xs text-slate-600 mt-1">
-            Click BP result for detailed percentile table • Click any result to explore full calculator
-          </p>
+          <div className="flex items-center justify-between mt-1">
+            <p className="text-xs text-slate-600">Click BP for percentile table • Click any result to explore</p>
+            <div>
+              <input type="file" accept="image/*" capture="environment" id="qc-ocr" className="hidden" onChange={handleOCR} />
+              <label htmlFor="qc-ocr">
+                <Button type="button" size="sm" variant="outline" className="cursor-pointer border-green-300 text-green-700 hover:bg-green-50 h-7 text-xs gap-1" asChild>
+                  <span>
+                    {ocrLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
+                    {ocrLoading ? 'Scanning...' : 'OCR Scan'}
+                  </span>
+                </Button>
+              </label>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="pt-4">
           <div className="grid md:grid-cols-3 gap-3 mb-4">
