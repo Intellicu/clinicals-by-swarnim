@@ -2,13 +2,13 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPageUrl } from "@/utils";
-import { 
-  Activity, 
-  Home, 
-  FileText, 
-  LogOut, 
-  BookOpen, 
-  ArrowLeft, 
+import {
+  Activity,
+  Home,
+  FileText,
+  LogOut,
+  BookOpen,
+  ArrowLeft,
   Calculator,
   GraduationCap,
   Heart,
@@ -28,7 +28,8 @@ import {
   Bell,
   Stethoscope,
   FlaskConical,
-  X
+  X,
+  ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -43,12 +44,19 @@ import NotificationEngine from "./components/notifications/NotificationEngine";
 import FloatingHubButton from "./components/FloatingHubButton";
 import { useQueryClient } from "@tanstack/react-query";
 
-// Tab root URLs — re-selecting the active tab navigates here
+// Tab root URLs — re-tapping the active tab resets to these
 const TAB_ROOTS = {
   Hub: createPageUrl("Hub"),
   AI: createPageUrl("AIAssistant"),
   Clinic: createPageUrl("ClinicWorkflow"),
   Research: createPageUrl("ResearchHub"),
+};
+
+const TAB_DETECTION = {
+  Hub: [createPageUrl("Hub"), createPageUrl("ClinicalToolsHub"), createPageUrl("ClinicalSupport"), createPageUrl("Guidelines"), createPageUrl("DrugCalculator")],
+  AI: [createPageUrl("AIAssistant"), createPageUrl("VoiceAgent"), createPageUrl("VideoTeachingAgent")],
+  Clinic: [createPageUrl("ClinicWorkflow"), createPageUrl("ClinicDashboard"), createPageUrl("ClinicManagement"), createPageUrl("ClinicWorkspace")],
+  Research: [createPageUrl("ResearchHub")],
 };
 
 const mainNavigation = [
@@ -95,15 +103,17 @@ function NavItem({ item, onClick }) {
     <Link
       to={item.url}
       onClick={onClick}
+      aria-label={item.title}
       aria-current={isActive ? "page" : undefined}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-150 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
         isActive
           ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md"
-          : "text-slate-600 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-100"
+          : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
       }`}
     >
       <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-      <span>{item.title}</span>
+      <span className="truncate">{item.title}</span>
+      {!isActive && <ChevronRight className="w-4 h-4 ml-auto opacity-30" aria-hidden="true" />}
     </Link>
   );
 }
@@ -111,14 +121,14 @@ function NavItem({ item, onClick }) {
 function SidebarContent({ user, onClose, onLogout }) {
   return (
     <>
-      {/* Brand header */}
-      <div className="border-b border-slate-200 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
+      {/* Header */}
+      <div className="border-b-2 border-slate-200 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg" aria-hidden="true">
-            <Activity className="w-6 h-6 text-white" />
+          <div className="w-11 h-11 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-xl">
+            <Activity className="w-6 h-6 text-white" aria-hidden="true" />
           </div>
           <div>
-            <p className="font-bold text-slate-900 text-lg leading-none">CliniCals</p>
+            <h2 className="font-bold text-slate-900 text-lg">CliniCals</h2>
             <p className="text-xs text-slate-500">by Swarnim</p>
           </div>
         </div>
@@ -126,61 +136,61 @@ function SidebarContent({ user, onClose, onLogout }) {
           <button
             onClick={onClose}
             aria-label="Close navigation menu"
-            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 active:bg-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="lg:hidden p-2 rounded-lg hover:bg-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 text-slate-600" aria-hidden="true" />
           </button>
         )}
       </div>
 
-      {/* Nav links */}
+      {/* Nav */}
       <nav className="flex-1 overflow-y-auto p-3 space-y-4" aria-label="Main navigation">
-        <div>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Main</p>
+        <section>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">Main</p>
           <div className="space-y-0.5">
             {mainNavigation.map((item) => (
               <NavItem key={item.title} item={item} onClick={onClose} />
             ))}
           </div>
-        </div>
+        </section>
         <Separator />
-        <div>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Clinical Tools</p>
+        <section>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">Clinical Tools</p>
           <div className="space-y-0.5">
             {toolsNavigation.map((item) => (
               <NavItem key={item.title} item={item} onClick={onClose} />
             ))}
           </div>
-        </div>
+        </section>
         <Separator />
-        <div>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Resources</p>
+        <section>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">Resources</p>
           <div className="space-y-0.5">
             {resourcesNavigation.map((item) => (
               <NavItem key={item.title} item={item} onClick={onClose} />
             ))}
           </div>
-        </div>
+        </section>
       </nav>
 
       {/* User footer */}
-      <div className="border-t border-slate-200 p-4 bg-slate-50 space-y-2">
-        <div className="flex items-center gap-3" aria-label="Signed in user">
+      <div className="border-t-2 border-slate-200 p-4 bg-slate-50 space-y-2">
+        <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow"
+            className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md"
             aria-hidden="true"
           >
             {user?.full_name?.[0]?.toUpperCase() || "U"}
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-slate-900 text-sm truncate">{user?.full_name || "Loading..."}</p>
-            <p className="text-xs text-slate-500 truncate capitalize">{user?.role || ""}</p>
+            <p className="text-xs text-slate-500 truncate">{user?.role || ""}</p>
           </div>
         </div>
         <button
           onClick={onLogout}
           aria-label="Sign out of CliniCals"
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 rounded-lg transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px]"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <LogOut className="w-4 h-4" aria-hidden="true" />
           <span>Sign Out</span>
@@ -191,8 +201,8 @@ function SidebarContent({ user, onClose, onLogout }) {
               toast.error("Account deletion initiated. Contact support to complete.");
             }
           }}
-          aria-label="Delete account"
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 min-h-[44px]"
+          aria-label="Delete your account"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
         >
           <Trash2 className="w-4 h-4" aria-hidden="true" />
           <span>Delete Account</span>
@@ -202,13 +212,6 @@ function SidebarContent({ user, onClose, onLogout }) {
   );
 }
 
-const BOTTOM_TABS = [
-  { key: "Hub", label: "Hub", icon: Home, root: TAB_ROOTS.Hub },
-  { key: "AI", label: "AI", icon: Sparkles, root: TAB_ROOTS.AI },
-  { key: "Clinic", label: "Clinic", icon: Users, root: TAB_ROOTS.Clinic },
-  { key: "Research", label: "Research", icon: Layers, root: TAB_ROOTS.Research },
-];
-
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -217,80 +220,47 @@ export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState("Hub");
 
-  // Tab navigation stacks for back-navigation within a tab
-  const [tabStacks, setTabStacks] = React.useState({
-    Hub: [TAB_ROOTS.Hub],
-    AI: [TAB_ROOTS.AI],
-    Clinic: [TAB_ROOTS.Clinic],
-    Research: [TAB_ROOTS.Research],
-  });
-
   React.useEffect(() => {
     let retryCount = 0;
-    const maxRetries = 3;
     const loadUser = async () => {
       try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-      } catch (error) {
-        console.error("Error loading user:", error);
-        if (retryCount < maxRetries) {
-          retryCount++;
-          setTimeout(loadUser, 1000 * retryCount);
-        }
+        setUser(await base44.auth.me());
+      } catch {
+        if (retryCount < 3) { retryCount++; setTimeout(loadUser, 1000 * retryCount); }
       }
     };
     loadUser();
   }, []);
 
-  // Determine active tab from location
+  // Detect active tab from pathname
   React.useEffect(() => {
-    const hubUrls = [createPageUrl("Hub"), createPageUrl("ClinicalToolsHub"), createPageUrl("ClinicalSupport"), createPageUrl("Guidelines"), createPageUrl("DrugCalculator")];
-    const aiUrls = [createPageUrl("AIAssistant"), createPageUrl("VoiceAgent"), createPageUrl("VideoTeachingAgent")];
-    const clinicUrls = [createPageUrl("ClinicWorkflow"), createPageUrl("ClinicDashboard"), createPageUrl("ClinicManagement"), createPageUrl("ClinicWorkspace")];
-    const researchUrls = [createPageUrl("ResearchHub")];
-
-    if (hubUrls.some((u) => location.pathname.startsWith(u))) setCurrentTab("Hub");
-    else if (aiUrls.some((u) => location.pathname.startsWith(u))) setCurrentTab("AI");
-    else if (clinicUrls.some((u) => location.pathname.startsWith(u))) setCurrentTab("Clinic");
-    else if (researchUrls.some((u) => location.pathname.startsWith(u))) setCurrentTab("Research");
+    for (const [tab, urls] of Object.entries(TAB_DETECTION)) {
+      if (urls.some((url) => location.pathname.startsWith(url))) {
+        setCurrentTab(tab);
+        return;
+      }
+    }
   }, [location.pathname]);
 
-  // Push to tab stack on navigation
+  // Close sidebar on navigation
   React.useEffect(() => {
-    setTabStacks((prev) => {
-      const stack = prev[currentTab] || [];
-      if (!stack.includes(location.pathname)) {
-        return { ...prev, [currentTab]: [...stack, location.pathname] };
-      }
-      return prev;
-    });
-  }, [location.pathname, currentTab]);
-
-  const handleBack = () => {
-    const stack = tabStacks[currentTab];
-    if (stack && stack.length > 1) {
-      const newStack = stack.slice(0, -1);
-      setTabStacks((prev) => ({ ...prev, [currentTab]: newStack }));
-      navigate(newStack[newStack.length - 1]);
-    } else {
-      navigate(-1);
-    }
-  };
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleTabPress = (tab) => {
-    if (tab.key === currentTab) {
+    const root = TAB_ROOTS[tab];
+    if (currentTab === tab) {
       // Re-selecting active tab → reset to root
-      setTabStacks((prev) => ({ ...prev, [tab.key]: [tab.root] }));
-      navigate(tab.root);
+      navigate(root, { replace: true });
     } else {
-      // Restore last position in that tab
-      const stack = tabStacks[tab.key];
-      navigate(stack[stack.length - 1]);
+      setCurrentTab(tab);
+      navigate(root);
     }
   };
 
+  const handleBack = () => navigate(-1);
   const handleLogout = () => base44.auth.logout();
+
   const showBackButton = currentPageName !== "Hub" && location.pathname !== createPageUrl("Hub");
 
   return (
@@ -302,66 +272,44 @@ export default function Layout({ children, currentPageName }) {
           --safe-bottom: env(safe-area-inset-bottom, 0px);
           --safe-left: env(safe-area-inset-left, 0px);
           --safe-right: env(safe-area-inset-right, 0px);
-
+          --tab-bar-height: calc(64px + var(--safe-bottom));
           --clinical-blue: #0066CC;
-          --bg-primary: #FFFFFF;
-          --bg-secondary: #F8FAFC;
           --bg-gradient-start: #F8FAFC;
           --bg-gradient-end: #EFF6FF;
           --text-primary: #0F172A;
           --text-secondary: #64748B;
           --border-color: #E2E8F0;
-          --sidebar-bg: rgba(255, 255, 255, 0.97);
-          --tab-bar-height: calc(64px + var(--safe-bottom));
+          --sidebar-bg: rgba(255,255,255,0.97);
         }
         @media (prefers-color-scheme: dark) {
           :root {
-            --bg-primary: #0F172A;
-            --bg-secondary: #1E293B;
             --bg-gradient-start: #1E293B;
             --bg-gradient-end: #334155;
             --text-primary: #F1F5F9;
             --text-secondary: #94A3B8;
             --border-color: #334155;
-            --sidebar-bg: rgba(15, 23, 42, 0.97);
+            --sidebar-bg: rgba(15,23,42,0.97);
           }
         }
-
-        * { -webkit-tap-highlight-color: transparent; }
-        button, a, [role="button"] {
-          user-select: none; -webkit-user-select: none;
-          touch-action: manipulation;
-        }
+        *, *::before, *::after { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         html, body {
           width: 100%; height: 100%;
           overflow: auto; overscroll-behavior: none;
           -webkit-text-size-adjust: 100%;
           -webkit-font-smoothing: antialiased;
-          background-color: var(--bg-primary);
-          color: var(--text-primary);
         }
         .overflow-y-auto, .overflow-auto { -webkit-overflow-scrolling: touch; }
-
-        /* Minimum 44px touch targets */
-        button, a { min-height: 44px; }
-
-        /* Prevent zoom on input focus (iOS) */
+        button, a { touch-action: manipulation; }
         input, select, textarea { font-size: 16px !important; }
-
-        /* Bottom tab bar safe area */
-        .bottom-tab-bar {
-          padding-bottom: var(--safe-bottom);
-        }
-        /* Main content padding for tab bar on mobile */
-        .main-content-mobile {
-          padding-bottom: var(--tab-bar-height);
-        }
-        /* Header safe area on notched devices */
-        .header-safe {
-          padding-top: max(12px, var(--safe-top));
-          padding-left: max(12px, var(--safe-left));
-          padding-right: max(12px, var(--safe-right));
-        }
+        .safe-pb { padding-bottom: var(--safe-bottom); }
+        .safe-pt { padding-top: var(--safe-top); }
+        .safe-pl { padding-left: var(--safe-left); }
+        .safe-pr { padding-right: var(--safe-right); }
+        /* Tab bar respects safe area */
+        .tab-bar-inner { height: 56px; }
+        .tab-bar-outer { padding-bottom: var(--safe-bottom); }
+        /* Focus rings */
+        :focus-visible { outline: 2px solid #3B82F6; outline-offset: 2px; }
       `}</style>
 
       <div
@@ -370,11 +318,11 @@ export default function Layout({ children, currentPageName }) {
       >
         {/* ── Desktop Sidebar ── */}
         <aside
-          className="hidden lg:flex flex-col fixed left-6 top-6 bottom-6 w-72 rounded-3xl shadow-2xl border z-50 overflow-hidden"
+          className="hidden lg:flex flex-col fixed left-6 top-6 bottom-6 w-72 rounded-3xl shadow-2xl border-2 z-50 overflow-hidden"
           style={{ backgroundColor: "var(--sidebar-bg)", borderColor: "var(--border-color)" }}
-          aria-label="Desktop navigation"
+          aria-label="Desktop sidebar navigation"
         >
-          <SidebarContent user={user} onClose={null} onLogout={handleLogout} />
+          <SidebarContent user={user} onLogout={handleLogout} />
         </aside>
 
         {/* ── Mobile Drawer ── */}
@@ -396,17 +344,17 @@ export default function Layout({ children, currentPageName }) {
                 initial={{ x: "-100%" }}
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
-                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                transition={{ type: "spring", stiffness: 400, damping: 40 }}
                 className="lg:hidden flex flex-col fixed left-0 top-0 bottom-0 z-50 shadow-2xl overflow-hidden"
                 style={{
-                  width: "min(320px, 85vw)",
+                  width: "min(80vw, 320px)",
                   backgroundColor: "var(--sidebar-bg)",
                   paddingTop: "var(--safe-top)",
-                  paddingLeft: "var(--safe-left)",
+                  paddingBottom: "var(--safe-bottom)",
                 }}
-                aria-label="Mobile navigation drawer"
                 role="dialog"
                 aria-modal="true"
+                aria-label="Navigation menu"
               >
                 <SidebarContent user={user} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
               </motion.aside>
@@ -414,50 +362,58 @@ export default function Layout({ children, currentPageName }) {
           )}
         </AnimatePresence>
 
-        {/* ── Main ── */}
+        {/* ── Main Content ── */}
         <main
-          className="flex-1 flex flex-col lg:ml-80 main-content-mobile lg:pb-0"
-          id="main-content"
+          className="flex-1 flex flex-col lg:ml-80"
+          style={{ paddingBottom: "var(--tab-bar-height)" }}
+          aria-label="Main content"
         >
           {/* Header */}
           <header
-            className="bg-white/90 backdrop-blur-md border-b sticky top-0 z-30 shadow-sm header-safe"
-            style={{ borderColor: "var(--border-color)" }}
+            className="bg-white/90 backdrop-blur-md border-b border-slate-200 px-3 md:px-6 sticky top-0 z-30 shadow-sm"
+            style={{ paddingTop: "var(--safe-top)" }}
             role="banner"
           >
-            <div className="flex items-center justify-between gap-2 px-3 pb-2 pt-1">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2 h-14">
+              <div className="flex items-center gap-1.5">
                 <button
+                  className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   onClick={() => setSidebarOpen(true)}
                   aria-label="Open navigation menu"
                   aria-expanded={sidebarOpen}
                   aria-controls="mobile-drawer"
-                  className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
+
                 {showBackButton && (
                   <button
                     onClick={handleBack}
                     aria-label="Go back"
-                    className="flex items-center gap-1 px-3 py-2 rounded-lg text-blue-700 hover:bg-blue-50 active:bg-blue-100 transition-colors text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 min-h-[44px]"
+                    className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   >
                     <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                     <span className="hidden sm:inline">Back</span>
                   </button>
                 )}
-                <h1 className="text-sm md:text-lg font-bold text-slate-900 leading-tight">CliniCals</h1>
+
+                <h1 className="text-sm md:text-base font-bold text-slate-900 leading-tight truncate">
+                  CliniCals <span className="text-slate-400 font-normal hidden sm:inline">by Swarnim</span>
+                </h1>
               </div>
-              <Link
-                to={createPageUrl("ClinicManagement")}
-                aria-label="Open Clinic Mode"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 text-xs font-semibold hover:bg-purple-100 active:bg-purple-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 min-h-[44px]"
-              >
-                <Users className="w-3.5 h-3.5" aria-hidden="true" />
-                <span className="hidden sm:inline">Clinic Mode</span>
-                <span className="sm:hidden">Clinic</span>
+
+              <Link to={createPageUrl("ClinicManagement")} aria-label="Open Clinic Mode">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-purple-50 border-purple-300 hover:bg-purple-100 text-purple-700 font-semibold text-xs h-9 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+                >
+                  <Users className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span className="hidden sm:inline ml-1">Clinic Mode</span>
+                  <span className="sm:hidden ml-1">Clinic</span>
+                </Button>
               </Link>
             </div>
           </header>
@@ -476,7 +432,7 @@ export default function Layout({ children, currentPageName }) {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.15 }}
+                  transition={{ duration: 0.18 }}
                 >
                   {children}
                 </motion.div>
@@ -485,12 +441,11 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           {/* Desktop footer */}
-          <footer className="hidden lg:block bg-white border-t px-6 py-3 text-center text-xs text-slate-400" style={{ borderColor: "var(--border-color)" }}>
-            CliniCals by Swarnim — For informational purposes. Verify all calculations. Not a substitute for clinical judgment.
+          <footer className="hidden lg:block bg-white border-t border-slate-200 px-6 py-3 text-center text-xs text-slate-400">
+            CliniCals by Swarnim — For informational purposes only. Not a substitute for clinical judgment.
           </footer>
         </main>
 
-        {/* Floating helpers */}
         <FloatingAIAssistant />
         <DataChatbot />
         <NotificationEngine />
@@ -498,32 +453,39 @@ export default function Layout({ children, currentPageName }) {
 
         {/* ── Mobile Bottom Tab Bar ── */}
         <nav
-          className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t bottom-tab-bar"
-          style={{ backgroundColor: "var(--sidebar-bg)", borderColor: "var(--border-color)" }}
-          aria-label="Primary navigation"
-          role="tablist"
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-50 tab-bar-outer"
+          style={{
+            backgroundColor: "var(--sidebar-bg)",
+            borderTop: "1px solid var(--border-color)",
+            boxShadow: "0 -4px 20px rgba(0,0,0,0.08)",
+          }}
+          aria-label="Bottom tab navigation"
         >
-          <div className="grid grid-cols-4 h-16">
-            {BOTTOM_TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = currentTab === tab.key;
+          <div className="tab-bar-inner grid grid-cols-4">
+            {[
+              { id: "Hub", label: "Hub", Icon: Home },
+              { id: "AI", label: "AI", Icon: Sparkles },
+              { id: "Clinic", label: "Clinic", Icon: Users },
+              { id: "Research", label: "Research", Icon: Layers },
+            ].map(({ id, label, Icon }) => {
+              const isActive = currentTab === id;
               return (
                 <button
-                  key={tab.key}
-                  role="tab"
-                  aria-selected={isActive}
-                  aria-label={`${tab.label}${isActive ? ", current tab" : ""}`}
-                  onClick={() => handleTabPress(tab)}
-                  className={`flex flex-col items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 active:bg-blue-50/50 ${
-                    isActive ? "text-blue-600" : "text-slate-400 hover:text-slate-600"
-                  }`}
+                  key={id}
+                  onClick={() => handleTabPress(id)}
+                  aria-label={`${label} tab${isActive ? ", currently selected" : ""}`}
+                  aria-current={isActive ? "true" : undefined}
+                  className="flex flex-col items-center justify-center gap-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 relative"
+                  style={{ color: isActive ? "#3B82F6" : "var(--text-secondary)" }}
                 >
-                  <div className={`relative flex items-center justify-center w-7 h-7 rounded-full transition-all duration-150 ${isActive ? "bg-blue-100" : ""}`}>
-                    <Icon className="w-5 h-5" aria-hidden="true" />
-                  </div>
-                  <span className={`text-xs font-semibold tracking-tight ${isActive ? "text-blue-600" : "text-slate-400"}`}>
-                    {tab.label}
-                  </span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="tab-indicator"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-500 rounded-full"
+                    />
+                  )}
+                  <Icon className="w-5 h-5" aria-hidden="true" />
+                  <span className="text-xs font-semibold">{label}</span>
                 </button>
               );
             })}
