@@ -3,62 +3,62 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Zap, Pill, AlertTriangle, Plus, Heart, Activity, Sparkles, GitBranch, Baby, FlaskConical } from "lucide-react";
+import { Zap, Pill, AlertTriangle, BookOpen, Heart, Activity, Sparkles, GitBranch, Baby, FlaskConical } from "lucide-react";
 
 const QUICK_ACTIONS = [
   {
     label: "NS Relapse Rx",
     icon: Pill,
-    color: "bg-purple-600 hover:bg-purple-700",
+    color: "bg-purple-700 hover:bg-purple-800",
     page: "DrugsDosing",
     description: "Prednisolone protocol"
   },
   {
     label: "AKI Emergency",
     icon: AlertTriangle,
-    color: "bg-red-600 hover:bg-red-700",
+    color: "bg-red-700 hover:bg-red-800",
     page: "AKIStager",
     description: "Staging + management"
   },
   {
     label: "Hyperkalemia",
     icon: Activity,
-    color: "bg-orange-600 hover:bg-orange-700",
+    color: "bg-orange-700 hover:bg-orange-800",
     page: "PotassiumCalculator",
     description: "K+ treatment protocol"
   },
   {
     label: "AI Prescriber",
     icon: Sparkles,
-    color: "bg-violet-600 hover:bg-violet-700",
+    color: "bg-violet-700 hover:bg-violet-800",
     page: "AIPrescriber",
     description: "AI-powered Rx builder"
   },
   {
-    label: "Add Patient",
-    icon: Plus,
-    color: "bg-green-600 hover:bg-green-700",
-    page: "ClinicDashboard",
-    description: "Enroll new patient"
+    label: "Guidelines",
+    icon: BookOpen,
+    color: "bg-emerald-700 hover:bg-emerald-800",
+    page: "Guidelines",
+    description: "KDIGO, IPNA, IAP library"
   },
   {
     label: "Clinical Pathway",
     icon: GitBranch,
-    color: "bg-indigo-600 hover:bg-indigo-700",
+    color: "bg-indigo-700 hover:bg-indigo-800",
     page: "ClinicalSupport",
     description: "Evidence-based protocols"
   },
   {
     label: "Growth Check",
     icon: Baby,
-    color: "bg-teal-600 hover:bg-teal-700",
+    color: "bg-teal-700 hover:bg-teal-800",
     page: "Anthropometry",
     description: "WHO Z-scores & BMI"
   },
   {
     label: "Drug Lookup",
     icon: FlaskConical,
-    color: "bg-pink-600 hover:bg-pink-700",
+    color: "bg-pink-700 hover:bg-pink-800",
     page: "DrugsDosing",
     description: "Drugs & dosing engine"
   },

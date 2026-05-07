@@ -13,6 +13,8 @@ import AIClinicalPathway from './pages/AIClinicalPathway';
 import PrescriptionWorkflow from './pages/PrescriptionWorkflow';
 import DrugsDosing from './pages/DrugsDosing';
 import AIPrescriber from './pages/AIPrescriber';
+import ClinicalApproaches from './pages/ClinicalApproaches';
+import LabPathways from './pages/LabPathways';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -70,6 +72,8 @@ const AuthenticatedApp = () => {
       <Route path="/PrescriptionWorkflow" element={<LayoutWrapper currentPageName="PrescriptionWorkflow"><PrescriptionWorkflow /></LayoutWrapper>} />
       <Route path="/DrugsDosing" element={<LayoutWrapper currentPageName="DrugsDosing"><DrugsDosing /></LayoutWrapper>} />
       <Route path="/AIPrescriber" element={<LayoutWrapper currentPageName="AIPrescriber"><AIPrescriber /></LayoutWrapper>} />
+      <Route path="/ClinicalApproaches" element={<LayoutWrapper currentPageName="ClinicalApproaches"><ClinicalApproaches /></LayoutWrapper>} />
+      <Route path="/LabPathways" element={<LayoutWrapper currentPageName="LabPathways"><LabPathways /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

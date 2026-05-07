@@ -50,7 +50,6 @@ import { ChevronDown, WifiOff, Wifi, HardDrive } from "lucide-react";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
 import QuickActionsPanel from "../components/QuickActionsPanel";
-import RecentPatientsPanel from "../components/RecentPatientsPanel";
 import StickyToolNav from "../components/StickyToolNav";
 
 export default function Hub() {
@@ -92,8 +91,8 @@ export default function Hub() {
     { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer" },
     { name: "Research Methods", icon: Layers, color: "bg-rose-700", page: "ResearchMethodsHub" },
     { name: "AI Pathway", icon: Brain, color: "bg-indigo-700", page: "AIClinicalPathway" },
-    { name: "Drugs & Dosing", icon: Pill, color: "bg-pink-700", page: "DrugsDosing" },
-    { name: "AI Prescriber", icon: Sparkles, color: "bg-violet-700", page: "AIPrescriber" },
+    { name: "Clinical Approaches", icon: Stethoscope, color: "bg-cyan-700", page: "ClinicalApproaches" },
+    { name: "Lab Pathways", icon: FlaskConical, color: "bg-amber-700", page: "LabPathways" },
   ];
 
   const toolsNavigation = [
@@ -220,7 +219,9 @@ export default function Hub() {
       { name: "AI Diagnostic Assistant", icon: Brain, page: "ClinicalSupport", description: "Guided symptom entry with differential diagnosis" },
       { name: "Clinical Pathways", icon: GitBranch, page: "ClinicalSupport", description: "25+ evidence-based management protocols" },
       { name: "Clinical Guidelines", icon: BookOpen, page: "Guidelines", description: "KDIGO, IPNA, IAP, ISPD guidelines library" },
-      { name: "Prediction Tools", icon: LineChart, page: "PredictionTools", description: "IgAN, CKiD, SRNS, transplant risk scores" }
+      { name: "Prediction Tools", icon: LineChart, page: "PredictionTools", description: "IgAN, CKiD, SRNS, transplant risk scores" },
+      { name: "Clinical Approaches", icon: Stethoscope, page: "ClinicalApproaches", description: "Structured diagnostic algorithms for 10 presentations" },
+      { name: "Lab Pathways", icon: FlaskConical, page: "LabPathways", description: "Water deprivation, UDS, acid-base, urine microscopy" }
     ]
   };
 
@@ -308,9 +309,6 @@ export default function Hub() {
 
         {/* Quick Actions */}
         <QuickActionsPanel />
-
-        {/* Recent Patients & Prescriptions */}
-        <RecentPatientsPanel />
 
         {/* Quick Patient Entry */}
         <QuickPatientEntry />

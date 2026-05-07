@@ -26,7 +26,9 @@ import {
   Layers,
   Building2,
   Trash2,
-  Bell
+  Bell,
+  Stethoscope,
+  FlaskConical
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -91,6 +93,16 @@ const toolsNavigation = [
     title: "Drugs & Dosing",
     url: createPageUrl("DrugsDosing"),
     icon: Pill,
+  },
+  {
+    title: "Clinical Approaches",
+    url: createPageUrl("ClinicalApproaches"),
+    icon: Stethoscope,
+  },
+  {
+    title: "Lab Pathways",
+    url: createPageUrl("LabPathways"),
+    icon: FlaskConical,
   }
 ];
 
