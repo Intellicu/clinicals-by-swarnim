@@ -10,10 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
-  Users, Calendar, Settings, Plus, Search, Building2, Clock, 
-  Activity, Pill, FileText, PlayCircle, ArrowRight, Home
+  Users, Calendar, Plus, Search, Building2, Clock, 
+  Activity, Pill, FileText, PlayCircle, ArrowRight, Home, ChevronRight,
+  Stethoscope, AlertCircle, CheckCircle, User
 } from 'lucide-react';
-import { format, parseISO, isSameDay } from 'date-fns';
+import { format, parseISO, isSameDay, formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import WorkspaceWizard from '../components/clinic/WorkspaceWizard';
 import PatientOnboarding from '../components/clinic/PatientOnboarding';
@@ -176,28 +177,46 @@ export default function ClinicDashboard() {
     ]);
   };
 
+  const diagnosisColor = (d = "") => {
+    const dl = d.toLowerCase();
+    if (dl.includes("srns") || dl.includes("resistant")) return "bg-red-100 text-red-800";
+    if (dl.includes("frns") || dl.includes("relapse")) return "bg-orange-100 text-orange-800";
+    if (dl.includes("ckd") || dl.includes("transplant")) return "bg-purple-100 text-purple-800";
+    if (dl.includes("aki")) return "bg-amber-100 text-amber-800";
+    return "bg-blue-100 text-blue-800";
+  };
+
   // Main Dashboard
   return (
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
+      {/* Header with Breadcrumb */}
       <div className="bg-white border-b-2 border-slate-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm" onClick={() => setSelectedWorkspace(null)}>
-                <Building2 className="w-4 h-4 mr-2" />
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3">
+          <div className="flex items-center justify-between gap-3">
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-1.5 text-sm min-w-0">
+              <button onClick={() => navigate(createPageUrl('Hub'))} className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium flex-shrink-0">
+                <Home className="w-4 h-4" />
+                <span className="hidden sm:inline">Hub</span>
+              </button>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              <button onClick={() => setSelectedWorkspace(null)} className="text-blue-600 hover:text-blue-800 font-medium truncate">
+                <Building2 className="w-4 h-4 inline mr-1" />
                 {selectedWorkspace.name}
-              </Button>
-              <Badge className="bg-blue-100 text-blue-800">
+              </button>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              <span className="text-slate-700 font-semibold truncate">Dashboard</span>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Badge className="bg-blue-100 text-blue-800 text-xs">
                 <Clock className="w-3 h-3 mr-1" />
                 {format(new Date(), 'EEE, MMM d')}
               </Badge>
+              <Button size="sm" onClick={() => setShowPatientOnboarding(true)} className="bg-green-600 hover:bg-green-700 text-white text-xs h-8">
+                <Plus className="w-3.5 h-3.5 mr-1" /> Add Patient
+              </Button>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate(createPageUrl('Hub'))}>
-              <Home className="w-4 h-4 mr-2" />
-              Calculator Mode
-            </Button>
           </div>
         </div>
       </div>
@@ -375,28 +394,39 @@ export default function ClinicDashboard() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {filteredPatients.map(patient => (
-                      <div 
+                      <div
                         key={patient.id}
-                        className="p-4 border rounded hover:bg-slate-50 cursor-pointer"
+                        className="border-2 border-slate-200 hover:border-blue-400 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all group bg-white"
                         onClick={() => navigate(createPageUrl('PatientMonitoringDashboard'), {
                           state: { patient, workspace: selectedWorkspace }
                         })}
                       >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold">{patient.patient_name}</h3>
-                            <p className="text-sm text-slate-600">
-                              CR# {patient.cr_number} • {patient.age_years}y • {patient.gender}
-                            </p>
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                            {patient.patient_name?.[0]?.toUpperCase() || "P"}
                           </div>
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline">{patient.diagnosis}</Badge>
-                            <Badge className="bg-green-100 text-green-800">{patient.status}</Badge>
-                            <ArrowRight className="w-5 h-5 text-slate-400" />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-blue-700">{patient.patient_name}</h3>
+                            <p className="text-xs text-slate-500">CR# {patient.cr_number} · {patient.age_years ? `${patient.age_years}y` : ""} · {patient.gender || ""}</p>
                           </div>
+                          <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 flex-shrink-0 mt-0.5" />
                         </div>
+                        <div className="flex flex-wrap gap-1.5 mb-2">
+                          {patient.diagnosis && (
+                            <Badge className={`text-xs ${diagnosisColor(patient.diagnosis)}`}>{patient.diagnosis}</Badge>
+                          )}
+                          <Badge className={`text-xs ${patient.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>
+                            {patient.status || "Active"}
+                          </Badge>
+                        </div>
+                        {patient.updated_date && (
+                          <p className="text-xs text-slate-400 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            Updated {formatDistanceToNow(new Date(patient.updated_date), { addSuffix: true })}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
