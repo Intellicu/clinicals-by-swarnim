@@ -2,6 +2,10 @@
   "name": "ToolLog",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of what this tool log entry captures, including the tool used and clinical context (up to 1000 characters)"
+    },
     "tool_id": {
       "type": "string",
       "description": "Tool identifier"
@@ -57,23 +61,5 @@
     "tool_id",
     "inputs",
     "outputs"
-  ],
-  "rls": {
-    "create": {},
-    "read": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "update": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
-  }
+  ]
 }

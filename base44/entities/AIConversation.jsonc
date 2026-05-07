@@ -2,6 +2,10 @@
   "name": "AIConversation",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of this AI conversation's topic or clinical context (up to 1000 characters)"
+    },
     "user_email": {
       "type": "string",
       "description": "User's email"

@@ -1,0 +1,70 @@
+{
+  "name": "RenalDoseAdjust",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of this renal dose adjustment rule and its clinical rationale (up to 1000 characters)"
+    },
+    "drug_id": {
+      "type": "string",
+      "description": "Reference to Drug entity ID"
+    },
+    "egfr_band": {
+      "type": "string",
+      "enum": [
+        ">=90",
+        "60-89",
+        "30-59",
+        "15-29",
+        "<15",
+        "HD",
+        "PD"
+      ],
+      "description": "eGFR category or dialysis type"
+    },
+    "adjustment_action": {
+      "type": "string",
+      "enum": [
+        "No change",
+        "Reduce dose 25%",
+        "Reduce dose 50%",
+        "Reduce dose 75%",
+        "Extend interval",
+        "Avoid",
+        "Post-HD supplement",
+        "Use alternate drug"
+      ],
+      "description": "Recommended action"
+    },
+    "dose_factor": {
+      "type": "number",
+      "description": "Multiplication factor (e.g., 0.5 for 50% reduction)"
+    },
+    "interval_extension": {
+      "type": "string",
+      "description": "New dosing interval if extended"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Clinical notes and warnings"
+    },
+    "post_hd_dose": {
+      "type": "string",
+      "description": "Post-hemodialysis supplementation instructions"
+    },
+    "monitoring": {
+      "type": "string",
+      "description": "Additional monitoring required"
+    },
+    "references": {
+      "type": "string",
+      "description": "Source references"
+    }
+  },
+  "required": [
+    "drug_id",
+    "egfr_band",
+    "adjustment_action"
+  ]
+}

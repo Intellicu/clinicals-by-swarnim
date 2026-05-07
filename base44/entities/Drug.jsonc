@@ -2,6 +2,10 @@
   "name": "Drug",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief overview of the drug, its primary use, and clinical significance (up to 1000 characters)"
+    },
     "generic_name": {
       "type": "string",
       "description": "Generic drug name"

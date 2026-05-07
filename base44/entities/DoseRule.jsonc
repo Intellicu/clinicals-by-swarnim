@@ -1,0 +1,93 @@
+{
+  "name": "DoseRule",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of this dose rule, its clinical context, and any special considerations (up to 1000 characters)"
+    },
+    "drug_id": {
+      "type": "string",
+      "description": "Reference to Drug entity ID"
+    },
+    "indication": {
+      "type": "string",
+      "description": "Clinical indication"
+    },
+    "dose_unit": {
+      "type": "string",
+      "enum": [
+        "mg/kg/day",
+        "mg/m2/day",
+        "mg/dose",
+        "mcg/kg/day",
+        "units/kg/day"
+      ],
+      "description": "Dosing unit"
+    },
+    "dose_value": {
+      "type": "number",
+      "description": "Standard dose value"
+    },
+    "min_dose_per_kg": {
+      "type": "number",
+      "description": "Minimum mg/kg dose"
+    },
+    "max_dose_per_kg": {
+      "type": "number",
+      "description": "Maximum mg/kg dose"
+    },
+    "max_total_mg": {
+      "type": "number",
+      "description": "Absolute maximum dose"
+    },
+    "frequency": {
+      "type": "string",
+      "description": "Dosing frequency (OD, BD, TDS, QID)"
+    },
+    "route": {
+      "type": "string",
+      "enum": [
+        "PO",
+        "IV",
+        "IM",
+        "SC",
+        "Topical",
+        "Inhaled"
+      ],
+      "description": "Route of administration"
+    },
+    "duration_days": {
+      "type": "number",
+      "description": "Standard treatment duration"
+    },
+    "age_min_months": {
+      "type": "number",
+      "description": "Minimum age in months"
+    },
+    "age_max_months": {
+      "type": "number",
+      "description": "Maximum age in months (null = no limit)"
+    },
+    "rounding_strategy": {
+      "type": "string",
+      "enum": [
+        "nearest_5",
+        "nearest_10",
+        "exact",
+        "round_up",
+        "round_down"
+      ],
+      "description": "Dose rounding method"
+    },
+    "references": {
+      "type": "string",
+      "description": "Source references"
+    }
+  },
+  "required": [
+    "drug_id",
+    "dose_unit",
+    "dose_value"
+  ]
+}

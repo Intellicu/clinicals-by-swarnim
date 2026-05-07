@@ -2,6 +2,10 @@
   "name": "MonitoringLog",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of this monitoring log entry, its purpose, and key findings (up to 1000 characters)"
+    },
     "patient_identifier": {
       "type": "string",
       "description": "Patient ID or name (anonymized)"
@@ -111,55 +115,5 @@
   "required": [
     "monitoring_type",
     "file_url"
-  ],
-  "rls": {
-    "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.analyzed_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.analyzed_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.analyzed_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    }
-  }
+  ]
 }

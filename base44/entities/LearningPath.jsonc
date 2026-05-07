@@ -2,6 +2,10 @@
   "name": "LearningPath",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of this learning path, its goals, and intended audience (up to 1000 characters)"
+    },
     "user_email": {
       "type": "string",
       "description": "Student's email"
@@ -59,19 +63,5 @@
   "required": [
     "user_email",
     "learning_goals"
-  ],
-  "rls": {
-    "create": {
-      "data.user_email": "{{user.email}}"
-    },
-    "read": {
-      "data.user_email": "{{user.email}}"
-    },
-    "update": {
-      "data.user_email": "{{user.email}}"
-    },
-    "delete": {
-      "data.user_email": "{{user.email}}"
-    }
-  }
+  ]
 }

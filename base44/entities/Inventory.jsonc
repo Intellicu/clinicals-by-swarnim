@@ -2,6 +2,10 @@
   "name": "Inventory",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of this inventory item, its intended use, and any storage requirements (up to 1000 characters)"
+    },
     "item_name": {
       "type": "string",
       "description": "Name of item"
@@ -52,46 +56,5 @@
     "quantity",
     "unit_cost",
     "reorder_level"
-  ],
-  "rls": {
-    "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    }
-  }
+  ]
 }

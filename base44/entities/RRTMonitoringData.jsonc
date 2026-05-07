@@ -2,6 +2,10 @@
   "name": "RRTMonitoringData",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Brief description of this RRT session, including modality, clinical context, and any notable events (up to 1000 characters)"
+    },
     "patient_identifier": {
       "type": "string",
       "description": "Patient ID or anonymized identifier"
@@ -165,55 +169,5 @@
     "patient_identifier",
     "modality",
     "session_date"
-  ],
-  "rls": {
-    "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.entered_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.entered_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.entered_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    }
-  }
+  ]
 }

@@ -2,6 +2,10 @@
   "name": "UserPreferences",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional notes about this user's preferences configuration or custom setup (up to 1000 characters)"
+    },
     "user_email": {
       "type": "string",
       "description": "User's email"
@@ -80,19 +84,5 @@
   },
   "required": [
     "user_email"
-  ],
-  "rls": {
-    "create": {
-      "data.user_email": "{{user.email}}"
-    },
-    "read": {
-      "data.user_email": "{{user.email}}"
-    },
-    "update": {
-      "data.user_email": "{{user.email}}"
-    },
-    "delete": {
-      "data.user_email": "{{user.email}}"
-    }
-  }
+  ]
 }
