@@ -1,0 +1,101 @@
+{
+  "name": "StudyForm",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "form_name": {
+      "type": "string"
+    },
+    "form_type": {
+      "type": "string",
+      "enum": [
+        "CRF",
+        "Consent",
+        "Screening",
+        "Baseline",
+        "Follow-up",
+        "Outcome",
+        "Adverse Event"
+      ],
+      "default": "CRF"
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "field_type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "number",
+              "date",
+              "select",
+              "multiselect",
+              "checkbox",
+              "textarea",
+              "calculated"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "auto_map": {
+            "type": "string",
+            "description": "Patient data field to auto-map"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "validation": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "is_published": {
+      "type": "boolean",
+      "default": false
+    },
+    "version": {
+      "type": "number",
+      "default": 1
+    }
+  },
+  "required": [
+    "project_id",
+    "form_name"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

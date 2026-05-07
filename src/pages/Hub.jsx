@@ -99,6 +99,7 @@ export default function Hub() {
     { name: "Differential Dx", icon: Brain, color: "bg-violet-700", page: "DifferentialEngine" },
     { name: "Case Library", icon: BookOpen, color: "bg-emerald-700", page: "CaseLibrary" },
     { name: "Discharge Summary", icon: FileText, color: "bg-slate-700", page: "DischargeSummary" },
+    { name: "Research OS", icon: Layers, color: "bg-indigo-700", page: "ResearchOS" },
   ];
 
   const toolsNavigation = [

@@ -1,0 +1,91 @@
+{
+  "name": "Manuscript",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review",
+        "Submitted",
+        "Revision",
+        "Accepted",
+        "Published"
+      ],
+      "default": "Draft"
+    },
+    "sections": {
+      "type": "object",
+      "properties": {
+        "abstract": {
+          "type": "string"
+        },
+        "background": {
+          "type": "string"
+        },
+        "methods": {
+          "type": "string"
+        },
+        "results": {
+          "type": "string"
+        },
+        "discussion": {
+          "type": "string"
+        },
+        "conclusion": {
+          "type": "string"
+        },
+        "references": {
+          "type": "string"
+        },
+        "acknowledgements": {
+          "type": "string"
+        }
+      }
+    },
+    "target_journal": {
+      "type": "string"
+    },
+    "word_count": {
+      "type": "number"
+    },
+    "checklist_consort": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "checklist_strobe": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "reviewer_feedback": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

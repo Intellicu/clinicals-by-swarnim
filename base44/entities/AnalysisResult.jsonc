@@ -1,0 +1,59 @@
+{
+  "name": "AnalysisResult",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "analysis_type": {
+      "type": "string"
+    },
+    "variables_used": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "results": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "ai_interpretation": {
+      "type": "string"
+    },
+    "charts_data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  },
+  "required": [
+    "project_id"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

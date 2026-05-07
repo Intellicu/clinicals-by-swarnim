@@ -20,6 +20,7 @@ import AdmissionOrders from './pages/AdmissionOrders';
 import DifferentialEngine from './pages/DifferentialEngine';
 import CaseLibrary from './pages/CaseLibrary';
 import DischargeSummary from './pages/DischargeSummary';
+import ResearchOS from './pages/ResearchOS';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -84,6 +85,7 @@ const AuthenticatedApp = () => {
       <Route path="/DifferentialEngine" element={<LayoutWrapper currentPageName="DifferentialEngine"><DifferentialEngine /></LayoutWrapper>} />
       <Route path="/CaseLibrary" element={<LayoutWrapper currentPageName="CaseLibrary"><CaseLibrary /></LayoutWrapper>} />
       <Route path="/DischargeSummary" element={<LayoutWrapper currentPageName="DischargeSummary"><DischargeSummary /></LayoutWrapper>} />
+      <Route path="/ResearchOS" element={<LayoutWrapper currentPageName="ResearchOS"><ResearchOS /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

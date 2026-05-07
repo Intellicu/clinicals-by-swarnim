@@ -4,228 +4,168 @@
   "properties": {
     "title": {
       "type": "string",
-      "description": "Research project title"
+      "description": "Project title"
     },
-    "description": {
+    "owner_email": {
       "type": "string",
-      "description": "Project description and objectives"
+      "description": "Owner email for isolation"
     },
-    "principal_investigator": {
+    "status": {
       "type": "string",
-      "description": "Lead researcher email"
+      "enum": [
+        "Draft",
+        "Active",
+        "Analysis",
+        "Writing",
+        "Submitted",
+        "Published",
+        "Archived"
+      ],
+      "default": "Draft"
+    },
+    "study_type": {
+      "type": "string",
+      "description": "RCT, Cohort, Case-Control, etc."
+    },
+    "pico": {
+      "type": "object",
+      "properties": {
+        "population": {
+          "type": "string"
+        },
+        "intervention": {
+          "type": "string"
+        },
+        "comparison": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "structured_question": {
+          "type": "string"
+        }
+      }
+    },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hypothesis": {
+      "type": "string"
+    },
+    "sample_size": {
+      "type": "object",
+      "properties": {
+        "calculated": {
+          "type": "number"
+        },
+        "method": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "justification": {
+          "type": "string"
+        }
+      }
+    },
+    "eligibility": {
+      "type": "object",
+      "properties": {
+        "inclusion": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclusion": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "statistical_plan": {
+      "type": "string"
+    },
+    "statistical_tests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ethics_status": {
+      "type": "string",
+      "enum": [
+        "Not Started",
+        "Pending",
+        "Approved",
+        "Waived"
+      ],
+      "default": "Not Started"
+    },
+    "iec_number": {
+      "type": "string"
+    },
+    "current_step": {
+      "type": "number",
+      "default": 0
+    },
+    "completed_steps": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "total_enrolled": {
+      "type": "number",
+      "default": 0
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "institution": {
+      "type": "string"
     },
     "collaborators": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Collaborator emails"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "Planning",
-        "Active",
-        "Analysis",
-        "Writing",
-        "Completed",
-        "Archived"
-      ],
-      "default": "Planning"
-    },
-    "included_patients": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Patient IDs included in study"
-    },
-    "data_fields": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "field_name": {
-            "type": "string"
-          },
-          "field_type": {
-            "type": "string"
-          },
-          "required": {
-            "type": "boolean"
-          }
-        }
       }
-    },
-    "ethics_approval": {
-      "type": "object",
-      "properties": {
-        "approved": {
-          "type": "boolean"
-        },
-        "approval_number": {
-          "type": "string"
-        },
-        "approval_date": {
-          "type": "string",
-          "format": "date"
-        }
-      }
-    },
-    "manuscripts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "draft_url": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "exports": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "export_date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "export_type": {
-            "type": "string"
-          },
-          "file_url": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "ctri_number": {
-      "type": "string",
-      "description": "CTRI registration number (mandatory for Indian trials)"
-    },
-    "icmr_grant_number": {
-      "type": "string",
-      "description": "ICMR grant/project number"
-    },
-    "grant_amount_inr": {
-      "type": "number",
-      "description": "Total grant amount in INR"
-    },
-    "grant_spent_inr": {
-      "type": "number",
-      "description": "Amount utilized to date"
-    },
-    "sample_size_calculated": {
-      "type": "number",
-      "description": "Calculated sample size"
-    },
-    "sample_size_method": {
-      "type": "string",
-      "description": "Power calculation method and assumptions"
-    },
-    "target_events": {
-      "type": "number",
-      "description": "Number of events required for Cox/survival analysis"
-    },
-    "enrollment_current": {
-      "type": "number",
-      "description": "Current enrollment count",
-      "default": 0
-    },
-    "enrollment_target": {
-      "type": "number"
-    },
-    "primary_outcome": {
-      "type": "string",
-      "description": "Primary endpoint"
-    },
-    "secondary_outcomes": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Secondary endpoints"
-    },
-    "biomarker_panel": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Biomarkers being collected"
-    },
-    "data_lock_date": {
-      "type": "string",
-      "format": "date",
-      "description": "Planned data lock date"
-    },
-    "study_design": {
-      "type": "string",
-      "enum": [
-        "Prospective Cohort",
-        "Retrospective Cohort",
-        "RCT",
-        "Case-Control",
-        "Cross-Sectional",
-        "Registry",
-        "Pilot"
-      ],
-      "description": "Study design type"
     }
   },
   "required": [
     "title",
-    "principal_investigator"
+    "owner_email"
   ],
   "rls": {
     "create": {
-      "data.principal_investigator": "{{user.email}}"
+      "created_by": "{{user.email}}"
     },
     "read": {
-      "$or": [
-        {
-          "data.principal_investigator": "{{user.email}}"
-        },
-        {
-          "data.collaborators": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "created_by": "{{user.email}}"
     },
     "update": {
-      "$or": [
-        {
-          "data.principal_investigator": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "created_by": "{{user.email}}"
     },
     "delete": {
-      "$or": [
-        {
-          "data.principal_investigator": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "created_by": "{{user.email}}"
     }
   }
 }

@@ -1,0 +1,63 @@
+{
+  "name": "StudyData",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "form_id": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "participant_id": {
+      "type": "string"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Link to Patient entity if matched"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "entry_method": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "ocr",
+        "auto_map"
+      ],
+      "default": "manual"
+    },
+    "ocr_source_url": {
+      "type": "string"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "verified_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "form_id"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}
