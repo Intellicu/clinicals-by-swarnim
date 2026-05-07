@@ -29,7 +29,9 @@ import {
   Stethoscope,
   FlaskConical,
   X,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle,
+  Brain
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -74,6 +76,11 @@ const toolsNavigation = [
   { title: "Drugs & Dosing", url: createPageUrl("DrugsDosing"), icon: Pill },
   { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: Stethoscope },
   { title: "Lab Pathways", url: createPageUrl("LabPathways"), icon: FlaskConical },
+  { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
+  { title: "Differential Dx Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
+  { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
+  { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
+  { title: "Discharge Summary", url: createPageUrl("DischargeSummary"), icon: FileText },
 ];
 
 const resourcesNavigation = [

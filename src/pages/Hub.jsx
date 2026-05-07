@@ -38,7 +38,8 @@ import {
   Info,
   GitBranch,
   Users,
-  Dna
+  Dna,
+  TriangleAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -93,6 +94,11 @@ export default function Hub() {
     { name: "AI Pathway", icon: Brain, color: "bg-indigo-700", page: "AIClinicalPathway" },
     { name: "Clinical Approaches", icon: Stethoscope, color: "bg-cyan-700", page: "ClinicalApproaches" },
     { name: "Lab Pathways", icon: FlaskConical, color: "bg-amber-700", page: "LabPathways" },
+    { name: "Emergency Hub", icon: AlertCircle, color: "bg-red-700", page: "EmergencyHub" },
+    { name: "Admit Orders", icon: ClipboardList, color: "bg-indigo-700", page: "AdmissionOrders" },
+    { name: "Differential Dx", icon: Brain, color: "bg-violet-700", page: "DifferentialEngine" },
+    { name: "Case Library", icon: BookOpen, color: "bg-emerald-700", page: "CaseLibrary" },
+    { name: "Discharge Summary", icon: FileText, color: "bg-slate-700", page: "DischargeSummary" },
   ];
 
   const toolsNavigation = [
@@ -221,7 +227,12 @@ export default function Hub() {
       { name: "Clinical Guidelines", icon: BookOpen, page: "Guidelines", description: "KDIGO, IPNA, IAP, ISPD guidelines library" },
       { name: "Prediction Tools", icon: LineChart, page: "PredictionTools", description: "IgAN, CKiD, SRNS, transplant risk scores" },
       { name: "Clinical Approaches", icon: Stethoscope, page: "ClinicalApproaches", description: "Structured diagnostic algorithms for 10 presentations" },
-      { name: "Lab Pathways", icon: FlaskConical, page: "LabPathways", description: "Water deprivation, UDS, acid-base, urine microscopy" }
+      { name: "Lab Pathways", icon: FlaskConical, page: "LabPathways", description: "Water deprivation, UDS, acid-base, urine microscopy" },
+      { name: "Emergency Hub", icon: AlertCircle, page: "EmergencyHub", description: "Hyperkalemia, HTN emergency, TLS, dialysis emergencies" },
+      { name: "Differential Engine", icon: Brain, page: "DifferentialEngine", description: "AI-ranked differentials from clinical features" },
+      { name: "Admission Orders", icon: ClipboardList, page: "AdmissionOrders", description: "AKI, NS, CKD, UTI, dialysis order sets" },
+      { name: "Case Library", icon: BookOpen, page: "CaseLibrary", description: "Interactive teaching cases with viva prep" },
+      { name: "Discharge Summary", icon: FileText, page: "DischargeSummary", description: "AI-generated summaries with parent instructions" }
     ]
   };
 

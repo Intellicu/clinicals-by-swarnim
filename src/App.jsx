@@ -15,6 +15,11 @@ import DrugsDosing from './pages/DrugsDosing';
 import AIPrescriber from './pages/AIPrescriber';
 import ClinicalApproaches from './pages/ClinicalApproaches';
 import LabPathways from './pages/LabPathways';
+import EmergencyHub from './pages/EmergencyHub';
+import AdmissionOrders from './pages/AdmissionOrders';
+import DifferentialEngine from './pages/DifferentialEngine';
+import CaseLibrary from './pages/CaseLibrary';
+import DischargeSummary from './pages/DischargeSummary';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -74,6 +79,11 @@ const AuthenticatedApp = () => {
       <Route path="/AIPrescriber" element={<LayoutWrapper currentPageName="AIPrescriber"><AIPrescriber /></LayoutWrapper>} />
       <Route path="/ClinicalApproaches" element={<LayoutWrapper currentPageName="ClinicalApproaches"><ClinicalApproaches /></LayoutWrapper>} />
       <Route path="/LabPathways" element={<LayoutWrapper currentPageName="LabPathways"><LabPathways /></LayoutWrapper>} />
+      <Route path="/EmergencyHub" element={<LayoutWrapper currentPageName="EmergencyHub"><EmergencyHub /></LayoutWrapper>} />
+      <Route path="/AdmissionOrders" element={<LayoutWrapper currentPageName="AdmissionOrders"><AdmissionOrders /></LayoutWrapper>} />
+      <Route path="/DifferentialEngine" element={<LayoutWrapper currentPageName="DifferentialEngine"><DifferentialEngine /></LayoutWrapper>} />
+      <Route path="/CaseLibrary" element={<LayoutWrapper currentPageName="CaseLibrary"><CaseLibrary /></LayoutWrapper>} />
+      <Route path="/DischargeSummary" element={<LayoutWrapper currentPageName="DischargeSummary"><DischargeSummary /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
