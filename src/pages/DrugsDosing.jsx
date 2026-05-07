@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
+import StickyToolNav from "../components/StickyToolNav";
 
 // ─── Inline interaction rules (rule-based, no DB needed) ─────────────────────
 const INTERACTION_RULES = [
@@ -286,13 +287,9 @@ CliniCals by Swarnim | Verify all doses independently`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-        <Link to={createPageUrl("Hub")}>
-          <Button variant="outline" size="sm" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-1" /> Back to Hub
-          </Button>
-        </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
+      <StickyToolNav />
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
 
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-2xl p-6 mb-6 shadow-xl text-white">
