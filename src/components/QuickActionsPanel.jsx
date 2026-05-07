@@ -3,15 +3,15 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Zap, Pill, AlertTriangle, BookOpen, Heart, Activity, Sparkles, GitBranch, Baby, FlaskConical } from "lucide-react";
+import { Zap, Pill, AlertTriangle, BookOpen, Heart, Activity, Sparkles, GitBranch, Baby, FlaskConical, Droplet } from "lucide-react";
 
 const QUICK_ACTIONS = [
   {
-    label: "NS Relapse Rx",
-    icon: Pill,
-    color: "bg-purple-700 hover:bg-purple-800",
-    page: "DrugsDosing",
-    description: "Prednisolone protocol"
+    label: "NS Protocol",
+    icon: Droplet,
+    color: "bg-blue-700 hover:bg-blue-800",
+    page: "ClinicalSupport",
+    description: "ISPN NS management"
   },
   {
     label: "AKI Emergency",
@@ -21,13 +21,6 @@ const QUICK_ACTIONS = [
     description: "Staging + management"
   },
   {
-    label: "Hyperkalemia",
-    icon: Activity,
-    color: "bg-orange-700 hover:bg-orange-800",
-    page: "PotassiumCalculator",
-    description: "K+ treatment protocol"
-  },
-  {
     label: "AI Prescriber",
     icon: Sparkles,
     color: "bg-violet-700 hover:bg-violet-800",
@@ -35,11 +28,25 @@ const QUICK_ACTIONS = [
     description: "AI-powered Rx builder"
   },
   {
-    label: "Guidelines",
-    icon: BookOpen,
-    color: "bg-emerald-700 hover:bg-emerald-800",
-    page: "Guidelines",
-    description: "KDIGO, IPNA, IAP library"
+    label: "Schwartz GFR",
+    icon: Activity,
+    color: "bg-cyan-700 hover:bg-cyan-800",
+    page: "SchwartzGFR",
+    description: "Estimate kidney function"
+  },
+  {
+    label: "BP Percentiles",
+    icon: Heart,
+    color: "bg-rose-700 hover:bg-rose-800",
+    page: "BPPercentiles",
+    description: "Paediatric BP charts"
+  },
+  {
+    label: "Drugs & Dosing",
+    icon: Pill,
+    color: "bg-purple-700 hover:bg-purple-800",
+    page: "DrugsDosing",
+    description: "Dose calc & renal adjust"
   },
   {
     label: "Clinical Pathway",
@@ -49,18 +56,25 @@ const QUICK_ACTIONS = [
     description: "Evidence-based protocols"
   },
   {
-    label: "Growth Check",
-    icon: Baby,
-    color: "bg-teal-700 hover:bg-teal-800",
-    page: "Anthropometry",
-    description: "WHO Z-scores & BMI"
+    label: "Guidelines",
+    icon: BookOpen,
+    color: "bg-emerald-700 hover:bg-emerald-800",
+    page: "Guidelines",
+    description: "KDIGO, IPNA, IAP library"
   },
   {
-    label: "Drug Lookup",
+    label: "RRT Assistant",
     icon: FlaskConical,
-    color: "bg-pink-700 hover:bg-pink-800",
-    page: "DrugsDosing",
-    description: "Drugs & dosing engine"
+    color: "bg-teal-700 hover:bg-teal-800",
+    page: "RRTAssistant",
+    description: "HD/PD prescription"
+  },
+  {
+    label: "Growth Check",
+    icon: Baby,
+    color: "bg-green-700 hover:bg-green-800",
+    page: "Anthropometry",
+    description: "WHO Z-scores & BMI"
   },
 ];
 
@@ -75,7 +89,7 @@ export default function QuickActionsPanel() {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-2">
           {QUICK_ACTIONS.map((action) => {
             const Icon = action.icon;
             return (
