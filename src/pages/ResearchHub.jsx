@@ -25,6 +25,7 @@ import KnowledgeBase from '../components/research/KnowledgeBase';
 import ProtocolBuilder from '../components/research/ProtocolBuilder';
 import EnhancedProtocolBuilder from '../components/research/EnhancedProtocolBuilder';
 import EHRExtractor from '../components/research/EHRExtractor';
+import ResearchMethodsContent from '../components/research/ResearchMethodsContent';
 
 export default function ResearchHub() {
   const [activeTab, setActiveTab] = useState("projects");
@@ -178,16 +179,21 @@ export default function ResearchHub() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-9 text-xs">
             <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="methods">Methods</TabsTrigger>
             <TabsTrigger value="protocol">Protocol</TabsTrigger>
-            <TabsTrigger value="forms">Form Builder</TabsTrigger>
-            <TabsTrigger value="data">Data Collection</TabsTrigger>
-            <TabsTrigger value="ehr">EHR Extractor</TabsTrigger>
+            <TabsTrigger value="forms">Forms</TabsTrigger>
+            <TabsTrigger value="data">Data</TabsTrigger>
+            <TabsTrigger value="ehr">EHR</TabsTrigger>
             <TabsTrigger value="literature">Literature</TabsTrigger>
-            <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
-            <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
+            <TabsTrigger value="analysis">Analysis</TabsTrigger>
+            <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="methods">
+            <ResearchMethodsContent />
+          </TabsContent>
 
           <TabsContent value="protocol">
             <EnhancedProtocolBuilder />

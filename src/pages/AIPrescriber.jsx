@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   Brain, ArrowLeft, Loader2, AlertTriangle, CheckCircle, ChevronRight,
-  Sparkles, ClipboardList, Pill, FileText, Activity, Zap, RotateCcw
+  Sparkles, ClipboardList, Pill, FileText, Activity, Zap, RotateCcw, Scan
 } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -17,6 +17,7 @@ import { usePatient } from "../components/PatientContext";
 import PatientInputForm from "../components/ai-prescriber/PatientInputForm";
 import TemplatePrescriberOutput from "../components/ai-prescriber/TemplatePrescriberOutput";
 import PrescriptionPreview from "../components/ai-prescriber/PrescriptionPreview";
+import OCRInputPanel from "../components/ai-prescriber/OCRInputPanel";
 import { PATHWAY_TEMPLATES, matchPathway } from "../components/ai-prescriber/PathwayTemplates";
 import { calcBSA, calcSchwartzEgfr } from "../components/ai-prescriber/DoseEngine";
 
@@ -51,6 +52,7 @@ export default function AIPrescriber() {
   const [selectedPathway, setSelectedPathway] = useState(null);
   const [autoMatchResult, setAutoMatchResult] = useState(null);
   const [activeDrugs, setActiveDrugs] = useState([]);
+  const [inputMode, setInputMode] = useState("manual"); // 'manual' | 'ocr'
 
   const { age, weight, height, egfr, creatinine, symptoms, labs, diagnosis } = patientState;
 
@@ -182,7 +184,40 @@ Be concise and practical for Indian pediatric nephrology. Prioritise ISKDC/IPNA 
         {/* ── STEP 1: INPUT ── */}
         {step === "input" && (
           <div className="space-y-4">
-            <PatientInputForm state={patientState} setState={setPatientState} />
+            {/* Input mode toggle */}
+            <div className="flex gap-2 bg-slate-100 p-1 rounded-xl">
+              <button onClick={() => setInputMode("manual")}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all
+                  ${inputMode === "manual" ? "bg-white shadow text-indigo-700" : "text-slate-500 hover:text-slate-700"}`}>
+                <Activity className="w-3.5 h-3.5" /> Manual Entry
+              </button>
+              <button onClick={() => setInputMode("ocr")}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all
+                  ${inputMode === "ocr" ? "bg-white shadow text-violet-700" : "text-slate-500 hover:text-slate-700"}`}>
+                <Scan className="w-3.5 h-3.5" /> OCR / Scan Document
+              </button>
+            </div>
+
+            {inputMode === "ocr" && (
+              <OCRInputPanel onExtracted={(data) => {
+                setPatientState(prev => ({
+                  ...prev,
+                  age: data.age || prev.age,
+                  weight: data.weight || prev.weight,
+                  height: data.height || prev.height,
+                  bp: data.bp || prev.bp,
+                  creatinine: data.creatinine || prev.creatinine,
+                  diagnosis: data.diagnosis || prev.diagnosis,
+                  symptoms: data.symptoms || prev.symptoms,
+                  labs: data.labs || prev.labs,
+                }));
+                setInputMode("manual");
+                toast.success("Fields auto-filled from OCR — verify and run analysis");
+              }} />
+            )}
+
+            {inputMode === "manual" && <PatientInputForm state={patientState} setState={setPatientState} />}
+
             <Button onClick={runAIAnalysis} disabled={!canProceed.input}
               className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 text-sm shadow-lg">
               <Brain className="w-5 h-5 mr-2" /> Run AI Analysis & Match Pathway

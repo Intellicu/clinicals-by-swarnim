@@ -48,6 +48,7 @@ import QuickCalculations from "../components/QuickCalculations";
 import QuickPatientEntry from "../components/QuickPatientEntry";
 import { ChevronDown, WifiOff, Wifi, HardDrive } from "lucide-react";
 import { useOnlineStatus } from "../components/OfflineDataManager";
+import GlobalSearch from "../components/GlobalSearch";
 
 export default function Hub() {
   const isOnline = useOnlineStatus();
@@ -333,6 +334,9 @@ export default function Hub() {
           </div>
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
         </div>
+
+        {/* Global Search */}
+        <GlobalSearch placeholder="Search pathways, drugs, calculators, research..." className="w-full" />
 
         {/* Quick Patient Entry */}
         <QuickPatientEntry />
