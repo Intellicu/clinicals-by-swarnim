@@ -40,7 +40,6 @@ import OfflineSync from "./components/OfflineSync";
 import OfflineManager from "./components/OfflineManager";
 import PullToRefresh from "./components/PullToRefresh";
 import NotificationEngine from "./components/notifications/NotificationEngine";
-import FloatingHubButton from "./components/FloatingHubButton";
 import { useQueryClient } from "@tanstack/react-query";
 
 const mainNavigation = [
@@ -90,6 +89,11 @@ const toolsNavigation = [
   {
     title: "Drugs & Dosing",
     url: createPageUrl("DrugsDosing"),
+    icon: Pill,
+  },
+  {
+    title: "Drug Database",
+    url: createPageUrl("DrugCalculator"),
     icon: Pill,
   }
 ];
@@ -575,7 +579,6 @@ export default function Layout({ children, currentPageName }) {
         <FloatingAIAssistant />
         <DataChatbot />
         <NotificationEngine />
-        <FloatingHubButton />
 
         {/* Mobile Bottom Tab Bar */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t-2 shadow-2xl pb-safe" style={{ backgroundColor: 'var(--sidebar-bg)', borderColor: 'var(--border-color)' }}>

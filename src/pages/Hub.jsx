@@ -49,9 +49,6 @@ import QuickPatientEntry from "../components/QuickPatientEntry";
 import { ChevronDown, WifiOff, Wifi, HardDrive } from "lucide-react";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
-import QuickActionsPanel from "../components/QuickActionsPanel";
-import RecentPatientsPanel from "../components/RecentPatientsPanel";
-import StickyToolNav from "../components/StickyToolNav";
 
 export default function Hub() {
   const isOnline = useOnlineStatus();
@@ -83,7 +80,7 @@ export default function Hub() {
     { name: "Schwartz GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR" },
     { name: "BP Percentiles", icon: Heart, color: "bg-red-600", page: "BPPercentiles" },
     { name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
-    { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
+    { name: "Dose Calculator", icon: Calculator, color: "bg-purple-600", page: "DoseCalculator" },
     { name: "RRT Assistant", icon: Droplet, color: "bg-cyan-600", page: "RRTAssistant" },
     { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
     { name: "Diet Generator", icon: UtensilsCrossed, color: "bg-green-600", page: "DietGenerator" },
@@ -204,8 +201,8 @@ export default function Hub() {
         name: "Drug Dosing & Risk Prediction",
         icon: Pill,
         tools: [
-          { name: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", description: "Unified drug search, dose calc, renal adjust & Rx builder" },
-          { name: "AI Prescriber", icon: Sparkles, page: "AIPrescriber", description: "AI-powered prescription with OCR input" },
+          { name: "Dose Calculator", icon: Calculator, page: "DoseCalculator", description: "Pediatric drug dosing with renal adjustments" },
+          { name: "Drug Database", icon: Pill, page: "DrugCalculator", description: "50+ drugs with Indian formulations" },
           { name: "Prediction Tools", icon: LineChart, page: "PredictionTools", description: "IgAN, CKiD ESRD, SRNS risk scores" }
         ]
       }
@@ -248,7 +245,7 @@ export default function Hub() {
     tools: [
       { name: "Patient History", icon: FileText, page: "PatientHistory", description: "Search all patient records" },
       { name: "Content Manager", icon: FileText, page: "UserContentManager", description: "Upload guidelines, create templates & scenarios" },
-      { name: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", description: "Unified dosing engine, renal adjustments & Rx builder" },
+      { name: "Drug Database", icon: Pill, page: "DrugCalculator", description: "50+ drugs with Indian formulations" },
       { name: "Monitoring Templates", icon: ClipboardList, page: "MonitoringHub", description: "8+ clinical monitoring charts" },
       { name: "Diet Generator", icon: UtensilsCrossed, page: "DietGenerator", description: "Nephrotic & CKD diet plans (IPNA/KDIGO/IAP)" },
       { name: "General Pediatrics", icon: Baby, page: "PediatricsHub", description: "Growth, Vaccination, Nutrition (IAP)" },
@@ -274,8 +271,43 @@ export default function Hub() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Sticky Tool Nav */}
-      <StickyToolNav />
+      {/* Top Navigation Tabs */}
+      <div className="bg-white border-b-2 border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex gap-2">
+            <Link to={createPageUrl("Hub")}>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <Calculator className="w-4 h-4 mr-2" />
+                Calc View
+              </Button>
+            </Link>
+            <Link to={createPageUrl("ClinicDashboard")}>
+              <Button variant="outline" className="hover:bg-purple-50">
+                <Users className="w-4 h-4 mr-2" />
+                Clinic Mode
+              </Button>
+            </Link>
+            <Link to={createPageUrl("ResearchHub")}>
+              <Button variant="outline" className="hover:bg-indigo-50">
+                <Layers className="w-4 h-4 mr-2" />
+                Research Mode
+              </Button>
+            </Link>
+            <Link to={createPageUrl("PatientManager")}>
+              <Button variant="outline" className="hover:bg-violet-50">
+                <Users className="w-4 h-4 mr-2" />
+                Patient Manager
+              </Button>
+            </Link>
+            <Link to={createPageUrl("ClinicAnalyticsDashboard")}>
+              <Button variant="outline" className="hover:bg-orange-50">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Analytics
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-7xl mx-auto space-y-6 p-6">
         {/* Header with Branding */}
@@ -305,12 +337,6 @@ export default function Hub() {
 
         {/* Global Search */}
         <GlobalSearch placeholder="Search pathways, drugs, calculators, research..." className="w-full" />
-
-        {/* Quick Actions */}
-        <QuickActionsPanel />
-
-        {/* Recent Patients & Prescriptions */}
-        <RecentPatientsPanel />
 
         {/* Quick Patient Entry */}
         <QuickPatientEntry />
