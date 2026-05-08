@@ -1,1024 +1,501 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Search,
-  BookOpen,
-  Plus,
-  Upload,
-  FileText,
-  ExternalLink,
-  Loader2,
-  Image as ImageIcon,
-  Award,
-  Edit,
-  Save,
-  X,
-  CheckCircle,
-  Sparkles,
-  ArrowLeft,
-  Lightbulb,
-  Target,
-  Users,
-  TrendingUp,
-  Brain,
-  Library,
-  Trash2
+  Search, BookOpen, Plus, Upload, Edit, X, CheckCircle, Sparkles,
+  Lightbulb, Target, Library, ChevronUp, Star, StarOff,
+  AlertTriangle, TrendingUp, Award, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
-import GuidelineSummaryCard from "../components/GuidelineSummaryCard";
-import MultimediaUploader from "../components/guidelines/MultimediaUploader";
+import { BUILTIN_GUIDELINES, EMERGENCY_PROTOCOLS, auditGuideline, getMaturityColor } from "@/lib/guidelines/index";
+import GuidelineDetailView from "../components/guidelines/GuidelineDetailView";
+import EmergencyProtocolCard from "../components/guidelines/EmergencyProtocolCard";
 import WebImporter from "../components/guidelines/WebImporter";
-import SemanticSearch from "../components/guidelines/SemanticSearch";
-import GuidelineListView from "../components/guidelines/GuidelineListView";
-import PathwayGenerator from "../components/guidelines/PathwayGenerator";
-import AutoUpdateManager from "../components/guidelines/AutoUpdateManager";
-import OfflineManager from "../components/OfflineManager";
 
-const categories = [
-  "All",
-  "AKI",
-  "CKD",
-  "Nephrotic Syndrome",
-  "Hypertension",
-  "Electrolytes",
-  "Acid-Base",
-  "RTA",
-  "Stones",
-  "Dialysis",
-  "Transplant",
-  "Glomerular Diseases",
-  "Tubular Disorders",
-  "Immunisation",
-  "General Pediatrics",
-  "Neonatology",
-  "Infection"
+// ── Constants ─────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  "All", "AKI", "CKD", "Nephrotic Syndrome", "Hypertension", "Electrolytes",
+  "Acid-Base", "Dialysis", "Transplant", "Glomerular Diseases", "Infection",
+  "Tubular Disorders", "Nutrition"
 ];
+const EVIDENCE_LEVELS = ["High Quality Evidence", "Moderate Quality Evidence", "Low Quality Evidence", "Expert Opinion"];
+const CAT_COLORS = {
+  "AKI":                "bg-red-100 text-red-800 border-red-200",
+  "CKD":                "bg-blue-100 text-blue-800 border-blue-200",
+  "Nephrotic Syndrome": "bg-purple-100 text-purple-800 border-purple-200",
+  "Hypertension":       "bg-orange-100 text-orange-800 border-orange-200",
+  "Electrolytes":       "bg-yellow-100 text-yellow-800 border-yellow-200",
+  "Dialysis":           "bg-cyan-100 text-cyan-800 border-cyan-200",
+  "Infection":          "bg-green-100 text-green-800 border-green-200",
+  "Glomerular Diseases":"bg-indigo-100 text-indigo-800 border-indigo-200",
+  "Tubular Disorders":  "bg-teal-100 text-teal-800 border-teal-200",
+};
 
-const evidenceLevels = [
-  "High Quality Evidence",
-  "Moderate Quality Evidence",
-  "Low Quality Evidence",
-  "Expert Opinion"
-];
+// ── Back to top ───────────────────────────────────────────────────────────
+function BackToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const h = () => setVisible(window.scrollY > 300);
+    window.addEventListener("scroll", h, { passive: true });
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+  if (!visible) return null;
+  return (
+    <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-20 right-4 z-50 w-11 h-11 rounded-full bg-blue-600 text-white shadow-xl flex items-center justify-center hover:bg-blue-700 transition-colors"
+      aria-label="Back to top">
+      <ChevronUp className="w-5 h-5" />
+    </button>
+  );
+}
 
-export default function Guidelines() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [semanticResults, setSemanticResults] = useState(null);
-  const [searchReasoning, setSearchReasoning] = useState('');
-  const [viewMode, setViewMode] = useState('list');
-  const [starredIds, setStarredIds] = useState([]);
-  const [selectedForPathway, setSelectedForPathway] = useState([]);
-  
-  const [newGuideline, setNewGuideline] = useState({
-    title: "",
-    category: "General",
-    source: "",
-    year: new Date().getFullYear(),
-    summary: "",
-    scope_and_population: "",
-    key_recommendations: [""],
-    practice_pearls: [""],
-    pdf_url: "",
-    external_link: "",
-    evidence_level: "Expert Opinion",
-    content: { sections: [] },
-    images: [],
-    related_calculators: [],
-    related_drugs: [],
-    keywords: [],
-    population: [],
-    clinical_scope: []
+// ── Maturity badge ────────────────────────────────────────────────────────
+function MaturityBadge({ audit }) {
+  const c = getMaturityColor(audit.maturity);
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded border ${c.bg} ${c.text} ${c.border}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
+      {audit.maturity} · {audit.pct}%
+    </span>
+  );
+}
+
+// ── Guideline card ────────────────────────────────────────────────────────
+function GuidelineCard({ guideline, starred, onStar, onClick }) {
+  const cat = CAT_COLORS[guideline.category] || "bg-slate-100 text-slate-700 border-slate-200";
+  const audit = auditGuideline(guideline);
+  const isBuiltin = !!guideline.sections;
+  const qs = guideline.sections?.quick_summary;
+
+  return (
+    <div
+      className={`w-full rounded-xl border-2 bg-white transition-all cursor-pointer active:scale-[0.99] overflow-hidden hover:shadow-md ${isBuiltin ? "border-blue-100 hover:border-blue-300" : "border-slate-200 hover:border-blue-300"}`}
+      onClick={onClick}
+    >
+      <div className="p-3">
+        <div className="flex items-start gap-2 mb-1.5">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 mb-1">
+              {isBuiltin && <Badge className="text-xs bg-blue-600 text-white border-0">Built-in</Badge>}
+              <Badge className={`text-xs border ${cat}`}>{guideline.category}</Badge>
+              {guideline.evidence_level?.includes("High") && (
+                <Badge className="text-xs bg-green-50 text-green-700 border border-green-200">High Evidence</Badge>
+              )}
+            </div>
+            <h3 className="font-semibold text-slate-900 leading-tight text-sm">{guideline.title}</h3>
+            <p className="text-xs text-slate-400 mt-0.5">{guideline.source} · {guideline.year}</p>
+          </div>
+          <button
+            className="flex-shrink-0 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            onClick={(e) => { e.stopPropagation(); onStar(); }}
+            aria-label={starred ? "Remove bookmark" : "Bookmark"}
+          >
+            {starred ? <Star className="w-4 h-4 text-amber-500 fill-amber-500" /> : <StarOff className="w-4 h-4 text-slate-300" />}
+          </button>
+        </div>
+
+        <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 mb-2">
+          {guideline.summary || guideline.scope_and_population || ""}
+        </p>
+
+        {qs?.emergency_recognition?.[0] && (
+          <div className="mb-2 p-2 bg-red-50 border border-red-100 rounded-lg">
+            <p className="text-xs text-red-800 flex items-start gap-1">
+              <AlertTriangle className="w-3 h-3 text-red-500 flex-shrink-0 mt-0.5" />
+              <span className="line-clamp-1">{qs.emergency_recognition[0]}</span>
+            </p>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
+          <MaturityBadge audit={audit} />
+          <span className="text-xs text-blue-600 font-medium">Full detail →</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Guideline modal ───────────────────────────────────────────────────────
+function GuidelineModal({ guideline, onClose }) {
+  const cat = CAT_COLORS[guideline.category] || "bg-slate-100 text-slate-700";
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="w-full sm:max-w-2xl max-h-[93vh] sm:max-h-[88vh] bg-white rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+        <div className="flex items-start gap-3 p-3.5 border-b border-slate-200 bg-white sticky top-0 z-10">
+          <div className="flex-1 min-w-0">
+            <h2 className="font-bold text-slate-900 leading-snug text-sm">{guideline.title}</h2>
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              <Badge className={`text-xs border ${cat}`}>{guideline.category}</Badge>
+              <Badge variant="outline" className="text-xs">{guideline.source} · {guideline.year}</Badge>
+              {guideline.sections && <Badge className="text-xs bg-blue-100 text-blue-700 border-0">Built-in · Detailed</Badge>}
+            </div>
+          </div>
+          <button onClick={onClose} className="flex-shrink-0 p-2 rounded-xl hover:bg-slate-100" aria-label="Close">
+            <X className="w-5 h-5 text-slate-600" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3">
+          <GuidelineDetailView guideline={guideline} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Add guideline dialog ──────────────────────────────────────────────────
+function AddGuidelineDialog({ open, onOpenChange, onSuccess }) {
+  const [g, setG] = useState({
+    title: "", category: "AKI", source: "", year: new Date().getFullYear(),
+    summary: "", scope_and_population: "", key_recommendations: [""],
+    practice_pearls: [""], evidence_level: "Expert Opinion", external_link: "",
+  });
+  const [extracting, setExtracting] = useState(false);
+  const [pdfDone, setPdfDone] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: (data) => base44.entities.Guideline.create({
+      ...data,
+      key_recommendations: data.key_recommendations.filter(r => r?.trim()),
+      practice_pearls: data.practice_pearls.filter(p => p?.trim()),
+      status: "Active",
+      last_reviewed: new Date().toISOString().split("T")[0],
+    }),
+    onSuccess: () => { onOpenChange(false); onSuccess(); toast.success("Guideline added!"); },
+    onError: () => toast.error("Failed to save"),
   });
 
-  const [pdfFile, setPdfFile] = useState(null);
-  const [imageFiles, setImageFiles] = useState([]);
-  const [isExtracting, setIsExtracting] = useState(false);
-
-  const queryClient = useQueryClient();
-
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
-
-  const { data: guidelines = [], isLoading } = useQuery({
-    queryKey: ['guidelines'],
-    queryFn: () => base44.entities.Guideline.list('-year'),
-    initialData: [],
-  });
-
-  const extractGuidelineFromPDF = async (file) => {
-    setIsExtracting(true);
-    toast.info("AI extracting guideline data...", { id: "pdf-extract", duration: 30000 });
-    
+  const extractPDF = async (file) => {
+    setExtracting(true);
+    toast.info("Extracting…", { id: "pdf-x" });
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      
-      const extractionPrompt = `You are a pediatric nephrologist creating a CLINICAL QUICK REFERENCE from this guideline PDF.
-
-Extract and structure the following information with NO REPETITION between sections:
-
-1. CLINICAL SUMMARY (2-3 clear, concise sentences):
-   - WHO: Exact patient population (age range, specific condition)
-   - WHEN: Specific clinical scenarios/presentations when this applies
-   - WHAT: Main clinical approach or intervention
-   Example: "For children 1-18 years with biopsy-proven IgA nephropathy presenting with proteinuria. Applies to both acute presentations and chronic management. Uses risk stratification to guide immunosuppression decisions."
-
-2. KEY MANAGEMENT STEPS (6-10 actionable steps in algorithm sequence):
-   - Present as STEP-BY-STEP clinical algorithm
-   - Each step must be SPECIFIC and ACTIONABLE (not general principles)
-   - Include decision criteria, thresholds, or timing
-   - Order by clinical workflow
-   Example format:
-   "1. Obtain 24-hour urine protein OR spot UPCR within 48 hours of presentation"
-   "2. Stage disease severity: Mild (<1g/day), Moderate (1-3g/day), Severe (>3g/day)"
-   "3. If proteinuria >1g/day AND eGFR >60: Start ACE-I at 0.1 mg/kg/day"
-
-3. PRACTICE PEARLS (4-6 bedside tips):
-   - Practical, implementation-focused tips
-   - Include common pitfalls to AVOID
-   - Shortcuts or clinical tricks
-   - Drug-specific dosing tips if relevant
-   Example: "Start ACE-I low and titrate slowly to avoid hyperkalemia in CKD patients"
-
-4. EVIDENCE LEVEL: State overall quality clearly with supporting landmark trials if any
-
-BE SPECIFIC. AVOID VAGUE STATEMENTS. NO REPETITION ACROSS SECTIONS.
-
-Also extract:
-- Title
-- Source organization (KDIGO, IPNA, IAP, ISPD, etc.)
-- Year
-- Category
-- Keywords for search
-- Target population age groups
-- Clinical scope (Diagnosis, Management, Follow-up, Prevention, Screening)
-- External link if mentioned`;
-
-      const extracted = await base44.integrations.Core.InvokeLLM({
-        prompt: extractionPrompt,
+      const out = await base44.integrations.Core.InvokeLLM({
+        prompt: "Extract from this pediatric nephrology guideline PDF: title, source (KDIGO/IPNA/IAP etc), year, category, scope_and_population (who/when/what 2-3 sentences), key_recommendations (8-12 specific sequential management steps with thresholds), practice_pearls (5-6 bedside tips), evidence_level, external_link if mentioned.",
         file_urls: [file_url],
         response_json_schema: {
           type: "object",
           properties: {
-            title: { type: "string" },
-            source: { type: "string" },
-            year: { type: "number" },
-            category: { type: "string" },
-            summary: { type: "string" },
-            scope_and_population: { type: "string" },
-            key_recommendations: { 
-              type: "array", 
-              items: { type: "string" },
-              description: "6-10 specific, sequential management steps"
-            },
-            practice_pearls: { 
-              type: "array", 
-              items: { type: "string" },
-              description: "4-6 bedside implementation tips"
-            },
-            evidence_level: { type: "string" },
-            keywords: { type: "array", items: { type: "string" } },
-            population: { type: "array", items: { type: "string" } },
-            clinical_scope: { type: "array", items: { type: "string" } },
-            external_link: { type: "string" }
+            title: { type: "string" }, source: { type: "string" }, year: { type: "number" },
+            category: { type: "string" }, scope_and_population: { type: "string" },
+            key_recommendations: { type: "array", items: { type: "string" } },
+            practice_pearls: { type: "array", items: { type: "string" } },
+            evidence_level: { type: "string" }, external_link: { type: "string" }
           }
         }
       });
-
-      toast.success("AI extraction complete!", { id: "pdf-extract" });
-      
-      setNewGuideline(prev => ({
-        ...prev,
-        ...extracted,
-        pdf_url: file_url,
-        key_recommendations: extracted.key_recommendations || [""],
-        practice_pearls: extracted.practice_pearls || [""],
-        content: {
-          sections: extracted.key_recommendations ? [
-            {
-              heading: "Key Management Steps",
-              key_points: extracted.key_recommendations
-            }
-          ] : []
-        }
+      setG(prev => ({
+        ...prev, ...out,
+        key_recommendations: out.key_recommendations?.length ? out.key_recommendations : [""],
+        practice_pearls: out.practice_pearls?.length ? out.practice_pearls : [""],
       }));
-      
-    } catch (error) {
-      console.error("PDF extraction error:", error);
-      toast.error("Could not extract data. Please fill manually.", { id: "pdf-extract" });
-      
-      try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        setNewGuideline(prev => ({ ...prev, pdf_url: file_url }));
-      } catch (uploadError) {
-        toast.error("PDF upload failed");
-      }
-    } finally {
-      setIsExtracting(false);
-    }
+      setPdfDone(true);
+      toast.success("Extracted!", { id: "pdf-x" });
+    } catch { toast.error("Extraction failed", { id: "pdf-x" }); }
+    finally { setExtracting(false); }
   };
 
-  const createGuidelineMutation = useMutation({
-    mutationFn: async (guidelineData) => {
-      const uploadedImages = [];
-      if (imageFiles.length > 0) {
-        toast.info("Uploading images...", { id: "image-upload" });
-        for (const imgData of imageFiles) {
-          const { file_url } = await base44.integrations.Core.UploadFile({ file: imgData.file });
-          uploadedImages.push({
-            url: file_url,
-            caption: imgData.caption || imgData.file.name,
-            type: imgData.type || "figure"
-          });
-        }
-        toast.success("Images uploaded!", { id: "image-upload" });
-      }
-
-      const cleanedData = {
-        ...guidelineData,
-        key_recommendations: guidelineData.key_recommendations.filter(r => r.trim()),
-        practice_pearls: guidelineData.practice_pearls.filter(p => p.trim()),
-        keywords: guidelineData.keywords.filter(k => k.trim()),
-        images: uploadedImages.length > 0 ? uploadedImages : guidelineData.images,
-        created_by: user?.email || "anonymous",
-        is_editable: true,
-        last_reviewed: new Date().toISOString().split('T')[0],
-        status: "Active"
-      };
-
-      return base44.entities.Guideline.create(cleanedData);
-    },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['guidelines'] });
-      setDialogOpen(false);
-      resetForm();
-      toast.success("Guideline added successfully!");
-    },
-    onError: (error) => {
-      console.error("Error creating guideline:", error);
-      toast.error("Failed to add guideline. Check connection and retry.", {
-        action: {
-          label: 'Retry',
-          onClick: () => createGuidelineMutation.mutate(newGuideline)
-        }
-      });
-    }
-  });
-
-  const resetForm = () => {
-    setNewGuideline({
-      title: "",
-      category: "General",
-      source: "",
-      year: new Date().getFullYear(),
-      summary: "",
-      scope_and_population: "",
-      key_recommendations: [""],
-      practice_pearls: [""],
-      pdf_url: "",
-      external_link: "",
-      evidence_level: "Expert Opinion",
-      content: { sections: [] },
-      images: [],
-      related_calculators: [],
-      related_drugs: [],
-      keywords: [],
-      population: [],
-      clinical_scope: []
-    });
-    setPdfFile(null);
-    setImageFiles([]);
-    setIsExtracting(false);
-  };
-
-  const handlePDFUpload = async (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      setPdfFile(file);
-      await extractGuidelineFromPDF(file);
-    } else if (file) {
-      toast.error("Please select a PDF file.");
-    }
-  };
-
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map(file => ({
-      file,
-      caption: "",
-      type: "figure"
-    }));
-    setImageFiles(prev => [...prev, ...newImages]);
-    toast.success(`${files.length} image(s) selected`);
-  };
-
-  const addRecommendation = () => {
-    setNewGuideline(prev => ({
-      ...prev,
-      key_recommendations: [...prev.key_recommendations, ""]
-    }));
-  };
-
-  const updateRecommendation = (index, value) => {
-    const updated = [...newGuideline.key_recommendations];
-    updated[index] = value;
-    setNewGuideline({ ...newGuideline, key_recommendations: updated });
-  };
-
-  const removeRecommendation = (index) => {
-    const updated = newGuideline.key_recommendations.filter((_, i) => i !== index);
-    setNewGuideline({ ...newGuideline, key_recommendations: updated });
-  };
-
-  const addPearl = () => {
-    setNewGuideline(prev => ({
-      ...prev,
-      practice_pearls: [...prev.practice_pearls, ""]
-    }));
-  };
-
-  const updatePearl = (index, value) => {
-    const updated = [...newGuideline.practice_pearls];
-    updated[index] = value;
-    setNewGuideline({ ...newGuideline, practice_pearls: updated });
-  };
-
-  const removePearl = (index) => {
-    const updated = newGuideline.practice_pearls.filter((_, i) => i !== index);
-    setNewGuideline({ ...newGuideline, practice_pearls: updated });
-  };
-
-  const filteredGuidelines = semanticResults 
-    ? semanticResults.filter(g => activeCategory === "All" || g.category === activeCategory)
-    : guidelines.filter(g => {
-        const matchesSearch = g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             g.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             g.summary?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             g.keywords?.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()));
-        const matchesCategory = activeCategory === "All" || g.category === activeCategory;
-        return matchesSearch && matchesCategory;
-      });
+  const upRec = (i, v) => { const u = [...g.key_recommendations]; u[i] = v; setG({ ...g, key_recommendations: u }); };
+  const upPearl = (i, v) => { const u = [...g.practice_pearls]; u[i] = v; setG({ ...g, practice_pearls: u }); };
+  const rmRec = (i) => setG(p => ({ ...p, key_recommendations: p.key_recommendations.filter((_, j) => j !== i) }));
+  const rmPearl = (i) => setG(p => ({ ...p, practice_pearls: p.practice_pearls.filter((_, j) => j !== i) }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
-              <Library className="w-9 h-9 text-white" />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-xl max-h-[92vh] overflow-y-auto mx-2 sm:mx-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="w-5 h-5 text-blue-600" /> Add Guideline
+          </DialogTitle>
+        </DialogHeader>
+        <Tabs defaultValue="upload" className="mt-2">
+          <TabsList className="grid w-full grid-cols-3 text-xs">
+            <TabsTrigger value="upload"><Upload className="w-3.5 h-3.5 mr-1" />PDF</TabsTrigger>
+            <TabsTrigger value="web"><Search className="w-3.5 h-3.5 mr-1" />Web</TabsTrigger>
+            <TabsTrigger value="manual"><Edit className="w-3.5 h-3.5 mr-1" />Manual</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upload" className="space-y-3 mt-3">
+            <div className="border-2 border-dashed border-blue-300 rounded-xl p-5 bg-blue-50 text-center">
+              <Upload className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+              <p className="text-sm font-medium text-blue-800 mb-1">Upload PDF Guideline</p>
+              <p className="text-xs text-blue-600 mb-3">AI extracts 8–12 management steps, pearls, evidence level</p>
+              <input type="file" accept=".pdf" disabled={extracting}
+                onChange={(e) => { const f = e.target.files[0]; if (f) extractPDF(f); }}
+                className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-blue-600 file:text-white file:cursor-pointer" />
+              {extracting && <div className="mt-3 flex items-center justify-center gap-2 text-blue-700 text-xs"><Loader2 className="w-4 h-4 animate-spin" />Analysing…</div>}
+              {pdfDone && !extracting && <Badge className="mt-2 bg-green-600 text-white text-xs"><CheckCircle className="w-3 h-3 mr-1" />Extracted — review below</Badge>}
+            </div>
+            {pdfDone && (
+              <div className="space-y-2 text-sm border-t pt-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div><Label className="text-xs">Title</Label><Input value={g.title} onChange={e => setG({...g, title: e.target.value})} className="mt-1 text-xs h-8" /></div>
+                  <div><Label className="text-xs">Source</Label><Input value={g.source} onChange={e => setG({...g, source: e.target.value})} className="mt-1 text-xs h-8" /></div>
+                </div>
+                <div><Label className="text-xs">Clinical Summary</Label><Textarea value={g.scope_and_population} onChange={e => setG({...g, scope_and_population: e.target.value})} className="mt-1 text-xs h-16" /></div>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="web" className="mt-3">
+            <WebImporter onImportComplete={(data) => setG(prev => ({ ...prev, ...data, key_recommendations: data.key_recommendations || [""], practice_pearls: [""] }))} />
+          </TabsContent>
+
+          <TabsContent value="manual" className="space-y-3 mt-3">
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label className="text-xs">Title *</Label><Input value={g.title} onChange={e => setG({...g, title: e.target.value})} className="mt-1 text-xs h-8" /></div>
+              <div><Label className="text-xs">Source *</Label><Input value={g.source} onChange={e => setG({...g, source: e.target.value})} className="mt-1 text-xs h-8" /></div>
+              <div>
+                <Label className="text-xs">Category *</Label>
+                <Select value={g.category} onValueChange={v => setG({...g, category: v})}>
+                  <SelectTrigger className="mt-1 text-xs h-8"><SelectValue /></SelectTrigger>
+                  <SelectContent>{CATEGORIES.filter(c => c !== "All").map(c => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div><Label className="text-xs">Year *</Label><Input type="number" value={g.year} onChange={e => setG({...g, year: parseInt(e.target.value)})} className="mt-1 text-xs h-8" /></div>
+            </div>
+            <div><Label className="text-xs font-semibold">Clinical Summary *</Label><Textarea value={g.scope_and_population} onChange={e => setG({...g, scope_and_population: e.target.value})} placeholder="Who/When/What — 2–3 sentences" className="mt-1 text-xs h-16" /></div>
+            <div>
+              <Label className="text-xs font-semibold flex items-center gap-1"><Target className="w-3.5 h-3.5 text-green-600" />Management Steps (aim for 8–12)</Label>
+              <div className="space-y-1.5 mt-1">
+                {g.key_recommendations.map((r, i) => (
+                  <div key={i} className="flex gap-1.5">
+                    <Badge className="bg-green-600 text-white flex-shrink-0 h-7 px-2 text-xs">{i + 1}</Badge>
+                    <Input value={r} onChange={e => upRec(i, e.target.value)} placeholder="Specific actionable step…" className="flex-1 text-xs h-7" />
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => rmRec(i)}><X className="w-3 h-3" /></Button>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" className="w-full text-xs h-7 border-green-300" onClick={() => setG(p => ({...p, key_recommendations: [...p.key_recommendations, ""]}))}>
+                  <Plus className="w-3.5 h-3.5 mr-1" />Add Step
+                </Button>
+              </div>
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-slate-900">Guidelines Library</h1>
-              <p className="text-slate-600 mt-1">Evidence-based clinical references with AI-powered quick summaries</p>
+              <Label className="text-xs font-semibold flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5 text-amber-600" />Practice Pearls</Label>
+              <div className="space-y-1.5 mt-1">
+                {g.practice_pearls.map((p, i) => (
+                  <div key={i} className="flex gap-1.5">
+                    <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-1.5" />
+                    <Input value={p} onChange={e => upPearl(i, e.target.value)} placeholder="Bedside tip…" className="flex-1 text-xs h-7" />
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => rmPearl(i)}><X className="w-3 h-3" /></Button>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" className="w-full text-xs h-7 border-amber-300" onClick={() => setG(p => ({...p, practice_pearls: [...p.practice_pearls, ""]}))}>
+                  <Plus className="w-3.5 h-3.5 mr-1" />Add Pearl
+                </Button>
+              </div>
             </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Evidence Level</Label>
+                <Select value={g.evidence_level} onValueChange={v => setG({...g, evidence_level: v})}>
+                  <SelectTrigger className="mt-1 text-xs h-8"><SelectValue /></SelectTrigger>
+                  <SelectContent>{EVIDENCE_LEVELS.map(l => <SelectItem key={l} value={l} className="text-xs">{l}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div><Label className="text-xs">External Link</Label><Input value={g.external_link} onChange={e => setG({...g, external_link: e.target.value})} placeholder="https://…" className="mt-1 text-xs h-8" /></div>
+            </div>
+            <div><Label className="text-xs">Full Summary</Label><Textarea value={g.summary} onChange={e => setG({...g, summary: e.target.value})} placeholder="Comprehensive overview…" className="mt-1 text-xs h-20" /></div>
+          </TabsContent>
+        </Tabs>
+        <Button onClick={() => mutation.mutate(g)} disabled={!g.title || !g.source || mutation.isPending} className="w-full mt-3 bg-blue-600 hover:bg-blue-700 h-10">
+          {mutation.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</> : <><Plus className="w-4 h-4 mr-2" />Add to Library</>}
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────
+export default function Guidelines() {
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [showEmergency, setShowEmergency] = useState(false);
+  const [showStarred, setShowStarred] = useState(false);
+  const [starred, setStarred] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("clinicals_starred") || "[]"); } catch { return []; }
+  });
+  const [recent, setRecent] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("clinicals_recent") || "[]"); } catch { return []; }
+  });
+
+  const queryClient = useQueryClient();
+  const { data: dbGuidelines = [], isLoading } = useQuery({
+    queryKey: ["guidelines"],
+    queryFn: () => base44.entities.Guideline.list("-year"),
+    initialData: [],
+  });
+
+  const allGuidelines = [...BUILTIN_GUIDELINES, ...dbGuidelines.map(g => ({ ...g, _db: true }))];
+
+  const filtered = allGuidelines.filter(g => {
+    const q = search.toLowerCase();
+    const matchSearch = !search ||
+      g.title?.toLowerCase().includes(q) ||
+      g.category?.toLowerCase().includes(q) ||
+      g.source?.toLowerCase().includes(q) ||
+      g.summary?.toLowerCase().includes(q) ||
+      g.tags?.some(t => t.toLowerCase().includes(q));
+    const matchCat = category === "All" || g.category === category;
+    const matchStar = !showStarred || starred.includes(g.id);
+    return matchSearch && matchCat && matchStar;
+  });
+
+  const handleStar = (id) => {
+    setStarred(prev => {
+      const u = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
+      try { localStorage.setItem("clinicals_starred", JSON.stringify(u)); } catch {}
+      return u;
+    });
+  };
+
+  const handleOpen = (g) => {
+    setSelected(g);
+    setRecent(prev => {
+      const u = [g.id, ...prev.filter(id => id !== g.id)].slice(0, 5);
+      try { localStorage.setItem("clinicals_recent", JSON.stringify(u)); } catch {}
+      return u;
+    });
+  };
+
+  const recentGuidelines = recent.map(id => allGuidelines.find(g => g.id === id)).filter(Boolean).slice(0, 5);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50" style={{ overflowX: "hidden", maxWidth: "100vw" }}>
+
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 px-4 py-5 shadow-xl">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Library className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-bold text-white leading-tight">Guidelines Library</h1>
+              <p className="text-blue-100 text-xs">{allGuidelines.length} guidelines · {BUILTIN_GUIDELINES.length} built-in detailed · KDIGO/IPNA/ESPN/AAP/EULAR</p>
+            </div>
+            <Button size="sm" className="bg-white text-blue-700 hover:bg-blue-50 font-semibold flex-shrink-0 h-9" onClick={() => setDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-1" />Add
+            </Button>
           </div>
-
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg px-6 py-6">
-                <Plus className="w-5 h-5 mr-2" />
-                Add Guideline
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-xl">
-                  <Sparkles className="w-6 h-6 text-blue-600" />
-                  Add New Guideline - AI-Powered
-                </DialogTitle>
-              </DialogHeader>
-              
-              <Tabs defaultValue="upload" className="mt-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="upload">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload PDF
-                  </TabsTrigger>
-                  <TabsTrigger value="web">
-                    <Search className="w-4 h-4 mr-2" />
-                    Import from Web
-                  </TabsTrigger>
-                  <TabsTrigger value="manual">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Manual
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="upload" className="space-y-6 mt-4">
-                  <div className="border-2 border-dashed border-blue-300 rounded-xl p-10 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4 shadow-xl">
-                        <Upload className="w-10 h-10 text-white" />
-                      </div>
-                      <h3 className="font-bold text-blue-900 mb-2 text-xl">Upload Clinical Guideline PDF</h3>
-                      <p className="text-sm text-blue-700 mb-6 max-w-md">
-                        AI will automatically extract: clinical summary, 6-10 management steps, practice pearls, evidence level, and all metadata
-                      </p>
-                      <input
-                        type="file"
-                        accept=".pdf"
-                        onChange={handlePDFUpload}
-                        disabled={isExtracting}
-                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-4 file:px-8 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-gradient-to-r file:from-blue-600 file:to-indigo-600 file:text-white hover:file:from-blue-700 hover:file:to-indigo-700 file:cursor-pointer file:shadow-lg"
-                      />
-                      {pdfFile && !isExtracting && (
-                        <Badge className="mt-4 bg-green-600 text-white flex items-center gap-2 text-sm px-4 py-2">
-                          <CheckCircle className="w-5 h-5" />
-                          {pdfFile.name} - Extracted!
-                        </Badge>
-                      )}
-                      {isExtracting && (
-                        <div className="mt-6 flex items-center gap-3 text-blue-700">
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                          <span className="font-semibold">AI analyzing guideline...</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {pdfFile && !isExtracting && (
-                    <div className="space-y-6 pt-6 border-t-2">
-                      <Alert className="bg-green-50 border-green-200">
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                        <AlertDescription className="text-green-800">
-                          <strong>Extraction Complete!</strong> Review and edit the auto-filled data below before saving.
-                        </AlertDescription>
-                      </Alert>
-
-                      {/* Basic Info */}
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label>Title *</Label>
-                          <Input
-                            value={newGuideline.title}
-                            onChange={(e) => setNewGuideline({...newGuideline, title: e.target.value})}
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label>Source Organization *</Label>
-                          <Input
-                            value={newGuideline.source}
-                            onChange={(e) => setNewGuideline({...newGuideline, source: e.target.value})}
-                            placeholder="KDIGO, IPNA, IAP, ISPD..."
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label>Category *</Label>
-                          <Select value={newGuideline.category} onValueChange={(val) => setNewGuideline({...newGuideline, category: val})}>
-                            <SelectTrigger className="mt-1">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {categories.filter(c => c !== "All").map(cat => (
-                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label>Year *</Label>
-                          <Input
-                            type="number"
-                            value={newGuideline.year}
-                            onChange={(e) => setNewGuideline({...newGuideline, year: parseInt(e.target.value) || new Date().getFullYear()})}
-                            className="mt-1"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Clinical Summary */}
-                      <div>
-                        <Label className="text-base font-semibold flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-blue-600" />
-                          Clinical Summary (Who, When, What) *
-                        </Label>
-                        <Textarea
-                          value={newGuideline.scope_and_population}
-                          onChange={(e) => setNewGuideline({...newGuideline, scope_and_population: e.target.value})}
-                          placeholder="2-3 sentences: Patient population, clinical scenarios, and main approach..."
-                          className="mt-2 h-24"
-                        />
-                      </div>
-
-                      {/* Key Management Steps */}
-                      <div>
-                        <Label className="text-base font-semibold flex items-center gap-2 mb-3">
-                          <Target className="w-5 h-5 text-green-600" />
-                          Key Management Steps (Algorithm Format)
-                        </Label>
-                        <div className="space-y-2">
-                          {newGuideline.key_recommendations.map((rec, idx) => (
-                            <div key={idx} className="flex gap-2">
-                              <Badge className="bg-green-600 text-white flex-shrink-0 h-10 flex items-center px-3 text-sm">
-                                Step {idx + 1}
-                              </Badge>
-                              <Textarea
-                                value={rec}
-                                onChange={(e) => updateRecommendation(idx, e.target.value)}
-                                placeholder="Be specific: Include thresholds, criteria, timing..."
-                                className="flex-1"
-                                rows={2}
-                              />
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => removeRecommendation(idx)}
-                                className="flex-shrink-0 h-10"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          ))}
-                          <Button onClick={addRecommendation} variant="outline" className="w-full border-green-300 hover:bg-green-50">
-                            <Target className="w-4 h-4 mr-2" />
-                            Add Management Step
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Practice Pearls */}
-                      <div>
-                        <Label className="text-base font-semibold flex items-center gap-2 mb-3">
-                          <Lightbulb className="w-5 h-5 text-amber-600" />
-                          Practice Pearls (Bedside Tips)
-                        </Label>
-                        <div className="space-y-2">
-                          {newGuideline.practice_pearls.map((pearl, idx) => (
-                            <div key={idx} className="flex gap-2">
-                              <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-3" />
-                              <Textarea
-                                value={pearl}
-                                onChange={(e) => updatePearl(idx, e.target.value)}
-                                placeholder="Practical tip, common pitfall to avoid, or clinical trick..."
-                                className="flex-1"
-                                rows={2}
-                              />
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => removePearl(idx)}
-                                className="flex-shrink-0 h-10"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          ))}
-                          <Button onClick={addPearl} variant="outline" className="w-full border-amber-300 hover:bg-amber-50">
-                            <Lightbulb className="w-4 h-4 mr-2" />
-                            Add Practice Pearl
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Evidence & Links */}
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label>Evidence Level</Label>
-                          <Select value={newGuideline.evidence_level} onValueChange={(val) => setNewGuideline({...newGuideline, evidence_level: val})}>
-                            <SelectTrigger className="mt-1">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {evidenceLevels.map(level => (
-                                <SelectItem key={level} value={level}>{level}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label>External Link</Label>
-                          <Input
-                            value={newGuideline.external_link}
-                            onChange={(e) => setNewGuideline({...newGuideline, external_link: e.target.value})}
-                            placeholder="https://..."
-                            className="mt-1"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Full Summary */}
-                      <div>
-                        <Label>Complete Summary (Detailed overview)</Label>
-                        <Textarea
-                          value={newGuideline.summary}
-                          onChange={(e) => setNewGuideline({...newGuideline, summary: e.target.value})}
-                          placeholder="Comprehensive guideline overview..."
-                          className="mt-1 h-32"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="web" className="space-y-6 mt-4">
-                  <WebImporter onImportComplete={(data) => {
-                    setNewGuideline(prev => ({
-                      ...prev,
-                      ...data,
-                      key_recommendations: data.key_recommendations || [""],
-                      practice_pearls: [""]
-                    }));
-                    toast.success('Imported! Review before saving');
-                  }} />
-                </TabsContent>
-
-                <TabsContent value="manual" className="space-y-6 mt-4">
-                  {/* Basic Metadata */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Title *</Label>
-                      <Input
-                        value={newGuideline.title}
-                        onChange={(e) => setNewGuideline({...newGuideline, title: e.target.value})}
-                        placeholder="KDIGO AKI Guidelines 2024"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>Source *</Label>
-                      <Input
-                        value={newGuideline.source}
-                        onChange={(e) => setNewGuideline({...newGuideline, source: e.target.value})}
-                        placeholder="KDIGO, IPNA, IAP"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>Category *</Label>
-                      <Select
-                        value={newGuideline.category}
-                        onValueChange={(val) => setNewGuideline({...newGuideline, category: val})}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.filter(c => c !== "All").map(cat => (
-                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Year *</Label>
-                      <Input
-                        type="number"
-                        value={newGuideline.year}
-                        onChange={(e) => setNewGuideline({...newGuideline, year: parseInt(e.target.value) || new Date().getFullYear()})}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Clinical Summary */}
-                  <div>
-                    <Label className="text-base font-semibold flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      Clinical Summary (Who, When, What) *
-                    </Label>
-                    <Textarea
-                      value={newGuideline.scope_and_population}
-                      onChange={(e) => setNewGuideline({...newGuideline, scope_and_population: e.target.value})}
-                      placeholder="WHO: Patient population and age range&#10;WHEN: Clinical scenarios when this applies&#10;WHAT: Main clinical approach or intervention"
-                      className="mt-2 h-24"
-                    />
-                  </div>
-
-                  {/* Key Management Steps */}
-                  <div>
-                    <Label className="text-base font-semibold flex items-center gap-2 mb-3">
-                      <Target className="w-5 h-5 text-green-600" />
-                      Key Management Steps (6-10 Steps)
-                    </Label>
-                    <div className="space-y-2">
-                      {newGuideline.key_recommendations.map((rec, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <Badge className="bg-green-600 text-white flex-shrink-0 h-10 flex items-center px-3 text-sm">
-                            Step {idx + 1}
-                          </Badge>
-                          <Textarea
-                            value={rec}
-                            onChange={(e) => updateRecommendation(idx, e.target.value)}
-                            placeholder="Specific actionable step with criteria/thresholds..."
-                            className="flex-1"
-                            rows={2}
-                          />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeRecommendation(idx)}
-                            className="flex-shrink-0 h-10"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                      <Button onClick={addRecommendation} variant="outline" className="w-full border-green-300 hover:bg-green-50">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Step
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Practice Pearls */}
-                  <div>
-                    <Label className="text-base font-semibold flex items-center gap-2 mb-3">
-                      <Lightbulb className="w-5 h-5 text-amber-600" />
-                      Practice Pearls (4-6 Tips)
-                    </Label>
-                    <div className="space-y-2">
-                      {newGuideline.practice_pearls.map((pearl, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-3" />
-                          <Textarea
-                            value={pearl}
-                            onChange={(e) => updatePearl(idx, e.target.value)}
-                            placeholder="Bedside tip, pitfall to avoid, or clinical shortcut..."
-                            className="flex-1"
-                            rows={2}
-                          />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removePearl(idx)}
-                            className="flex-shrink-0 h-10"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                      <Button onClick={addPearl} variant="outline" className="w-full border-amber-300 hover:bg-amber-50">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Pearl
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Evidence & Links */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Evidence Level</Label>
-                      <Select value={newGuideline.evidence_level} onValueChange={(val) => setNewGuideline({...newGuideline, evidence_level: val})}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {evidenceLevels.map(level => (
-                            <SelectItem key={level} value={level}>{level}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>External Link</Label>
-                      <Input
-                        value={newGuideline.external_link}
-                        onChange={(e) => setNewGuideline({...newGuideline, external_link: e.target.value})}
-                        placeholder="https://..."
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Full Summary */}
-                  <div>
-                    <Label>Complete Summary (Detailed overview)</Label>
-                    <Textarea
-                      value={newGuideline.summary}
-                      onChange={(e) => setNewGuideline({...newGuideline, summary: e.target.value})}
-                      placeholder="Include scope, population, key findings, and implementation notes..."
-                      className="mt-1 h-40"
-                    />
-                  </div>
-                </TabsContent>
-              </Tabs>
-
-              {/* Multimedia Section */}
-              <div className="mt-6">
-                <MultimediaUploader onUploadComplete={(media) => {
-                  setNewGuideline(prev => ({
-                    ...prev,
-                    multimedia: {
-                      ...prev.multimedia,
-                      [media.type === 'video' ? 'video_overview_url' : 
-                       media.type === 'slides' ? 'slides_url' : null]: media.url,
-                      infographics: media.type === 'infographic' 
-                        ? [...(prev.multimedia?.infographics || []), { url: media.url, caption: media.name }]
-                        : prev.multimedia?.infographics || []
-                    }
-                  }));
-                }} />
-              </div>
-
-              {/* Tables/Images Upload */}
-              <div className="border-2 border-dashed border-purple-300 rounded-lg p-6 bg-purple-50/30 mt-6">
-                <div className="flex items-center gap-4">
-                  <ImageIcon className="w-8 h-8 text-purple-600" />
-                  <div className="flex-1">
-                    <Label className="text-base font-semibold">Upload Tables/Algorithms (Optional)</Label>
-                    <p className="text-sm text-slate-600 mt-1">Staging tables, flowcharts, diagrams</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageUpload}
-                      className="mt-3 block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 file:cursor-pointer"
-                    />
-                    {imageFiles.length > 0 && (
-                      <div className="mt-3 space-y-2">
-                        {imageFiles.map((img, idx) => (
-                          <div key={idx} className="flex flex-wrap items-center gap-2 bg-white p-2 rounded border">
-                            <Badge className="bg-purple-600 text-white flex items-center">
-                              <ImageIcon className="w-3 h-3 mr-1" />
-                              {img.file.name}
-                            </Badge>
-                            <Select
-                              value={img.type}
-                              onValueChange={(val) => {
-                                const updated = [...imageFiles];
-                                updated[idx].type = val;
-                                setImageFiles(updated);
-                              }}
-                            >
-                              <SelectTrigger className="w-32 h-7 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="table">Table</SelectItem>
-                                <SelectItem value="flowchart">Flowchart</SelectItem>
-                                <SelectItem value="diagram">Diagram</SelectItem>
-                                <SelectItem value="algorithm">Algorithm</SelectItem>
-                                <SelectItem value="figure">Figure</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Input
-                              placeholder="Caption"
-                              value={img.caption}
-                              onChange={(e) => {
-                                const updated = [...imageFiles];
-                                updated[idx].caption = e.target.value;
-                                setImageFiles(updated);
-                              }}
-                              className="h-7 text-xs flex-1 min-w-[150px]"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={() => createGuidelineMutation.mutate(newGuideline)}
-                disabled={!newGuideline.title || !newGuideline.source || !newGuideline.scope_and_population || createGuidelineMutation.isPending || isExtracting}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 mt-6 py-6 text-lg font-semibold"
-              >
-                {createGuidelineMutation.isPending ? (
-                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Creating Guideline...</>
-                ) : (
-                  <><Plus className="w-5 h-5 mr-2" />Add Guideline to Library</>
-                )}
-              </Button>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
-          <div className="md:col-span-2 space-y-6">
-            <SemanticSearch 
-              guidelines={guidelines}
-              onResultsFound={(results, reasoning) => {
-                setSemanticResults(results);
-                setSearchReasoning(reasoning);
-              }}
-            />
-
           <div className="relative">
-            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-slate-400" />
-            <Input
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
               type="text"
-              placeholder="Or use keyword search: title, source, category..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                if (!e.target.value) setSemanticResults(null);
-              }}
-              className="pl-16 pr-6 py-7 text-lg border-2 border-slate-300 focus:border-blue-500 shadow-md rounded-2xl bg-white"
+              placeholder="Search AKI, nephrotic, HUS, dialysis, lupus…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border-0 bg-white/90 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50"
             />
-          </div>
-
-          {semanticResults && searchReasoning && (
-            <Alert className="bg-purple-50 border-purple-200">
-              <Sparkles className="w-5 h-5 text-purple-600" />
-              <AlertDescription className="text-purple-900">
-                <strong>AI Search Results:</strong> {searchReasoning}
-              </AlertDescription>
-            </Alert>
-          )}
-
-            <div className="flex gap-3 overflow-x-auto pb-2">
-            {categories.map((cat) => (
-              <Button
-                key={cat}
-                variant={activeCategory === cat ? "default" : "outline"}
-                size="lg"
-                onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 whitespace-nowrap rounded-xl px-6 py-3 ${
-                  activeCategory === cat 
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg font-semibold" 
-                    : "border-2 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-blue-300"
-                }`}
-              >
-                {cat}
-              </Button>
-            ))}
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <AutoUpdateManager />
-            <OfflineManager />
+            {search && (
+              <button className="absolute right-3 top-1/2 -translate-y-1/2" onClick={() => setSearch("")}>
+                <X className="w-4 h-4 text-slate-400" />
+              </button>
+            )}
           </div>
         </div>
+      </div>
 
-        {isLoading ? (
-          <div className="text-center py-32">
-            <Loader2 className="w-20 h-20 animate-spin text-blue-600 mx-auto mb-6" />
-            <p className="text-slate-600 text-xl font-medium">Loading guidelines...</p>
-          </div>
-        ) : filteredGuidelines.length === 0 ? (
-          <Card className="bg-white shadow-2xl border-2 border-slate-200">
-            <CardContent className="p-32 text-center">
-              <BookOpen className="w-24 h-24 text-slate-300 mx-auto mb-6" />
-              <h3 className="text-3xl font-bold text-slate-700 mb-3">No Guidelines Found</h3>
-              <p className="text-slate-500 text-lg">Try adjusting your search or filter</p>
-            </CardContent>
+      <div className="max-w-3xl mx-auto px-3 py-4 space-y-4">
+
+        {/* Category pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          {CATEGORIES.map(cat => (
+            <button key={cat} onClick={() => setCategory(cat)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${category === cat ? "bg-blue-600 text-white border-blue-600 shadow-sm" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"}`}>
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Filter bar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={() => setShowStarred(!showStarred)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${showStarred ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-white text-slate-600 border-slate-200"}`}>
+            <Star className="w-3.5 h-3.5" />Bookmarked ({starred.length})
+          </button>
+          <button onClick={() => setShowEmergency(!showEmergency)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${showEmergency ? "bg-red-100 text-red-800 border-red-300" : "bg-white text-slate-600 border-slate-200"}`}>
+            <AlertTriangle className="w-3.5 h-3.5" />Emergency ({EMERGENCY_PROTOCOLS.length})
+          </button>
+          <span className="ml-auto text-xs text-slate-400">{filtered.length} results</span>
+        </div>
+
+        {/* Emergency panel */}
+        {showEmergency && (
+          <Card className="border-2 border-red-200 shadow-md overflow-hidden">
+            <CardContent className="p-3"><EmergencyProtocolCard /></CardContent>
           </Card>
-        ) : viewMode === 'list' ? (
-          <GuidelineListView
-            guidelines={filteredGuidelines}
-            onOpen={(g) => window.location.href = createPageUrl("GuidelineDetail") + `?id=${g.id}`}
-            onStar={(id) => {
-              setStarredIds(prev => 
-                prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-              );
-            }}
-            starredIds={starredIds}
-          />
+        )}
+
+        {/* Recently viewed */}
+        {!search && category === "All" && !showStarred && recentGuidelines.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5" />Recently Viewed
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+              {recentGuidelines.map(g => (
+                <button key={g.id} onClick={() => handleOpen(g)}
+                  className="flex-shrink-0 w-40 px-3 py-2 bg-white border border-slate-200 rounded-xl text-left hover:border-blue-300 transition-colors">
+                  <p className="font-medium text-slate-800 text-xs leading-snug line-clamp-2">{g.title}</p>
+                  <p className="text-slate-400 text-xs mt-0.5">{g.category}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Guidelines list */}
+        {isLoading ? (
+          <div className="flex flex-col items-center py-16 gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <p className="text-sm text-slate-500">Loading guidelines…</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center py-16 gap-3">
+            <BookOpen className="w-12 h-12 text-slate-300" />
+            <p className="text-sm text-slate-500">No guidelines found</p>
+            <Button variant="outline" size="sm" onClick={() => { setSearch(""); setCategory("All"); setShowStarred(false); }}>Clear filters</Button>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {filteredGuidelines.map((guideline) => (
-              <GuidelineSummaryCard
-                key={guideline.id}
-                guideline={guideline}
-                onUpdate={() => queryClient.invalidateQueries({ queryKey: ['guidelines'] })}
+          <div className="space-y-2.5">
+            {filtered.map(g => (
+              <GuidelineCard key={g.id} guideline={g}
+                starred={starred.includes(g.id)}
+                onStar={() => handleStar(g.id)}
+                onClick={() => handleOpen(g)}
               />
             ))}
           </div>
         )}
 
-        {selectedForPathway.length > 0 && (
-          <div className="mt-6">
-            <PathwayGenerator
-              selectedGuidelines={selectedForPathway}
-              onRemoveGuideline={(id) => {
-                setSelectedForPathway(prev => prev.filter(g => g.id !== id));
-              }}
-            />
-          </div>
-        )}
-
-        <Alert className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 p-6">
-          <Award className="w-6 h-6 text-blue-600" />
-          <AlertDescription className="text-blue-900">
-            <strong className="text-lg block mb-2">Evidence-Based Clinical Practice</strong>
-            <p className="leading-relaxed">All guidelines sourced from KDIGO, IPNA, ISPD, IAP, ESPN, ISKDC, WHO and internationally recognized organizations. AI-powered extraction provides structured summaries: clinical scope, sequential management algorithms, and bedside practice pearls for rapid clinical decision-making.</p>
+        <Alert className="bg-blue-50 border-blue-200">
+          <Award className="w-4 h-4 text-blue-600 flex-shrink-0" />
+          <AlertDescription className="text-blue-800 text-xs leading-relaxed">
+            <strong>Evidence-Based:</strong> Built-in content sourced from KDIGO, IPNA, ISPD, AAP, EULAR, SHARE, ERKNet, ESPN, ISKDC, WHO. Educational bedside reference — always apply clinical judgment.
           </AlertDescription>
         </Alert>
       </div>
+
+      {selected && <GuidelineModal guideline={selected} onClose={() => setSelected(null)} />}
+      <AddGuidelineDialog open={dialogOpen} onOpenChange={setDialogOpen} onSuccess={() => queryClient.invalidateQueries({ queryKey: ["guidelines"] })} />
+      <BackToTop />
     </div>
   );
 }
