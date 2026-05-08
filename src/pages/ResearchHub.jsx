@@ -1,395 +1,416 @@
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Database, FileBarChart, Download, Brain, FileText, ArrowLeft, Microscope,
-  Plus, Users, TrendingUp, Sparkles, BookOpen, BarChart3, Layers,
-  Rocket, Share2, Clock, CheckCircle2, AlertCircle, Save, HardDrive, Edit2, FlaskConical
+  Database, Brain, FileText, Layers, Sparkles, BookOpen,
+  BarChart3, Users, Calculator, FlaskConical, Target, Shield,
+  GitBranch, Download, TrendingUp, Microscope, FileBarChart
 } from "lucide-react";
-import { toast } from "sonner";
-import ProjectWizard from '../components/research/ProjectWizard';
-import FormBuilder from '../components/research/FormBuilder';
-import DataExtractor from '../components/research/DataExtractor';
-import LiteratureSearch from '../components/research/LiteratureSearch';
-import StatisticalAnalysis from '../components/research/StatisticalAnalysis';
-import KnowledgeBase from '../components/research/KnowledgeBase';
-import ProtocolBuilder from '../components/research/ProtocolBuilder';
-import EnhancedProtocolBuilder from '../components/research/EnhancedProtocolBuilder';
-import EHRExtractor from '../components/research/EHRExtractor';
-import ResearchMethodsContent from '../components/research/ResearchMethodsContent';
 
-export default function ResearchHub() {
-  const [activeTab, setActiveTab] = useState("projects");
-  const [showProjectWizard, setShowProjectWizard] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
+import ResearchMethodsContent from "../components/research/ResearchMethodsContent";
+import KnowledgeBase from "../components/research/KnowledgeBase";
+import ResearchOSWorkspace from "../components/research/ResearchOSWorkspace";
+import LiteratureSearch from "../components/research/LiteratureSearch";
+import StatisticalAnalysis from "../components/research/StatisticalAnalysis";
 
-  const queryClient = useQueryClient();
-
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
-
-  const { data: projects = [] } = useQuery({
-    queryKey: ['research-projects', user?.email],
-    queryFn: async () => {
-      const all = await base44.entities.ResearchProject.list('-created_date');
-      // Show only own projects unless admin
-      if (user?.role === 'admin') return all;
-      return all.filter(p => p.principal_investigator === user?.email || p.collaborators?.includes(user?.email));
+// ─── Quick Reference Tools ─────────────────────────────────────────────────
+function QuickToolsPanel() {
+  const tools = [
+    {
+      title: "Study Design Guide",
+      desc: "RCT, Cohort, Cross-sectional — when to use each",
+      icon: GitBranch,
+      color: "bg-indigo-50 border-indigo-200",
+      iconColor: "text-indigo-600",
+      link: null
     },
-    enabled: !!user
-  });
+    {
+      title: "Sample Size Calculator",
+      desc: "Two proportions, two means — built into Study Builder",
+      icon: Calculator,
+      color: "bg-blue-50 border-blue-200",
+      iconColor: "text-blue-600",
+      link: null
+    },
+    {
+      title: "Statistical Test Selector",
+      desc: "Chi-square, t-test, ANOVA, regression — pick the right test",
+      icon: BarChart3,
+      color: "bg-purple-50 border-purple-200",
+      iconColor: "text-purple-600",
+      link: null
+    },
+    {
+      title: "STROBE Checklist",
+      desc: "Observational study reporting checklist — 22 items",
+      icon: FileText,
+      color: "bg-green-50 border-green-200",
+      iconColor: "text-green-600",
+      link: null
+    },
+    {
+      title: "CONSORT Checklist",
+      desc: "RCT reporting checklist — CONSORT 2010 extension",
+      icon: Shield,
+      color: "bg-teal-50 border-teal-200",
+      iconColor: "text-teal-600",
+      link: null
+    },
+    {
+      title: "PRISMA Checklist",
+      desc: "Systematic review/meta-analysis reporting — PRISMA 2020",
+      icon: Layers,
+      color: "bg-rose-50 border-rose-200",
+      iconColor: "text-rose-600",
+      link: null
+    },
+    {
+      title: "Journal Impact Factors",
+      desc: "Top nephrology + pediatrics journals ranked by IF",
+      icon: TrendingUp,
+      color: "bg-amber-50 border-amber-200",
+      iconColor: "text-amber-600",
+      link: null
+    },
+    {
+      title: "Bias Assessment Tools",
+      desc: "Cochrane RoB, NOS, GRADE — built into protocol builder",
+      icon: Microscope,
+      color: "bg-orange-50 border-orange-200",
+      iconColor: "text-orange-600",
+      link: null
+    },
+  ];
 
-  const { data: patients = [] } = useQuery({
-    queryKey: ['all-patients'],
-    queryFn: () => base44.entities.Patient.list()
-  });
+  return (
+    <div className="space-y-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+        {tools.map(t => {
+          const Icon = t.icon;
+          return (
+            <Card key={t.title} className={`border-2 ${t.color} hover:shadow-md transition-shadow`}>
+              <CardContent className="p-4">
+                <Icon className={`w-6 h-6 ${t.iconColor} mb-2`} />
+                <h3 className="font-semibold text-sm text-slate-900 mb-1">{t.title}</h3>
+                <p className="text-xs text-slate-600">{t.desc}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      <div className="p-4 bg-indigo-50 border-2 border-indigo-200 rounded-xl">
+        <p className="text-sm font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+          <Sparkles className="w-4 h-4" /> All tools are available inside Research OS
+        </p>
+        <p className="text-xs text-indigo-700">
+          Go to the <strong>Research OS</strong> tab → select a project → access study builder, eligibility engine, CRF, analytics, and manuscript studio in a unified workspace.
+        </p>
+      </div>
+    </div>
+  );
+}
 
-  const createProjectMutation = useMutation({
-    mutationFn: (projectData) => base44.entities.ResearchProject.create({
-      ...projectData,
-      principal_investigator: user?.email,
-      status: 'Planning',
-      included_patients: [],
-      collaborators: []
-    }),
-    onSuccess: (newProject) => {
-      queryClient.invalidateQueries({ queryKey: ['research-projects'] });
-      setShowProjectWizard(false);
-      setSelectedProject(newProject);
-      setActiveTab('forms');
-      toast.success('Research project created!');
-    }
-  });
+// ─── Reporting Guidelines Panel ────────────────────────────────────────────
+function ReportingGuidelinesPanel() {
+  const GUIDELINES = [
+    {
+      name: "STROBE", full: "Strengthening the Reporting of Observational Studies in Epidemiology",
+      year: 2007, items: 22, type: "Observational",
+      link: "https://www.strobe-statement.org",
+      sections: ["Title & Abstract", "Introduction", "Methods (Study design, Setting, Participants, Variables, Data sources, Bias, Study size, Statistical methods)", "Results (Participants, Descriptive data, Outcome data, Main results, Other analyses)", "Discussion (Key results, Limitations, Interpretation, Generalisability)", "Funding"],
+      key: "Exposure, confounders, effect modifiers must be clearly defined"
+    },
+    {
+      name: "CONSORT", full: "Consolidated Standards of Reporting Trials",
+      year: 2010, items: 25, type: "RCT",
+      link: "https://www.consort-statement.org",
+      sections: ["Title & Abstract", "Introduction (Background)", "Methods (Participants, Interventions, Outcomes, Randomisation, Blinding, Statistical methods)", "Results (Participant flow, Recruitment, Baseline data, Numbers analysed, Outcomes, Ancillary analyses, Harms)", "Discussion", "Other information (Registration, Protocol, Funding)"],
+      key: "CONSORT flow diagram mandatory — show screening, randomization, follow-up, analysis numbers"
+    },
+    {
+      name: "PRISMA", full: "Preferred Reporting Items for Systematic Reviews and Meta-Analyses",
+      year: 2020, items: 27, type: "Systematic Review / Meta-analysis",
+      link: "https://www.prisma-statement.org",
+      sections: ["Title", "Abstract", "Introduction", "Methods (Eligibility, Sources, Search, Selection, Data collection, Data items, Risk of bias, Effect measures, Synthesis methods, Reporting bias, Certainty assessment)", "Results (Study selection, Study characteristics, Risk of bias, Individual studies, Synthesis, Reporting biases, Certainty of evidence)", "Discussion", "Other"],
+      key: "PRISMA flow diagram mandatory — records identified, screened, eligible, included"
+    },
+    {
+      name: "STARD", full: "Standards for Reporting Diagnostic Accuracy Studies",
+      year: 2015, items: 30, type: "Diagnostic Accuracy",
+      link: "https://www.stard-statement.org",
+      sections: ["Title, abstract", "Introduction", "Methods (Study design, Participants, Test methods, Analysis)", "Results", "Discussion"],
+      key: "Report sensitivity, specificity, PPV, NPV, AUC with 95% CI"
+    },
+    {
+      name: "CARE", full: "Case Reports",
+      year: 2013, items: 13, type: "Case Report / Series",
+      link: "https://www.care-statement.org",
+      sections: ["Title", "Abstract", "Introduction", "Patient information", "Clinical findings", "Timeline", "Diagnostic assessment", "Therapeutic interventions", "Follow-up and outcomes", "Discussion", "Patient perspective", "Informed consent"],
+      key: "Patient consent and anonymization mandatory"
+    },
+  ];
 
-  const saveProjectToLocalDrive = async (project) => {
+  const [selected, setSelected] = useState(null);
+
+  return (
+    <div className="space-y-4">
+      <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {GUIDELINES.map(g => (
+          <button key={g.name} onClick={() => setSelected(selected?.name === g.name ? null : g)}
+            className={`p-4 rounded-xl border-2 text-left transition-all hover:shadow-md ${selected?.name === g.name ? "border-indigo-500 bg-indigo-50" : "border-slate-200 bg-white hover:border-indigo-300"}`}>
+            <div className="font-bold text-lg text-indigo-700 mb-1">{g.name}</div>
+            <Badge variant="outline" className="text-xs mb-2">{g.type}</Badge>
+            <div className="text-xs text-slate-600">{g.items} items · {g.year}</div>
+          </button>
+        ))}
+      </div>
+
+      {selected && (
+        <Card className="border-2 border-indigo-200">
+          <CardHeader className="pb-2 bg-indigo-50">
+            <CardTitle className="text-base text-indigo-900">{selected.name} — {selected.full}</CardTitle>
+            <div className="flex gap-2">
+              <Badge>{selected.type}</Badge>
+              <Badge variant="outline">{selected.items} checklist items</Badge>
+              <a href={selected.link} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">Official website →</a>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            <p className="text-xs font-bold text-amber-700 mb-3 p-2 bg-amber-50 rounded-lg">⭐ Key Point: {selected.key}</p>
+            <div className="grid md:grid-cols-2 gap-2">
+              {selected.sections.map((s, i) => (
+                <div key={i} className="flex gap-2 text-xs p-2 bg-slate-50 rounded-lg">
+                  <span className="text-indigo-500 font-bold shrink-0">{i + 1}.</span>
+                  <span className="text-slate-700">{s}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ─── Pediatric Nephrology Templates ────────────────────────────────────────
+function TemplatesPanel() {
+  const TEMPLATES = [
+    { condition: "AKI", type: "Cohort", title: "Acute Kidney Injury in Critically Ill Children — Incidence & Outcomes", pico: { population: "Children 1-18y admitted to PICU", intervention: "AKI (KDIGO staging)", comparison: "No AKI", outcome: "28-day mortality, RRT requirement, hospital stay" } },
+    { condition: "CKD", type: "CrossSectional", title: "Prevalence of Malnutrition in Children with CKD — A Cross-Sectional Study", pico: { population: "Children 1-18y with CKD Stage 2-5", intervention: "Nutritional assessment (PYMS, anthropometry)", comparison: "Age-matched healthy controls", outcome: "Prevalence of malnutrition, growth stunting" } },
+    { condition: "Nephrotic", type: "RCT", title: "Levamisole vs Mycophenolate in FRNS — A Randomized Controlled Trial", pico: { population: "Children 1-12y with frequently relapsing nephrotic syndrome", intervention: "Levamisole 2.5 mg/kg alternate days", comparison: "Mycophenolate mofetil 600 mg/m²/day", outcome: "Relapse rate at 12 months" } },
+    { condition: "Dialysis", type: "Cohort", title: "Peritoneal Dialysis Outcomes in Pediatric ESRD — A Single-Center Experience", pico: { population: "Children <18y on chronic PD", intervention: "PD therapy (CCPD/CAPD)", comparison: "HD (if comparative)", outcome: "Technique survival, growth, peritonitis episodes" } },
+    { condition: "Hypertension", type: "CaseControl", title: "Risk Factors for Hypertension in CKD Children — A Case-Control Study", pico: { population: "Children 1-18y with CKD", intervention: "Hypertension (BP >95th percentile)", comparison: "Normotensive CKD children", outcome: "Risk factors: GFR, proteinuria, anemia, obesity" } },
+    { condition: "Electrolytes", type: "CrossSectional", title: "Prevalence of Hyponatremia in Hospitalized Children — A Tertiary Care Study", pico: { population: "Hospitalized children 1-18y", intervention: "Serum sodium <135 mEq/L", comparison: "Normonatremic children", outcome: "Prevalence, etiology, outcomes" } },
+  ];
+
+  const [applying, setApplying] = useState(null);
+
+  const applyTemplate = async (tpl) => {
+    setApplying(tpl.condition);
     try {
-      const projectPatients = patients.filter(p => project.included_patients?.includes(p.id));
-      const exportObj = {
-        project,
-        patients: projectPatients,
-        exported_at: new Date().toISOString(),
-        version: "1.0",
-      };
-      const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${project.title.replace(/\s+/g, '_')}_backup_${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success('Project saved to your computer!');
+      const user = await base44.auth.me();
+      await base44.entities.ResearchProject.create({
+        title: tpl.title,
+        study_type: tpl.type,
+        pico: tpl.pico,
+        owner_email: user.email,
+        status: "Draft",
+        current_step: 0,
+        completed_steps: [],
+        total_enrolled: 0,
+        included_patients: [],
+        tags: [tpl.condition, "Pediatric Nephrology"],
+      });
+      window.location.reload();
     } catch {
-      toast.error('Failed to save backup');
+      alert("Failed to create from template");
+    } finally {
+      setApplying(null);
     }
   };
 
-  const updateProjectMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ResearchProject.update(id, { ...data, updated_date: new Date().toISOString() }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['research-projects'] }); toast.success('Project updated!'); }
-  });
-
-  const exportData = async (projectId, format) => {
-    toast.info("Generating export...", { id: "export" });
-    try {
-      const project = projects.find(p => p.id === projectId);
-      const projectPatients = patients.filter(p => project.included_patients?.includes(p.id));
-      
-      let content = "";
-      if (format === "csv") {
-        const headers = ["CR Number", "Name", "Age", "Gender", "Diagnosis", "Status"];
-        content = headers.join(",") + "\n";
-        projectPatients.forEach(p => {
-          content += `${p.cr_number},${p.patient_name},${p.age_years || ''},${p.gender},${p.diagnosis || ''},${p.status}\n`;
-        });
-      }
-
-      const blob = new Blob([content], { type: format === "csv" ? 'text/csv' : 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `research_export_${new Date().toISOString().split('T')[0]}.${format}`;
-      a.click();
-      toast.success("Export downloaded!", { id: "export" });
-    } catch (error) {
-      toast.error("Export failed", { id: "export" });
-    }
+  const COND_COLORS = {
+    AKI: "bg-red-50 border-red-200",
+    CKD: "bg-blue-50 border-blue-200",
+    Nephrotic: "bg-purple-50 border-purple-200",
+    Dialysis: "bg-cyan-50 border-cyan-200",
+    Hypertension: "bg-orange-50 border-orange-200",
+    Electrolytes: "bg-green-50 border-green-200",
   };
 
   return (
+    <div className="space-y-3">
+      <p className="text-sm text-slate-600">Pre-built pediatric nephrology study templates. Click "Use Template" to create a project with pre-filled PICO, design, and objectives.</p>
+      <div className="grid md:grid-cols-2 gap-3">
+        {TEMPLATES.map(tpl => (
+          <Card key={tpl.condition} className={`border-2 ${COND_COLORS[tpl.condition]} hover:shadow-md transition-shadow`}>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <div>
+                  <Badge variant="outline" className="text-xs mb-1">{tpl.condition} · {tpl.type}</Badge>
+                  <h3 className="font-semibold text-sm text-slate-900">{tpl.title}</h3>
+                </div>
+              </div>
+              <div className="space-y-1 mb-3 text-xs text-slate-600">
+                <div><span className="font-semibold text-slate-700">P:</span> {tpl.pico.population}</div>
+                <div><span className="font-semibold text-slate-700">O:</span> {tpl.pico.outcome}</div>
+              </div>
+              <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => applyTemplate(tpl)} disabled={applying === tpl.condition}>
+                {applying === tpl.condition ? "Creating..." : "Use Template → Open in Research OS"}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────
+export default function ResearchHub() {
+  const { data: projects = [] } = useQuery({
+    queryKey: ["hub-projects-count"],
+    queryFn: () => base44.entities.ResearchProject.list("-created_date", 50)
+  });
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
-      {/* Top Navigation Tabs */}
-      <div className="bg-white border-b-2 border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex gap-2">
-            <Link to={createPageUrl("Hub")}>
-              <Button variant="outline" className="hover:bg-blue-50">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Calc View
-              </Button>
-            </Link>
-            <Link to={createPageUrl("ClinicManagement")}>
-              <Button variant="outline" className="hover:bg-purple-50">
-                <Users className="w-4 h-4 mr-2" />
-                Clinic Mode
-              </Button>
-            </Link>
-            <Button className="bg-indigo-600 hover:bg-indigo-700">
-              <Layers className="w-4 h-4 mr-2" />
-              Research Mode
-            </Button>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-700 px-6 py-8 shadow-xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+              <Database className="w-9 h-9 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-white">Research Hub</h1>
+              <p className="text-purple-100">Integrated Clinical Research Ecosystem — Pediatric Nephrology</p>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <Badge className="bg-white/20 backdrop-blur text-white">AI-Assisted Study Design</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Live Patient Database Sync</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Eligibility Matching Engine</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Manuscript Studio</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">{projects.length} Projects</Badge>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto space-y-6 p-6">
-
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl p-8 shadow-2xl text-white">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
-              <Database className="w-9 h-9" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold">Research Hub</h1>
-              <p className="text-purple-100">REDCap-equivalent with AI-powered clinical data auto-extraction</p>
-            </div>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <Badge className="bg-white/20 backdrop-blur">80-90% Auto-Fill from Clinical Data</Badge>
-            <Badge className="bg-white/20 backdrop-blur">📊 AI Statistical Analysis</Badge>
-            <Badge className="bg-white/20 backdrop-blur">📚 Literature Search</Badge>
-            <Badge className="bg-white/20 backdrop-blur">🤖 Study Design Assistant</Badge>
-            <Badge className="bg-white/20 backdrop-blur">📈 Publication Ready</Badge>
-            <Link to={createPageUrl("ResearchMethodsHub")}>
-              <Badge className="bg-white/30 backdrop-blur cursor-pointer hover:bg-white/40 border border-white/50">
-                📐 Study Design & PRISMA Guide →
-              </Badge>
-            </Link>
-          </div>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-9 text-xs">
-            <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="methods">Methods</TabsTrigger>
-            <TabsTrigger value="protocol">Protocol</TabsTrigger>
-            <TabsTrigger value="forms">Forms</TabsTrigger>
-            <TabsTrigger value="data">Data</TabsTrigger>
-            <TabsTrigger value="ehr">EHR</TabsTrigger>
-            <TabsTrigger value="literature">Literature</TabsTrigger>
-            <TabsTrigger value="analysis">Analysis</TabsTrigger>
-            <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
+      {/* Content */}
+      <div className="max-w-7xl mx-auto p-6">
+        <Tabs defaultValue="os" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 text-xs">
+            <TabsTrigger value="os" className="gap-1.5">
+              <FlaskConical className="w-3.5 h-3.5" />Research OS
+            </TabsTrigger>
+            <TabsTrigger value="methods" className="gap-1.5">
+              <Brain className="w-3.5 h-3.5" />Methods Guide
+            </TabsTrigger>
+            <TabsTrigger value="tools" className="gap-1.5">
+              <Calculator className="w-3.5 h-3.5" />Quick Tools
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="gap-1.5">
+              <FileText className="w-3.5 h-3.5" />Templates
+            </TabsTrigger>
+            <TabsTrigger value="reporting" className="gap-1.5">
+              <FileBarChart className="w-3.5 h-3.5" />Reporting
+            </TabsTrigger>
+            <TabsTrigger value="knowledge" className="gap-1.5">
+              <BookOpen className="w-3.5 h-3.5" />Knowledge Base
+            </TabsTrigger>
           </TabsList>
 
+          {/* ── Research OS ── */}
+          <TabsContent value="os">
+            <Card className="shadow-xl border-2 border-indigo-100 overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b py-3 px-5">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FlaskConical className="w-5 h-5 text-indigo-600" />
+                  Research OS — Advanced Workflow Engine
+                  <Badge className="bg-indigo-100 text-indigo-700 ml-auto">Live DB Sync</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ResearchOSWorkspace />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Methods Guide ── */}
           <TabsContent value="methods">
-            <ResearchMethodsContent />
-          </TabsContent>
-
-          <TabsContent value="protocol">
-            <EnhancedProtocolBuilder />
-          </TabsContent>
-
-          <TabsContent value="projects" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-slate-900">Research Projects</h2>
-              <Dialog open={showProjectWizard} onOpenChange={setShowProjectWizard}>
-                <DialogTrigger asChild>
-                  <Button className="bg-purple-600 hover:bg-purple-700">
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Project
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Rocket className="w-5 h-5 text-purple-600" />
-                      Create Research Project
-                    </DialogTitle>
-                  </DialogHeader>
-                  <ProjectWizard onComplete={(data) => createProjectMutation.mutate(data)} />
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            {projects.length === 0 ? (
-              <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-purple-200">
-                <CardContent className="p-12 text-center">
-                  <Database className="w-20 h-20 text-purple-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">No Research Projects Yet</h3>
-                  <p className="text-slate-600 mb-6">Start your first research study with AI-powered tools and automatic clinical data extraction</p>
-                  <Button onClick={() => setShowProjectWizard(true)} className="bg-purple-600">
-                    <Rocket className="w-4 h-4 mr-2" />
-                    Create Your First Project
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {projects.map(project => (
-                  <Card key={project.id} className="hover:shadow-xl transition-shadow cursor-pointer" onClick={() => {
-                    setSelectedProject(project);
-                    setActiveTab('data');
-                  }}>
-                    <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg mb-1">{project.title}</CardTitle>
-                          <p className="text-sm text-slate-600">{project.description}</p>
-                        </div>
-                        <Badge className={
-                          project.status === 'Active' ? 'bg-green-100 text-green-800' :
-                          project.status === 'Planning' ? 'bg-blue-100 text-blue-800' :
-                          project.status === 'Analysis' ? 'bg-purple-100 text-purple-800' :
-                          'bg-slate-100 text-slate-800'
-                        }>
-                          {project.status}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-600">PI:</span>
-                          <span className="font-semibold">{project.principal_investigator}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-600">Patients Enrolled:</span>
-                          <span className="font-semibold">{project.included_patients?.length || 0}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-600">Study Type:</span>
-                          <Badge variant="outline">{project.study_type || 'observational'}</Badge>
-                        </div>
-                        <div className="flex gap-2 pt-2 border-t flex-wrap">
-                           <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
-                             e.stopPropagation();
-                             exportData(project.id, "csv");
-                           }}>
-                             <Download className="w-4 h-4 mr-2" />CSV
-                           </Button>
-                           <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
-                             e.stopPropagation();
-                             saveProjectToLocalDrive(project);
-                           }}>
-                             <HardDrive className="w-4 h-4 mr-2" />Backup
-                           </Button>
-                           <Button size="sm" variant="outline" className="flex-1" onClick={(e) => {
-                             e.stopPropagation();
-                             setSelectedProject(project);
-                             setActiveTab('analysis');
-                           }}>
-                             <BarChart3 className="w-4 h-4 mr-2" />Analyze
-                           </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="forms">
-            <Card className="shadow-xl">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    Research Form Builder - Clinical Data Auto-Extraction
-                  </CardTitle>
-                  <Badge className="bg-green-100 text-green-800">80-90% Auto-Fill</Badge>
-                </div>
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-blue-600" />Study Design & Methods Guide
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <Alert className="mb-6 bg-blue-50 border-blue-200">
-                  <Database className="w-4 h-4 text-blue-600" />
-                  <AlertDescription className="text-blue-800">
-                    <strong>Clinical Data Auto-Mapping:</strong> Link form fields to patient records, vitals, labs, medications. Research data auto-filled from routine care—no duplicate entry.
-                  </AlertDescription>
-                </Alert>
-
-                <FormBuilder onSave={(formData) => {
-                  console.log('Form saved:', formData);
-                  toast.success('Research form created with auto-extraction!');
-                }} />
+              <CardContent className="p-4">
+                <ResearchMethodsContent />
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="data">
-            {selectedProject ? (
-              <div className="space-y-6">
-                <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
-                      {selectedProject.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2 items-center">
-                      <Badge>{selectedProject.status}</Badge>
-                      <Badge variant="outline">{selectedProject.included_patients?.length || 0} patients enrolled</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <DataExtractor 
-                  patientId={patients[0]?.id}
-                  researchForm={{ sections: selectedProject.data_fields || [] }}
-                  onDataExtracted={(data) => {
-                    console.log('Data extracted:', data);
-                    toast.success('Clinical data extracted!');
-                  }}
-                />
-              </div>
-            ) : (
-              <Alert>
-                <AlertCircle className="w-4 h-4" />
-                <AlertDescription>
-                  Please select a project from the Projects tab to begin data collection.
-                </AlertDescription>
-              </Alert>
-            )}
-          </TabsContent>
-
-          <TabsContent value="ehr">
-            <Card className="shadow-xl">
-              <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-indigo-600" />
-                    NLP + EHR Registry Extractor
-                  </CardTitle>
-                  <Badge className="bg-indigo-100 text-indigo-800">AI-Powered · Claude Sonnet</Badge>
-                </div>
+          {/* ── Quick Tools ── */}
+          <TabsContent value="tools">
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="w-5 h-5 text-blue-600" />Quick Research Tools
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <EHRExtractor />
+              <CardContent className="p-4">
+                <QuickToolsPanel />
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="literature">
-            <LiteratureSearch projectId={selectedProject?.id} />
+          {/* ── Templates ── */}
+          <TabsContent value="templates">
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-purple-50 border-b">
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-purple-600" />Pediatric Nephrology Study Templates
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <TemplatesPanel />
+              </CardContent>
+            </Card>
           </TabsContent>
 
-          <TabsContent value="analysis">
-            <StatisticalAnalysis projectId={selectedProject?.id} />
+          {/* ── Reporting Guidelines ── */}
+          <TabsContent value="reporting">
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-green-50 border-b">
+                <CardTitle className="flex items-center gap-2">
+                  <FileBarChart className="w-5 h-5 text-green-600" />Reporting Guidelines (STROBE / CONSORT / PRISMA / STARD / CARE)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <ReportingGuidelinesPanel />
+              </CardContent>
+            </Card>
           </TabsContent>
 
+          {/* ── Knowledge Base ── */}
           <TabsContent value="knowledge">
-            <KnowledgeBase />
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-indigo-50 border-b">
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-indigo-600" />Research Knowledge Base
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <KnowledgeBase />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
