@@ -1,0 +1,81 @@
+{
+  "name": "GuidelineReference",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "PRNT",
+        "KDIGO",
+        "KDOQI",
+        "WHO",
+        "AIIMS",
+        "ISPD",
+        "IPNA",
+        "IAP",
+        "AAP",
+        "ESPN",
+        "Other"
+      ]
+    },
+    "year": {
+      "type": "number"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "recommendation_level": {
+      "type": "string",
+      "enum": [
+        "Strong",
+        "Moderate",
+        "Weak",
+        "Expert Opinion"
+      ]
+    },
+    "evidence_grade": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "linked_module": {
+      "type": "string",
+      "enum": [
+        "AKI",
+        "CKD",
+        "Dialysis",
+        "Nutrition",
+        "Hypertension",
+        "Nephrotic",
+        "Research",
+        "General"
+      ]
+    },
+    "doi_url": {
+      "type": "string"
+    },
+    "key_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "title",
+    "source",
+    "year",
+    "linked_module"
+  ]
+}

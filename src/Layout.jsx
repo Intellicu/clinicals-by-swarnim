@@ -94,6 +94,7 @@ const resourcesNavigation = [
   { title: "Audit Logs", url: createPageUrl("AuditLogs"), icon: FileText },
   { title: "Research Hub", url: createPageUrl("ResearchHub"), icon: Layers },
   { title: "Research OS", url: createPageUrl("ResearchOS"), icon: Layers },
+  { title: "Nutrition Hub", url: createPageUrl("NutritionHub"), icon: Heart },
   { title: "Notification Center", url: createPageUrl("NotificationDashboard"), icon: Bell },
   { title: "Genetic Analyzer", url: createPageUrl("GeneticReportAnalyzer"), icon: Activity },
   { title: "Patient Education", url: createPageUrl("PatientEducationHub"), icon: GraduationCap },

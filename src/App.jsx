@@ -21,6 +21,7 @@ import DifferentialEngine from './pages/DifferentialEngine';
 import CaseLibrary from './pages/CaseLibrary';
 import DischargeSummary from './pages/DischargeSummary';
 import ResearchOS from './pages/ResearchOS';
+import NutritionHub from './pages/NutritionHub';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -86,6 +87,7 @@ const AuthenticatedApp = () => {
       <Route path="/CaseLibrary" element={<LayoutWrapper currentPageName="CaseLibrary"><CaseLibrary /></LayoutWrapper>} />
       <Route path="/DischargeSummary" element={<LayoutWrapper currentPageName="DischargeSummary"><DischargeSummary /></LayoutWrapper>} />
       <Route path="/ResearchOS" element={<LayoutWrapper currentPageName="ResearchOS"><ResearchOS /></LayoutWrapper>} />
+      <Route path="/NutritionHub" element={<LayoutWrapper currentPageName="NutritionHub"><NutritionHub /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

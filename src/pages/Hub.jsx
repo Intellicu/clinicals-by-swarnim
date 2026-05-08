@@ -100,6 +100,7 @@ export default function Hub() {
     { name: "Case Library", icon: BookOpen, color: "bg-emerald-700", page: "CaseLibrary" },
     { name: "Discharge Summary", icon: FileText, color: "bg-slate-700", page: "DischargeSummary" },
     { name: "Research OS", icon: Layers, color: "bg-indigo-700", page: "ResearchOS" },
+    { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-teal-700", page: "NutritionHub" },
   ];
 
   const toolsNavigation = [
