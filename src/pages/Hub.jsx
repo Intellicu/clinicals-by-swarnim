@@ -83,6 +83,8 @@ export default function Hub() {
     { name: "Schwartz GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR" },
     { name: "BP Percentiles", icon: Heart, color: "bg-red-600", page: "BPPercentiles" },
     { name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
+    { name: "Guidelines", icon: BookOpen, color: "bg-blue-700", page: "Guidelines" },
+    { name: "Emergency Hub", icon: AlertCircle, color: "bg-red-700", page: "EmergencyHub" },
     { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
     { name: "RRT Assistant", icon: Droplet, color: "bg-cyan-600", page: "RRTAssistant" },
     { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
@@ -91,10 +93,8 @@ export default function Hub() {
     { name: "AI Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub" },
     { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer" },
     { name: "Research Methods", icon: Layers, color: "bg-rose-700", page: "ResearchMethodsHub" },
-    { name: "AI Pathway", icon: Brain, color: "bg-indigo-700", page: "AIClinicalPathway" },
     { name: "Clinical Approaches", icon: Stethoscope, color: "bg-cyan-700", page: "ClinicalApproaches" },
     { name: "Lab Pathways", icon: FlaskConical, color: "bg-amber-700", page: "LabPathways" },
-    { name: "Emergency Hub", icon: AlertCircle, color: "bg-red-700", page: "EmergencyHub" },
     { name: "Admit Orders", icon: ClipboardList, color: "bg-indigo-700", page: "AdmissionOrders" },
     { name: "Differential Dx", icon: Brain, color: "bg-violet-700", page: "DifferentialEngine" },
     { name: "Case Library", icon: BookOpen, color: "bg-emerald-700", page: "CaseLibrary" },
@@ -287,7 +287,7 @@ export default function Hub() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 overflow-x-hidden max-w-full">
       {/* Sticky Tool Nav */}
       <StickyToolNav />
 
