@@ -14,7 +14,8 @@ import { formatDistanceToNow } from "date-fns";
 import {
   FlaskConical, Plus, Edit3, BarChart3, BookOpen, Users, Trash2,
   Search, Calendar, Loader2, ChevronRight, CheckCircle2, XCircle,
-  UserCheck, Target, Shield, Database, FileText, Sparkles, ArrowLeft
+  UserCheck, Target, Shield, Database, FileText, Sparkles, ArrowLeft,
+  Crown
 } from "lucide-react";
 
 import StudyBuilder from "../ros/StudyBuilder";
@@ -29,7 +30,11 @@ import ResearchAIAssistant from "./ResearchAIAssistant";
 import StudyTypeDetector from "./StudyTypeDetector";
 import ReportingGuidelineTracker from "./ReportingGuidelineTracker";
 import ResearchContinuationWorkspace from "./ResearchContinuationWorkspace";
+import GrantWritingStudio from "./GrantWritingStudio";
+import LiteratureMonitorEngine from "./LiteratureMonitorEngine";
+import PremiumFeatureGate from "./PremiumFeatureGate";
 import { classifyStudyType, STUDY_TYPES, suggestNextSteps } from "@/lib/AdaptiveMethodologyEngine";
+import { usePremiumGate, FEATURE_GATES } from "@/lib/usePremiumGate";
 
 const STATUS_COLORS = {
   Draft: "bg-slate-100 text-slate-600",
@@ -43,16 +48,18 @@ const STATUS_COLORS = {
 
 const OS_SECTIONS = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { id: "builder", label: "Protocol Builder", icon: Target },
   { id: "import", label: "Import & Continue", icon: Database },
-  { id: "builder", label: "Study Builder", icon: Target },
-  { id: "eligibility", label: "Eligibility & Matching", icon: UserCheck },
+  { id: "literature", label: "Literature Workspace", icon: Search },
+  { id: "lit_monitor", label: "Literature Monitor", icon: BookOpen, premium: true },
   { id: "crf", label: "CRF Builder", icon: FileText },
-  { id: "ocr", label: "OCR Import", icon: Database },
+  { id: "eligibility", label: "Patient Matching", icon: UserCheck },
   { id: "data", label: "Data Collection", icon: Database },
+  { id: "ocr", label: "OCR Import", icon: Database },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "manuscript", label: "Manuscript Studio", icon: BookOpen },
-  { id: "literature", label: "Literature", icon: Search },
-  { id: "reporting", label: "Reporting Checklist", icon: Shield },
+  { id: "grant", label: "Grant Writing Studio", icon: FileText, premium: true },
+  { id: "reporting", label: "Submission Toolkit", icon: Shield },
 ];
 
 export default function ResearchOSWorkspace() {
@@ -66,6 +73,7 @@ export default function ResearchOSWorkspace() {
   const [showStudyBuilder, setShowStudyBuilder] = useState(false);
 
   const { data: user } = useQuery({ queryKey: ["me"], queryFn: () => base44.auth.me() });
+  const gate = usePremiumGate(user);
   const { data: patients = [] } = useQuery({ queryKey: ["all-patients"], queryFn: () => base44.entities.Patient.list("-created_date", 200) });
 
   const { data: projects = [], refetch } = useQuery({
@@ -166,11 +174,15 @@ export default function ResearchOSWorkspace() {
             <div className="space-y-0.5 mt-2">
               {OS_SECTIONS.map(s => {
                 const Icon = s.icon;
+                const isPremiumLocked = s.premium && !gate.isAdmin;
                 return (
                   <button key={s.id} onClick={() => setActiveSection(s.id)}
-                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs transition-colors ${activeSection === s.id ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-200"}`}>
+                    className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs transition-colors ${activeSection === s.id ? "bg-indigo-600 text-white" : isPremiumLocked ? "text-slate-400 hover:bg-slate-100" : "text-slate-600 hover:bg-slate-200"}`}>
                     <Icon className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">{s.label}</span>
+                    <span className="truncate flex-1">{s.label}</span>
+                    {isPremiumLocked && (
+                      <span className="text-amber-500 text-xs">★</span>
+                    )}
                   </button>
                 );
               })}
@@ -304,10 +316,14 @@ export default function ResearchOSWorkspace() {
                     <h3 className="text-sm font-semibold text-slate-700 mb-3">Quick Actions</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                       {[
-                        { label: "Open Study Builder", icon: Target, action: () => setShowStudyBuilder(true), color: "bg-indigo-600" },
-                        { label: "Match Patients", icon: UserCheck, action: () => setActiveSection("eligibility"), color: "bg-green-600" },
+                        { label: "Protocol Builder", icon: Target, action: () => setShowStudyBuilder(true), color: "bg-indigo-600" },
+                        { label: "Patient Matching", icon: UserCheck, action: () => setActiveSection("eligibility"), color: "bg-green-600" },
                         { label: "Analytics", icon: BarChart3, action: () => setActiveSection("analytics"), color: "bg-purple-600" },
                         { label: "Manuscript Studio", icon: BookOpen, action: () => setActiveSection("manuscript"), color: "bg-amber-600" },
+                        { label: "Grant Studio", icon: FileText, action: () => setActiveSection("grant"), color: gate.isAdmin ? "bg-rose-600" : "bg-slate-400" },
+                        { label: "Lit Monitor", icon: Search, action: () => setActiveSection("lit_monitor"), color: gate.isAdmin ? "bg-teal-600" : "bg-slate-400" },
+                        { label: "CRF Builder", icon: Database, action: () => setActiveSection("crf"), color: "bg-cyan-600" },
+                        { label: "Import & Continue", icon: Shield, action: () => setActiveSection("import"), color: "bg-slate-600" },
                       ].map(a => (
                         <button key={a.label} onClick={a.action}
                           className={`${a.color} text-white rounded-xl p-3 flex flex-col items-center gap-2 hover:opacity-90 transition-opacity`}>
@@ -432,6 +448,28 @@ export default function ResearchOSWorkspace() {
 
             {activeSection === "literature" && (
               <LiteratureSearch projectId={selectedProject.id} />
+            )}
+
+            {activeSection === "lit_monitor" && (
+              <PremiumFeatureGate
+                hasAccess={gate.canAccess(FEATURE_GATES.LITERATURE_MONITOR)}
+                featureName="Literature Monitoring Engine"
+                description="Automated PubMed + Google Scholar surveillance with AI-powered abstract summarization, evidence gap analysis, and real-time guideline updates for your specific study topic."
+                icon={BookOpen}
+              >
+                <LiteratureMonitorEngine project={selectedProject} />
+              </PremiumFeatureGate>
+            )}
+
+            {activeSection === "grant" && (
+              <PremiumFeatureGate
+                hasAccess={gate.canAccess(FEATURE_GATES.GRANT_WRITING_STUDIO)}
+                featureName="Grant Writing Studio"
+                description="AI-assisted grant generation for ICMR, ANRF, DBT, DST, AIIMS Intramural and more. Includes smart budget engine, section-by-section AI writing, and AI reviewer simulation."
+                icon={FileText}
+              >
+                <GrantWritingStudio project={selectedProject} />
+              </PremiumFeatureGate>
             )}
           </div>
         )}

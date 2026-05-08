@@ -10,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Database, Brain, FileText, Layers, Sparkles, BookOpen,
   BarChart3, Users, Calculator, FlaskConical, Target, Shield,
-  GitBranch, Download, TrendingUp, Microscope, FileBarChart, Upload
+  GitBranch, Download, TrendingUp, Microscope, FileBarChart, Upload, Crown, Lock
 } from "lucide-react";
+import { usePremiumGate } from "@/lib/usePremiumGate";
 
 import ResearchMethodsContent from "../components/research/ResearchMethodsContent";
 import KnowledgeBase from "../components/research/KnowledgeBase";
@@ -280,6 +281,9 @@ export default function ResearchHub() {
     queryFn: () => base44.entities.ResearchProject.list("-created_date", 50)
   });
 
+  const { data: user } = useQuery({ queryKey: ["me"], queryFn: () => base44.auth.me() });
+  const gate = usePremiumGate(user);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
       {/* Header */}
@@ -294,13 +298,22 @@ export default function ResearchHub() {
               <p className="text-purple-100">Integrated Clinical Research Ecosystem — Pediatric Nephrology</p>
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap items-center">
             <Badge className="bg-white/20 backdrop-blur text-white">Adaptive Methodology Engine</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Import & Continue Research</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">11 Study Type Classifiers</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Reporting Guideline Tracker</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Import & Continue</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">11 Study Classifiers</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Reporting Tracker</Badge>
             <Badge className="bg-white/20 backdrop-blur text-white">Live DB Sync</Badge>
             <Badge className="bg-white/20 backdrop-blur text-white">{projects.length} Projects</Badge>
+            {gate.isAdmin ? (
+              <Badge className="bg-amber-400/90 text-amber-900 gap-1 font-semibold">
+                <Crown className="w-3 h-3" />Premium Unlocked
+              </Badge>
+            ) : (
+              <Badge className="bg-white/10 text-white/70 gap-1 border border-white/20">
+                <Lock className="w-3 h-3" />Premium features locked
+              </Badge>
+            )}
           </div>
         </div>
       </div>
