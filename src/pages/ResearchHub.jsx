@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Database, Brain, FileText, Layers, Sparkles, BookOpen,
   BarChart3, Users, Calculator, FlaskConical, Target, Shield,
-  GitBranch, Download, TrendingUp, Microscope, FileBarChart
+  GitBranch, Download, TrendingUp, Microscope, FileBarChart, Upload
 } from "lucide-react";
 
 import ResearchMethodsContent from "../components/research/ResearchMethodsContent";
@@ -18,6 +18,7 @@ import KnowledgeBase from "../components/research/KnowledgeBase";
 import ResearchOSWorkspace from "../components/research/ResearchOSWorkspace";
 import LiteratureSearch from "../components/research/LiteratureSearch";
 import StatisticalAnalysis from "../components/research/StatisticalAnalysis";
+import ResearchContinuationWorkspace from "../components/research/ResearchContinuationWorkspace";
 
 // ─── Quick Reference Tools ─────────────────────────────────────────────────
 function QuickToolsPanel() {
@@ -294,10 +295,11 @@ export default function ResearchHub() {
             </div>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <Badge className="bg-white/20 backdrop-blur text-white">AI-Assisted Study Design</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Live Patient Database Sync</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Eligibility Matching Engine</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Manuscript Studio</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Adaptive Methodology Engine</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Import & Continue Research</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">11 Study Type Classifiers</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Reporting Guideline Tracker</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Live DB Sync</Badge>
             <Badge className="bg-white/20 backdrop-blur text-white">{projects.length} Projects</Badge>
           </div>
         </div>
@@ -306,15 +308,18 @@ export default function ResearchHub() {
       {/* Content */}
       <div className="max-w-7xl mx-auto p-6">
         <Tabs defaultValue="os" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 text-xs">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 text-xs">
             <TabsTrigger value="os" className="gap-1.5">
               <FlaskConical className="w-3.5 h-3.5" />Research OS
             </TabsTrigger>
+            <TabsTrigger value="import" className="gap-1.5">
+              <Upload className="w-3.5 h-3.5" />Import & Continue
+            </TabsTrigger>
             <TabsTrigger value="methods" className="gap-1.5">
-              <Brain className="w-3.5 h-3.5" />Methods Guide
+              <Brain className="w-3.5 h-3.5" />Methods
             </TabsTrigger>
             <TabsTrigger value="tools" className="gap-1.5">
-              <Calculator className="w-3.5 h-3.5" />Quick Tools
+              <Calculator className="w-3.5 h-3.5" />Tools
             </TabsTrigger>
             <TabsTrigger value="templates" className="gap-1.5">
               <FileText className="w-3.5 h-3.5" />Templates
@@ -323,7 +328,7 @@ export default function ResearchHub() {
               <FileBarChart className="w-3.5 h-3.5" />Reporting
             </TabsTrigger>
             <TabsTrigger value="knowledge" className="gap-1.5">
-              <BookOpen className="w-3.5 h-3.5" />Knowledge Base
+              <BookOpen className="w-3.5 h-3.5" />Knowledge
             </TabsTrigger>
           </TabsList>
 
@@ -339,6 +344,23 @@ export default function ResearchHub() {
               </CardHeader>
               <CardContent className="p-0">
                 <ResearchOSWorkspace />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Import & Continue ── */}
+          <TabsContent value="import">
+            <Card className="shadow-xl border-2 border-purple-100 overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b py-3 px-5">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Upload className="w-5 h-5 text-purple-600" />
+                  Import & Continue Research
+                  <Badge className="bg-purple-100 text-purple-700 ml-auto">AI Document Understanding</Badge>
+                </CardTitle>
+                <p className="text-xs text-slate-500">Upload an existing protocol, manuscript, or thesis — AI will analyze it and help you continue from where you left off.</p>
+              </CardHeader>
+              <CardContent className="p-4">
+                <ResearchContinuationWorkspace />
               </CardContent>
             </Card>
           </TabsContent>

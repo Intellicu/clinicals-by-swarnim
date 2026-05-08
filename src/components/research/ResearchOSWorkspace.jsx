@@ -26,6 +26,10 @@ import EHRExtractor from "./EHRExtractor";
 import FormBuilder from "./FormBuilder";
 import LiteratureSearch from "./LiteratureSearch";
 import ResearchAIAssistant from "./ResearchAIAssistant";
+import StudyTypeDetector from "./StudyTypeDetector";
+import ReportingGuidelineTracker from "./ReportingGuidelineTracker";
+import ResearchContinuationWorkspace from "./ResearchContinuationWorkspace";
+import { classifyStudyType, STUDY_TYPES, suggestNextSteps } from "@/lib/AdaptiveMethodologyEngine";
 
 const STATUS_COLORS = {
   Draft: "bg-slate-100 text-slate-600",
@@ -39,6 +43,7 @@ const STATUS_COLORS = {
 
 const OS_SECTIONS = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { id: "import", label: "Import & Continue", icon: Database },
   { id: "builder", label: "Study Builder", icon: Target },
   { id: "eligibility", label: "Eligibility & Matching", icon: UserCheck },
   { id: "crf", label: "CRF Builder", icon: FileText },
@@ -47,6 +52,7 @@ const OS_SECTIONS = [
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "manuscript", label: "Manuscript Studio", icon: BookOpen },
   { id: "literature", label: "Literature", icon: Search },
+  { id: "reporting", label: "Reporting Checklist", icon: Shield },
 ];
 
 export default function ResearchOSWorkspace() {
@@ -241,16 +247,28 @@ export default function ResearchOSWorkspace() {
         ) : (
           <div className="p-5">
             {/* Project Header */}
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b">
-              <button onClick={() => setSelectedProject(null)} className="text-slate-400 hover:text-slate-700">
+            <div className="flex items-start gap-3 mb-4 pb-4 border-b">
+              <button onClick={() => setSelectedProject(null)} className="text-slate-400 hover:text-slate-700 mt-1">
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div className="flex-1 min-w-0">
                 <h2 className="font-bold text-slate-900 truncate">{selectedProject.title}</h2>
-                <div className="flex gap-2 items-center mt-0.5">
+                <div className="flex gap-2 items-center mt-0.5 flex-wrap">
                   <Badge className={STATUS_COLORS[selectedProject.status]}>{selectedProject.status}</Badge>
-                  {selectedProject.study_type && <Badge variant="outline" className="text-xs">{selectedProject.study_type}</Badge>}
                   <span className="text-xs text-slate-400">{selectedProject.total_enrolled || 0} enrolled · {getProgress(selectedProject)}% complete</span>
+                </div>
+                {/* Adaptive Methodology Engine — Study Type Badge */}
+                <div className="mt-2">
+                  <StudyTypeDetector
+                    title={selectedProject.title}
+                    currentStudyType={selectedProject.study_type}
+                    compact={true}
+                    onSelectType={async (typeId) => {
+                      await base44.entities.ResearchProject.update(selectedProject.id, { study_type: typeId });
+                      setSelectedProject(p => ({ ...p, study_type: typeId }));
+                      refetch();
+                    }}
+                  />
                 </div>
               </div>
               <Select value={selectedProject.status} onValueChange={v => updateStatus(selectedProject.id, v)}>
@@ -334,17 +352,50 @@ export default function ResearchOSWorkspace() {
               </div>
             )}
 
+            {activeSection === "import" && (
+              <ResearchContinuationWorkspace
+                project={selectedProject}
+                onProjectUpdate={(updated) => { setSelectedProject(updated); refetch(); }}
+              />
+            )}
+
             {activeSection === "builder" && (
-              <div>
-                <Alert className="mb-3 border-indigo-200 bg-indigo-50">
+              <div className="space-y-3">
+                {/* Study Type Detector — full mode in builder */}
+                <StudyTypeDetector
+                  title={selectedProject.title}
+                  currentStudyType={selectedProject.study_type}
+                  onDetected={(detected) => {
+                    if (!selectedProject.study_type) {
+                      // Auto-suggest but don't force
+                    }
+                  }}
+                  onSelectType={async (typeId) => {
+                    await base44.entities.ResearchProject.update(selectedProject.id, { study_type: typeId });
+                    setSelectedProject(p => ({ ...p, study_type: typeId }));
+                    refetch();
+                  }}
+                />
+                <Alert className="border-indigo-200 bg-indigo-50">
                   <AlertDescription className="text-sm flex items-center justify-between">
-                    <span>Full step-by-step study builder with AI assistance at each stage</span>
+                    <span>Full step-by-step study builder with adaptive AI assistance</span>
                     <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 ml-4" onClick={() => setShowStudyBuilder(true)}>
                       Open Study Builder <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </AlertDescription>
                 </Alert>
               </div>
+            )}
+
+            {activeSection === "reporting" && (
+              <ReportingGuidelineTracker
+                studyTypeId={selectedProject.study_type || classifyStudyType(selectedProject.title)?.detected?.id}
+                projectChecklist={selectedProject.checklist_strobe || selectedProject.checklist_consort}
+                onChecklistUpdate={async (updated) => {
+                  const field = selectedProject.study_type === "rct" ? "checklist_consort" : "checklist_strobe";
+                  await base44.entities.ResearchProject.update(selectedProject.id, { [field]: updated });
+                }}
+              />
             )}
 
             {activeSection === "eligibility" && (
