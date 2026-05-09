@@ -34,7 +34,11 @@ import {
   ArrowRight,
   Sparkles,
   Link as LinkIcon,
-  GraduationCap
+  GraduationCap,
+  Pill,
+  Network,
+  Dna,
+  GitBranch
 } from "lucide-react";
 import { toast } from "sonner";
 import GuidelineEditor from "../components/GuidelineEditor";
@@ -47,6 +51,10 @@ import { Smartphone, BookOpenCheck } from "lucide-react";
 import ExpertReviewPanel from "@/components/clinicalOS/ExpertReviewPanel";
 import { EvidenceAuthorityPanel } from "@/components/clinicalOS/EvidenceAuthorityPanel";
 import { GUIDELINE_HIERARCHY } from "@/lib/clinicalOS/EvidenceGovernance";
+import StructuredPrescriptionPanel from "@/components/clinicalOS/StructuredPrescriptionPanel.jsx";
+import ClinicalKnowledgeGraphPanel from "@/components/clinicalOS/ClinicalKnowledgeGraphPanel.jsx";
+import EvidenceVersioningPanel from "@/components/clinicalOS/EvidenceVersioningPanel.jsx";
+import DifferentialDiagnosisPanel from "@/components/clinicalOS/DifferentialDiagnosisPanel.jsx";
 
 export default function GuidelineDetail() {
   const navigate = useNavigate();
@@ -608,6 +616,22 @@ Only return JSON.`;
                   <ArrowRight className="w-4 h-4" />
                   <span className="hidden sm:inline">Actions</span>
                 </TabsTrigger>
+                <TabsTrigger value="prescriptions" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <Pill className="w-4 h-4" />
+                  <span className="hidden sm:inline">Rx</span>
+                </TabsTrigger>
+                <TabsTrigger value="knowledge" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <Network className="w-4 h-4" />
+                  <span className="hidden sm:inline">Graph</span>
+                </TabsTrigger>
+                <TabsTrigger value="ddx" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <GitBranch className="w-4 h-4" />
+                  <span className="hidden sm:inline">DDx</span>
+                </TabsTrigger>
+                <TabsTrigger value="versioning" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <History className="w-4 h-4" />
+                  <span className="hidden sm:inline">Versions</span>
+                </TabsTrigger>
                 {user?.role === "admin" && (
                   <TabsTrigger value="governance" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px] bg-indigo-50 data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
                     <Sparkles className="w-4 h-4" />
@@ -862,6 +886,66 @@ Only return JSON.`;
                   </CardHeader>
                   <CardContent className="p-4">
                     <ContextualActionsPanel category={guideline.category} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Prescription Templates Tab */}
+              <TabsContent value="prescriptions" className="mt-4">
+                <Card className="shadow-lg border-2 border-blue-200">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Pill className="w-5 h-5 text-blue-600" />
+                      <span className="text-blue-900">Evidence-Linked Prescription Templates</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <StructuredPrescriptionPanel category={guideline.category} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Knowledge Graph Tab */}
+              <TabsContent value="knowledge" className="mt-4">
+                <Card className="shadow-lg border-2 border-green-200">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b border-green-200 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Network className="w-5 h-5 text-green-600" />
+                      <span className="text-green-900">Clinical Knowledge Graph</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <ClinicalKnowledgeGraphPanel />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Differential Diagnosis Tab */}
+              <TabsContent value="ddx" className="mt-4">
+                <Card className="shadow-lg border-2 border-indigo-200">
+                  <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-200 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <GitBranch className="w-5 h-5 text-indigo-600" />
+                      <span className="text-indigo-900">Differential Diagnosis Engine</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <DifferentialDiagnosisPanel />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Evidence Versioning Tab */}
+              <TabsContent value="versioning" className="mt-4">
+                <Card className="shadow-lg border-2 border-amber-200">
+                  <CardHeader className="bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <History className="w-5 h-5 text-amber-600" />
+                      <span className="text-amber-900">Evidence Version History</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <EvidenceVersioningPanel />
                   </CardContent>
                 </Card>
               </TabsContent>

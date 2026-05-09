@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   Pill, Calculator, Activity, Shield, Heart, FlaskConical,
-  AlertTriangle, ArrowRight, GitBranch, FileText, Stethoscope, Zap
+  AlertTriangle, ArrowRight, GitBranch, FileText, Stethoscope, Zap, Network
 } from "lucide-react";
 
 const CONTEXTUAL_LINKS = {
@@ -78,8 +78,15 @@ const FALLBACK_LINKS = [
   { icon: Calculator, label: "Clinical Calculators", desc: "GFR, BP, Kt/V, and more", color: "text-teal-600 bg-teal-50 border-teal-200", url: "ClinicalOS" },
 ];
 
+// Additional OS links appended to every category
+const OS_LINKS = [
+  { icon: GitBranch, label: "DDx Engine", desc: "Symptom-driven differential diagnosis", color: "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200", url: "ClinicalOS" },
+  { icon: FileText, label: "Knowledge Graph", desc: "Disease–drug–gene–pathway connections", color: "text-emerald-600 bg-emerald-50 border-emerald-200", url: "ClinicalOS" },
+];
+
 export default function ContextualActionsPanel({ category, compact = false }) {
-  const links = CONTEXTUAL_LINKS[category] || FALLBACK_LINKS;
+  const base = CONTEXTUAL_LINKS[category] || FALLBACK_LINKS;
+  const links = compact ? base : [...base, ...OS_LINKS];
   const displayLinks = compact ? links.slice(0, 4) : links;
 
   if (!links.length) return null;

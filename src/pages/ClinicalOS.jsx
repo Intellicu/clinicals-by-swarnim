@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Activity, Brain, Calculator, Shield, GitBranch, TrendingUp,
-  BookOpen, Pill, Zap, Heart, ChevronRight, AlertTriangle, CheckCircle, Info, GitCompare, Award
+  BookOpen, Pill, Zap, Heart, ChevronRight, AlertTriangle, CheckCircle, Info, GitCompare, Award,
+  Network, History, FileText
 } from "lucide-react";
 import DoseCalculatorPanel from "@/components/clinicalOS/DoseCalculatorPanel";
 import PathwayExecutor from "@/components/clinicalOS/PathwayExecutor";
@@ -17,6 +18,10 @@ import { getFactsForModule, getComparableFacts } from "@/lib/clinicalOS/Clinical
 import { GUIDELINE_HIERARCHY } from "@/lib/clinicalOS/EvidenceGovernance";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import StructuredPrescriptionPanel from "@/components/clinicalOS/StructuredPrescriptionPanel.jsx";
+import ClinicalKnowledgeGraphPanel from "@/components/clinicalOS/ClinicalKnowledgeGraphPanel.jsx";
+import EvidenceVersioningPanel from "@/components/clinicalOS/EvidenceVersioningPanel.jsx";
+import DifferentialDiagnosisPanel from "@/components/clinicalOS/DifferentialDiagnosisPanel.jsx";
 
 const OS_MODULES = [
   { id: "facts", icon: BookOpen, label: "Clinical Facts Registry", color: "bg-blue-600", desc: "Canonical definitions" },
@@ -27,6 +32,10 @@ const OS_MODULES = [
   { id: "bp", icon: Activity, label: "BP Percentile", color: "bg-rose-600", desc: "SBP + DBP · AAP 2017" },
   { id: "longitudinal", icon: TrendingUp, label: "Longitudinal Engine", color: "bg-teal-600", desc: "Trends + risk scoring" },
   { id: "hierarchy", icon: Award, label: "Evidence Hierarchy", color: "bg-amber-600", desc: "Primary guidelines by area" },
+  { id: "prescriptions", icon: Pill, label: "Rx Templates", color: "bg-blue-500", desc: "Guideline-linked prescriptions" },
+  { id: "knowledge", icon: Network, label: "Knowledge Graph", color: "bg-emerald-600", desc: "Disease-drug-gene-pathway" },
+  { id: "ddx", icon: GitBranch, label: "DDx Engine", color: "bg-fuchsia-600", desc: "Differential diagnosis" },
+  { id: "versioning", icon: History, label: "Evidence Versions", color: "bg-orange-600", desc: "Guideline timelines" },
 ];
 
 const QUICK_REFS = [
@@ -97,7 +106,7 @@ export default function ClinicalOS() {
         {/* Module Navigation */}
         <div className="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">OS Modules</p>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2">
             {OS_MODULES.map(m => (
               <button key={m.id} onClick={() => setActiveModule(m.id)}
                 className={`flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all text-center ${activeModule === m.id ? "bg-slate-900 text-white shadow-lg scale-105" : "hover:bg-slate-50 text-slate-600"}`}>
@@ -292,6 +301,71 @@ export default function ClinicalOS() {
                 )}
               </div>
 
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Prescription Templates */}
+        {activeModule === "prescriptions" && (
+          <Card className="border-2 border-blue-200 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Pill className="w-5 h-5 text-blue-600" />Structured Prescription Templates
+                <Badge className="ml-auto bg-blue-600 text-white text-xs">Evidence-Linked</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              {["Nephrotic Syndrome", "Hypertension", "Dialysis"].map(cat => (
+                <div key={cat} className="mb-4">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">{cat}</p>
+                  <StructuredPrescriptionPanel category={cat} />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Knowledge Graph */}
+        {activeModule === "knowledge" && (
+          <Card className="border-2 border-emerald-200 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Network className="w-5 h-5 text-emerald-600" />Clinical Knowledge Graph
+                <Badge className="ml-auto bg-emerald-600 text-white text-xs">Disease · Drug · Gene · Biopsy</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <ClinicalKnowledgeGraphPanel />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* DDx Engine */}
+        {activeModule === "ddx" && (
+          <Card className="border-2 border-fuchsia-200 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-fuchsia-50 to-purple-50 pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <GitBranch className="w-5 h-5 text-fuchsia-600" />Differential Diagnosis Engine
+                <Badge className="ml-auto bg-fuchsia-600 text-white text-xs">Symptom-Driven</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <DifferentialDiagnosisPanel />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Evidence Versioning */}
+        {activeModule === "versioning" && (
+          <Card className="border-2 border-orange-200 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <History className="w-5 h-5 text-orange-600" />Evidence Versioning
+                <Badge className="ml-auto bg-orange-600 text-white text-xs">Guideline Timelines</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <EvidenceVersioningPanel />
             </CardContent>
           </Card>
         )}
