@@ -22,6 +22,7 @@ import CaseLibrary from './pages/CaseLibrary';
 import DischargeSummary from './pages/DischargeSummary';
 import ResearchOS from './pages/ResearchOS';
 import NutritionHub from './pages/NutritionHub';
+import ClinicalOS from './pages/ClinicalOS';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -88,6 +89,7 @@ const AuthenticatedApp = () => {
       <Route path="/DischargeSummary" element={<LayoutWrapper currentPageName="DischargeSummary"><DischargeSummary /></LayoutWrapper>} />
       <Route path="/ResearchOS" element={<LayoutWrapper currentPageName="ResearchOS"><ResearchOS /></LayoutWrapper>} />
       <Route path="/NutritionHub" element={<LayoutWrapper currentPageName="NutritionHub"><NutritionHub /></LayoutWrapper>} />
+      <Route path="/ClinicalOS" element={<LayoutWrapper currentPageName="ClinicalOS"><ClinicalOS /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
