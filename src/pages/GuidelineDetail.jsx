@@ -30,12 +30,16 @@ import {
   History,
   ArrowRight,
   Sparkles,
-  Link as LinkIcon
+  Link as LinkIcon,
+  GraduationCap
 } from "lucide-react";
 import { toast } from "sonner";
 import GuidelineEditor from "../components/GuidelineEditor";
 import MultimediaViewer from "../components/guidelines/MultimediaViewer";
 import ReferencesPanel from "../components/guidelines/ReferencesPanel";
+import SmartRelatedContent from "../components/guidelines/SmartRelatedContent";
+import GuidelineCompletenessTracker from "../components/guidelines/GuidelineCompletenessTracker";
+import TeachingModePanel from "../components/guidelines/TeachingModePanel";
 import { Smartphone, BookOpenCheck } from "lucide-react";
 
 export default function GuidelineDetail() {
@@ -551,6 +555,14 @@ Only return JSON.`;
                   <Award className="w-4 h-4" />
                   <span className="hidden sm:inline">Evidence</span>
                 </TabsTrigger>
+                <TabsTrigger value="teaching" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <GraduationCap className="w-4 h-4" />
+                  <span className="hidden sm:inline">Teach</span>
+                </TabsTrigger>
+                <TabsTrigger value="audit" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="hidden sm:inline">Audit</span>
+                </TabsTrigger>
               </TabsList>
 
               {/* Practice Pearls Tab */}
@@ -703,7 +715,45 @@ Only return JSON.`;
                 </Card>
               </TabsContent>
 
-              {/* New Related Guidelines & Links Tab */}
+              {/* Teaching Mode Tab */}
+              <TabsContent value="teaching" className="mt-6">
+                <Card className="shadow-xl border-2 border-violet-300">
+                  <CardHeader className="bg-gradient-to-r from-violet-100 to-purple-100 border-b-2 border-violet-300">
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      <div className="w-12 h-12 bg-violet-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <GraduationCap className="w-7 h-7 text-white" />
+                      </div>
+                      <span className="text-violet-900">Teaching Mode</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <TeachingModePanel guideline={guideline} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Audit & Completeness Tab */}
+              <TabsContent value="audit" className="mt-6">
+                <Card className="shadow-xl border-2 border-teal-300">
+                  <CardHeader className="bg-gradient-to-r from-teal-100 to-emerald-100 border-b-2 border-teal-300">
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <TrendingUp className="w-7 h-7 text-white" />
+                      </div>
+                      <span className="text-teal-900">Content Completeness Audit</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-6">
+                    <GuidelineCompletenessTracker guideline={guideline} />
+                    <div className="border-t pt-4">
+                      <p className="text-sm font-bold text-slate-700 mb-3">Smart Ecosystem Links</p>
+                      <SmartRelatedContent guideline={guideline} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Related Guidelines & Links Tab */}
               <TabsContent value="related" className="mt-6">
                 <Card className="shadow-xl border-2 border-indigo-300">
                   <CardHeader className="bg-gradient-to-r from-indigo-100 to-blue-100 border-b-2 border-indigo-300">

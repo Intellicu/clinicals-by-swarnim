@@ -1,36 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Search, BookOpen, Plus, Upload, Edit, X, CheckCircle, Sparkles,
-  Lightbulb, Target, Library, ChevronUp, Star, StarOff,
-  AlertTriangle, TrendingUp, Award, Loader2, Maximize2
+  Search, BookOpen, Plus, X, Sparkles, Lightbulb, Target,
+  Library, ChevronUp, Star, StarOff, AlertTriangle, TrendingUp,
+  Award, Loader2, Maximize2, Zap, Download, RefreshCw,
+  GraduationCap, Scale, WifiOff, FileText, Settings,
+  BarChart3, Filter, Globe
 } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { BUILTIN_GUIDELINES, EMERGENCY_PROTOCOLS, auditGuideline, getMaturityColor } from "@/lib/guidelines/index";
 import GuidelineDetailView from "../components/guidelines/GuidelineDetailView";
-import EmergencyProtocolCard from "../components/guidelines/EmergencyProtocolCard";
-import WebImporter from "../components/guidelines/WebImporter";
+import EmergencyQuickMode from "../components/guidelines/EmergencyQuickMode";
+import SyncEngine from "../components/guidelines/SyncEngine";
+import AdvancedIngestion from "../components/guidelines/AdvancedIngestion";
+import OfflineManager from "../components/guidelines/OfflineManager";
+import EvidenceComparisonMode from "../components/guidelines/EvidenceComparisonMode";
+import TeachingModePanel from "../components/guidelines/TeachingModePanel";
+import HandbookExporter from "../components/guidelines/HandbookExporter";
+import SmartRelatedContent from "../components/guidelines/SmartRelatedContent";
+import GuidelineCompletenessTracker from "../components/guidelines/GuidelineCompletenessTracker";
 
-// ── Constants ─────────────────────────────────────────────────────────────
+// ── Constants ──────────────────────────────────────────────────────────────
 const CATEGORIES = [
   "All", "AKI", "CKD", "Nephrotic Syndrome", "Hypertension", "Electrolytes",
   "Acid-Base", "Dialysis", "Transplant", "Glomerular Diseases", "Infection",
   "Tubular Disorders", "Nutrition"
 ];
-const EVIDENCE_LEVELS = ["High Quality Evidence", "Moderate Quality Evidence", "Low Quality Evidence", "Expert Opinion"];
+
 const CAT_COLORS = {
   "AKI":                "bg-red-100 text-red-800 border-red-200",
   "CKD":                "bg-blue-100 text-blue-800 border-blue-200",
@@ -43,7 +46,18 @@ const CAT_COLORS = {
   "Tubular Disorders":  "bg-teal-100 text-teal-800 border-teal-200",
 };
 
-// ── Back to top ───────────────────────────────────────────────────────────
+// ── Panel IDs for the intelligent hub bottom drawer ──────────────────────
+const HUB_PANELS = [
+  { id: "emergency", icon: Zap,          label: "Emergency",  color: "text-red-600" },
+  { id: "sync",      icon: RefreshCw,    label: "Sync",       color: "text-blue-600" },
+  { id: "import",    icon: Plus,         label: "Import",     color: "text-green-600" },
+  { id: "compare",   icon: Scale,        label: "Compare",    color: "text-indigo-600" },
+  { id: "teaching",  icon: GraduationCap,label: "Teaching",   color: "text-violet-600" },
+  { id: "offline",   icon: Download,     label: "Offline",    color: "text-slate-600" },
+  { id: "export",    icon: FileText,     label: "Export",     color: "text-emerald-600" },
+];
+
+// ── Back to top ────────────────────────────────────────────────────────────
 function BackToTop() {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -54,14 +68,14 @@ function BackToTop() {
   if (!visible) return null;
   return (
     <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-20 right-4 z-50 w-11 h-11 rounded-full bg-blue-600 text-white shadow-xl flex items-center justify-center hover:bg-blue-700 transition-colors"
+      className="fixed bottom-20 right-4 z-40 w-11 h-11 rounded-full bg-blue-600 text-white shadow-xl flex items-center justify-center hover:bg-blue-700 transition-colors"
       aria-label="Back to top">
       <ChevronUp className="w-5 h-5" />
     </button>
   );
 }
 
-// ── Maturity badge ────────────────────────────────────────────────────────
+// ── Maturity badge ─────────────────────────────────────────────────────────
 function MaturityBadge({ audit }) {
   const c = getMaturityColor(audit.maturity);
   return (
@@ -72,7 +86,7 @@ function MaturityBadge({ audit }) {
   );
 }
 
-// ── Guideline card ────────────────────────────────────────────────────────
+// ── Guideline card ─────────────────────────────────────────────────────────
 function GuidelineCard({ guideline, starred, onStar, onClick }) {
   const cat = CAT_COLORS[guideline.category] || "bg-slate-100 text-slate-700 border-slate-200";
   const audit = auditGuideline(guideline);
@@ -99,7 +113,7 @@ function GuidelineCard({ guideline, starred, onStar, onClick }) {
           </div>
           <button
             className="flex-shrink-0 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-            onClick={(e) => { e.stopPropagation(); onStar(); }}
+            onClick={e => { e.stopPropagation(); onStar(); }}
             aria-label={starred ? "Remove bookmark" : "Bookmark"}
           >
             {starred ? <Star className="w-4 h-4 text-amber-500 fill-amber-500" /> : <StarOff className="w-4 h-4 text-slate-300" />}
@@ -128,22 +142,26 @@ function GuidelineCard({ guideline, starred, onStar, onClick }) {
   );
 }
 
-// ── Guideline modal ───────────────────────────────────────────────────────
-function GuidelineModal({ guideline, onClose }) {
+// ── Guideline quick modal ──────────────────────────────────────────────────
+function GuidelineModal({ guideline, allGuidelines, onClose }) {
   const cat = CAT_COLORS[guideline.category] || "bg-slate-100 text-slate-700";
+  const [activeTab, setActiveTab] = useState("content");
+  const audit = auditGuideline(guideline);
+
   return (
     <div
       className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="w-full sm:max-w-2xl max-h-[93vh] sm:max-h-[88vh] bg-white rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+        {/* Header */}
         <div className="flex items-start gap-3 p-3.5 border-b border-slate-200 bg-white sticky top-0 z-10">
           <div className="flex-1 min-w-0">
             <h2 className="font-bold text-slate-900 leading-snug text-sm">{guideline.title}</h2>
             <div className="flex flex-wrap gap-1.5 mt-1">
               <Badge className={`text-xs border ${cat}`}>{guideline.category}</Badge>
               <Badge variant="outline" className="text-xs">{guideline.source} · {guideline.year}</Badge>
-              {guideline.sections && <Badge className="text-xs bg-blue-100 text-blue-700 border-0">Built-in · Detailed</Badge>}
+              <MaturityBadge audit={audit} />
             </div>
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -152,199 +170,112 @@ function GuidelineModal({ guideline, onClose }) {
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
               onClick={onClose}
             >
-              <Maximize2 className="w-3.5 h-3.5" />
-              Full Page
+              <Maximize2 className="w-3.5 h-3.5" />Full
             </Link>
-            <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-100" aria-label="Close">
-              <X className="w-5 h-5 text-slate-600" />
-            </button>
+            <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-100"><X className="w-5 h-5 text-slate-600" /></button>
           </div>
         </div>
+
+        {/* Tab nav */}
+        <div className="flex border-b border-slate-100 bg-white px-3 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          {[
+            { id: "content", label: "📋 Content" },
+            { id: "completeness", label: "📊 Audit" },
+            { id: "related", label: "🔗 Linked" },
+          ].map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)}
+              className={`flex-shrink-0 px-3 py-2 text-xs font-semibold border-b-2 transition-colors ${activeTab === t.id ? "border-blue-500 text-blue-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
         <div className="flex-1 overflow-y-auto p-3">
-          <GuidelineDetailView guideline={guideline} defaultMode="quick" />
+          {activeTab === "content" && <GuidelineDetailView guideline={guideline} defaultMode="quick" />}
+          {activeTab === "completeness" && <GuidelineCompletenessTracker guideline={guideline} />}
+          {activeTab === "related" && <SmartRelatedContent guideline={guideline} />}
         </div>
       </div>
     </div>
   );
 }
 
-// ── Add guideline dialog ──────────────────────────────────────────────────
-function AddGuidelineDialog({ open, onOpenChange, onSuccess }) {
-  const [g, setG] = useState({
-    title: "", category: "AKI", source: "", year: new Date().getFullYear(),
-    summary: "", scope_and_population: "", key_recommendations: [""],
-    practice_pearls: [""], evidence_level: "Expert Opinion", external_link: "",
-  });
-  const [extracting, setExtracting] = useState(false);
-  const [pdfDone, setPdfDone] = useState(false);
+// ── Intelligent Hub Drawer ─────────────────────────────────────────────────
+function IntelligentHubDrawer({ open, activePanel: initialPanel, onClose, allGuidelines, dbGuidelines, onRefresh }) {
+  const [activePanel, setActivePanel] = useState(initialPanel);
+  useEffect(() => { setActivePanel(initialPanel); }, [initialPanel]);
 
-  const mutation = useMutation({
-    mutationFn: (data) => base44.entities.Guideline.create({
-      ...data,
-      key_recommendations: data.key_recommendations.filter(r => r?.trim()),
-      practice_pearls: data.practice_pearls.filter(p => p?.trim()),
-      status: "Active",
-      last_reviewed: new Date().toISOString().split("T")[0],
-    }),
-    onSuccess: () => { onOpenChange(false); onSuccess(); toast.success("Guideline added!"); },
-    onError: () => toast.error("Failed to save"),
-  });
-
-  const extractPDF = async (file) => {
-    setExtracting(true);
-    toast.info("Extracting…", { id: "pdf-x" });
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const out = await base44.integrations.Core.InvokeLLM({
-        prompt: "Extract from this pediatric nephrology guideline PDF: title, source (KDIGO/IPNA/IAP etc), year, category, scope_and_population (who/when/what 2-3 sentences), key_recommendations (8-12 specific sequential management steps with thresholds), practice_pearls (5-6 bedside tips), evidence_level, external_link if mentioned.",
-        file_urls: [file_url],
-        response_json_schema: {
-          type: "object",
-          properties: {
-            title: { type: "string" }, source: { type: "string" }, year: { type: "number" },
-            category: { type: "string" }, scope_and_population: { type: "string" },
-            key_recommendations: { type: "array", items: { type: "string" } },
-            practice_pearls: { type: "array", items: { type: "string" } },
-            evidence_level: { type: "string" }, external_link: { type: "string" }
-          }
-        }
-      });
-      setG(prev => ({
-        ...prev, ...out,
-        key_recommendations: out.key_recommendations?.length ? out.key_recommendations : [""],
-        practice_pearls: out.practice_pearls?.length ? out.practice_pearls : [""],
-      }));
-      setPdfDone(true);
-      toast.success("Extracted!", { id: "pdf-x" });
-    } catch { toast.error("Extraction failed", { id: "pdf-x" }); }
-    finally { setExtracting(false); }
-  };
-
-  const upRec = (i, v) => { const u = [...g.key_recommendations]; u[i] = v; setG({ ...g, key_recommendations: u }); };
-  const upPearl = (i, v) => { const u = [...g.practice_pearls]; u[i] = v; setG({ ...g, practice_pearls: u }); };
-  const rmRec = (i) => setG(p => ({ ...p, key_recommendations: p.key_recommendations.filter((_, j) => j !== i) }));
-  const rmPearl = (i) => setG(p => ({ ...p, practice_pearls: p.practice_pearls.filter((_, j) => j !== i) }));
+  if (!open) return null;
+  const panelConfig = HUB_PANELS.find(p => p.id === activePanel);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl max-h-[92vh] overflow-y-auto mx-2 sm:mx-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base">
-            <Sparkles className="w-5 h-5 text-blue-600" /> Add Guideline
-          </DialogTitle>
-        </DialogHeader>
-        <Tabs defaultValue="upload" className="mt-2">
-          <TabsList className="grid w-full grid-cols-3 text-xs">
-            <TabsTrigger value="upload"><Upload className="w-3.5 h-3.5 mr-1" />PDF</TabsTrigger>
-            <TabsTrigger value="web"><Search className="w-3.5 h-3.5 mr-1" />Web</TabsTrigger>
-            <TabsTrigger value="manual"><Edit className="w-3.5 h-3.5 mr-1" />Manual</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="upload" className="space-y-3 mt-3">
-            <div className="border-2 border-dashed border-blue-300 rounded-xl p-5 bg-blue-50 text-center">
-              <Upload className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-              <p className="text-sm font-medium text-blue-800 mb-1">Upload PDF Guideline</p>
-              <p className="text-xs text-blue-600 mb-3">AI extracts 8–12 management steps, pearls, evidence level</p>
-              <input type="file" accept=".pdf" disabled={extracting}
-                onChange={(e) => { const f = e.target.files[0]; if (f) extractPDF(f); }}
-                className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-blue-600 file:text-white file:cursor-pointer" />
-              {extracting && <div className="mt-3 flex items-center justify-center gap-2 text-blue-700 text-xs"><Loader2 className="w-4 h-4 animate-spin" />Analysing…</div>}
-              {pdfDone && !extracting && <Badge className="mt-2 bg-green-600 text-white text-xs"><CheckCircle className="w-3 h-3 mr-1" />Extracted — review below</Badge>}
-            </div>
-            {pdfDone && (
-              <div className="space-y-2 text-sm border-t pt-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <div><Label className="text-xs">Title</Label><Input value={g.title} onChange={e => setG({...g, title: e.target.value})} className="mt-1 text-xs h-8" /></div>
-                  <div><Label className="text-xs">Source</Label><Input value={g.source} onChange={e => setG({...g, source: e.target.value})} className="mt-1 text-xs h-8" /></div>
-                </div>
-                <div><Label className="text-xs">Clinical Summary</Label><Textarea value={g.scope_and_population} onChange={e => setG({...g, scope_and_population: e.target.value})} className="mt-1 text-xs h-16" /></div>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="web" className="mt-3">
-            <WebImporter onImportComplete={(data) => setG(prev => ({ ...prev, ...data, key_recommendations: data.key_recommendations || [""], practice_pearls: [""] }))} />
-          </TabsContent>
-
-          <TabsContent value="manual" className="space-y-3 mt-3">
-            <div className="grid grid-cols-2 gap-2">
-              <div><Label className="text-xs">Title *</Label><Input value={g.title} onChange={e => setG({...g, title: e.target.value})} className="mt-1 text-xs h-8" /></div>
-              <div><Label className="text-xs">Source *</Label><Input value={g.source} onChange={e => setG({...g, source: e.target.value})} className="mt-1 text-xs h-8" /></div>
-              <div>
-                <Label className="text-xs">Category *</Label>
-                <Select value={g.category} onValueChange={v => setG({...g, category: v})}>
-                  <SelectTrigger className="mt-1 text-xs h-8"><SelectValue /></SelectTrigger>
-                  <SelectContent>{CATEGORIES.filter(c => c !== "All").map(c => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div><Label className="text-xs">Year *</Label><Input type="number" value={g.year} onChange={e => setG({...g, year: parseInt(e.target.value)})} className="mt-1 text-xs h-8" /></div>
-            </div>
-            <div><Label className="text-xs font-semibold">Clinical Summary *</Label><Textarea value={g.scope_and_population} onChange={e => setG({...g, scope_and_population: e.target.value})} placeholder="Who/When/What — 2–3 sentences" className="mt-1 text-xs h-16" /></div>
-            <div>
-              <Label className="text-xs font-semibold flex items-center gap-1"><Target className="w-3.5 h-3.5 text-green-600" />Management Steps (aim for 8–12)</Label>
-              <div className="space-y-1.5 mt-1">
-                {g.key_recommendations.map((r, i) => (
-                  <div key={i} className="flex gap-1.5">
-                    <Badge className="bg-green-600 text-white flex-shrink-0 h-7 px-2 text-xs">{i + 1}</Badge>
-                    <Input value={r} onChange={e => upRec(i, e.target.value)} placeholder="Specific actionable step…" className="flex-1 text-xs h-7" />
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => rmRec(i)}><X className="w-3 h-3" /></Button>
-                  </div>
-                ))}
-                <Button variant="outline" size="sm" className="w-full text-xs h-7 border-green-300" onClick={() => setG(p => ({...p, key_recommendations: [...p.key_recommendations, ""]}))}>
-                  <Plus className="w-3.5 h-3.5 mr-1" />Add Step
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Label className="text-xs font-semibold flex items-center gap-1"><Lightbulb className="w-3.5 h-3.5 text-amber-600" />Practice Pearls</Label>
-              <div className="space-y-1.5 mt-1">
-                {g.practice_pearls.map((p, i) => (
-                  <div key={i} className="flex gap-1.5">
-                    <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-1.5" />
-                    <Input value={p} onChange={e => upPearl(i, e.target.value)} placeholder="Bedside tip…" className="flex-1 text-xs h-7" />
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => rmPearl(i)}><X className="w-3 h-3" /></Button>
-                  </div>
-                ))}
-                <Button variant="outline" size="sm" className="w-full text-xs h-7 border-amber-300" onClick={() => setG(p => ({...p, practice_pearls: [...p.practice_pearls, ""]}))}>
-                  <Plus className="w-3.5 h-3.5 mr-1" />Add Pearl
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs">Evidence Level</Label>
-                <Select value={g.evidence_level} onValueChange={v => setG({...g, evidence_level: v})}>
-                  <SelectTrigger className="mt-1 text-xs h-8"><SelectValue /></SelectTrigger>
-                  <SelectContent>{EVIDENCE_LEVELS.map(l => <SelectItem key={l} value={l} className="text-xs">{l}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div><Label className="text-xs">External Link</Label><Input value={g.external_link} onChange={e => setG({...g, external_link: e.target.value})} placeholder="https://…" className="mt-1 text-xs h-8" /></div>
-            </div>
-            <div><Label className="text-xs">Full Summary</Label><Textarea value={g.summary} onChange={e => setG({...g, summary: e.target.value})} placeholder="Comprehensive overview…" className="mt-1 text-xs h-20" /></div>
-          </TabsContent>
-        </Tabs>
-        <Button onClick={() => mutation.mutate(g)} disabled={!g.title || !g.source || mutation.isPending} className="w-full mt-3 bg-blue-600 hover:bg-blue-700 h-10">
-          {mutation.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</> : <><Plus className="w-4 h-4 mr-2" />Add to Library</>}
-        </Button>
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col z-10">
+        {/* Handle drag bar */}
+        <div className="flex justify-center pt-2 pb-1">
+          <div className="w-10 h-1 bg-slate-300 rounded-full" />
+        </div>
+        {/* Drawer header */}
+        <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            {panelConfig && <panelConfig.icon className={`w-4 h-4 ${panelConfig.color}`} />}
+            <p className="font-bold text-slate-900 text-sm">{panelConfig?.label}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-slate-100"><X className="w-5 h-5 text-slate-600" /></button>
+        </div>
+        {/* Panel tabs */}
+        <div className="flex border-b border-slate-100 px-2 overflow-x-auto bg-slate-50/60" style={{ scrollbarWidth: "none" }}>
+          {HUB_PANELS.map(p => (
+            <button key={p.id}
+              onClick={() => setActivePanel(p.id)}
+              className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-semibold border-b-2 transition-colors ${activePanel === p.id ? "border-blue-500 text-blue-700" : "border-transparent text-slate-400 hover:text-slate-700"}`}
+            >
+              <p.icon className="w-4 h-4" />
+              {p.label}
+            </button>
+          ))}
+        </div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {activePanel === "emergency" && <EmergencyQuickMode />}
+          {activePanel === "sync" && <SyncEngine onImportComplete={onRefresh} />}
+          {activePanel === "import" && <AdvancedIngestion onSuccess={onRefresh} />}
+          {activePanel === "compare" && <EvidenceComparisonMode allGuidelines={allGuidelines} />}
+          {activePanel === "teaching" && allGuidelines.length > 0 && (
+            <TeachingModePanel guideline={allGuidelines[0]} />
+          )}
+          {activePanel === "offline" && <OfflineManager dbGuidelines={dbGuidelines} />}
+          {activePanel === "export" && <HandbookExporter allGuidelines={allGuidelines} />}
+        </div>
+      </div>
+    </div>
   );
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────
+// ── Main page ──────────────────────────────────────────────────────────────
 export default function Guidelines() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [showEmergency, setShowEmergency] = useState(false);
   const [showStarred, setShowStarred] = useState(false);
+  const [hubPanel, setHubPanel] = useState(null); // null = closed; string = panel id
+
   const [starred, setStarred] = useState(() => {
     try { return JSON.parse(localStorage.getItem("clinicals_starred") || "[]"); } catch { return []; }
   });
   const [recent, setRecent] = useState(() => {
     try { return JSON.parse(localStorage.getItem("clinicals_recent") || "[]"); } catch { return []; }
   });
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const on = () => setIsOnline(true);
+    const off = () => setIsOnline(false);
+    window.addEventListener("online", on);
+    window.addEventListener("offline", off);
+    return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
+  }, []);
 
   const queryClient = useQueryClient();
   const { data: dbGuidelines = [], isLoading } = useQuery({
@@ -355,14 +286,16 @@ export default function Guidelines() {
 
   const allGuidelines = [...BUILTIN_GUIDELINES, ...dbGuidelines.map(g => ({ ...g, _db: true }))];
 
+  // Semantic + fuzzy search
   const filtered = allGuidelines.filter(g => {
     const q = search.toLowerCase();
-    const matchSearch = !search ||
-      g.title?.toLowerCase().includes(q) ||
-      g.category?.toLowerCase().includes(q) ||
-      g.source?.toLowerCase().includes(q) ||
-      g.summary?.toLowerCase().includes(q) ||
-      g.tags?.some(t => t.toLowerCase().includes(q));
+    const searchableText = [
+      g.title, g.category, g.source, g.summary, g.scope_and_population,
+      g.tags?.join(" "), g.keywords?.join(" "),
+      g.key_recommendations?.join(" "), g.practice_pearls?.join(" "),
+      g.related_drugs?.join(" "), g.clinical_scope?.join(" ")
+    ].filter(Boolean).join(" ").toLowerCase();
+    const matchSearch = !search || searchableText.includes(q);
     const matchCat = category === "All" || g.category === category;
     const matchStar = !showStarred || starred.includes(g.id);
     return matchSearch && matchCat && matchStar;
@@ -379,18 +312,23 @@ export default function Guidelines() {
   const handleOpen = (g) => {
     setSelected(g);
     setRecent(prev => {
-      const u = [g.id, ...prev.filter(id => id !== g.id)].slice(0, 5);
+      const u = [g.id, ...prev.filter(id => id !== g.id)].slice(0, 6);
       try { localStorage.setItem("clinicals_recent", JSON.stringify(u)); } catch {}
       return u;
     });
   };
 
-  const recentGuidelines = recent.map(id => allGuidelines.find(g => g.id === id)).filter(Boolean).slice(0, 5);
+  const openHub = (panelId) => setHubPanel(panelId);
+  const closeHub = () => setHubPanel(null);
+  const onRefresh = () => queryClient.invalidateQueries({ queryKey: ["guidelines"] });
+
+  const recentGuidelines = recent.map(id => allGuidelines.find(g => g.id === id)).filter(Boolean).slice(0, 6);
+  const starredGuidelines = allGuidelines.filter(g => starred.includes(g.id));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50" style={{ overflowX: "hidden", maxWidth: "100vw" }}>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 px-4 py-5 shadow-xl">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center gap-3 mb-3">
@@ -398,18 +336,24 @@ export default function Guidelines() {
               <Library className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-white leading-tight">Guidelines Library</h1>
-              <p className="text-blue-100 text-xs">{allGuidelines.length} guidelines · {BUILTIN_GUIDELINES.length} built-in detailed · KDIGO/IPNA/ESPN/AAP/EULAR</p>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-white leading-tight">Guidelines Library</h1>
+                {!isOnline && (
+                  <Badge className="bg-amber-400 text-amber-900 text-xs border-0 flex items-center gap-1">
+                    <WifiOff className="w-3 h-3" />Offline
+                  </Badge>
+                )}
+              </div>
+              <p className="text-blue-100 text-xs">{allGuidelines.length} guidelines · {BUILTIN_GUIDELINES.length} built-in · KDIGO/IPNA/ESPN/AAP/EULAR</p>
             </div>
-            <Button size="sm" className="bg-white text-blue-700 hover:bg-blue-50 font-semibold flex-shrink-0 h-9" onClick={() => setDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-1" />Add
-            </Button>
           </div>
+
+          {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search AKI, nephrotic, HUS, dialysis, lupus…"
+              placeholder="Search by condition, drug, guideline, keyword…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border-0 bg-white/90 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50"
@@ -423,9 +367,22 @@ export default function Guidelines() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-3 py-4 space-y-4">
+      <div className="max-w-3xl mx-auto px-3 py-3 space-y-3">
 
-        {/* Category pills */}
+        {/* ── Intelligent Hub toolbar ── */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center gap-1 p-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            {HUB_PANELS.map(p => (
+              <button key={p.id} onClick={() => openHub(p.id)}
+                className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all text-xs font-semibold ${hubPanel === p.id ? "bg-blue-50 border border-blue-200" : "hover:bg-slate-50"}`}>
+                <p.icon className={`w-4 h-4 ${p.color}`} />
+                <span className="text-slate-600">{p.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Category pills ── */}
         <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
           {CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setCategory(cat)}
@@ -435,27 +392,29 @@ export default function Guidelines() {
           ))}
         </div>
 
-        {/* Filter bar */}
+        {/* ── Filter bar ── */}
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={() => setShowStarred(!showStarred)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${showStarred ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-white text-slate-600 border-slate-200"}`}>
-            <Star className="w-3.5 h-3.5" />Bookmarked ({starred.length})
+            <Star className="w-3.5 h-3.5" />Starred ({starred.length})
           </button>
-          <button onClick={() => setShowEmergency(!showEmergency)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${showEmergency ? "bg-red-100 text-red-800 border-red-300" : "bg-white text-slate-600 border-slate-200"}`}>
-            <AlertTriangle className="w-3.5 h-3.5" />Emergency ({EMERGENCY_PROTOCOLS.length})
+          <button onClick={() => openHub("emergency")}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200 hover:bg-red-100 transition-all">
+            <Zap className="w-3.5 h-3.5" />Emergency ({EMERGENCY_PROTOCOLS.length})
           </button>
           <span className="ml-auto text-xs text-slate-400">{filtered.length} results</span>
         </div>
 
-        {/* Emergency panel */}
-        {showEmergency && (
-          <Card className="border-2 border-red-200 shadow-md overflow-hidden">
-            <CardContent className="p-3"><EmergencyProtocolCard /></CardContent>
-          </Card>
+        {/* ── Starred collection ── */}
+        {showStarred && starredGuidelines.length === 0 && (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-center">
+            <Star className="w-8 h-8 text-amber-300 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-amber-800">No starred guidelines yet</p>
+            <p className="text-xs text-amber-600 mt-1">Tap the star icon on any guideline to bookmark it</p>
+          </div>
         )}
 
-        {/* Recently viewed */}
+        {/* ── Recently viewed ── */}
         {!search && category === "All" && !showStarred && recentGuidelines.length > 0 && (
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
@@ -473,7 +432,7 @@ export default function Guidelines() {
           </div>
         )}
 
-        {/* Guidelines list */}
+        {/* ── Guidelines list ── */}
         {isLoading ? (
           <div className="flex flex-col items-center py-16 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
@@ -483,7 +442,9 @@ export default function Guidelines() {
           <div className="flex flex-col items-center py-16 gap-3">
             <BookOpen className="w-12 h-12 text-slate-300" />
             <p className="text-sm text-slate-500">No guidelines found</p>
-            <Button variant="outline" size="sm" onClick={() => { setSearch(""); setCategory("All"); setShowStarred(false); }}>Clear filters</Button>
+            <Button variant="outline" size="sm" onClick={() => { setSearch(""); setCategory("All"); setShowStarred(false); }}>
+              Clear filters
+            </Button>
           </div>
         ) : (
           <div className="space-y-2.5">
@@ -497,16 +458,50 @@ export default function Guidelines() {
           </div>
         )}
 
+        {/* ── Feature cards ── */}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          {[
+            { icon: Scale, label: "Compare Guidelines", desc: "KDIGO vs IPNA", color: "bg-indigo-50 border-indigo-200 text-indigo-700", panel: "compare" },
+            { icon: GraduationCap, label: "Teaching Mode", desc: "MCQs · Viva · Flashcards", color: "bg-violet-50 border-violet-200 text-violet-700", panel: "teaching" },
+            { icon: Download, label: "Offline Mode", desc: "Cache for offline use", color: "bg-slate-50 border-slate-200 text-slate-700", panel: "offline" },
+            { icon: FileText, label: "Export Handbook", desc: "PDF · Teaching pack", color: "bg-emerald-50 border-emerald-200 text-emerald-700", panel: "export" },
+          ].map(f => (
+            <button key={f.panel} onClick={() => openHub(f.panel)}
+              className={`p-3 rounded-xl border-2 text-left hover:shadow-md transition-all ${f.color}`}>
+              <f.icon className="w-5 h-5 mb-1.5" />
+              <p className="text-xs font-bold leading-tight">{f.label}</p>
+              <p className="text-xs opacity-70 mt-0.5">{f.desc}</p>
+            </button>
+          ))}
+        </div>
+
         <Alert className="bg-blue-50 border-blue-200">
           <Award className="w-4 h-4 text-blue-600 flex-shrink-0" />
           <AlertDescription className="text-blue-800 text-xs leading-relaxed">
-            <strong>Evidence-Based:</strong> Built-in content sourced from KDIGO, IPNA, ISPD, AAP, EULAR, SHARE, ERKNet, ESPN, ISKDC, WHO. Educational bedside reference — always apply clinical judgment.
+            <strong>Evidence-Based:</strong> KDIGO · IPNA · ISPD · AAP · EULAR · SHARE · ERKNet · ESPN · ISKDC · WHO. Educational bedside reference — always apply clinical judgment.
           </AlertDescription>
         </Alert>
       </div>
 
-      {selected && <GuidelineModal guideline={selected} onClose={() => setSelected(null)} />}
-      <AddGuidelineDialog open={dialogOpen} onOpenChange={setDialogOpen} onSuccess={() => queryClient.invalidateQueries({ queryKey: ["guidelines"] })} />
+      {/* ── Guideline quick modal ── */}
+      {selected && (
+        <GuidelineModal
+          guideline={selected}
+          allGuidelines={allGuidelines}
+          onClose={() => setSelected(null)}
+        />
+      )}
+
+      {/* ── Intelligent Hub Drawer ── */}
+      <IntelligentHubDrawer
+        open={!!hubPanel}
+        activePanel={hubPanel}
+        onClose={closeHub}
+        allGuidelines={allGuidelines}
+        dbGuidelines={dbGuidelines}
+        onRefresh={onRefresh}
+      />
+
       <BackToTop />
     </div>
   );
