@@ -13,6 +13,8 @@ import RheumApproaches from "@/components/rheumatology/RheumApproaches";
 import RheumEvidenceUpdates from "@/components/rheumatology/RheumEvidenceUpdates";
 import RheumDiseaseActivityCalculators from "@/components/rheumatology/RheumDiseaseActivityCalculators";
 import RheumNephrologyOverlap from "@/components/rheumatology/RheumNephrologyOverlap";
+import UnifiedMonitoringPanel from "@/components/rheumatology/UnifiedMonitoringPanel";
+import CrossSpecialtyLinks from "@/components/rheumatology/CrossSpecialtyLinks";
 import { NEPHROLOGY_OVERLAPS } from "@/lib/rheumatology/RheumatologyData";
 
 const MAIN_TABS = [
@@ -21,6 +23,7 @@ const MAIN_TABS = [
   { id: "drugs", label: "💊 Drugs" },
   { id: "calculators", label: "🧮 Calculators" },
   { id: "nephrology", label: "🫘 Kidney" },
+  { id: "monitoring", label: "📊 Monitoring" },
   { id: "updates", label: "📡 Evidence" },
 ];
 
@@ -159,6 +162,13 @@ export default function PediatricRheumatology() {
                 No conditions match your search
               </div>
             )}
+
+            {/* Cross-specialty navigation chips */}
+            {!search && (
+              <div className="bg-white border border-slate-200 rounded-xl p-3 mt-2">
+                <CrossSpecialtyLinks context="lupus" />
+              </div>
+            )}
           </>
         )}
 
@@ -173,6 +183,9 @@ export default function PediatricRheumatology() {
 
         {/* ── NEPHROLOGY OVERLAP TAB ── */}
         {mainTab === "nephrology" && <RheumNephrologyOverlap overlaps={NEPHROLOGY_OVERLAPS} />}
+
+        {/* ── MONITORING TAB ── */}
+        {mainTab === "monitoring" && <UnifiedMonitoringPanel />}
 
         {/* ── EVIDENCE UPDATES TAB ── */}
         {mainTab === "updates" && <RheumEvidenceUpdates isAdmin={isAdmin} />}

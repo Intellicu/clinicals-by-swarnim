@@ -60,49 +60,61 @@ const TAB_DETECTION = {
   Research: [createPageUrl("ResearchHub")],
 };
 
-const mainNavigation = [
-  { title: "Hub", url: createPageUrl("Hub"), icon: Home },
-  { title: "AI Assistant", url: createPageUrl("AIAssistant"), icon: Sparkles },
-  { title: "Voice Agent", url: createPageUrl("VoiceAgent"), icon: Mic },
-  { title: "Video Companion", url: createPageUrl("VideoTeachingAgent"), icon: Activity },
-];
-
-const toolsNavigation = [
-  { title: "Clinical Tools Hub", url: createPageUrl("ClinicalToolsHub"), icon: Calculator },
-  { title: "Clinical Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
-  { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
-  { title: "AI Prescriber", url: createPageUrl("AIPrescriber"), icon: Sparkles },
-  { title: "Drugs & Dosing", url: createPageUrl("DrugsDosing"), icon: Pill },
-  { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: Stethoscope },
-  { title: "Lab Pathways", url: createPageUrl("LabPathways"), icon: FlaskConical },
-  { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
-  { title: "Pediatric Rheumatology", url: createPageUrl("PediatricRheumatology"), icon: Stethoscope },
-  { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
-  { title: "Differential Dx Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
-  { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
-  { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
-  { title: "Discharge Summary", url: createPageUrl("DischargeSummary"), icon: FileText },
-];
-
-const resourcesNavigation = [
-  { title: "Clinic Dashboard", url: createPageUrl("ClinicDashboard"), icon: Users },
-  { title: "Content Manager", url: createPageUrl("UserContentManager"), icon: FileText },
-  { title: "Teaching Hub", url: createPageUrl("TeachingHub"), icon: GraduationCap },
-  { title: "Parental Guidance", url: createPageUrl("ParentalGuidance"), icon: Heart },
-  { title: "Prediction Tools", url: createPageUrl("PredictionTools"), icon: LineChart },
-  { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: ClipboardList },
-  { title: "Diet Generator", url: createPageUrl("DietChartGenerator"), icon: UtensilsCrossed },
-  { title: "Reference Ranges", url: createPageUrl("ReferenceRanges"), icon: TestTube },
-  { title: "Audit Logs", url: createPageUrl("AuditLogs"), icon: FileText },
-  { title: "Research Hub", url: createPageUrl("ResearchHub"), icon: Layers },
-  { title: "Nutrition Hub", url: createPageUrl("NutritionHub"), icon: Heart },
-  { title: "Notification Center", url: createPageUrl("NotificationDashboard"), icon: Bell },
-  { title: "Genetic Analyzer", url: createPageUrl("GeneticReportAnalyzer"), icon: Activity },
-  { title: "Patient Education", url: createPageUrl("PatientEducationHub"), icon: GraduationCap },
-  { title: "Billing", url: createPageUrl("BillingDashboard"), icon: FileText },
-  { title: "Referral Portal", url: createPageUrl("ReferralPortal"), icon: Activity },
-  { title: "Lab Results", url: createPageUrl("LabResults"), icon: TestTube },
-  { title: "Telemedicine", url: createPageUrl("Telemedicine"), icon: Activity },
+// ── Grouped sidebar navigation (Phase 8 refactor) ────────────────────────
+const NAV_GROUPS = [
+  {
+    label: "CliniCalc",
+    items: [
+      { title: "Hub", url: createPageUrl("Hub"), icon: Home },
+      { title: "Clinical Tools Hub", url: createPageUrl("ClinicalToolsHub"), icon: Calculator },
+      { title: "Drugs & Dosing", url: createPageUrl("DrugsDosing"), icon: Pill },
+      { title: "Reference Ranges", url: createPageUrl("ReferenceRanges"), icon: TestTube },
+      { title: "Diet Generator", url: createPageUrl("DietChartGenerator"), icon: UtensilsCrossed },
+    ],
+  },
+  {
+    label: "Clinical Care",
+    items: [
+      { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
+      { title: "Clinical Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
+      { title: "Pediatric Rheumatology", url: createPageUrl("PediatricRheumatology"), icon: Stethoscope },
+      { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
+      { title: "AI Prescriber", url: createPageUrl("AIPrescriber"), icon: Sparkles },
+      { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: Stethoscope },
+      { title: "Lab Pathways", url: createPageUrl("LabPathways"), icon: FlaskConical },
+      { title: "Differential Dx Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
+      { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
+      { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
+      { title: "Discharge Summary", url: createPageUrl("DischargeSummary"), icon: FileText },
+      { title: "Clinic Dashboard", url: createPageUrl("ClinicDashboard"), icon: Users },
+      { title: "Teaching Hub", url: createPageUrl("TeachingHub"), icon: GraduationCap },
+      { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: ClipboardList },
+      { title: "AI Assistant", url: createPageUrl("AIAssistant"), icon: Sparkles },
+      { title: "Voice Agent", url: createPageUrl("VoiceAgent"), icon: Mic },
+    ],
+  },
+  {
+    label: "Research",
+    items: [
+      { title: "Research Hub", url: createPageUrl("ResearchHub"), icon: Layers },
+      { title: "Research Methods", url: createPageUrl("ResearchMethodsHub"), icon: Activity },
+      { title: "Genetic Analyzer", url: createPageUrl("GeneticReportAnalyzer"), icon: Activity },
+      { title: "Nutrition Hub", url: createPageUrl("NutritionHub"), icon: Heart },
+      { title: "Parental Guidance", url: createPageUrl("ParentalGuidance"), icon: Heart },
+      { title: "Patient Education", url: createPageUrl("PatientEducationHub"), icon: GraduationCap },
+      { title: "Notification Center", url: createPageUrl("NotificationDashboard"), icon: Bell },
+      { title: "Billing", url: createPageUrl("BillingDashboard"), icon: FileText },
+    ],
+  },
+  {
+    label: "Admin & Tools",
+    items: [
+      { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
+      { title: "Audit Logs", url: createPageUrl("AuditLogs"), icon: FileText },
+      { title: "Content Manager", url: createPageUrl("UserContentManager"), icon: FileText },
+      { title: "Prediction Tools", url: createPageUrl("PredictionTools"), icon: LineChart },
+    ],
+  },
 ];
 
 function NavItem({ item, onClick }) {
@@ -153,33 +165,20 @@ function SidebarContent({ user, onClose, onLogout }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-4" aria-label="Main navigation">
-        <section>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">Main</p>
-          <div className="space-y-0.5">
-            {mainNavigation.map((item) => (
-              <NavItem key={item.title} item={item} onClick={onClose} />
-            ))}
-          </div>
-        </section>
-        <Separator />
-        <section>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">Clinical Tools</p>
-          <div className="space-y-0.5">
-            {toolsNavigation.map((item) => (
-              <NavItem key={item.title} item={item} onClick={onClose} />
-            ))}
-          </div>
-        </section>
-        <Separator />
-        <section>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">Resources</p>
-          <div className="space-y-0.5">
-            {resourcesNavigation.map((item) => (
-              <NavItem key={item.title} item={item} onClick={onClose} />
-            ))}
-          </div>
-        </section>
+      <nav className="flex-1 overflow-y-auto p-3 space-y-3" aria-label="Main navigation">
+        {NAV_GROUPS.map((group, gi) => (
+          <React.Fragment key={group.label}>
+            {gi > 0 && <Separator />}
+            <section>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">{group.label}</p>
+              <div className="space-y-0.5">
+                {group.items.map((item) => (
+                  <NavItem key={item.title} item={item} onClick={onClose} />
+                ))}
+              </div>
+            </section>
+          </React.Fragment>
+        ))}
       </nav>
 
       {/* User footer */}
