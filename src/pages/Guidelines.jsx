@@ -14,8 +14,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Search, BookOpen, Plus, Upload, Edit, X, CheckCircle, Sparkles,
   Lightbulb, Target, Library, ChevronUp, Star, StarOff,
-  AlertTriangle, TrendingUp, Award, Loader2
+  AlertTriangle, TrendingUp, Award, Loader2, Maximize2
 } from "lucide-react";
+import { createPageUrl } from "@/utils";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { BUILTIN_GUIDELINES, EMERGENCY_PROTOCOLS, auditGuideline, getMaturityColor } from "@/lib/guidelines/index";
 import GuidelineDetailView from "../components/guidelines/GuidelineDetailView";
@@ -144,12 +146,22 @@ function GuidelineModal({ guideline, onClose }) {
               {guideline.sections && <Badge className="text-xs bg-blue-100 text-blue-700 border-0">Built-in · Detailed</Badge>}
             </div>
           </div>
-          <button onClick={onClose} className="flex-shrink-0 p-2 rounded-xl hover:bg-slate-100" aria-label="Close">
-            <X className="w-5 h-5 text-slate-600" />
-          </button>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <Link
+              to={`${createPageUrl("GuidelineDetail")}?id=${guideline.id}`}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+              onClick={onClose}
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              Full Page
+            </Link>
+            <button onClick={onClose} className="p-2 rounded-xl hover:bg-slate-100" aria-label="Close">
+              <X className="w-5 h-5 text-slate-600" />
+            </button>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto p-3">
-          <GuidelineDetailView guideline={guideline} />
+          <GuidelineDetailView guideline={guideline} defaultMode="quick" />
         </div>
       </div>
     </div>

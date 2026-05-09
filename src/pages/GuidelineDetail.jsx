@@ -3,6 +3,8 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { BUILTIN_GUIDELINES } from "@/lib/guidelines/index";
+import GuidelineDetailView from "../components/guidelines/GuidelineDetailView";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +35,7 @@ import {
 import { toast } from "sonner";
 import GuidelineEditor from "../components/GuidelineEditor";
 import MultimediaViewer from "../components/guidelines/MultimediaViewer";
+import { Smartphone, BookOpenCheck } from "lucide-react";
 
 export default function GuidelineDetail() {
   const navigate = useNavigate();
@@ -43,21 +46,28 @@ export default function GuidelineDetail() {
   const [editMode, setEditMode] = useState(false);
   const [expandedSteps, setExpandedSteps] = useState(true);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
-  const [enhancing, setEnhancing] = useState(false); // State for AI enhancement process
+  const [enhancing, setEnhancing] = useState(false);
+  const [detailViewMode, setDetailViewMode] = useState("detailed"); // "quick" | "detailed"
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me()
   });
 
-  const { data: guideline, isLoading } = useQuery({
+  // Check built-in first (no network needed)
+  const builtinGuideline = BUILTIN_GUIDELINES.find(g => g.id === guidelineId);
+
+  const { data: dbGuideline, isLoading } = useQuery({
     queryKey: ['guideline', guidelineId],
     queryFn: async () => {
       const guidelines = await base44.entities.Guideline.list();
-      return guidelines.find(g => g.id === guidelineId);
+      return guidelines.find(g => g.id === guidelineId) || null;
     },
-    enabled: !!guidelineId // Only run query if guidelineId exists
+    enabled: !!guidelineId && !builtinGuideline, // Skip DB fetch if built-in found
   });
+
+  const guideline = builtinGuideline || dbGuideline;
+  const isBuiltin = !!builtinGuideline;
 
   // Query to fetch all guidelines for related links and AI enhancement context
   const { data: allGuidelines = [] } = useQuery({
@@ -231,41 +241,108 @@ Only return JSON.`;
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header Actions */}
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <Button variant="outline" onClick={() => navigate(createPageUrl("Guidelines"))}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Library
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <Button variant="outline" size="sm" onClick={() => navigate(createPageUrl("Guidelines"))}>
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
           </Button>
+
+          {/* View mode toggle (always shown) */}
+          <div className="flex rounded-lg overflow-hidden border border-slate-200 bg-white">
+            <button
+              onClick={() => setDetailViewMode("quick")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${detailViewMode === "quick" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              Quick
+            </button>
+            <button
+              onClick={() => setDetailViewMode("detailed")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${detailViewMode === "detailed" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+            >
+              <BookOpenCheck className="w-3.5 h-3.5" />
+              Full
+            </button>
+          </div>
+
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowVersionHistory(!showVersionHistory)}
-              className="border-slate-300"
-            >
-              <History className="w-4 h-4 mr-2" />
-              History
-            </Button>
-            <Button
-              onClick={() => enhanceGuidelineMutation.mutate()} // Trigger AI Enhance mutation
-              disabled={enhancing || updateMutation.isPending} // Disable if enhancing or saving
-              variant="outline"
-              className="border-purple-300 hover:bg-purple-50"
-            >
-              {enhancing ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />AI Enhancing...</>
-              ) : (
-                <><Sparkles className="w-4 h-4 mr-2" />AI Enhance</>
-              )}
-            </Button>
-            <Button onClick={() => setEditMode(true)} disabled={editMode} className="bg-blue-600 hover:bg-blue-700">
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
+            {!isBuiltin && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowVersionHistory(!showVersionHistory)}
+                  className="border-slate-300"
+                >
+                  <History className="w-4 h-4 mr-1" />
+                  History
+                </Button>
+                <Button
+                  onClick={() => enhanceGuidelineMutation.mutate()}
+                  disabled={enhancing || updateMutation.isPending}
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-300 hover:bg-purple-50"
+                >
+                  {enhancing ? (
+                    <><Loader2 className="w-4 h-4 mr-1 animate-spin" />Enhancing…</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4 mr-1" />AI Enhance</>
+                  )}
+                </Button>
+                <Button size="sm" onClick={() => setEditMode(true)} disabled={editMode} className="bg-blue-600 hover:bg-blue-700">
+                  <Edit className="w-4 h-4 mr-1" />
+                  Edit
+                </Button>
+              </>
+            )}
+            {isBuiltin && (
+              <Badge className="bg-blue-100 text-blue-700 border border-blue-200 text-xs self-center px-3 py-1.5">
+                Built-in Structured Content
+              </Badge>
+            )}
           </div>
         </div>
 
-        {/* Conditional rendering: View Mode vs. Edit Mode */}
-        {!editMode ? (
+        {/* ── Built-in guideline: use GuidelineDetailView component ── */}
+        {isBuiltin && (
+          <>
+            {/* Title & Metadata */}
+            <Card className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-300 shadow-xl overflow-hidden">
+              <CardHeader className="pb-4">
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge className="bg-blue-600 text-white text-sm px-3 py-1 font-semibold">{guideline.source}</Badge>
+                    <Badge variant="outline" className="text-sm px-3 py-1 border-2 font-semibold">{guideline.year}</Badge>
+                    <Badge className="bg-slate-700 text-white text-sm px-3 py-1">{guideline.category}</Badge>
+                    {guideline.evidence_level && (
+                      <Badge className={`${guideline.evidence_level.includes("High") ? "bg-green-500" : guideline.evidence_level.includes("Moderate") ? "bg-amber-500" : "bg-slate-500"} text-white text-sm px-3 py-1 font-semibold`}>
+                        <Award className="w-3.5 h-3.5 mr-1.5" />{guideline.evidence_level}
+                      </Badge>
+                    )}
+                  </div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight">{guideline.title}</h1>
+                  {guideline.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {guideline.tags.slice(0, 8).map((tag, i) => (
+                        <Badge key={i} variant="outline" className="text-xs bg-white/60">{tag}</Badge>
+                      ))}
+                    </div>
+                  )}
+                  {guideline.summary && (
+                    <p className="text-sm text-slate-600 leading-relaxed">{guideline.summary}</p>
+                  )}
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Content via GuidelineDetailView — passes mode from toggle */}
+            <GuidelineDetailView guideline={guideline} defaultMode={detailViewMode} key={detailViewMode} />
+          </>
+        )}
+
+        {/* ── DB guideline: original full view + edit mode ── */}
+        {!isBuiltin && !editMode ? (
           <>
             {/* Title & Metadata Card */}
             <Card className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-300 shadow-xl">

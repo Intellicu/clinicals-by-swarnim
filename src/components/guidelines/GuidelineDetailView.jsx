@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChevronDown, ChevronUp, AlertTriangle, Lightbulb, Pill,
-  Activity, CheckCircle, ExternalLink, BookOpen, Clock,
-  Zap, Shield, TrendingUp, Utensils, Target, FlaskConical
+  CheckCircle, ExternalLink, BookOpen, Clock,
+  Zap, Shield, TrendingUp, Utensils, Target, FlaskConical,
+  Smartphone, BookOpenCheck, Activity
 } from "lucide-react";
 
-// ── Accordion section ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// SHARED HELPERS
+// ═══════════════════════════════════════════════════════════════
+
 function AccSection({ title, icon: Icon, color = "blue", children, defaultOpen = false, badge }) {
   const [open, setOpen] = useState(defaultOpen);
   const palettes = {
@@ -38,31 +44,49 @@ function AccSection({ title, icon: Icon, color = "blue", children, defaultOpen =
   );
 }
 
-// ── Drug card ─────────────────────────────────────────────────────────────
-function DrugCard({ drug }) {
-  const [open, setOpen] = useState(false);
+function DrugCard({ drug, detailed = false }) {
+  const [open, setOpen] = useState(detailed);
   return (
-    <div className="border-l-4 border-blue-400 bg-blue-50 rounded-r-xl p-2.5 mb-2">
+    <div className={`border-l-4 border-blue-400 bg-blue-50 rounded-r-xl p-2.5 mb-2 ${detailed ? "border-l-[6px]" : ""}`}>
       <button className="w-full flex items-start justify-between gap-2 text-left" onClick={() => setOpen(!open)}>
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
-            <span className="font-semibold text-sm text-blue-900">{drug.name}</span>
-            {drug.purpose && <Badge className="text-xs bg-blue-100 text-blue-700 border-0 font-normal leading-tight">{drug.purpose}</Badge>}
+            <span className={`font-semibold text-blue-900 ${detailed ? "text-base" : "text-sm"}`}>{drug.name}</span>
+            {drug.purpose && (
+              <Badge className={`bg-blue-100 text-blue-700 border-0 font-normal leading-tight ${detailed ? "text-xs" : "text-xs"}`}>
+                {drug.purpose}
+              </Badge>
+            )}
           </div>
-          <p className="text-xs text-blue-700 leading-relaxed">{drug.dose}</p>
+          <p className={`text-blue-700 leading-relaxed ${detailed ? "text-sm" : "text-xs"}`}>{drug.dose}</p>
         </div>
         <span className="flex-shrink-0 text-blue-400 mt-0.5">
           {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </span>
       </button>
       {open && (
-        <div className="mt-2 pt-2 border-t border-blue-200 space-y-1.5">
-          {drug.max && <p className="text-xs"><span className="font-semibold text-slate-600">Max: </span><span className="text-red-700 font-semibold">{drug.max}</span></p>}
-          {drug.renal_adjust && <p className="text-xs"><span className="font-semibold text-slate-600">Renal adj: </span><span className="text-orange-700">{drug.renal_adjust}</span></p>}
-          {drug.monitoring && <p className="text-xs"><span className="font-semibold text-slate-600">Monitor: </span><span className="text-slate-700">{drug.monitoring}</span></p>}
+        <div className={`mt-2 pt-2 border-t border-blue-200 space-y-2 ${detailed ? "" : "space-y-1.5"}`}>
+          {drug.max && (
+            <p className={detailed ? "text-sm" : "text-xs"}>
+              <span className="font-semibold text-slate-600">Max dose: </span>
+              <span className="text-red-700 font-semibold">{drug.max}</span>
+            </p>
+          )}
+          {drug.renal_adjust && (
+            <p className={detailed ? "text-sm" : "text-xs"}>
+              <span className="font-semibold text-slate-600">Renal adjustment: </span>
+              <span className="text-orange-700">{drug.renal_adjust}</span>
+            </p>
+          )}
+          {drug.monitoring && (
+            <p className={detailed ? "text-sm" : "text-xs"}>
+              <span className="font-semibold text-slate-600">Monitoring: </span>
+              <span className="text-slate-700">{drug.monitoring}</span>
+            </p>
+          )}
           {drug.notes && (
-            <div className="p-2 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-900 flex items-start gap-1.5">
-              <Lightbulb className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div className={`p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 flex items-start gap-1.5 ${detailed ? "text-sm" : "text-xs"}`}>
+              <Lightbulb className={`text-amber-500 flex-shrink-0 mt-0.5 ${detailed ? "w-4 h-4" : "w-3 h-3"}`} />
               <span className="leading-relaxed">{drug.notes}</span>
             </div>
           )}
@@ -72,61 +96,39 @@ function DrugCard({ drug }) {
   );
 }
 
-// ── Main view ─────────────────────────────────────────────────────────────
-export default function GuidelineDetailView({ guideline }) {
-  const s = guideline.sections;
+// ═══════════════════════════════════════════════════════════════
+// QUICK VIEW — compact accordion bedside mode
+// ═══════════════════════════════════════════════════════════════
 
-  // DB guideline (flat fields, no structured sections)
-  if (!s) return <DBGuidelineView guideline={guideline} />;
+function QuickView({ guideline }) {
+  const s = guideline.sections;
+  if (!s) return <DBQuickView guideline={guideline} />;
 
   const qs = s.quick_summary || {};
   const classData = s.staging?.kdigo || s.staging?.ckd || s.classification || [];
 
   return (
     <div className="space-y-2 w-full overflow-hidden">
-
-      {/* ── Meta context pills ── */}
-      {(qs.epidemiology || qs.pathophysiology) && (
+      {qs.epidemiology && (
         <div className="flex gap-1.5 flex-wrap">
-          {qs.epidemiology && (
-            <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full border border-slate-200 leading-relaxed">
-              📊 {qs.epidemiology.slice(0, 100)}{qs.epidemiology.length > 100 ? "…" : ""}
-            </span>
-          )}
+          <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full border border-slate-200 leading-relaxed">
+            📊 {qs.epidemiology.slice(0, 110)}{qs.epidemiology.length > 110 ? "…" : ""}
+          </span>
         </div>
       )}
 
-      {/* ── Quick Clinical Summary ── */}
       {(qs.definition || qs.emergency_recognition?.length || qs.immediate_management?.length) && (
         <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-3">
           <div className="flex items-center gap-2 mb-2.5">
             <Zap className="w-4 h-4 text-blue-600 flex-shrink-0" />
             <span className="font-bold text-blue-800 text-sm">Quick Clinical Summary</span>
           </div>
-
           {qs.definition && (
             <div className="mb-2.5 p-2 bg-white rounded-lg border border-blue-100">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Definition</p>
               <p className="text-sm text-slate-800 leading-relaxed">{qs.definition}</p>
             </div>
           )}
-
-          {qs.key_diagnostic?.length > 0 && (
-            <div className="mb-2.5">
-              <p className="text-xs font-bold text-teal-700 uppercase tracking-wide mb-1 flex items-center gap-1">
-                <FlaskConical className="w-3 h-3" /> Key Diagnostic Points
-              </p>
-              <ul className="space-y-1">
-                {qs.key_diagnostic.map((item, i) => (
-                  <li key={i} className="text-xs text-slate-700 flex items-start gap-1.5">
-                    <span className="text-teal-500 font-bold flex-shrink-0">→</span>
-                    <span className="leading-relaxed">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           {qs.emergency_recognition?.length > 0 && (
             <div className="mb-2.5">
               <p className="text-xs font-bold text-red-600 uppercase tracking-wide mb-1 flex items-center gap-1">
@@ -142,7 +144,6 @@ export default function GuidelineDetailView({ guideline }) {
               </ul>
             </div>
           )}
-
           {qs.immediate_management?.length > 0 && (
             <div>
               <p className="text-xs font-bold text-green-700 uppercase tracking-wide mb-1 flex items-center gap-1">
@@ -161,24 +162,23 @@ export default function GuidelineDetailView({ guideline }) {
         </div>
       )}
 
-      {/* ── Staging / Classification ── */}
       {classData.length > 0 && (
         <AccSection title="Staging / Classification" icon={TrendingUp} color="indigo" defaultOpen>
           <div className="space-y-2">
             {classData.map((item, i) => (
               <div key={i} className="p-2 bg-indigo-50 rounded-lg border border-indigo-100">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <Badge className="bg-indigo-600 text-white text-xs flex-shrink-0 leading-none">
+                  <Badge className="bg-indigo-600 text-white text-xs flex-shrink-0">
                     {item.stage || item.type || item.modality || `#${i + 1}`}
                   </Badge>
                   {(item.scr || item.gfr || item.bp || item.definition) && (
-                    <span className="text-xs font-medium text-slate-700 leading-relaxed">{item.scr || item.gfr || item.bp || item.definition}</span>
+                    <span className="text-xs font-medium text-slate-700">{item.scr || item.gfr || item.bp || item.definition}</span>
                   )}
-                  {item.uo && <Badge variant="outline" className="text-xs leading-none">{item.uo}</Badge>}
+                  {item.uo && <Badge variant="outline" className="text-xs">{item.uo}</Badge>}
                   {item.description && <span className="text-xs text-slate-500">{item.description}</span>}
                 </div>
-                {(item.action || item.management || item.advantages) && (
-                  <p className="text-xs text-slate-600 leading-relaxed">{item.action || item.management || item.advantages}</p>
+                {(item.action || item.management) && (
+                  <p className="text-xs text-slate-600 leading-relaxed">{item.action || item.management}</p>
                 )}
               </div>
             ))}
@@ -186,78 +186,24 @@ export default function GuidelineDetailView({ guideline }) {
         </AccSection>
       )}
 
-      {/* ── Stepwise Management ── */}
       {s.management && Object.keys(s.management).length > 0 && (
         <AccSection title="Stepwise Management Algorithm" icon={Target} color="green">
-          {Object.entries(s.management).map(([key, items]) => {
-            if (!items || (Array.isArray(items) && items.length === 0)) return null;
-            const label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-            return (
-              <div key={key} className="mb-3 last:mb-0">
-                <p className="text-xs font-bold text-green-700 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                  <span className="w-1 h-3 bg-green-400 rounded-full flex-shrink-0 inline-block" />
-                  {label}
-                </p>
-                {Array.isArray(items) ? (
-                  <ol className="space-y-1">
-                    {items.map((item, i) => (
-                      <li key={i} className="text-xs text-slate-700 flex items-start gap-1.5">
-                        <span className="font-bold text-green-500 flex-shrink-0 w-4 text-right">{i + 1}.</span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ol>
-                ) : typeof items === "object" ? (
-                  <div className="space-y-2">
-                    {Object.entries(items).map(([sk, subitems]) => (
-                      <div key={sk} className="pl-2 border-l-2 border-green-200">
-                        <p className="text-xs font-semibold text-slate-500 mb-1">{sk.replace(/_/g, " ")}</p>
-                        {Array.isArray(subitems) && subitems.map((si, j) => (
-                          <p key={j} className="text-xs text-slate-700 flex items-start gap-1 mb-0.5">
-                            <span className="text-green-400 flex-shrink-0">→</span>
-                            <span className="leading-relaxed">{si}</span>
-                          </p>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+          <ManagementContent management={s.management} textSize="xs" />
         </AccSection>
       )}
 
-      {/* ── Drug Dosing ── */}
       {s.drugs?.length > 0 && (
         <AccSection title="Drug Dosing & Monitoring" icon={Pill} color="blue" badge={`${s.drugs.length} drugs`}>
           {s.drugs.map((drug, i) => <DrugCard key={i} drug={drug} />)}
         </AccSection>
       )}
 
-      {/* ── Monitoring ── */}
       {s.monitoring && (
-        <AccSection title="Monitoring Schedule & Follow-Up" icon={Clock} color="teal">
-          {s.monitoring.frequency && (
-            <div className="mb-2 p-2 bg-teal-50 rounded-lg border border-teal-200">
-              <span className="text-xs font-semibold text-teal-800">Frequency: </span>
-              <span className="text-xs text-teal-700">{s.monitoring.frequency}</span>
-            </div>
-          )}
-          {s.monitoring.parameters?.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {s.monitoring.parameters.map((p, i) => (
-                <Badge key={i} variant="outline" className="text-xs bg-white">{p}</Badge>
-              ))}
-            </div>
-          )}
-          {s.monitoring.follow_up && (
-            <p className="text-xs text-slate-600 border-t border-teal-100 pt-2 leading-relaxed">{s.monitoring.follow_up}</p>
-          )}
+        <AccSection title="Monitoring Schedule" icon={Clock} color="teal">
+          <MonitoringContent monitoring={s.monitoring} textSize="xs" />
         </AccSection>
       )}
 
-      {/* ── Nutrition ── */}
       {s.nutrition?.length > 0 && (
         <AccSection title="Nutrition Guidance" icon={Utensils} color="orange">
           <ul className="space-y-1.5">
@@ -271,7 +217,6 @@ export default function GuidelineDetailView({ guideline }) {
         </AccSection>
       )}
 
-      {/* ── Vaccination ── */}
       {s.vaccination?.length > 0 && (
         <AccSection title="Vaccination Guidance" icon={Shield} color="purple">
           <ul className="space-y-1.5">
@@ -285,9 +230,8 @@ export default function GuidelineDetailView({ guideline }) {
         </AccSection>
       )}
 
-      {/* ── Red Flags ── */}
       {s.red_flags?.length > 0 && (
-        <AccSection title="Red Flags & Escalation Triggers" icon={AlertTriangle} color="red">
+        <AccSection title="Red Flags & Escalation" icon={AlertTriangle} color="red">
           <ul className="space-y-1.5">
             {s.red_flags.map((flag, i) => (
               <li key={i} className="text-xs text-red-900 flex items-start gap-1.5 p-2 bg-red-50 rounded-lg border border-red-100">
@@ -299,13 +243,12 @@ export default function GuidelineDetailView({ guideline }) {
         </AccSection>
       )}
 
-      {/* ── Clinical Pearls ── */}
       {s.pearls?.length > 0 && (
         <AccSection title="Clinical Pearls & Viva Points" icon={Lightbulb} color="amber">
           <ul className="space-y-2">
             {s.pearls.map((pearl, i) => (
               <li key={i} className="text-xs text-amber-900 flex items-start gap-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
-                <span className="text-amber-500 font-bold flex-shrink-0 text-sm">★</span>
+                <span className="text-amber-500 font-bold flex-shrink-0">★</span>
                 <span className="leading-relaxed">{pearl}</span>
               </li>
             ))}
@@ -313,33 +256,387 @@ export default function GuidelineDetailView({ guideline }) {
         </AccSection>
       )}
 
-      {/* ── Evidence Footer ── */}
-      <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-        <div className="flex flex-wrap items-center gap-2">
-          <BookOpen className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-          <span className="text-xs font-medium text-slate-600">{guideline.source}</span>
-          <Badge variant="outline" className="text-xs">{guideline.year}</Badge>
-          <Badge className={`text-xs ${
-            guideline.evidence_level?.includes("High") ? "bg-green-100 text-green-800" :
-            guideline.evidence_level?.includes("Moderate") ? "bg-yellow-100 text-yellow-800" :
-            "bg-slate-100 text-slate-700"
-          }`}>{guideline.evidence_level || "Expert Opinion"}</Badge>
-          {guideline.external_link && (
-            <a href={guideline.external_link} target="_blank" rel="noreferrer"
-               className="ml-auto text-xs text-blue-600 hover:underline flex items-center gap-1">
-              Full guideline <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
+      <EvidenceFooter guideline={guideline} />
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DETAILED VIEW — handbook chapter style, fully expanded
+// ═══════════════════════════════════════════════════════════════
+
+function DetailedView({ guideline }) {
+  const s = guideline.sections;
+  if (!s) return <DBDetailedView guideline={guideline} />;
+
+  const qs = s.quick_summary || {};
+  const classData = s.staging?.kdigo || s.staging?.ckd || s.classification || [];
+
+  return (
+    <div className="space-y-5 w-full overflow-x-hidden">
+
+      {/* Epidemiology & Pathophysiology block */}
+      {(qs.epidemiology || qs.pathophysiology || qs.age_specific) && (
+        <Card className="border-2 border-slate-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-slate-500" /> Background & Context
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-3">
+            {qs.definition && (
+              <div className="p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1">Definition</p>
+                <p className="text-sm text-slate-800 leading-relaxed">{qs.definition}</p>
+              </div>
+            )}
+            {qs.epidemiology && (
+              <div>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Epidemiology</p>
+                <p className="text-sm text-slate-700 leading-relaxed">{qs.epidemiology}</p>
+              </div>
+            )}
+            {qs.pathophysiology && (
+              <div>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Pathophysiology</p>
+                <p className="text-sm text-slate-700 leading-relaxed">{qs.pathophysiology}</p>
+              </div>
+            )}
+            {qs.age_specific && (
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <p className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1">Age-Specific Considerations</p>
+                <p className="text-sm text-slate-700 leading-relaxed">{qs.age_specific}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Emergency Recognition */}
+      {qs.emergency_recognition?.length > 0 && (
+        <Card className="border-2 border-red-300 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-red-50 to-orange-50 border-b border-red-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-red-800 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-600" /> Emergency Recognition & Red Flags
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              {qs.emergency_recognition.map((item, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
+                  <div className="w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0">{i + 1}</div>
+                  <p className="text-sm text-red-900 leading-relaxed">{item}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Immediate Management */}
+      {qs.immediate_management?.length > 0 && (
+        <Card className="border-2 border-green-300 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-green-800 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-green-600" /> Immediate Management Steps
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ol className="space-y-2.5">
+              {qs.immediate_management.map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <div className="w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">{i + 1}</div>
+                  <p className="text-sm text-slate-800 leading-relaxed pt-0.5">{item}</p>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Staging / Classification */}
+      {classData.length > 0 && (
+        <Card className="border-2 border-indigo-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-indigo-800 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-indigo-600" /> Staging & Classification
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="overflow-x-auto -mx-1">
+              <table className="w-full text-sm border-collapse min-w-0">
+                <thead>
+                  <tr className="bg-indigo-100">
+                    <th className="text-left p-2 text-xs font-bold text-indigo-800 border border-indigo-200 w-20">Stage/Type</th>
+                    <th className="text-left p-2 text-xs font-bold text-indigo-800 border border-indigo-200">Criteria / Definition</th>
+                    <th className="text-left p-2 text-xs font-bold text-indigo-800 border border-indigo-200">Action / Management</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {classData.map((item, i) => (
+                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-indigo-50/40"}>
+                      <td className="p-2 border border-indigo-100 align-top">
+                        <Badge className="bg-indigo-600 text-white text-xs whitespace-nowrap">
+                          {item.stage || item.type || item.modality || `#${i + 1}`}
+                        </Badge>
+                        {item.description && <p className="text-xs text-slate-500 mt-1">{item.description}</p>}
+                      </td>
+                      <td className="p-2 border border-indigo-100 text-xs text-slate-700 align-top leading-relaxed">
+                        {item.scr || item.gfr || item.bp || item.definition || "—"}
+                        {item.uo && <p className="mt-1 text-slate-500">UO: {item.uo}</p>}
+                      </td>
+                      <td className="p-2 border border-indigo-100 text-xs text-slate-700 align-top leading-relaxed">
+                        {item.action || item.management || item.advantages || "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stepwise Management — fully expanded subsections */}
+      {s.management && Object.keys(s.management).length > 0 && (
+        <Card className="border-2 border-green-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-green-800 flex items-center gap-2">
+              <Target className="w-4 h-4 text-green-600" /> Management Algorithm
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-4">
+            <ManagementContent management={s.management} textSize="sm" expanded />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Drug Dosing — all expanded */}
+      {s.drugs?.length > 0 && (
+        <Card className="border-2 border-blue-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 py-3 px-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-bold text-blue-800 flex items-center gap-2">
+                <Pill className="w-4 h-4 text-blue-600" /> Drug Dosing, Monitoring & Renal Adjustment
+              </CardTitle>
+              <Badge className="bg-blue-600 text-white text-xs">{s.drugs.length} drugs</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            {s.drugs.map((drug, i) => <DrugCard key={i} drug={drug} detailed />)}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Monitoring */}
+      {s.monitoring && (
+        <Card className="border-2 border-teal-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-teal-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-teal-800 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-teal-600" /> Monitoring Schedule & Follow-Up
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <MonitoringContent monitoring={s.monitoring} textSize="sm" expanded />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Nutrition */}
+      {s.nutrition?.length > 0 && (
+        <Card className="border-2 border-orange-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-orange-800 flex items-center gap-2">
+              <Utensils className="w-4 h-4 text-orange-600" /> Nutrition Guidance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ul className="space-y-2.5">
+              {s.nutrition.map((item, i) => (
+                <li key={i} className="text-sm text-slate-700 flex items-start gap-2.5">
+                  <span className="w-5 h-5 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Vaccination */}
+      {s.vaccination?.length > 0 && (
+        <Card className="border-2 border-purple-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-purple-800 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-purple-600" /> Vaccination Guidance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ul className="space-y-2.5">
+              {s.vaccination.map((v, i) => (
+                <li key={i} className="text-sm text-slate-700 flex items-start gap-2.5 p-2.5 bg-purple-50 rounded-lg border border-purple-100">
+                  <Shield className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{v}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Red Flags */}
+      {s.red_flags?.length > 0 && (
+        <Card className="border-2 border-red-200 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-red-50 to-orange-50 border-b border-red-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-red-800 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-600" /> Red Flags & Escalation Triggers
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ul className="space-y-2.5">
+              {s.red_flags.map((flag, i) => (
+                <li key={i} className="text-sm text-red-900 flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
+                  <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                  <span className="leading-relaxed font-medium">{flag}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Clinical Pearls */}
+      {s.pearls?.length > 0 && (
+        <Card className="border-2 border-amber-300 shadow-sm overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50 border-b border-amber-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-amber-800 flex items-center gap-2">
+              <Lightbulb className="w-4 h-4 text-amber-600" /> Clinical Pearls & Viva Points
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ul className="space-y-3">
+              {s.pearls.map((pearl, i) => (
+                <li key={i} className="text-sm text-amber-900 flex items-start gap-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                  <span className="text-amber-500 font-bold text-lg flex-shrink-0 leading-none">★</span>
+                  <span className="leading-relaxed">{pearl}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      <EvidenceFooter guideline={guideline} detailed />
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED SUB-COMPONENTS
+// ═══════════════════════════════════════════════════════════════
+
+function ManagementContent({ management, textSize = "xs", expanded = false }) {
+  return (
+    <div className="space-y-4">
+      {Object.entries(management).map(([key, items]) => {
+        if (!items || (Array.isArray(items) && items.length === 0)) return null;
+        const label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        return (
+          <div key={key}>
+            <p className={`font-bold text-green-700 uppercase tracking-wide mb-2 flex items-center gap-1.5 ${textSize === "sm" ? "text-xs" : "text-xs"}`}>
+              <span className="w-1.5 h-4 bg-green-400 rounded-full flex-shrink-0 inline-block" />
+              {label}
+            </p>
+            {Array.isArray(items) ? (
+              <ol className="space-y-1.5">
+                {items.map((item, i) => (
+                  <li key={i} className={`text-slate-700 flex items-start gap-2 ${textSize === "sm" ? "text-sm" : "text-xs"}`}>
+                    <span className="font-bold text-green-500 flex-shrink-0 w-5 text-right">{i + 1}.</span>
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : typeof items === "object" ? (
+              <div className="space-y-3 pl-2">
+                {Object.entries(items).map(([sk, subitems]) => (
+                  <div key={sk} className="pl-3 border-l-2 border-green-200">
+                    <p className={`font-semibold text-slate-500 mb-1 ${textSize === "sm" ? "text-xs" : "text-xs"}`}>{sk.replace(/_/g, " ")}</p>
+                    {Array.isArray(subitems) && subitems.map((si, j) => (
+                      <p key={j} className={`text-slate-700 flex items-start gap-1 mb-1 ${textSize === "sm" ? "text-sm" : "text-xs"}`}>
+                        <span className="text-green-400 flex-shrink-0 mt-0.5">→</span>
+                        <span className="leading-relaxed">{si}</span>
+                      </p>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function MonitoringContent({ monitoring, textSize = "xs", expanded = false }) {
+  return (
+    <div className="space-y-3">
+      {monitoring.frequency && (
+        <div className={`p-3 bg-teal-50 rounded-lg border border-teal-200`}>
+          <span className={`font-semibold text-teal-800 ${textSize === "sm" ? "text-sm" : "text-xs"}`}>Frequency: </span>
+          <span className={`text-teal-700 ${textSize === "sm" ? "text-sm" : "text-xs"}`}>{monitoring.frequency}</span>
         </div>
+      )}
+      {monitoring.parameters?.length > 0 && (
+        <div>
+          {expanded && <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Parameters to monitor</p>}
+          <div className="flex flex-wrap gap-1.5">
+            {monitoring.parameters.map((p, i) => (
+              <Badge key={i} variant="outline" className={`bg-white ${textSize === "sm" ? "text-xs" : "text-xs"}`}>{p}</Badge>
+            ))}
+          </div>
+        </div>
+      )}
+      {monitoring.follow_up && (
+        <div className={`border-t border-teal-100 pt-3`}>
+          {expanded && <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Follow-up plan</p>}
+          <p className={`text-slate-600 leading-relaxed ${textSize === "sm" ? "text-sm" : "text-xs"}`}>{monitoring.follow_up}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EvidenceFooter({ guideline, detailed = false }) {
+  return (
+    <div className={`bg-slate-50 border border-slate-200 rounded-xl ${detailed ? "p-4" : "p-2.5"}`}>
+      <div className="flex flex-wrap items-center gap-2">
+        <BookOpen className={`text-slate-500 flex-shrink-0 ${detailed ? "w-4 h-4" : "w-3.5 h-3.5"}`} />
+        <span className={`font-medium text-slate-600 ${detailed ? "text-sm" : "text-xs"}`}>{guideline.source}</span>
+        <Badge variant="outline" className={detailed ? "text-xs" : "text-xs"}>{guideline.year}</Badge>
+        <Badge className={`${
+          guideline.evidence_level?.includes("High") ? "bg-green-100 text-green-800" :
+          guideline.evidence_level?.includes("Moderate") ? "bg-yellow-100 text-yellow-800" :
+          "bg-slate-100 text-slate-700"
+        } ${detailed ? "text-xs" : "text-xs"}`}>{guideline.evidence_level || "Expert Opinion"}</Badge>
+        {guideline.external_link && (
+          <a href={guideline.external_link} target="_blank" rel="noreferrer"
+             className={`ml-auto text-blue-600 hover:underline flex items-center gap-1 ${detailed ? "text-sm" : "text-xs"}`}>
+            Full guideline <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
       </div>
     </div>
   );
 }
 
-// ── Flat DB guideline view ────────────────────────────────────────────────
-function DBGuidelineView({ guideline }) {
+// ═══════════════════════════════════════════════════════════════
+// DB GUIDELINE VIEWS (flat fields)
+// ═══════════════════════════════════════════════════════════════
+
+function DBQuickView({ guideline }) {
   return (
-    <div className="space-y-3 w-full overflow-hidden">
+    <div className="space-y-2 w-full overflow-hidden">
       {guideline.scope_and_population && (
         <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">
           <p className="text-xs font-semibold text-blue-700 mb-1 flex items-center gap-1"><Zap className="w-3 h-3" />Clinical Summary</p>
@@ -376,19 +673,150 @@ function DBGuidelineView({ guideline }) {
           <p className="text-sm text-slate-700 leading-relaxed">{guideline.summary}</p>
         </div>
       )}
-      <div className="flex flex-wrap gap-2 items-center p-2 bg-slate-50 rounded-xl border border-slate-200">
-        <BookOpen className="w-3.5 h-3.5 text-slate-500" />
-        <span className="text-xs text-slate-600">{guideline.source} · {guideline.year}</span>
-        <Badge className={`text-xs ${guideline.evidence_level?.includes("High") ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"}`}>
-          {guideline.evidence_level || "Expert Opinion"}
-        </Badge>
-        {guideline.external_link && (
-          <a href={guideline.external_link} target="_blank" rel="noreferrer"
-             className="ml-auto text-xs text-blue-600 flex items-center gap-1 hover:underline">
-            Full guideline <ExternalLink className="w-3 h-3" />
-          </a>
+      <EvidenceFooter guideline={guideline} />
+    </div>
+  );
+}
+
+function DBDetailedView({ guideline }) {
+  return (
+    <div className="space-y-4 w-full overflow-hidden">
+      {guideline.scope_and_population && (
+        <Card className="border-2 border-blue-200">
+          <CardHeader className="bg-blue-50 border-b border-blue-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-blue-800 flex items-center gap-2">
+              <Zap className="w-4 h-4" /> Clinical Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <p className="text-base text-slate-800 leading-relaxed">{guideline.scope_and_population}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {guideline.key_recommendations?.filter(r => r?.trim()).length > 0 && (
+        <Card className="border-2 border-green-200">
+          <CardHeader className="bg-green-50 border-b border-green-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-green-800 flex items-center gap-2">
+              <Target className="w-4 h-4" /> Management Algorithm
+              <Badge className="bg-green-600 text-white text-xs ml-auto">{guideline.key_recommendations.filter(r => r?.trim()).length} Steps</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ol className="space-y-3">
+              {guideline.key_recommendations.filter(r => r?.trim()).map((rec, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <div className="w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">{i + 1}</div>
+                  <p className="text-sm text-slate-800 leading-relaxed pt-0.5">{rec}</p>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
+
+      {guideline.practice_pearls?.filter(p => p?.trim()).length > 0 && (
+        <Card className="border-2 border-amber-200">
+          <CardHeader className="bg-amber-50 border-b border-amber-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-amber-800 flex items-center gap-2">
+              <Lightbulb className="w-4 h-4" /> Clinical Practice Pearls
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <ul className="space-y-3">
+              {guideline.practice_pearls.filter(p => p?.trim()).map((pearl, i) => (
+                <li key={i} className="text-sm text-amber-900 flex items-start gap-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                  <span className="text-amber-500 font-bold text-lg flex-shrink-0 leading-none">★</span>
+                  <span className="leading-relaxed">{pearl}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {guideline.content?.sections?.length > 0 && (
+        <Card className="border-2 border-purple-200">
+          <CardHeader className="bg-purple-50 border-b border-purple-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-purple-800">Detailed Content</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-4">
+            {guideline.content.sections.map((section, idx) => (
+              <div key={idx} className="border-l-4 border-purple-400 pl-4">
+                <h3 className="font-bold text-slate-900 mb-2">{section.heading}</h3>
+                {section.content && (
+                  <div className="prose prose-sm max-w-none text-slate-700 overflow-x-auto"
+                    dangerouslySetInnerHTML={{ __html: section.content }} />
+                )}
+                {section.key_points?.length > 0 && (
+                  <ul className="space-y-1.5 mt-2">
+                    {section.key_points.map((point, pidx) => (
+                      <li key={pidx} className="text-sm text-slate-700 flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
+                        <span className="leading-relaxed">{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {guideline.summary && (
+        <Card className="border-2 border-slate-200">
+          <CardHeader className="bg-slate-50 border-b border-slate-200 py-3 px-4">
+            <CardTitle className="text-base font-bold text-slate-700">Complete Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <p className="text-sm text-slate-700 leading-relaxed">{guideline.summary}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      <EvidenceFooter guideline={guideline} detailed />
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN EXPORT — with view toggle
+// ═══════════════════════════════════════════════════════════════
+
+export default function GuidelineDetailView({ guideline, defaultMode = "quick" }) {
+  const [mode, setMode] = useState(defaultMode);
+  const isBuiltin = !!guideline.sections;
+
+  return (
+    <div className="w-full overflow-hidden">
+      {/* View toggle */}
+      <div className="flex items-center gap-2 mb-3 p-2 bg-slate-50 rounded-xl border border-slate-200">
+        <div className="flex rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0">
+          <button
+            onClick={() => setMode("quick")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${mode === "quick" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            Quick View
+          </button>
+          <button
+            onClick={() => setMode("detailed")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${mode === "detailed" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+          >
+            <BookOpenCheck className="w-3.5 h-3.5" />
+            Detailed View
+          </button>
+        </div>
+        <p className="text-xs text-slate-400 hidden sm:block">
+          {mode === "quick" ? "Compact bedside reference" : "Full handbook-style reading mode"}
+        </p>
+        {isBuiltin && (
+          <Badge className="ml-auto text-xs bg-blue-100 text-blue-700 border-0 flex-shrink-0">Built-in · Structured</Badge>
         )}
       </div>
+
+      {mode === "quick" ? <QuickView guideline={guideline} /> : <DetailedView guideline={guideline} />}
     </div>
   );
 }
