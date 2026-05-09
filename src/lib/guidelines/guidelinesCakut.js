@@ -9,6 +9,65 @@ export const CAKUT_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-vur-uti",
+  references: [
+    {
+      id: "uti-ref1",
+      citation: "Subcommittee on Urinary Tract Infection; Steering Committee on Quality Improvement and Management. Urinary tract infection: clinical practice guideline for the diagnosis and management of the initial UTI in febrile infants and children 2 to 24 months. Pediatrics. 2011;128(3):595–610.",
+      authors: "AAP Subcommittee on Urinary Tract Infection",
+      journal: "Pediatrics",
+      year: 2011,
+      volume: "128(3)",
+      pages: "595–610",
+      doi: "10.1542/peds.2011-1330",
+      pmid: "21873693",
+      evidence_grade: "A",
+      guideline_body: "AAP",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "Diagnosis criteria (culture + dipstick + symptoms), imaging pathway, antibiotic choice for febrile UTI"
+    },
+    {
+      id: "uti-ref2",
+      citation: "NICE Clinical Guideline CG54. Urinary tract infection in under 16s: diagnosis and management. National Institute for Health and Care Excellence. 2007 (updated 2017).",
+      authors: "National Institute for Health and Care Excellence (NICE)",
+      journal: "NICE Clinical Guidelines",
+      year: 2017,
+      pages: "CG54",
+      doi: "https://www.nice.org.uk/guidance/cg54",
+      evidence_grade: "A",
+      guideline_body: "NICE",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "UK UTI management in children: imaging criteria (USS, DMSA, MCUG), antibiotic choice, prophylaxis thresholds"
+    },
+    {
+      id: "uti-ref3",
+      citation: "Hoberman A, Greenfield SP, Mattoo TK, et al. Antimicrobial prophylaxis for children with vesicoureteral reflux. N Engl J Med. 2014;370(25):2367–2376.",
+      authors: "Hoberman A, Greenfield SP, Mattoo TK et al (RIVUR Trial Investigators)",
+      journal: "New England Journal of Medicine",
+      year: 2014,
+      volume: "370(25)",
+      pages: "2367–2376",
+      doi: "10.1056/NEJMoa1401811",
+      pmid: "24795142",
+      evidence_grade: "A",
+      type: "Randomized Controlled Trial",
+      key_recommendation: "RIVUR trial: prophylactic trimethoprim-sulfamethoxazole halves recurrent UTI in VUR but does not prevent renal scarring"
+    },
+    {
+      id: "uti-ref4",
+      citation: "Tekgül S, Riedmiller H, Hoebeke P, et al. EAU guidelines on vesicoureteral reflux in children. Eur Urol. 2012;62(3):534–542.",
+      authors: "Tekgül S, Riedmiller H, Hoebeke P et al (European Association of Urology)",
+      journal: "European Urology",
+      year: 2012,
+      volume: "62(3)",
+      pages: "534–542",
+      doi: "10.1016/j.eururo.2012.05.059",
+      pmid: "22699015",
+      evidence_grade: "A",
+      guideline_body: "EAU",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "VUR grading, conservative vs interventional management (STING vs ureteral reimplantation), prophylaxis decision"
+    }
+  ],
   title: "UTI, Vesicoureteric Reflux & Reflux Nephropathy in Children",
   category: "Infection",
   source: "AAP / NICE / EAU",
@@ -144,6 +203,38 @@ export const CAKUT_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-neurogenic-bladder",
+  references: [
+    {
+      id: "nb-ref1",
+      citation: "Bauer SB, Austin PF, Rawashdeh YF, et al. International Children's Continence Society's recommendations for initial diagnostic evaluation and follow-up in congenital neuropathic bladder and bowel dysfunction in children. Neurourol Urodyn. 2012;31(5):610–614.",
+      authors: "Bauer SB, Austin PF, Rawashdeh YF et al (International Children's Continence Society)",
+      journal: "Neurourology and Urodynamics",
+      year: 2012,
+      volume: "31(5)",
+      pages: "610–614",
+      doi: "10.1002/nau.22229",
+      pmid: "22532462",
+      evidence_grade: "A",
+      guideline_body: "ICCS",
+      type: "Consensus Recommendation",
+      key_recommendation: "ICCS: initial urodynamics in neuropathic bladder, CIC protocol, leak point pressure threshold (40 cmH₂O)"
+    },
+    {
+      id: "nb-ref2",
+      citation: "Nevéus T, von Gontard A, Hoebeke P, et al. The standardization of terminology of lower urinary tract function in children and adolescents: report from the Standardisation Committee of the International Children's Continence Society. J Urol. 2006;176(1):314–324.",
+      authors: "Nevéus T, von Gontard A, Hoebeke P et al (ICCS Standardisation Committee)",
+      journal: "Journal of Urology",
+      year: 2006,
+      volume: "176(1)",
+      pages: "314–324",
+      doi: "10.1016/S0022-5347(06)00305-3",
+      pmid: "16753432",
+      evidence_grade: "A",
+      guideline_body: "ICCS",
+      type: "Standardization Document",
+      key_recommendation: "ICCS standardized terminology for BBD, neurogenic bladder, overactive bladder, urodynamic parameters"
+    }
+  ],
   title: "Neurogenic Bladder & Bladder-Bowel Dysfunction in Children",
   category: "Tubular Disorders",
   source: "EAU / ICCS",

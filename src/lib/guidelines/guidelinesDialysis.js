@@ -9,6 +9,51 @@ export const DIALYSIS_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-pd",
+  references: [
+    {
+      id: "pd-ref1",
+      citation: "Warady BA, Bakkaloglu S, Newland J, et al. Consensus guidelines for the prevention and treatment of catheter-related infections and peritonitis in pediatric patients receiving peritoneal dialysis. Perit Dial Int. 2012;32 Suppl 2:S32–S86.",
+      authors: "Warady BA, Bakkaloglu S, Newland J et al (ISPD Pediatric Guidelines Work Group)",
+      journal: "Peritoneal Dialysis International",
+      year: 2012,
+      volume: "32 Suppl 2",
+      pages: "S32–S86",
+      doi: "10.3747/pdi.2011.00091",
+      pmid: "22851742",
+      evidence_grade: "A",
+      guideline_body: "ISPD",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "ISPD paediatric PD guidelines: peritonitis management, catheter care, empiric IP antibiotic protocols"
+    },
+    {
+      id: "pd-ref2",
+      citation: "Schaefer F, Klaus G, Müller-Wiefel DE, Mehls O; Mid-European Pediatric PD Study Group. Current practice of peritoneal dialysis in children: results of a longitudinal survey. Perit Dial Int. 1999;19 Suppl 2:S445–449.",
+      authors: "Schaefer F, Klaus G, Müller-Wiefel DE, Mehls O",
+      journal: "Peritoneal Dialysis International",
+      year: 1999,
+      volume: "19 Suppl 2",
+      pages: "S445–449",
+      pmid: "10409629",
+      evidence_grade: "B",
+      type: "Survey / Cohort",
+      key_recommendation: "Paediatric PD modality distribution, adequacy targets, peritonitis rates in European children"
+    },
+    {
+      id: "pd-ref3",
+      citation: "Li PK, Szeto CC, Piraino B, et al. ISPD Peritonitis Recommendations: 2016 Update on Prevention and Treatment. Perit Dial Int. 2016;36(5):481–508.",
+      authors: "Li PK, Szeto CC, Piraino B et al",
+      journal: "Peritoneal Dialysis International",
+      year: 2016,
+      volume: "36(5)",
+      pages: "481–508",
+      doi: "10.3747/pdi.2016.00078",
+      pmid: "27282851",
+      evidence_grade: "A",
+      guideline_body: "ISPD",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "ISPD 2016 peritonitis update: diagnosis (WBC criteria), IP antibiotic protocols, treatment duration, catheter removal"
+    }
+  ],
   title: "Peritoneal Dialysis in Children — ISPD Paediatric Guidelines",
   category: "Dialysis",
   source: "ISPD / PRNT",
@@ -159,6 +204,51 @@ export const DIALYSIS_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-dysnatremia",
+  references: [
+    {
+      id: "na-ref1",
+      citation: "Moritz ML, Ayus JC. 0.9% saline solution: still the right choice for pediatric maintenance fluid therapy. Clin Pediatr (Phila). 2010;49(1):19–25.",
+      authors: "Moritz ML, Ayus JC",
+      journal: "Clinical Pediatrics",
+      year: 2010,
+      volume: "49(1)",
+      pages: "19–25",
+      doi: "10.1177/0009922809339935",
+      pmid: "19786716",
+      evidence_grade: "B",
+      type: "Review",
+      key_recommendation: "Isotonic saline for paediatric maintenance to prevent hospital-acquired hyponatraemia"
+    },
+    {
+      id: "na-ref2",
+      citation: "Spasovski G, Vanholder R, Allolio B, et al. Clinical practice guideline on diagnosis and treatment of hyponatraemia. Eur J Endocrinol. 2014;170(3):G1–47.",
+      authors: "Spasovski G, Vanholder R, Allolio B et al (European Hyponatraemia Guideline Development Group)",
+      journal: "European Journal of Endocrinology",
+      year: 2014,
+      volume: "170(3)",
+      pages: "G1–47",
+      doi: "10.1530/EJE-13-1020",
+      pmid: "24569125",
+      evidence_grade: "A",
+      guideline_body: "European Clinical Practice Guideline",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "Hyponatraemia diagnosis (SIADH vs CSW vs dilutional), 3% NaCl for symptomatic cases, correction rate limits"
+    },
+    {
+      id: "na-ref3",
+      citation: "Verbalis JG, Goldsmith SR, Greenberg A, et al. Diagnosis, Evaluation, and Treatment of Hyponatremia: Expert Panel Recommendations. Am J Med. 2013;126(10 Suppl 1):S1–42.",
+      authors: "Verbalis JG, Goldsmith SR, Greenberg A et al",
+      journal: "American Journal of Medicine",
+      year: 2013,
+      volume: "126(10 Suppl 1)",
+      pages: "S1–42",
+      doi: "10.1016/j.amjmed.2013.07.006",
+      pmid: "24074529",
+      evidence_grade: "A",
+      type: "Expert Panel Recommendation",
+      key_recommendation: "Osmotic demyelination prevention: maximum 10–12 mmol/L per 24h correction rate, risk factors"
+    }
+  ],
   title: "Dysnatraemia — Hyponatraemia & Hypernatraemia in Children",
   category: "Electrolytes",
   source: "PRNT / ESPNIC",
@@ -272,6 +362,50 @@ export const DIALYSIS_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-rta",
+  references: [
+    {
+      id: "rta-ref1",
+      citation: "Batlle D, Haque SK. Genetic causes and mechanisms of distal renal tubular acidosis. Nephrol Dial Transplant. 2012;27(10):3691–3704.",
+      authors: "Batlle D, Haque SK",
+      journal: "Nephrology Dialysis Transplantation",
+      year: 2012,
+      volume: "27(10)",
+      pages: "3691–3704",
+      doi: "10.1093/ndt/gfs442",
+      pmid: "23065487",
+      evidence_grade: "B",
+      type: "Review",
+      key_recommendation: "Hereditary dRTA genetics (SLC4A1, ATP6V1B1, ATP6V0A4), pathophysiology, clinical features"
+    },
+    {
+      id: "rta-ref2",
+      citation: "Kleta R, Bockenhauer D. Bartter syndromes and other salt-losing tubulopathies. Nephron Physiol. 2006;104(2):p73–80.",
+      authors: "Kleta R, Bockenhauer D",
+      journal: "Nephron Physiology",
+      year: 2006,
+      volume: "104(2)",
+      pages: "p73–80",
+      doi: "10.1159/000093253",
+      pmid: "16785748",
+      evidence_grade: "B",
+      type: "Review",
+      key_recommendation: "Tubulopathy classification, Fanconi syndrome, RTA genetic basis"
+    },
+    {
+      id: "rta-ref3",
+      citation: "Igarashi T, Sekine T, Inatomi J, Takeshima Y. Unraveling the molecular pathogenesis of isolated proximal renal tubular acidosis. J Am Soc Nephrol. 2002;13(8):2171–2177.",
+      authors: "Igarashi T, Sekine T, Inatomi J, Takeshima Y",
+      journal: "Journal of the American Society of Nephrology",
+      year: 2002,
+      volume: "13(8)",
+      pages: "2171–2177",
+      doi: "10.1097/01.asn.0000022017.96880.f7",
+      pmid: "12138147",
+      evidence_grade: "B",
+      type: "Original Article",
+      key_recommendation: "pRTA molecular basis: NBC1 transporter mutations, Fanconi syndrome pathogenesis"
+    }
+  ],
   title: "Renal Tubular Acidosis (RTA) — Types I, II, IV",
   category: "Tubular Disorders",
   source: "PRNT / ESPN",

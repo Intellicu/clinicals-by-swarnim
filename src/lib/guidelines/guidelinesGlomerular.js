@@ -9,6 +9,65 @@ export const GLOMERULAR_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-igan",
+  references: [
+    {
+      id: "igan-ref1",
+      citation: "Kidney Disease: Improving Global Outcomes (KDIGO) Glomerular Diseases Work Group. KDIGO 2021 Clinical Practice Guideline for the Management of Glomerular Diseases. Kidney Int. 2021;100(4S):S1–S276.",
+      authors: "KDIGO Glomerular Diseases Work Group",
+      journal: "Kidney International",
+      year: 2021,
+      volume: "100(4S)",
+      pages: "S1–S276",
+      doi: "10.1016/j.kint.2021.05.021",
+      pmid: "34556256",
+      evidence_grade: "A",
+      guideline_body: "KDIGO",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "IgAN management: ACE-I/ARB first-line, Oxford MEST-C classification, immunosuppression criteria"
+    },
+    {
+      id: "igan-ref2",
+      citation: "Roberts IS, Cook HT, Troyanov S, et al. The Oxford classification of IgA nephropathy: pathology definitions, correlations, and reproducibility. Kidney Int. 2009;76(5):546–556.",
+      authors: "Roberts IS, Cook HT, Troyanov S et al (IgAN Classification Working Group)",
+      journal: "Kidney International",
+      year: 2009,
+      volume: "76(5)",
+      pages: "546–556",
+      doi: "10.1038/ki.2009.168",
+      pmid: "19571791",
+      evidence_grade: "A",
+      type: "Validation Study",
+      key_recommendation: "Oxford-MEST classification: M, E, S, T scoring and prognostic value"
+    },
+    {
+      id: "igan-ref3",
+      citation: "Lv J, Zhang H, Wong MG, et al. Effect of Oral Methylprednisolone on Clinical Outcomes in Patients With IgA Nephropathy: The TESTING Randomized Clinical Trial. JAMA. 2017;318(5):432–442.",
+      authors: "Lv J, Zhang H, Wong MG et al (TESTING Study Group)",
+      journal: "JAMA",
+      year: 2017,
+      volume: "318(5)",
+      pages: "432–442",
+      doi: "10.1001/jama.2017.9362",
+      pmid: "28763548",
+      evidence_grade: "A",
+      type: "Randomized Controlled Trial",
+      key_recommendation: "TESTING trial: prednisolone reduces proteinuria but increases serious infections in IgAN"
+    },
+    {
+      id: "igan-ref4",
+      citation: "Floege J, Barbour SJ, Cattran DC, et al. Management and treatment of glomerular diseases (part 1): conclusions from a Kidney Disease: Improving Global Outcomes (KDIGO) Controversies Conference. Kidney Int. 2019;95(2):268–280.",
+      authors: "Floege J, Barbour SJ, Cattran DC et al",
+      journal: "Kidney International",
+      year: 2019,
+      volume: "95(2)",
+      pages: "268–280",
+      doi: "10.1016/j.kint.2018.10.018",
+      pmid: "30665569",
+      evidence_grade: "B",
+      type: "Consensus Statement",
+      key_recommendation: "IgAN controversies: immunosuppression threshold, fish oil evidence, sparsentan emerging data"
+    }
+  ],
   title: "IgA Nephropathy & IgA Vasculitis Nephritis (HSP) in Children",
   category: "Glomerular Diseases",
   source: "KDIGO 2021 / IPNA / ESPN",
@@ -117,6 +176,79 @@ export const GLOMERULAR_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-lupus-nephritis",
+  references: [
+    {
+      id: "ln-ref1",
+      citation: "Fanouriakis A, Kostopoulou M, Cheema K, et al. 2019 Update of the Joint European League Against Rheumatism and European Renal Association–European Dialysis and Transplant Association (EULAR/ERA-EDTA) recommendations for the management of lupus nephritis. Ann Rheum Dis. 2020;79(6):713–723.",
+      authors: "Fanouriakis A, Kostopoulou M, Cheema K et al",
+      journal: "Annals of the Rheumatic Diseases",
+      year: 2020,
+      volume: "79(6)",
+      pages: "713–723",
+      doi: "10.1136/annrheumdis-2020-216924",
+      pmid: "32220834",
+      evidence_grade: "A",
+      guideline_body: "EULAR / ERA-EDTA",
+      type: "Clinical Practice Guideline",
+      key_recommendation: "LN induction (MMF vs IV CYC), maintenance (MMF ≥3y), hydroxychloroquine mandatory, belimumab add-on"
+    },
+    {
+      id: "ln-ref2",
+      citation: "Rovin BH, Furie R, Teng YKO, et al. A secondary analysis of the Belimumab International Study in Lupus Nephritis trial examined effects of belimumab on kidney outcomes and preservation of kidney function in active lupus nephritis. Kidney Int. 2022;101(2):403–413.",
+      authors: "Rovin BH, Furie R, Teng YKO et al (BLISS-LN Investigators)",
+      journal: "Kidney International",
+      year: 2022,
+      volume: "101(2)",
+      pages: "403–413",
+      doi: "10.1016/j.kint.2021.08.016",
+      pmid: "34509531",
+      evidence_grade: "A",
+      type: "Randomized Controlled Trial",
+      key_recommendation: "BLISS-LN: belimumab added to MMF+steroids improved primary efficacy renal response (43% vs 32%)"
+    },
+    {
+      id: "ln-ref3",
+      citation: "Houssiau FA, Vasconcelos C, D'Cruz D, et al. Immunosuppressive therapy in lupus nephritis: the Euro-Lupus Nephritis Trial, a randomized trial of low-dose versus high-dose intravenous cyclophosphamide. Arthritis Rheum. 2002;46(8):2121–2131.",
+      authors: "Houssiau FA, Vasconcelos C, D'Cruz D et al (Euro-Lupus Nephritis Trial)",
+      journal: "Arthritis & Rheumatism",
+      year: 2002,
+      volume: "46(8)",
+      pages: "2121–2131",
+      doi: "10.1002/art.10461",
+      pmid: "12209517",
+      evidence_grade: "A",
+      type: "Randomized Controlled Trial",
+      key_recommendation: "Euro-Lupus: low-dose IV CYC (500 mg ×6) equivalent to high-dose NIH with less gonadotoxicity"
+    },
+    {
+      id: "ln-ref4",
+      citation: "Rovin BH, Teng YKO, Ginzler EM, et al. Efficacy and safety of voclosporin versus placebo for lupus nephritis (AURORA 1): a double-blind, randomised, multicentre, placebo-controlled, phase 3 trial. Lancet. 2021;397(10289):2070–2080.",
+      authors: "Rovin BH, Teng YKO, Ginzler EM et al (AURORA 1 investigators)",
+      journal: "The Lancet",
+      year: 2021,
+      volume: "397(10289)",
+      pages: "2070–2080",
+      doi: "10.1016/S0140-6736(21)00578-X",
+      pmid: "33971155",
+      evidence_grade: "A",
+      type: "Randomized Controlled Trial",
+      key_recommendation: "AURORA 1 trial: voclosporin + MMF + prednisolone significantly improved complete renal remission vs standard therapy in LN"
+    },
+    {
+      id: "ln-ref5",
+      citation: "Brunner HI, Huggins J, Klein-Gitelman MS. Pediatric SLE: towards a comprehensive management plan. Nat Rev Rheumatol. 2011;7(9):523–531.",
+      authors: "Brunner HI, Huggins J, Klein-Gitelman MS",
+      journal: "Nature Reviews Rheumatology",
+      year: 2011,
+      volume: "7(9)",
+      pages: "523–531",
+      doi: "10.1038/nrrheum.2011.107",
+      pmid: "21808287",
+      evidence_grade: "B",
+      type: "Review",
+      key_recommendation: "Paediatric SLE-specific management considerations, LN in children, adolescent adherence"
+    }
+  ],
   title: "Lupus Nephritis in Children — ACR/EULAR/KDIGO",
   category: "Glomerular Diseases",
   source: "ACR / EULAR / KDIGO",
@@ -255,6 +387,36 @@ export const GLOMERULAR_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-psgn",
+  references: [
+    {
+      id: "psgn-ref1",
+      citation: "Rodriguez-Iturbe B, Musser JM. The current state of poststreptococcal glomerulonephritis. J Am Soc Nephrol. 2008;19(10):1855–1864.",
+      authors: "Rodriguez-Iturbe B, Musser JM",
+      journal: "Journal of the American Society of Nephrology",
+      year: 2008,
+      volume: "19(10)",
+      pages: "1855–1864",
+      doi: "10.1681/ASN.2008010054",
+      pmid: "18667731",
+      evidence_grade: "B",
+      type: "Review",
+      key_recommendation: "PSGN pathogenesis, streptococcal antigens (SpeB, NAPlr), complement activation, clinical spectrum"
+    },
+    {
+      id: "psgn-ref2",
+      citation: "Eison TM, Ault BH, Jones DP, Chesney RW, Wyatt RJ. Post-streptococcal acute glomerulonephritis in children: clinical features and pathogenesis. Pediatr Nephrol. 2011;26(2):165–180.",
+      authors: "Eison TM, Ault BH, Jones DP, Chesney RW, Wyatt RJ",
+      journal: "Pediatric Nephrology",
+      year: 2011,
+      volume: "26(2)",
+      pages: "165–180",
+      doi: "10.1007/s00467-010-1554-6",
+      pmid: "20725758",
+      evidence_grade: "B",
+      type: "Review",
+      key_recommendation: "Paediatric PSGN: clinical presentation, ASO/anti-DNAseB, complement, prognosis, management"
+    }
+  ],
   title: "Post-Streptococcal Glomerulonephritis (PSGN)",
   category: "Glomerular Diseases",
   source: "PRNT / AHA",
@@ -361,6 +523,51 @@ export const GLOMERULAR_GUIDELINES = [
 // ═══════════════════════════════════════════════════════════════════════════
 {
   id: "gl-anca-vasculitis",
+  references: [
+    {
+      id: "anca-ref1",
+      citation: "Geetha D, Jefferson JA. ANCA-Associated Vasculitis: Core Curriculum 2020. Am J Kidney Dis. 2020;75(1):124–137.",
+      authors: "Geetha D, Jefferson JA",
+      journal: "American Journal of Kidney Diseases",
+      year: 2020,
+      volume: "75(1)",
+      pages: "124–137",
+      doi: "10.1053/j.ajkd.2019.04.031",
+      pmid: "31358311",
+      evidence_grade: "A",
+      type: "Review / Core Curriculum",
+      key_recommendation: "ANCA vasculitis pathophysiology, classification (GPA/MPA), induction and maintenance therapy evidence"
+    },
+    {
+      id: "anca-ref2",
+      citation: "Stone JH, Merkel PA, Spiera R, et al. Rituximab versus cyclophosphamide for ANCA-associated vasculitis. N Engl J Med. 2010;363(3):221–232.",
+      authors: "Stone JH, Merkel PA, Spiera R et al (RAVE-ITN Research Group)",
+      journal: "New England Journal of Medicine",
+      year: 2010,
+      volume: "363(3)",
+      pages: "221–232",
+      doi: "10.1056/NEJMoa0909905",
+      pmid: "20647199",
+      evidence_grade: "A",
+      type: "Randomized Controlled Trial",
+      key_recommendation: "RAVE trial: rituximab non-inferior to cyclophosphamide for induction of remission in ANCA vasculitis"
+    },
+    {
+      id: "anca-ref3",
+      citation: "Ozen S, Pistorio A, Iusan SM, et al. EULAR/PRINTO/PRES criteria for Henoch-Schönlein purpura, childhood polyarteritis nodosa, childhood Wegener granulomatosis and childhood Takayasu arteritis. Ann Rheum Dis. 2010;69(5):798–806.",
+      authors: "Ozen S, Pistorio A, Iusan SM et al (SHARE Initiative)",
+      journal: "Annals of the Rheumatic Diseases",
+      year: 2010,
+      volume: "69(5)",
+      pages: "798–806",
+      doi: "10.1136/ard.2009.116657",
+      pmid: "20185124",
+      evidence_grade: "A",
+      guideline_body: "SHARE / EULAR",
+      type: "Classification Criteria",
+      key_recommendation: "EULAR/PRINTO/PRES classification criteria for childhood ANCA vasculitis (GPA)"
+    }
+  ],
   title: "ANCA-Associated Vasculitis — GPA, MPA & EGPA in Children",
   category: "Glomerular Diseases",
   source: "SHARE / ACR / EULAR",
