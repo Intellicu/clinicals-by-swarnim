@@ -1,0 +1,83 @@
+{
+  "name": "UsageTracking",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "YYYY-MM-DD"
+    },
+    "ai_prescriber_count": {
+      "type": "number",
+      "default": 0
+    },
+    "ocr_count": {
+      "type": "number",
+      "default": 0
+    },
+    "lab_ai_count": {
+      "type": "number",
+      "default": 0
+    },
+    "ai_assistant_count": {
+      "type": "number",
+      "default": 0
+    },
+    "differential_engine_count": {
+      "type": "number",
+      "default": 0
+    },
+    "total_ai_calls": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "user_email",
+    "date"
+  ],
+  "rls": {
+    "create": {
+      "data.user_email": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
