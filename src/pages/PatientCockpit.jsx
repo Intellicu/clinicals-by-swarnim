@@ -158,7 +158,7 @@ Keep response concise and cite the specific guideline source.`,
           {[
             { id: "overview", label: "Overview", icon: Activity },
             { id: "vitals", label: "Vitals", icon: Stethoscope },
-            { id: "intelligence", label: "Clinical OS", icon: Brain },
+            { id: "intelligence", label: "Insights", icon: Brain },
             { id: "prescription", label: "Prescription", icon: Pill },
             { id: "history", label: "History", icon: History },
           ].map(t => (
@@ -188,7 +188,7 @@ Keep response concise and cite the specific guideline source.`,
               {[
                 { label: "Vitals", icon: Activity, color: "bg-green-50 border-green-200 text-green-700", tab: "vitals" },
                 { label: "Prescription", icon: Pill, color: "bg-blue-50 border-blue-200 text-blue-700", tab: "prescription" },
-                { label: "Clinical OS", icon: Brain, color: "bg-purple-50 border-purple-200 text-purple-700", tab: "intelligence" },
+                { label: "Insights", icon: Brain, color: "bg-purple-50 border-purple-200 text-purple-700", tab: "intelligence" },
                 { label: "AI Discuss", icon: MessageCircle, color: "bg-indigo-50 border-indigo-200 text-indigo-700", action: getAIInsight },
                 { label: "Pathways", icon: GitBranch, color: "bg-teal-50 border-teal-200 text-teal-700", path: "ClinicalSupport" },
                 { label: "Emergency", icon: Zap, color: "bg-red-50 border-red-200 text-red-700", path: "EmergencyHub" },
@@ -323,8 +323,7 @@ Keep response concise and cite the specific guideline source.`,
             <Card>
               <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <Brain className="w-4 h-4 text-purple-600" />Contextual Clinical Intelligence
-                  <Badge className="ml-auto bg-purple-600 text-white text-xs border-0">Clinical OS</Badge>
+                  <Brain className="w-4 h-4 text-purple-600" />Contextual Clinical Insights
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-3 pb-3">
