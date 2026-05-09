@@ -213,15 +213,6 @@ const clinicalScenarios = [
   hasFullPathway: true
 },
 {
-  id: "steroid-resistant-ns",
-  title: "Steroid-Resistant Nephrotic Syndrome",
-  category: "Nephrotic Syndrome",
-  priority: "warning",
-  description: "SRNS workup, biopsy, immunosuppression options",
-  icon: Microscope,
-  hasFullPathway: true
-},
-{
   id: "hemolytic-uremic",
   title: "Hemolytic Uremic Syndrome (HUS)",
   category: "Acute Kidney Disease",
@@ -312,15 +303,6 @@ const clinicalScenarios = [
   hasFullPathway: true
 },
 {
-  id: "congenital-nephrotic",
-  title: "Congenital Nephrotic Syndrome",
-  category: "Nephrotic Syndrome",
-  priority: "warning",
-  description: "Nephrotic syndrome <3 months - genetic workup",
-  icon: Baby,
-  hasFullPathway: true
-},
-{
   id: "aki-cardiac-surgery",
   title: "Post-Cardiac Surgery AKI",
   category: "Acute Kidney Disease",
@@ -336,15 +318,6 @@ const clinicalScenarios = [
   priority: "warning",
   description: "Refeeding syndrome, dialysis-associated",
   icon: Wind,
-  hasFullPathway: true
-},
-{
-  id: "contrast-nephropathy",
-  title: "Contrast-Induced Nephropathy Prevention",
-  category: "Acute Kidney Disease",
-  priority: "secondary",
-  description: "Risk stratification and prophylaxis before contrast studies",
-  icon: Stethoscope,
   hasFullPathway: true
 },
 {
