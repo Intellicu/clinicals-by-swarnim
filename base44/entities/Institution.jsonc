@@ -1,0 +1,126 @@
+{
+  "name": "Institution",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "admin_email": {
+      "type": "string"
+    },
+    "member_emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "pro",
+        "enterprise"
+      ],
+      "default": "basic"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "cancelled",
+        "past_due",
+        "none"
+      ],
+      "default": "none"
+    },
+    "max_members": {
+      "type": "number",
+      "default": 10
+    },
+    "workspaces": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "name",
+    "admin_email"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.admin_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.admin_email": "{{user.email}}"
+        },
+        {
+          "data.member_emails": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.admin_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.admin_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
