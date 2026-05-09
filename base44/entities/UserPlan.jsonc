@@ -1,0 +1,103 @@
+{
+  "name": "UserPlan",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "free",
+        "resident_pro",
+        "consultant",
+        "institution"
+      ],
+      "default": "free"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "cancelled",
+        "past_due",
+        "trialing",
+        "none"
+      ],
+      "default": "none"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "institution_id": {
+      "type": "string"
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "ai_prescriber_daily": {
+          "type": "number"
+        },
+        "ocr_daily": {
+          "type": "number"
+        },
+        "lab_ai_daily": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": [
+    "user_email",
+    "plan_type"
+  ],
+  "rls": {
+    "create": {
+      "data.user_email": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
