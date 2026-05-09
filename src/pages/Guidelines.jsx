@@ -26,6 +26,9 @@ import TeachingModePanel from "../components/guidelines/TeachingModePanel";
 import HandbookExporter from "../components/guidelines/HandbookExporter";
 import SmartRelatedContent from "../components/guidelines/SmartRelatedContent";
 import GuidelineCompletenessTracker from "../components/guidelines/GuidelineCompletenessTracker";
+import { EvidenceAuthorityPanel, InlineSourceBadge } from "@/components/clinicalOS/EvidenceAuthorityPanel";
+import GuidelineComparisonEngine from "@/components/clinicalOS/GuidelineComparisonEngine";
+import { GUIDELINE_HIERARCHY } from "@/lib/clinicalOS/EvidenceGovernance";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -180,6 +183,7 @@ function GuidelineModal({ guideline, allGuidelines, onClose }) {
         <div className="flex border-b border-slate-100 bg-white px-3 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           {[
             { id: "content", label: "📋 Content" },
+            { id: "evidence", label: "🏛 Evidence" },
             { id: "completeness", label: "📊 Audit" },
             { id: "related", label: "🔗 Linked" },
           ].map(t => (
@@ -192,6 +196,17 @@ function GuidelineModal({ guideline, allGuidelines, onClose }) {
 
         <div className="flex-1 overflow-y-auto p-3">
           {activeTab === "content" && <GuidelineDetailView guideline={guideline} defaultMode="quick" />}
+          {activeTab === "evidence" && (
+            <div className="space-y-3 py-1">
+              <EvidenceAuthorityPanel
+                area={Object.keys(GUIDELINE_HIERARCHY).find(k => k.includes(guideline.category?.toLowerCase().replace(/\s+/g, "_").replace("nephrotic_syndrome", "nephrotic_syndrome")) || k.includes(guideline.linked_module?.toLowerCase()))}
+                reviewStatus={guideline.review_status || "DRAFT"}
+                reviewedBy={guideline.reviewed_by}
+                lastExpertUpdate={guideline.last_expert_update}
+              />
+              <GuidelineComparisonEngine />
+            </div>
+          )}
           {activeTab === "completeness" && <GuidelineCompletenessTracker guideline={guideline} />}
           {activeTab === "related" && <SmartRelatedContent guideline={guideline} />}
         </div>

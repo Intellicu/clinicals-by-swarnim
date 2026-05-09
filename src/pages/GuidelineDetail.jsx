@@ -41,6 +41,9 @@ import SmartRelatedContent from "../components/guidelines/SmartRelatedContent";
 import GuidelineCompletenessTracker from "../components/guidelines/GuidelineCompletenessTracker";
 import TeachingModePanel from "../components/guidelines/TeachingModePanel";
 import { Smartphone, BookOpenCheck } from "lucide-react";
+import ExpertReviewPanel from "@/components/clinicalOS/ExpertReviewPanel";
+import { EvidenceAuthorityPanel } from "@/components/clinicalOS/EvidenceAuthorityPanel";
+import { GUIDELINE_HIERARCHY } from "@/lib/clinicalOS/EvidenceGovernance";
 
 export default function GuidelineDetail() {
   const navigate = useNavigate();
@@ -341,6 +344,16 @@ Only return JSON.`;
               </CardHeader>
             </Card>
 
+            {/* Evidence Authority Panel */}
+            <EvidenceAuthorityPanel
+              area={Object.keys(GUIDELINE_HIERARCHY).find(k =>
+                guideline.category?.toLowerCase().replace(/\s+/g, "_").includes(k) || k.includes(guideline.category?.toLowerCase().split(" ")[0])
+              )}
+              reviewStatus={guideline.review_status || (guideline.sections ? "EXPERT_REVIEWED" : "DRAFT")}
+              reviewedBy={guideline.reviewed_by}
+              lastExpertUpdate={guideline.last_expert_update}
+            />
+
             {/* Content via GuidelineDetailView — passes mode from toggle */}
             <GuidelineDetailView guideline={guideline} defaultMode={detailViewMode} key={detailViewMode} />
           </>
@@ -434,6 +447,24 @@ Only return JSON.`;
                 </div>
               </CardHeader>
             </Card>
+
+            {/* Evidence Authority + Expert Review */}
+            <EvidenceAuthorityPanel
+              area={Object.keys(GUIDELINE_HIERARCHY).find(k =>
+                guideline.category?.toLowerCase().replace(/\s+/g, "_").includes(k) || k.includes(guideline.category?.toLowerCase().split(" ")[0])
+              )}
+              reviewStatus={guideline.review_status || "DRAFT"}
+              reviewedBy={guideline.reviewed_by}
+              lastExpertUpdate={guideline.last_expert_update}
+            />
+            {user && (
+              <ExpertReviewPanel
+                entity={guideline}
+                entityType="guideline"
+                user={user}
+                onSave={async (reviewData) => updateMutation.mutate({ ...guideline, ...reviewData })}
+              />
+            )}
 
             {/* Version History */}
             {showVersionHistory && guideline.version_history && guideline.version_history.length > 0 && (

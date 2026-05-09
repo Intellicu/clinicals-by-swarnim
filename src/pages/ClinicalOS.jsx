@@ -4,16 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Activity, Brain, Calculator, Shield, GitBranch, TrendingUp,
-  BookOpen, Pill, Zap, Heart, FlaskConical, Dna, Microscope,
-  ChevronRight, AlertTriangle, CheckCircle, Info
+  BookOpen, Pill, Zap, Heart, ChevronRight, AlertTriangle, CheckCircle, Info, GitCompare, Award
 } from "lucide-react";
 import DoseCalculatorPanel from "@/components/clinicalOS/DoseCalculatorPanel";
 import PathwayExecutor from "@/components/clinicalOS/PathwayExecutor";
 import BPCalculatorPanel from "@/components/clinicalOS/BPCalculatorPanel";
 import LongitudinalTrendPanel from "@/components/clinicalOS/LongitudinalTrendPanel";
 import SafetyAlertBanner from "@/components/clinicalOS/SafetyAlertBanner";
-import { checkElectrolytes, checkInteractions, getNephrotoxins } from "@/lib/clinicalOS/SafetyEngine";
-import { getFactsForModule } from "@/lib/clinicalOS/ClinicalFactsRegistry";
+import GuidelineComparisonEngine from "@/components/clinicalOS/GuidelineComparisonEngine";
+import { checkElectrolytes, getNephrotoxins } from "@/lib/clinicalOS/SafetyEngine";
+import { getFactsForModule, getComparableFacts } from "@/lib/clinicalOS/ClinicalFactsRegistry";
+import { GUIDELINE_HIERARCHY } from "@/lib/clinicalOS/EvidenceGovernance";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -21,9 +22,11 @@ const OS_MODULES = [
   { id: "facts", icon: BookOpen, label: "Clinical Facts Registry", color: "bg-blue-600", desc: "Canonical definitions" },
   { id: "dose", icon: Calculator, label: "Dynamic Dose Engine", color: "bg-green-600", desc: "Weight/BSA/renal-adjusted" },
   { id: "pathways", icon: GitBranch, label: "Pathway Executor", color: "bg-indigo-600", desc: "Executable workflows + DDx" },
+  { id: "compare", icon: GitCompare, label: "Guideline Comparator", color: "bg-violet-600", desc: "Multi-org definitions" },
   { id: "safety", icon: Shield, label: "Safety Engine", color: "bg-red-600", desc: "Interactions + nephrotoxins" },
-  { id: "bp", icon: Activity, label: "BP Percentile", color: "bg-rose-600", desc: "AAP 2017 tables" },
+  { id: "bp", icon: Activity, label: "BP Percentile", color: "bg-rose-600", desc: "SBP + DBP · AAP 2017" },
   { id: "longitudinal", icon: TrendingUp, label: "Longitudinal Engine", color: "bg-teal-600", desc: "Trends + risk scoring" },
+  { id: "hierarchy", icon: Award, label: "Evidence Hierarchy", color: "bg-amber-600", desc: "Primary guidelines by area" },
 ];
 
 const QUICK_REFS = [
@@ -72,7 +75,7 @@ export default function ClinicalOS() {
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {["Clinical Facts Registry", "Dynamic Dose Engine", "Pathway Executor", "Safety Engine", "BP Engine", "Longitudinal Trends"].map(l => (
+            {["ISPN 2023", "IPNA 2021", "AAP 2017", "KDIGO 2012", "ISPD 2019", "ERKNet 2021", "Multi-Org Comparison", "Expert-Governed"].map(l => (
               <Badge key={l} className="bg-white/15 text-white border-0 text-xs">{l}</Badge>
             ))}
           </div>
@@ -94,7 +97,7 @@ export default function ClinicalOS() {
         {/* Module Navigation */}
         <div className="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">OS Modules</p>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
             {OS_MODULES.map(m => (
               <button key={m.id} onClick={() => setActiveModule(m.id)}
                 className={`flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all text-center ${activeModule === m.id ? "bg-slate-900 text-white shadow-lg scale-105" : "hover:bg-slate-50 text-slate-600"}`}>
@@ -112,6 +115,55 @@ export default function ClinicalOS() {
         {activeModule === "pathways" && <PathwayExecutor />}
         {activeModule === "bp" && <BPCalculatorPanel />}
         {activeModule === "longitudinal" && <LongitudinalTrendPanel />}
+
+        {/* Guideline Comparison Engine */}
+        {activeModule === "compare" && (
+          <Card className="border-2 border-violet-200 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-violet-50 to-indigo-50 pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <GitCompare className="w-5 h-5 text-violet-600" />
+                Guideline Comparison Engine
+                <Badge className="ml-auto bg-violet-600 text-white text-xs">Multi-Org</Badge>
+              </CardTitle>
+              <p className="text-xs text-violet-600 mt-0.5">Side-by-side definition comparison — ISPN vs IPNA vs KDIGO</p>
+            </CardHeader>
+            <CardContent className="p-4">
+              <GuidelineComparisonEngine />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Evidence Hierarchy Panel */}
+        {activeModule === "hierarchy" && (
+          <Card className="border-2 border-amber-200 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50 pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Award className="w-5 h-5 text-amber-600" />
+                Primary Operational Guideline Hierarchy
+                <Badge className="ml-auto bg-amber-600 text-white text-xs">Evidence Source</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-2.5">
+              {Object.entries(GUIDELINE_HIERARCHY).map(([area, h]) => (
+                <div key={area} className="bg-white border border-slate-200 rounded-xl p-3">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className="text-xs font-bold text-slate-700 capitalize">{area.replace(/_/g, " ")}</span>
+                    <span className="text-xs px-1.5 py-0.5 bg-blue-600 text-white rounded font-bold">{h.primary.org} {h.primary.year}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed mb-1.5 italic">{h.rationale}</p>
+                  {h.supporting?.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      <span className="text-xs text-slate-400 font-semibold">Supporting:</span>
+                      {h.supporting.map((s, i) => (
+                        <span key={i} className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{s.org} {s.year}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Clinical Facts Registry */}
         {activeModule === "facts" && (
@@ -137,21 +189,30 @@ export default function ClinicalOS() {
                   <div key={fact.id} className="bg-white border border-slate-200 rounded-xl p-3">
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <span className="font-bold text-sm text-slate-900">{fact.term}</span>
-                      <div className="flex gap-1 flex-shrink-0">
-                        <Badge className="text-xs bg-blue-100 text-blue-800 border-0">{fact.source?.split(" / ")[0]}</Badge>
+                      <div className="flex gap-1 flex-shrink-0 flex-wrap justify-end">
+                        <Badge className="text-xs bg-blue-600 text-white border-0">{fact.primary_source?.split(" ")[0] || fact.source?.split(" / ")[0]}</Badge>
                         <Badge className="text-xs bg-green-100 text-green-800 border-0">Grade {fact.evidence_grade}</Badge>
-                        {fact.emergency && <Badge className="text-xs bg-red-100 text-red-800 border-0">EMERGENCY</Badge>}
+                        {fact.emergency && <Badge className="text-xs bg-red-600 text-white border-0">⚡ EMERGENCY</Badge>}
+                        {fact.comparison_available && (
+                          <button onClick={() => setActiveModule("compare")}
+                            className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded hover:bg-violet-200 transition-colors font-medium">
+                            Compare ↗
+                          </button>
+                        )}
                       </div>
                     </div>
                     <p className="text-xs text-slate-700 leading-relaxed">{fact.definition}</p>
                     {fact.canonical_value && (
                       <div className="mt-1.5 flex flex-wrap gap-1">
                         {Object.entries(fact.canonical_value).map(([k, v]) => (
-                          <span key={k} className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                          <span key={k} className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">
                             {k.replace(/_/g, " ")}: <strong>{v}</strong>
                           </span>
                         ))}
                       </div>
+                    )}
+                    {fact.notes && (
+                      <p className="text-xs text-amber-700 mt-1.5 italic leading-relaxed border-t border-slate-100 pt-1.5">{fact.notes}</p>
                     )}
                   </div>
                 ))}
@@ -261,8 +322,8 @@ export default function ClinicalOS() {
               <div>
                 <p className="text-xs font-bold text-slate-700 mb-1">Clinical OS Architecture</p>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  This Clinical OS layer powers consistent definitions (Facts Registry), real-time dosing with renal adjustments (Dose Engine), executable pathways with branch logic and DDx (Pathway Engine), electrolyte + drug safety (Safety Engine), AAP 2017 BP percentiles (BP Engine), and longitudinal trend analytics with CKD risk scoring (Longitudinal Engine). All engines are importable by any other module in the app.
-                </p>
+                         <strong>Evidence Governance:</strong> Multi-org definitions (ISPN/IPNA/KDIGO) with comparison engine. Primary guideline hierarchy per clinical area. Expert review workflow with audit trail. AI content governance with approval queue. <strong>BP Engine:</strong> Separate SBP + DBP percentiles; overall classification = higher of two (AAP 2017 operational logic). <strong>Facts Registry:</strong> Org-specific definitions with comparison links. All engines importable by any module.
+                      </p>
               </div>
             </div>
           </CardContent>

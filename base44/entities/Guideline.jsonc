@@ -31,7 +31,7 @@
     },
     "source": {
       "type": "string",
-      "description": "Guideline source (KDIGO, IAP, ESPGHAN, IPNA, ISPD, etc.)"
+      "description": "Guideline source (KDIGO, ISPN, IPNA, ISPD, AAP, etc.)"
     },
     "organization": {
       "type": "string",
@@ -46,7 +46,6 @@
         "North America",
         "Asia-Pacific"
       ],
-      "description": "Geographic applicability",
       "default": "Global"
     },
     "year": {
@@ -54,34 +53,67 @@
       "description": "Year of publication"
     },
     "summary": {
-      "type": "string",
-      "description": "Comprehensive guideline overview"
+      "type": "string"
     },
     "scope_and_population": {
-      "type": "string",
-      "description": "Target population and clinical scope"
+      "type": "string"
     },
     "key_recommendations": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Sequential management steps"
+      }
     },
     "practice_pearls": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Clinical implementation tips"
+      }
+    },
+    "evidence_level": {
+      "type": "string",
+      "description": "Evidence level/grade"
+    },
+    "linked_module": {
+      "type": "string",
+      "description": "Primary linked clinical module"
+    },
+    "population": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "clinical_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "related_drugs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "pdf_url": {
-      "type": "string",
-      "description": "URL to downloadable PDF guideline"
+      "type": "string"
     },
     "external_link": {
+      "type": "string"
+    },
+    "doi_url": {
+      "type": "string"
+    },
+    "last_reviewed": {
       "type": "string",
-      "description": "External link to original guideline"
+      "format": "date"
     },
     "multimedia": {
       "type": "object",
@@ -132,8 +164,7 @@
             }
           }
         }
-      },
-      "description": "Multimedia content attachments"
+      }
     },
     "images": {
       "type": "array",
@@ -157,8 +188,7 @@
             ]
           }
         }
-      },
-      "description": "Images, tables, flowcharts"
+      }
     },
     "content": {
       "type": "object",
@@ -185,12 +215,13 @@
         }
       }
     },
-    "keywords": {
+    "references": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "object",
+        "additionalProperties": true
       },
-      "description": "Search keywords"
+      "description": "Structured academic citations"
     },
     "provenance": {
       "type": "object",
@@ -211,8 +242,7 @@
         "license": {
           "type": "string"
         }
-      },
-      "description": "Content provenance tracking"
+      }
     },
     "status": {
       "type": "string",
@@ -225,22 +255,89 @@
       "default": "Draft"
     },
     "version": {
-      "type": "string",
-      "description": "Version number"
-    },
-    "created_by": {
-      "type": "string",
-      "description": "User who created/uploaded"
+      "type": "string"
     },
     "is_editable": {
       "type": "boolean",
-      "description": "Whether editable by users",
       "default": false
     },
     "usage_count": {
       "type": "number",
-      "description": "Number of times accessed",
       "default": 0
+    },
+    "version_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "EXPERT_REVIEWED",
+        "PENDING_REVIEW",
+        "AI_GENERATED",
+        "AI_SUGGESTION",
+        "DRAFT"
+      ],
+      "default": "DRAFT",
+      "description": "Expert review governance status"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Expert reviewer name/email"
+    },
+    "last_expert_update": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of last expert review/edit"
+    },
+    "audit_trail": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "by": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Full audit trail of reviews, approvals, and edits"
+    },
+    "ai_pending_sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "description": "AI-generated sections awaiting expert approval"
+    },
+    "primary_guideline_org": {
+      "type": "string",
+      "description": "Primary operational guideline organisation (e.g. ISPN, AAP)"
+    },
+    "supporting_guidelines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Supporting guideline sources"
+    },
+    "org_definition_notes": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Organisation-specific definition differences"
     }
   },
   "required": [
@@ -248,49 +345,5 @@
     "category",
     "source",
     "scope_and_population"
-  ],
-  "rls": {
-    "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
-      "$or": [
-        {
-          "data.is_editable": false
-        },
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    }
-  }
+  ]
 }
