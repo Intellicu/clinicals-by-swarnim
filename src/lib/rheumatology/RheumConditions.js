@@ -605,7 +605,7 @@ export const RHEUM_CONDITIONS = [
   },
 ];
 
-export const RHEUM_CATEGORIES_V2 = ["All", "JIA", "SLE", "Vasculitis", "Myositis", "Autoinflammatory"];
+export const RHEUM_CATEGORIES_V2 = ["All", "JIA", "SLE", "Vasculitis", "Myositis", "Autoinflammatory", "CTD", "Uveitis"];
 
 export const URGENCY_CONFIG = {
   critical: { label: "🔴 Critical", color: "bg-red-100 text-red-800 border-red-300" },

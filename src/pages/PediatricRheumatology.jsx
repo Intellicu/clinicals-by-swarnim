@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Calculator, FlaskConical, GitBranch, Pill, RefreshCw, Stethoscope, Search, X } from "lucide-react";
+import { BookOpen, Stethoscope, Search, X } from "lucide-react";
 
 import { RHEUM_CONDITIONS, RHEUM_CATEGORIES_V2, URGENCY_CONFIG } from "@/lib/rheumatology/RheumConditions";
 import RheumPathwayCard from "@/components/rheumatology/RheumPathwayCard";
@@ -15,16 +15,30 @@ import RheumDiseaseActivityCalculators from "@/components/rheumatology/RheumDise
 import RheumNephrologyOverlap from "@/components/rheumatology/RheumNephrologyOverlap";
 import UnifiedMonitoringPanel from "@/components/rheumatology/UnifiedMonitoringPanel";
 import CrossSpecialtyLinks from "@/components/rheumatology/CrossSpecialtyLinks";
+import RheumVasculitisTab from "@/components/rheumatology/RheumVasculitisTab";
+import RheumAutoinflammatoryTab from "@/components/rheumatology/RheumAutoinflammatoryTab";
+import RheumProceduresTab from "@/components/rheumatology/RheumProceduresTab";
+import RheumNeuroinflammTab from "@/components/rheumatology/RheumNeuroinflammTab";
+import RheumCTDTab from "@/components/rheumatology/RheumCTDTab";
+import RheumUveitisTab from "@/components/rheumatology/RheumUveitisTab";
+import RheumLatestUpdates from "@/components/rheumatology/RheumLatestUpdates";
 import { NEPHROLOGY_OVERLAPS } from "@/lib/rheumatology/RheumatologyData";
 
 const MAIN_TABS = [
   { id: "diseases", label: "📋 Pathways" },
+  { id: "vasculitis", label: "🩸 Vasculitis" },
+  { id: "autoinflammatory", label: "🔥 Autoinflam." },
+  { id: "ctd", label: "🫀 CTD/SSc" },
+  { id: "uveitis", label: "👁 Uveitis" },
+  { id: "neuroinflam", label: "🧠 Neuro" },
   { id: "approaches", label: "🔀 Approaches" },
   { id: "drugs", label: "💊 Drugs" },
-  { id: "calculators", label: "🧮 Calculators" },
+  { id: "calculators", label: "🧮 Scores" },
+  { id: "procedures", label: "🔬 Procedures" },
   { id: "nephrology", label: "🫘 Kidney" },
   { id: "monitoring", label: "📊 Monitoring" },
-  { id: "updates", label: "📡 Evidence" },
+  { id: "latest", label: "📡 Latest" },
+  { id: "updates", label: "⚙️ Evidence" },
 ];
 
 export default function PediatricRheumatology() {
@@ -63,7 +77,7 @@ export default function PediatricRheumatology() {
             <div className="flex-1 min-w-0">
               <h1 className="text-xl font-bold text-white">Pediatric Rheumatology</h1>
               <p className="text-purple-100 text-xs">
-                {RHEUM_CONDITIONS.length} pathways · ACR/EULAR/PRINTO · Disease activity tools · Drug knowledge
+                {RHEUM_CONDITIONS.length}+ pathways · Vasculitis · Autoinflammatory · CTD · Uveitis · Neuro · Procedures
               </p>
             </div>
             {isAdmin && (
@@ -172,6 +186,21 @@ export default function PediatricRheumatology() {
           </>
         )}
 
+        {/* ── VASCULITIS TAB ── */}
+        {mainTab === "vasculitis" && <RheumVasculitisTab isAdmin={isAdmin} savedUpdates={savedUpdates} onSaveUpdate={handleSaveUpdate} />}
+
+        {/* ── AUTOINFLAMMATORY TAB ── */}
+        {mainTab === "autoinflammatory" && <RheumAutoinflammatoryTab isAdmin={isAdmin} savedUpdates={savedUpdates} onSaveUpdate={handleSaveUpdate} />}
+
+        {/* ── CTD / SCLERODERMA TAB ── */}
+        {mainTab === "ctd" && <RheumCTDTab />}
+
+        {/* ── UVEITIS TAB ── */}
+        {mainTab === "uveitis" && <RheumUveitisTab />}
+
+        {/* ── NEUROINFLAMMATORY TAB ── */}
+        {mainTab === "neuroinflam" && <RheumNeuroinflammTab />}
+
         {/* ── APPROACHES TAB ── */}
         {mainTab === "approaches" && <RheumApproaches />}
 
@@ -181,13 +210,19 @@ export default function PediatricRheumatology() {
         {/* ── CALCULATORS TAB ── */}
         {mainTab === "calculators" && <RheumDiseaseActivityCalculators />}
 
+        {/* ── PROCEDURES TAB ── */}
+        {mainTab === "procedures" && <RheumProceduresTab />}
+
         {/* ── NEPHROLOGY OVERLAP TAB ── */}
         {mainTab === "nephrology" && <RheumNephrologyOverlap overlaps={NEPHROLOGY_OVERLAPS} />}
 
         {/* ── MONITORING TAB ── */}
         {mainTab === "monitoring" && <UnifiedMonitoringPanel />}
 
-        {/* ── EVIDENCE UPDATES TAB ── */}
+        {/* ── LATEST UPDATES TAB ── */}
+        {mainTab === "latest" && <RheumLatestUpdates isAdmin={isAdmin} />}
+
+        {/* ── EVIDENCE GOVERNANCE TAB ── */}
         {mainTab === "updates" && <RheumEvidenceUpdates isAdmin={isAdmin} />}
 
       </div>
