@@ -76,6 +76,7 @@ const toolsNavigation = [
   { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: Stethoscope },
   { title: "Lab Pathways", url: createPageUrl("LabPathways"), icon: FlaskConical },
   { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
+  { title: "Pediatric Rheumatology", url: createPageUrl("PediatricRheumatology"), icon: Stethoscope },
   { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
   { title: "Differential Dx Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
   { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },

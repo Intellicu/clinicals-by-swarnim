@@ -25,6 +25,7 @@ import NutritionHub from './pages/NutritionHub';
 import ClinicalOS from './pages/ClinicalOS';
 import ClinicOPDCockpit from './pages/ClinicOPDCockpit';
 import PatientCockpit from './pages/PatientCockpit';
+import PediatricRheumatology from './pages/PediatricRheumatology';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -94,6 +95,7 @@ const AuthenticatedApp = () => {
       <Route path="/ClinicalOS" element={<LayoutWrapper currentPageName="ClinicalOS"><ClinicalOS /></LayoutWrapper>} />
       <Route path="/ClinicOPDCockpit" element={<LayoutWrapper currentPageName="ClinicOPDCockpit"><ClinicOPDCockpit /></LayoutWrapper>} />
       <Route path="/PatientCockpit" element={<LayoutWrapper currentPageName="PatientCockpit"><PatientCockpit /></LayoutWrapper>} />
+      <Route path="/PediatricRheumatology" element={<LayoutWrapper currentPageName="PediatricRheumatology"><PediatricRheumatology /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
