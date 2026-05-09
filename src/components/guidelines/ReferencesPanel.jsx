@@ -37,7 +37,7 @@ function sourceBg(source) {
 }
 
 // ── Structured citation card (new format from built-in guidelines) ─────────
-function StructuredCitationCard({ ref: r, index }) {
+function StructuredCitationCard({ citation: r, index }) {
   const [open, setOpen] = useState(false);
   const sourceKey = r.guideline_body || r.authors?.split(" ")[0] || "REF";
 
@@ -255,7 +255,7 @@ export default function ReferencesPanel({ guideline, citations, compact = false 
             Academic Citations & Evidence Base ({structuredRefs.length})
           </p>
           {structuredRefs.map((r, i) => (
-            <StructuredCitationCard key={r.id || i} ref={r} index={i} />
+            <StructuredCitationCard key={r.id || i} citation={r} index={i} />
           ))}
         </div>
       )}
