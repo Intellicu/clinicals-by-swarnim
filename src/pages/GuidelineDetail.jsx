@@ -35,6 +35,7 @@ import {
 import { toast } from "sonner";
 import GuidelineEditor from "../components/GuidelineEditor";
 import MultimediaViewer from "../components/guidelines/MultimediaViewer";
+import ReferencesPanel from "../components/guidelines/ReferencesPanel";
 import { Smartphone, BookOpenCheck } from "lucide-react";
 
 export default function GuidelineDetail() {
@@ -523,28 +524,32 @@ Only return JSON.`;
               </Card>
             )}
 
-            {/* Tabbed Interface for Pearls, Content, Tables, Related, Multimedia */}
+            {/* Tabbed Interface for Pearls, Content, Tables, Related, Multimedia, References */}
             <Tabs defaultValue="pearls" className="w-full">
-              <TabsList className="grid w-full grid-cols-5 h-14">
-                <TabsTrigger value="pearls" className="text-base">
-                  <Lightbulb className="w-5 h-5 mr-2" />
-                  Pearls
+              <TabsList className="flex w-full h-auto flex-wrap gap-1 p-1">
+                <TabsTrigger value="pearls" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <Lightbulb className="w-4 h-4" />
+                  <span className="hidden sm:inline">Pearls</span>
                 </TabsTrigger>
-                <TabsTrigger value="content" className="text-base">
-                  <FileText className="w-5 h-5 mr-2" />
-                  Content
+                <TabsTrigger value="content" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <FileText className="w-4 h-4" />
+                  <span className="hidden sm:inline">Content</span>
                 </TabsTrigger>
-                <TabsTrigger value="tables" className="text-base">
-                  <TableIcon className="w-5 h-5 mr-2" />
-                  Tables
+                <TabsTrigger value="tables" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <TableIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Tables</span>
                 </TabsTrigger>
-                <TabsTrigger value="multimedia" className="text-base">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Media
+                <TabsTrigger value="multimedia" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden sm:inline">Media</span>
                 </TabsTrigger>
-                <TabsTrigger value="related" className="text-base">
-                  <LinkIcon className="w-5 h-5 mr-2" />
-                  Related
+                <TabsTrigger value="related" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <LinkIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Related</span>
+                </TabsTrigger>
+                <TabsTrigger value="references" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px] bg-indigo-50 data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+                  <Award className="w-4 h-4" />
+                  <span className="hidden sm:inline">Evidence</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -679,6 +684,23 @@ Only return JSON.`;
               {/* Multimedia Tab */}
               <TabsContent value="multimedia" className="mt-6">
                 <MultimediaViewer multimedia={guideline.multimedia} />
+              </TabsContent>
+
+              {/* References & Evidence Tab */}
+              <TabsContent value="references" className="mt-6">
+                <Card className="shadow-xl border-2 border-indigo-300">
+                  <CardHeader className="bg-gradient-to-r from-indigo-100 to-blue-100 border-b-2 border-indigo-300">
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <Award className="w-7 h-7 text-white" />
+                      </div>
+                      <span className="text-indigo-900">References, Evidence & Citations</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <ReferencesPanel guideline={guideline} />
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               {/* New Related Guidelines & Links Tab */}

@@ -8,6 +8,7 @@ import {
   Zap, Shield, TrendingUp, Utensils, Target, FlaskConical,
   Smartphone, BookOpenCheck, Activity
 } from "lucide-react";
+import ReferencesPanel from "./ReferencesPanel";
 
 // ═══════════════════════════════════════════════════════════════
 // SHARED HELPERS
@@ -257,6 +258,9 @@ function QuickView({ guideline }) {
       )}
 
       <EvidenceFooter guideline={guideline} />
+      <AccSection title="References & Citations" icon={BookOpen} color="indigo">
+        <ReferencesPanel guideline={guideline} compact />
+      </AccSection>
     </div>
   );
 }
@@ -527,6 +531,18 @@ function DetailedView({ guideline }) {
       )}
 
       <EvidenceFooter guideline={guideline} detailed />
+
+      {/* References & Citations — always shown in detailed mode */}
+      <Card className="border-2 border-indigo-200 shadow-sm overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-200 py-3 px-4">
+          <CardTitle className="text-base font-bold text-indigo-800 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-indigo-600" /> References & Citations
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <ReferencesPanel guideline={guideline} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -674,6 +690,9 @@ function DBQuickView({ guideline }) {
         </div>
       )}
       <EvidenceFooter guideline={guideline} />
+      <AccSection title="References & Citations" icon={BookOpen} color="indigo">
+        <ReferencesPanel guideline={guideline} compact />
+      </AccSection>
     </div>
   );
 }
@@ -776,6 +795,17 @@ function DBDetailedView({ guideline }) {
       )}
 
       <EvidenceFooter guideline={guideline} detailed />
+
+      <Card className="border-2 border-indigo-200 shadow-sm overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-200 py-3 px-4">
+          <CardTitle className="text-base font-bold text-indigo-800 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-indigo-600" /> References & Citations
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <ReferencesPanel guideline={guideline} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
