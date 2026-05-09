@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import ContextualActionsPanel from "@/components/clinicalOS/ContextualActionsPanel";
+import AIEnhancePanel from "@/components/clinicalOS/AIEnhancePanel";
+import AdminGovernanceQueue from "@/components/clinicalOS/AdminGovernanceQueue";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
@@ -354,6 +357,13 @@ Only return JSON.`;
               lastExpertUpdate={guideline.last_expert_update}
             />
 
+            {/* Contextual actions for built-in */}
+            <Card className="border border-emerald-200 shadow-sm">
+              <CardContent className="p-4">
+                <ContextualActionsPanel category={guideline.category} compact />
+              </CardContent>
+            </Card>
+
             {/* Content via GuidelineDetailView — passes mode from toggle */}
             <GuidelineDetailView guideline={guideline} defaultMode={detailViewMode} key={detailViewMode} />
           </>
@@ -594,6 +604,16 @@ Only return JSON.`;
                   <TrendingUp className="w-4 h-4" />
                   <span className="hidden sm:inline">Audit</span>
                 </TabsTrigger>
+                <TabsTrigger value="actions" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px]">
+                  <ArrowRight className="w-4 h-4" />
+                  <span className="hidden sm:inline">Actions</span>
+                </TabsTrigger>
+                {user?.role === "admin" && (
+                  <TabsTrigger value="governance" className="text-sm flex items-center gap-1.5 flex-1 min-w-[80px] bg-indigo-50 data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+                    <Sparkles className="w-4 h-4" />
+                    <span className="hidden sm:inline">AI+Gov</span>
+                  </TabsTrigger>
+                )}
               </TabsList>
 
               {/* Practice Pearls Tab */}
@@ -831,6 +851,33 @@ Only return JSON.`;
                   </CardContent>
                 </Card>
               </TabsContent>
+              {/* Contextual Actions Tab */}
+              <TabsContent value="actions" className="mt-4">
+                <Card className="shadow-lg border-2 border-emerald-200">
+                  <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <ArrowRight className="w-5 h-5 text-emerald-600" />
+                      <span className="text-emerald-900">Contextual Clinical Actions</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <ContextualActionsPanel category={guideline.category} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Admin + AI Governance Tab */}
+              {user?.role === "admin" && (
+                <TabsContent value="governance" className="mt-4 space-y-4">
+                  <AIEnhancePanel
+                    guideline={guideline}
+                    isAdmin={true}
+                    onApprove={(data) => updateMutation.mutate({ ...guideline, ...data })}
+                    onReject={() => {}}
+                  />
+                  <AdminGovernanceQueue user={user} />
+                </TabsContent>
+              )}
             </Tabs>
           </>
         ) : (

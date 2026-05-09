@@ -29,6 +29,9 @@ import GuidelineCompletenessTracker from "../components/guidelines/GuidelineComp
 import { EvidenceAuthorityPanel, InlineSourceBadge } from "@/components/clinicalOS/EvidenceAuthorityPanel";
 import GuidelineComparisonEngine from "@/components/clinicalOS/GuidelineComparisonEngine";
 import { GUIDELINE_HIERARCHY } from "@/lib/clinicalOS/EvidenceGovernance";
+import ClinicalFactsPanel from "@/components/clinicalOS/ClinicalFactsPanel";
+import AdminGovernanceQueue from "@/components/clinicalOS/AdminGovernanceQueue";
+import { getFactsForModule } from "@/lib/clinicalOS/ClinicalFactsRegistry";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -52,12 +55,14 @@ const CAT_COLORS = {
 // ── Panel IDs for the intelligent hub bottom drawer ──────────────────────
 const HUB_PANELS = [
   { id: "emergency", icon: Zap,          label: "Emergency",  color: "text-red-600" },
+  { id: "facts",     icon: BookOpen,     label: "Facts",      color: "text-blue-700" },
+  { id: "compare",   icon: Scale,        label: "Compare",    color: "text-indigo-600" },
   { id: "sync",      icon: RefreshCw,    label: "Sync",       color: "text-blue-600" },
   { id: "import",    icon: Plus,         label: "Import",     color: "text-green-600" },
-  { id: "compare",   icon: Scale,        label: "Compare",    color: "text-indigo-600" },
   { id: "teaching",  icon: GraduationCap,label: "Teaching",   color: "text-violet-600" },
   { id: "offline",   icon: Download,     label: "Offline",    color: "text-slate-600" },
   { id: "export",    icon: FileText,     label: "Export",     color: "text-emerald-600" },
+  { id: "governance",icon: Settings,     label: "Governance", color: "text-rose-600" },
 ];
 
 // ── Back to top ────────────────────────────────────────────────────────────
@@ -216,7 +221,7 @@ function GuidelineModal({ guideline, allGuidelines, onClose }) {
 }
 
 // ── Intelligent Hub Drawer ─────────────────────────────────────────────────
-function IntelligentHubDrawer({ open, activePanel: initialPanel, onClose, allGuidelines, dbGuidelines, onRefresh }) {
+function IntelligentHubDrawer({ open, activePanel: initialPanel, onClose, allGuidelines, dbGuidelines, onRefresh, compareDefaultTopic, onSetCompareTopic, currentUser }) {
   const [activePanel, setActivePanel] = useState(initialPanel);
   useEffect(() => { setActivePanel(initialPanel); }, [initialPanel]);
 
@@ -254,14 +259,31 @@ function IntelligentHubDrawer({ open, activePanel: initialPanel, onClose, allGui
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
           {activePanel === "emergency" && <EmergencyQuickMode />}
+          {activePanel === "facts" && (
+            <ClinicalFactsPanel
+              onCompare={(topicId) => { if (onSetCompareTopic) onSetCompareTopic(topicId); setActivePanel("compare"); }}
+            />
+          )}
           {activePanel === "sync" && <SyncEngine onImportComplete={onRefresh} />}
           {activePanel === "import" && <AdvancedIngestion onSuccess={onRefresh} />}
-          {activePanel === "compare" && <EvidenceComparisonMode allGuidelines={allGuidelines} />}
+          {activePanel === "compare" && (
+            <div className="space-y-4">
+              <GuidelineComparisonEngine defaultTopic={compareDefaultTopic} />
+              <div className="border-t pt-4">
+                <EvidenceComparisonMode allGuidelines={allGuidelines} />
+              </div>
+            </div>
+          )}
           {activePanel === "teaching" && allGuidelines.length > 0 && (
             <TeachingModePanel guideline={allGuidelines[0]} />
           )}
           {activePanel === "offline" && <OfflineManager dbGuidelines={dbGuidelines} />}
           {activePanel === "export" && <HandbookExporter allGuidelines={allGuidelines} />}
+          {activePanel === "governance" && (
+            currentUser && currentUser.role === "admin"
+              ? <AdminGovernanceQueue user={currentUser} />
+              : <div className="text-sm text-slate-500 text-center py-6 flex flex-col items-center gap-2"><Settings className="w-6 h-6 text-slate-300" />Admin access required for governance queue.</div>
+          )}
         </div>
       </div>
     </div>
@@ -275,6 +297,7 @@ export default function Guidelines() {
   const [selected, setSelected] = useState(null);
   const [showStarred, setShowStarred] = useState(false);
   const [hubPanel, setHubPanel] = useState(null); // null = closed; string = panel id
+  const [compareDefaultTopic, setCompareDefaultTopic] = useState(undefined);
 
   const [starred, setStarred] = useState(() => {
     try { return JSON.parse(localStorage.getItem("clinicals_starred") || "[]"); } catch { return []; }
@@ -292,6 +315,7 @@ export default function Guidelines() {
     return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
   }, []);
 
+  const { data: currentUser } = useQuery({ queryKey: ["currentUser"], queryFn: () => base44.auth.me() });
   const queryClient = useQueryClient();
   const { data: dbGuidelines = [], isLoading } = useQuery({
     queryKey: ["guidelines"],
@@ -476,10 +500,12 @@ export default function Guidelines() {
         {/* ── Feature cards ── */}
         <div className="grid grid-cols-2 gap-2 pt-1">
           {[
-            { icon: Scale, label: "Compare Guidelines", desc: "KDIGO vs IPNA", color: "bg-indigo-50 border-indigo-200 text-indigo-700", panel: "compare" },
+            { icon: BookOpen, label: "Clinical Facts Registry", desc: `${Object.keys(GUIDELINE_HIERARCHY).length} areas · ISPN/IPNA/AAP`, color: "bg-blue-50 border-blue-200 text-blue-700", panel: "facts" },
+            { icon: Scale, label: "Compare Guidelines", desc: "KDIGO vs IPNA · side-by-side", color: "bg-indigo-50 border-indigo-200 text-indigo-700", panel: "compare" },
             { icon: GraduationCap, label: "Teaching Mode", desc: "MCQs · Viva · Flashcards", color: "bg-violet-50 border-violet-200 text-violet-700", panel: "teaching" },
             { icon: Download, label: "Offline Mode", desc: "Cache for offline use", color: "bg-slate-50 border-slate-200 text-slate-700", panel: "offline" },
             { icon: FileText, label: "Export Handbook", desc: "PDF · Teaching pack", color: "bg-emerald-50 border-emerald-200 text-emerald-700", panel: "export" },
+            { icon: Settings, label: "Governance Queue", desc: "Admin review workflow", color: "bg-rose-50 border-rose-200 text-rose-700", panel: "governance" },
           ].map(f => (
             <button key={f.panel} onClick={() => openHub(f.panel)}
               className={`p-3 rounded-xl border-2 text-left hover:shadow-md transition-all ${f.color}`}>
@@ -515,6 +541,9 @@ export default function Guidelines() {
         allGuidelines={allGuidelines}
         dbGuidelines={dbGuidelines}
         onRefresh={onRefresh}
+        compareDefaultTopic={compareDefaultTopic}
+        onSetCompareTopic={setCompareDefaultTopic}
+        currentUser={currentUser}
       />
 
       <BackToTop />
