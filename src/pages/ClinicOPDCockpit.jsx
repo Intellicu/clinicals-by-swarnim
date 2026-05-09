@@ -11,7 +11,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Users, Calendar, Search, Plus, Building2, Play, Clock,
   ChevronRight, Home, Zap, AlertTriangle, CheckCircle,
-  Activity, Pill, FileText, RefreshCw, ArrowRight,
+  Activity, Pill, FileText, RefreshCw,
   ArrowLeft, UserPlus, Stethoscope
 } from "lucide-react";
 import { format, isSameDay, parseISO, formatDistanceToNow } from "date-fns";
