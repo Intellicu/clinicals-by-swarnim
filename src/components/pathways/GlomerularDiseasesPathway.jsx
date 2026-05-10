@@ -17,6 +17,10 @@ import GNApproaches from "../gn/GNApproaches";
 import GNDrugs from "../gn/GNDrugs";
 import GNMonitoring from "../gn/GNMonitoring";
 import GNEvidence from "../gn/GNEvidence";
+import TubularDisordersCenter from "../nephrology/TubularDisordersCenter";
+import CAKUTCenter from "../nephrology/CAKUTCenter";
+import ImmunologyLabPathways from "../immunology/ImmunologyLabPathways";
+import SteroidEquivalentEngine from "../nephrology/SteroidEquivalentEngine";
 
 // ── Flowchart component (pure CSS/div based) ─────────────────────────────────
 const FlowStep = ({ step, index, total, color = "blue" }) => {
@@ -731,7 +735,11 @@ export default function GlomerularDiseasesPathway() {
         { id: "drugs", label: "💊 Drugs" },
         { id: "monitoring", label: "📊 Monitoring" },
         { id: "evidence", label: "📡 Evidence" },
-        { id: "decision", label: "🧠 Decision Engine" },
+        { id: "tubular", label: "🧪 Tubular" },
+        { id: "cakut", label: "🍼 CAKUT" },
+        { id: "immunology", label: "🔬 Immunology" },
+        { id: "steroids", label: "⚗️ Steroids" },
+        { id: "decision", label: "🧠 Decision" },
         { id: "ns-detail", label: "🩺 NS Protocol" },
         { id: "dialysis", label: "💧 Dialysis" }].
         map((t) =>
@@ -746,6 +754,10 @@ export default function GlomerularDiseasesPathway() {
       {mainTab === "drugs" && <GNDrugs />}
       {mainTab === "monitoring" && <GNMonitoring />}
       {mainTab === "evidence" && <GNEvidence isAdmin={isAdmin} />}
+      {mainTab === "tubular" && <TubularDisordersCenter />}
+      {mainTab === "cakut" && <CAKUTCenter />}
+      {mainTab === "immunology" && <ImmunologyLabPathways />}
+      {mainTab === "steroids" && <SteroidEquivalentEngine />}
       {mainTab === "decision" && <GlomerularDecisionEngine />}
       {mainTab === "ns-detail" && <NephroticSyndromePathwayDetail />}
       {mainTab === "dialysis" && <DialysisDecisionSupport />}

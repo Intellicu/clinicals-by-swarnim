@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ImmunologyLabPathways from "../components/immunology/ImmunologyLabPathways";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -332,6 +333,7 @@ export default function LabPathways() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [mainTab, setMainTab] = useState("lab");
 
   const categories = ["All", ...new Set(LAB_PATHWAYS.map(p => p.category))];
   const filtered = LAB_PATHWAYS.filter(p => {
@@ -384,6 +386,16 @@ export default function LabPathways() {
           </div>
         </div>
 
+        {/* Main tab switcher */}
+        <div className="flex gap-2 mb-4">
+          {[{ id: "lab", label: "🔬 Lab Protocols" }, { id: "immunology", label: "🧫 Immunology Tests" }].map(t => (
+            <button key={t.id} onClick={() => setMainTab(t.id)}
+              className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all ${mainTab === t.id ? "bg-white text-amber-800 font-bold shadow" : "bg-white/20 hover:bg-white/30 text-white"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
         {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -395,6 +407,10 @@ export default function LabPathways() {
           />
         </div>
 
+        {mainTab === "immunology" ? (
+          <ImmunologyLabPathways />
+        ) : (
+        <>
         {!pathway ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map(p => {
@@ -478,6 +494,8 @@ export default function LabPathways() {
               {pathway.pearls && renderSection("Clinical Pearls", pathway.pearls, "text-emerald-700", "bg-emerald-50", "border-emerald-200", <BookOpen className="text-emerald-600" />)}
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
