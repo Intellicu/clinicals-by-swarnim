@@ -13,6 +13,10 @@ import { useQuery } from "@tanstack/react-query";
 import GlomerularDecisionEngine from "../nephrology/GlomerularDecisionEngine";
 import DialysisDecisionSupport from "../nephrology/DialysisDecisionSupport";
 import NephroticSyndromePathwayDetail from "../nephrology/NephroticSyndromePathwayDetail";
+import GNApproaches from "../gn/GNApproaches";
+import GNDrugs from "../gn/GNDrugs";
+import GNMonitoring from "../gn/GNMonitoring";
+import GNEvidence from "../gn/GNEvidence";
 
 // ── Flowchart component (pure CSS/div based) ─────────────────────────────────
 const FlowStep = ({ step, index, total, color = "blue" }) => {
@@ -722,10 +726,14 @@ export default function GlomerularDiseasesPathway() {
       {/* Main Tabs */}
       <div className="flex gap-1.5 flex-wrap bg-slate-100 p-1 rounded-xl">
         {[
-        { id: "diseases", label: "📋 Disease Pathways" },
+        { id: "diseases", label: "📋 Pathways" },
+        { id: "approaches", label: "🔀 Approaches" },
+        { id: "drugs", label: "💊 Drugs" },
+        { id: "monitoring", label: "📊 Monitoring" },
+        { id: "evidence", label: "📡 Evidence" },
         { id: "decision", label: "🧠 Decision Engine" },
         { id: "ns-detail", label: "🩺 NS Protocol" },
-        { id: "dialysis", label: "💧 Dialysis Support" }].
+        { id: "dialysis", label: "💧 Dialysis" }].
         map((t) =>
         <button key={t.id} onClick={() => setMainTab(t.id)}
           className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all ${mainTab === t.id ? "bg-blue-600 text-white shadow" : "bg-white text-slate-600 hover:bg-slate-200"}`}>
@@ -734,6 +742,10 @@ export default function GlomerularDiseasesPathway() {
         )}
       </div>
 
+      {mainTab === "approaches" && <GNApproaches />}
+      {mainTab === "drugs" && <GNDrugs />}
+      {mainTab === "monitoring" && <GNMonitoring />}
+      {mainTab === "evidence" && <GNEvidence isAdmin={isAdmin} />}
       {mainTab === "decision" && <GlomerularDecisionEngine />}
       {mainTab === "ns-detail" && <NephroticSyndromePathwayDetail />}
       {mainTab === "dialysis" && <DialysisDecisionSupport />}
