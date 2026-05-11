@@ -17,6 +17,7 @@ import BBDICCSModule from "../components/urology/BBDICCSModule";
 import TubularDisorderLab from "../components/tubular/TubularDisorderLab";
 import BiostatisticsAcademy from "../components/research/BiostatisticsAcademy";
 import PatientFamilyEducation from "../components/urology/PatientFamilyEducation";
+import PatientCockpitTimeline from "../components/nephrology/PatientCockpitTimeline";
 
 // ── UTI Master Module (inline — preserved from previous) ────────────────────
 const AGE_PATHWAYS = {
@@ -197,14 +198,14 @@ const SECTIONS = [
   {
     id: "nephrology",
     label: "Nephrology",
-    subtitle: "Core modules",
+    subtitle: "Core kidney modules",
     icon: Droplet,
     color: "from-blue-600 to-indigo-600",
-    badge: "Core",
     tabs: [
       { id: "cakut", label: "CAKUT", icon: Droplet, badge: "8 conditions" },
       { id: "tubular", label: "Tubular Lab", icon: TestTube, badge: "RTA · Stones" },
       { id: "uti", label: "UTI Master", icon: Microscope, badge: "ISPN" },
+      { id: "gn", label: "Glomerular / GN", icon: FlaskConical, badge: "Pathways" },
     ]
   },
   {
@@ -213,7 +214,6 @@ const SECTIONS = [
     subtitle: "Functional & structural",
     icon: Activity,
     color: "from-violet-600 to-purple-600",
-    badge: "Functional",
     tabs: [
       { id: "neuro_bladder", label: "Neurogenic Bladder", icon: Brain, badge: "Flagship" },
       { id: "bbd", label: "BBD / ICCS", icon: BookOpen, badge: "ICCS 2016" },
@@ -222,12 +222,21 @@ const SECTIONS = [
     ]
   },
   {
+    id: "cockpit",
+    label: "Patient Cockpit",
+    subtitle: "Timeline & PDF export",
+    icon: Heart,
+    color: "from-blue-700 to-indigo-700",
+    tabs: [
+      { id: "timeline", label: "Clinical Timeline", icon: Heart, badge: "Multi-module" },
+    ]
+  },
+  {
     id: "education",
     label: "Patient & Family",
     subtitle: "Education & counseling",
     icon: Users,
     color: "from-emerald-600 to-teal-600",
-    badge: "Education",
     tabs: [
       { id: "family_edu", label: "Family Education", icon: Users, badge: "CIC · CKD · Tx" },
     ]
@@ -238,18 +247,78 @@ const SECTIONS = [
     subtitle: "Academic tools",
     icon: BarChart2,
     color: "from-slate-600 to-slate-800",
-    badge: "Academy",
     tabs: [
       { id: "biostat", label: "Biostatistics Academy", icon: BarChart2, badge: "Full course" },
     ]
   },
 ];
 
+// ── GN Bridge Panel — links to GlomerularDiseases page + inline quick-ref ──
+const GN_CONDITIONS = [
+  { name: "Minimal Change Disease (MCD)", tag: "Nephrotic", color: "border-blue-200 bg-blue-50", points: ["Empirical steroids without biopsy in children", "Prednisolone 60mg/m²/day × 4–6 weeks", "Steroid-sensitive in >90% children", "Relapse: cyclophosphamide 2mg/kg × 8–12 wks"] },
+  { name: "FSGS", tag: "Nephrotic", color: "border-purple-200 bg-purple-50", points: ["Biopsy required for diagnosis", "Genetic testing (NPHS2, TRPC6, INF2) for familial", "Steroid-resistant: CNI + MMF", "SRNS: consider rituximab"] },
+  { name: "Membranous Nephropathy (MN)", tag: "Nephrotic", color: "border-indigo-200 bg-indigo-50", points: ["PLA2R antibody in primary MN (adults)", "Children: secondary causes first (SLE, HBV)", "Rituximab — first-line immunotherapy", "Monitor anti-PLA2R titres for response"] },
+  { name: "IgA Nephropathy (IgAN)", tag: "Haematuria/Mixed", color: "border-pink-200 bg-pink-50", points: ["Oxford MEST-C score guides prognosis", "SGLT2i: reduces CKD progression", "Budesonide (Nefecon): targeted gut mucosal IgA", "ACE/ARB: mandatory for proteinuria >0.5g/day"] },
+  { name: "PSGN", tag: "Nephritic", color: "border-amber-200 bg-amber-50", points: ["Post-Strep: 2–4 weeks after throat/skin infection", "Low C3 (returns normal in 6–8 weeks)", "Conservative: fluid, salt restriction, antihypertensives", "Prognosis: excellent in children"] },
+  { name: "Lupus Nephritis (LN)", tag: "Autoimmune", color: "border-rose-200 bg-rose-50", points: ["Class III/IV: MMF + steroids (induction)", "Maintenance: MMF or azathioprine × 3+ years", "Belimumab/voclosporin: new adjunct agents", "Renal biopsy: guides class and treatment"] },
+  { name: "ANCA Vasculitis", tag: "Nephritic", color: "border-orange-200 bg-orange-50", points: ["MPA/GPA: MPO-ANCA or PR3-ANCA", "Induction: rituximab + steroids preferred over CYC", "PLEX: rapidly progressive GN with pulmonary haemorrhage", "Maintenance: rituximab every 6 months × 2 years"] },
+  { name: "HUS (Atypical / STEC)", tag: "TMA", color: "border-red-200 bg-red-50", points: ["STEC-HUS: supportive, no antibiotics, no antimotility", "aHUS: eculizumab — life-saving, start early", "TTP: ADAMTS13 deficiency → plasma exchange urgent", "Monitor: smear, LDH, platelets, creatinine"] },
+];
+
+function GNBridgePanel() {
+  const [open, setOpen] = useState(null);
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl bg-gradient-to-r from-pink-700 to-rose-700 p-5 text-white">
+        <div className="flex items-center gap-3">
+          <FlaskConical className="w-7 h-7" />
+          <div>
+            <h2 className="text-xl font-bold">Glomerular Diseases Quick Reference</h2>
+            <p className="text-pink-100 text-sm">KDIGO-based · Key management points · Links to full GN module</p>
+          </div>
+        </div>
+      </div>
+      <Card className="border-pink-200 bg-pink-50">
+        <CardContent className="p-3">
+          <p className="text-xs text-pink-800 font-semibold">
+            For the full interactive Glomerular Diseases module with AI analysis, pathway navigator, and biopsy patterns —
+            visit <strong>Nephrology Pathways → Glomerular Diseases</strong> from the main Hub.
+          </p>
+        </CardContent>
+      </Card>
+      <div className="space-y-2">
+        {GN_CONDITIONS.map((c, i) => (
+          <Card key={c.name} className={`border-2 ${c.color}`}>
+            <CardContent className="p-0">
+              <button className="w-full flex items-center justify-between p-3" onClick={() => setOpen(open === i ? null : i)}>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-sm text-slate-800">{c.name}</span>
+                  <Badge className="bg-white text-slate-600 border text-xs">{c.tag}</Badge>
+                </div>
+                {open === i ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+              </button>
+              {open === i && (
+                <div className="px-3 pb-3 space-y-1">
+                  {c.points.map((p, j) => (
+                    <p key={j} className="text-xs text-slate-700 flex items-start gap-2">
+                      <span className="w-4 h-4 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 text-xs flex-shrink-0 font-bold">{j+1}</span>{p}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const ALL_TABS = SECTIONS.flatMap(s => s.tabs);
 
 function SectionNav({ activeSectionId, onSelectSection }) {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="flex gap-2 overflow-x-auto pb-1">
       {SECTIONS.map(s => {
         const Icon = s.icon;
         const active = activeSectionId === s.id;
@@ -257,12 +326,12 @@ function SectionNav({ activeSectionId, onSelectSection }) {
           <button
             key={s.id}
             onClick={() => onSelectSection(s)}
-            className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left ${active ? "bg-gradient-to-r " + s.color + " text-white border-transparent shadow-md" : "bg-white border-slate-200 hover:border-slate-300 text-slate-700"}`}
+            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left flex-shrink-0 ${active ? "bg-gradient-to-r " + s.color + " text-white border-transparent shadow-md" : "bg-white border-slate-200 hover:border-slate-300 text-slate-700"}`}
           >
-            <Icon className="w-5 h-5 flex-shrink-0" />
+            <Icon className="w-4 h-4 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-xs">{s.label}</p>
-              <p className={`text-xs ${active ? "text-white/70" : "text-slate-400"}`}>{s.subtitle}</p>
+              <p className="font-semibold text-xs whitespace-nowrap">{s.label}</p>
+              <p className={`text-xs whitespace-nowrap ${active ? "text-white/70" : "text-slate-400"}`}>{s.subtitle}</p>
             </div>
           </button>
         );
@@ -289,6 +358,8 @@ export default function UrologyNephrologyHub() {
       case "bbd": return <BBDICCSModule />;
       case "tubular": return <TubularDisorderLab />;
       case "uti": return <UTIMasterModule />;
+      case "gn": return <GNBridgePanel />;
+      case "timeline": return <PatientCockpitTimeline />;
       case "family_edu": return <PatientFamilyEducation />;
       case "biostat": return <BiostatisticsAcademy />;
       default: return null;
@@ -304,7 +375,7 @@ export default function UrologyNephrologyHub() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">Pediatric Nephrology & Urology Hub</h1>
-              <p className="text-blue-100 text-sm mt-1">CAKUT · Neurogenic Bladder · UDS · Tubular · UTI · BBD · Research · Education</p>
+              <p className="text-blue-100 text-sm mt-1">GN · CAKUT · Neurogenic Bladder · UDS · Tubular · UTI · BBD · Patient Cockpit · Education</p>
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {["ICCS 2016", "ISPN-based", "AI-powered", "Fellowship-grade", "Mobile-native"].map(t => (
                   <span key={t} className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{t}</span>
