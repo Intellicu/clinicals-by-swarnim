@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPageUrl } from "@/utils";
 import { Home, ArrowLeft, Users, Sparkles, Layers } from "lucide-react";
+import ContextualBottomBar from "./components/nav/ContextualBottomBar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
@@ -268,46 +269,8 @@ export default function Layout({ children, currentPageName }) {
         <NotificationEngine />
         <FloatingHubButton />
 
-        {/* ── Mobile Bottom Tab Bar ── */}
-        <nav
-          className="lg:hidden fixed bottom-0 left-0 right-0 z-50 tab-bar-outer"
-          style={{
-            backgroundColor: "var(--sidebar-bg)",
-            borderTop: "1px solid var(--border-color)",
-            boxShadow: "0 -4px 20px rgba(0,0,0,0.08)",
-          }}
-          aria-label="Bottom tab navigation"
-        >
-          <div className="tab-bar-inner grid grid-cols-4">
-            {[
-              { id: "Hub", label: "Hub", Icon: Home },
-              { id: "AI", label: "AI", Icon: Sparkles },
-              { id: "Clinic", label: "Clinic", Icon: Users },
-              { id: "Research", label: "Research", Icon: Layers },
-            ].map(({ id, label, Icon }) => {
-              const isActive = currentTab === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => handleTabPress(id)}
-                  aria-label={`${label} tab${isActive ? ", currently selected" : ""}`}
-                  aria-current={isActive ? "true" : undefined}
-                  className="flex flex-col items-center justify-center gap-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 relative"
-                  style={{ color: isActive ? "#3B82F6" : "var(--text-secondary)" }}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="tab-indicator"
-                      className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-500 rounded-full"
-                    />
-                  )}
-                  <Icon className="w-5 h-5" aria-hidden="true" />
-                  <span className="text-xs font-semibold">{label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </nav>
+        {/* ── Contextual Bottom Navigation ── */}
+        <ContextualBottomBar />
       </div>
     </PatientProvider>
   );

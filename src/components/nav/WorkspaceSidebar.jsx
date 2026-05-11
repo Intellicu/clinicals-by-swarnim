@@ -9,7 +9,7 @@ import {
   Users, FileText, LineChart, GraduationCap, Sparkles, Mic, Bell,
   ClipboardList, UtensilsCrossed, Dna, X, ChevronRight, ChevronDown,
   Settings, Shield, LogOut, Trash2, Microscope, Zap, BarChart2,
-  BookMarked, Clock, Star, RefreshCw, Beaker, Wind, FlaskRound,
+  BookMarked, Clock, Star, RefreshCw, Beaker, Wind,
   Syringe, Radio, FileSearch, Edit3, Database
 } from "lucide-react";
 import { toast } from "sonner";
@@ -49,22 +49,20 @@ const HUB_NAV = [
     items: [
       { title: "Dashboard", url: createPageUrl("Hub"), icon: Home },
       { title: "AI Assistant", url: createPageUrl("AIAssistant"), icon: Sparkles },
-      { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
     ]
   },
   {
     label: "Knowledge Base",
     icon: BookMarked,
-    collapsible: true,
     items: [
       {
         title: "Pediatric Nephrology",
         icon: Droplet,
         children: [
-          { title: "Pathways (GN, NS, AKI…)", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
+          { title: "Nephrology Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
           { title: "Glomerular Diseases", url: createPageUrl("GlomerularDiseases"), icon: Microscope },
           { title: "Dialysis & RRT", url: createPageUrl("RRTAssistant"), icon: Activity },
-          { title: "CAKUT & Tubular", url: createPageUrl("ClinicalApproaches"), icon: TestTube },
+          { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: TestTube },
         ]
       },
       {
@@ -96,21 +94,13 @@ const HUB_NAV = [
         icon: BarChart2,
         children: [
           { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
-          { title: "Calculators Engine", url: createPageUrl("CalculatorsHub"), icon: Calculator },
-        ]
-      },
-      {
-        title: "Procedures",
-        icon: Syringe,
-        children: [
-          { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
-          { title: "Discharge Summary", url: createPageUrl("DischargeSummary"), icon: FileText },
         ]
       },
       {
         title: "Evidence Updates",
         icon: RefreshCw,
         children: [
+          { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
           { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
           { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
         ]
@@ -124,10 +114,8 @@ const HUB_NAV = [
       { title: "All Calculators", url: createPageUrl("CalculatorsHub"), icon: Calculator },
       { title: "Schwartz GFR", url: createPageUrl("SchwartzGFR"), icon: Activity },
       { title: "BP Percentiles", url: createPageUrl("BPPercentiles"), icon: Heart },
-      { title: "Fluid Calculator", url: createPageUrl("FluidCalculator"), icon: Droplet },
       { title: "ABG Interpreter", url: createPageUrl("ABGInterpreter"), icon: Wind },
       { title: "AKI Stager", url: createPageUrl("AKIStager"), icon: AlertTriangle },
-      { title: "Anthropometry", url: createPageUrl("Anthropometry"), icon: Baby },
     ]
   },
   {
@@ -137,9 +125,6 @@ const HUB_NAV = [
       { title: "Research Hub", url: createPageUrl("ResearchHub"), icon: Layers },
       { title: "Research OS", url: createPageUrl("ResearchOS"), icon: Database },
       { title: "Research Methods", url: createPageUrl("ResearchMethodsHub"), icon: FileSearch },
-      { title: "Nutrition Hub", url: createPageUrl("NutritionHub"), icon: UtensilsCrossed },
-      { title: "General Pediatrics", url: createPageUrl("PediatricsHub"), icon: Baby },
-      { title: "Genetic Analyzer", url: createPageUrl("GeneticReportAnalyzer"), icon: Dna },
       { title: "Teaching Hub", url: createPageUrl("TeachingHub"), icon: GraduationCap },
     ]
   },
@@ -152,10 +137,10 @@ const CLINIC_NAV = [
     icon: Users,
     items: [
       { title: "Clinic Dashboard", url: createPageUrl("ClinicDashboard"), icon: Home },
-      { title: "OPD Cockpit", url: createPageUrl("ClinicOPDCockpit"), icon: Users },
-      { title: "Patient Cockpit", url: createPageUrl("PatientCockpit"), icon: Stethoscope },
       { title: "Appointments", url: createPageUrl("ClinicWorkflow"), icon: Clock },
-      { title: "Patient Manager", url: createPageUrl("PatientManager"), icon: FileText },
+      { title: "Patient Charts", url: createPageUrl("PatientCockpit"), icon: Stethoscope },
+      { title: "Patient Manager", url: createPageUrl("PatientManager"), icon: Users },
+      { title: "OPD Cockpit", url: createPageUrl("ClinicOPDCockpit"), icon: BarChart2 },
     ]
   },
   {
@@ -163,20 +148,18 @@ const CLINIC_NAV = [
     icon: Stethoscope,
     items: [
       { title: "Prescriptions", url: createPageUrl("PrescriptionWorkflow"), icon: FileText },
-      { title: "AI Clinical Pathway", url: createPageUrl("AIClinicalPathway"), icon: Brain },
       { title: "Monitoring", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
-      { title: "Lab Results", url: createPageUrl("LabResults"), icon: TestTube },
       { title: "OCR Uploads", url: createPageUrl("AIPrescriber"), icon: FileSearch },
+      { title: "Clinical AI", url: createPageUrl("AIClinicalPathway"), icon: Brain },
+      { title: "Lab Results", url: createPageUrl("LabResults"), icon: TestTube },
     ]
   },
   {
-    label: "Operations",
-    icon: Settings,
+    label: "Emergency Workflows",
+    icon: AlertTriangle,
     items: [
-      { title: "Analytics", url: createPageUrl("ClinicAnalyticsDashboard"), icon: LineChart },
-      { title: "Billing", url: createPageUrl("BillingDashboard"), icon: FileText },
-      { title: "Notifications", url: createPageUrl("NotificationDashboard"), icon: Bell },
-      { title: "Referral Portal", url: createPageUrl("ReferralPortal"), icon: Radio },
+      { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
+      { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
     ]
   },
 ];
@@ -184,15 +167,21 @@ const CLINIC_NAV = [
 // ── Admin sidebar nav ─────────────────────────────────────────────────────
 const ADMIN_NAV = [
   {
+    label: "Editorial Review",
+    icon: Edit3,
+    items: [
+      { title: "Content Manager", url: createPageUrl("UserContentManager"), icon: Edit3 },
+      { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
+      { title: "Audit Logs", url: createPageUrl("AuditLogs"), icon: FileSearch },
+    ]
+  },
+  {
     label: "Governance",
     icon: Shield,
     items: [
-      { title: "Content Manager", url: createPageUrl("UserContentManager"), icon: Edit3 },
-      { title: "Audit Logs", url: createPageUrl("AuditLogs"), icon: FileSearch },
-      { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
       { title: "Prediction Tools", url: createPageUrl("PredictionTools"), icon: LineChart },
-      { title: "Notification Center", url: createPageUrl("NotificationDashboard"), icon: Bell },
       { title: "Reference Ranges", url: createPageUrl("ReferenceRanges"), icon: TestTube },
+      { title: "Publishing Queue", url: createPageUrl("NotificationDashboard"), icon: Bell },
     ]
   },
 ];
