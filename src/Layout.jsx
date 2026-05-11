@@ -2,40 +2,9 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPageUrl } from "@/utils";
-import {
-  Activity,
-  Home,
-  FileText,
-  LogOut,
-  BookOpen,
-  ArrowLeft,
-  Calculator,
-  GraduationCap,
-  Heart,
-  Droplet,
-  Pill,
-  LineChart,
-  TestTube,
-  Baby,
-  GitBranch,
-  ClipboardList,
-  UtensilsCrossed,
-  Sparkles,
-  Mic,
-  Users,
-  Layers,
-  Trash2,
-  Bell,
-  Stethoscope,
-  FlaskConical,
-  X,
-  ChevronRight,
-  AlertTriangle,
-  Brain
-} from "lucide-react";
+import { Home, ArrowLeft, Users, Sparkles, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { base44 } from "@/api/base44Client";
 import { PatientProvider } from "./components/PatientContext";
 import FloatingAIAssistant from "./components/FloatingAIAssistant";
@@ -44,6 +13,7 @@ import PullToRefresh from "./components/PullToRefresh";
 import NotificationEngine from "./components/notifications/NotificationEngine";
 import FloatingHubButton from "./components/FloatingHubButton";
 import { useQueryClient } from "@tanstack/react-query";
+import WorkspaceSidebar from "./components/nav/WorkspaceSidebar";
 
 // Tab root URLs — re-tapping the active tab resets to these
 const TAB_ROOTS = {
@@ -54,172 +24,11 @@ const TAB_ROOTS = {
 };
 
 const TAB_DETECTION = {
-  Hub: [createPageUrl("Hub"), createPageUrl("ClinicalToolsHub"), createPageUrl("ClinicalSupport"), createPageUrl("Guidelines"), createPageUrl("DrugCalculator")],
+  Hub: [createPageUrl("Hub"), createPageUrl("ClinicalSupport"), createPageUrl("Guidelines"), createPageUrl("CalculatorsHub")],
   AI: [createPageUrl("AIAssistant"), createPageUrl("VoiceAgent"), createPageUrl("VideoTeachingAgent")],
-  Clinic: [createPageUrl("ClinicWorkflow"), createPageUrl("ClinicDashboard"), createPageUrl("ClinicManagement"), createPageUrl("ClinicWorkspace")],
-  Research: [createPageUrl("ResearchHub")],
+  Clinic: [createPageUrl("ClinicWorkflow"), createPageUrl("ClinicDashboard"), createPageUrl("ClinicManagement"), createPageUrl("ClinicOPDCockpit"), createPageUrl("PatientCockpit")],
+  Research: [createPageUrl("ResearchHub"), createPageUrl("ResearchOS"), createPageUrl("ResearchMethodsHub")],
 };
-
-// ── Grouped sidebar navigation (Phase 8 refactor) ────────────────────────
-const NAV_GROUPS = [
-  {
-    label: "CliniCalc",
-    items: [
-      { title: "Hub", url: createPageUrl("Hub"), icon: Home },
-      { title: "Clinical Tools Hub", url: createPageUrl("ClinicalToolsHub"), icon: Calculator },
-      { title: "Clinical Calculators", url: createPageUrl("CalculatorsHub"), icon: Calculator },
-      { title: "Drugs & Dosing", url: createPageUrl("DrugsDosing"), icon: Pill },
-      { title: "Reference Ranges", url: createPageUrl("ReferenceRanges"), icon: TestTube },
-      { title: "Diet Generator", url: createPageUrl("DietChartGenerator"), icon: UtensilsCrossed },
-    ],
-  },
-  {
-    label: "Clinical Care",
-    items: [
-      { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
-      { title: "Pediatric Nephrology Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
-      { title: "Pediatric Rheumatology", url: createPageUrl("PediatricRheumatology"), icon: Stethoscope },
-      { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
-      { title: "AI Prescriber", url: createPageUrl("AIPrescriber"), icon: Sparkles },
-      { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: Stethoscope },
-      { title: "Lab Pathways", url: createPageUrl("LabPathways"), icon: FlaskConical },
-      { title: "Differential Dx Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
-      { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
-      { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
-      { title: "Discharge Summary", url: createPageUrl("DischargeSummary"), icon: FileText },
-      { title: "Clinic Dashboard", url: createPageUrl("ClinicDashboard"), icon: Users },
-      { title: "Teaching Hub", url: createPageUrl("TeachingHub"), icon: GraduationCap },
-      { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: ClipboardList },
-      { title: "AI Assistant", url: createPageUrl("AIAssistant"), icon: Sparkles },
-      { title: "Voice Agent", url: createPageUrl("VoiceAgent"), icon: Mic },
-    ],
-  },
-  {
-    label: "Research",
-    items: [
-      { title: "Research Hub", url: createPageUrl("ResearchHub"), icon: Layers },
-      { title: "Research Methods", url: createPageUrl("ResearchMethodsHub"), icon: Activity },
-      { title: "Genetic Analyzer", url: createPageUrl("GeneticReportAnalyzer"), icon: Activity },
-      { title: "Nutrition Hub", url: createPageUrl("NutritionHub"), icon: Heart },
-      { title: "Parental Guidance", url: createPageUrl("ParentalGuidance"), icon: Heart },
-      { title: "Patient Education", url: createPageUrl("PatientEducationHub"), icon: GraduationCap },
-      { title: "Notification Center", url: createPageUrl("NotificationDashboard"), icon: Bell },
-      { title: "Billing", url: createPageUrl("BillingDashboard"), icon: FileText },
-    ],
-  },
-  {
-    label: "Admin & Tools",
-    items: [
-      { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
-      { title: "Audit Logs", url: createPageUrl("AuditLogs"), icon: FileText },
-      { title: "Content Manager", url: createPageUrl("UserContentManager"), icon: FileText },
-      { title: "Prediction Tools", url: createPageUrl("PredictionTools"), icon: LineChart },
-    ],
-  },
-];
-
-function NavItem({ item, onClick }) {
-  const location = useLocation();
-  const isActive = location.pathname === item.url;
-  return (
-    <Link
-      to={item.url}
-      onClick={onClick}
-      aria-label={item.title}
-      aria-current={isActive ? "page" : undefined}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
-        isActive
-          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md"
-          : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-      }`}
-    >
-      <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-      <span className="truncate">{item.title}</span>
-      {!isActive && <ChevronRight className="w-4 h-4 ml-auto opacity-30" aria-hidden="true" />}
-    </Link>
-  );
-}
-
-function SidebarContent({ user, onClose, onLogout }) {
-  return (
-    <>
-      {/* Header */}
-      <div className="border-b-2 border-slate-200 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-xl">
-            <Activity className="w-6 h-6 text-white" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 className="font-bold text-slate-900 text-lg">CliniCals</h2>
-            <p className="text-xs text-slate-500">by Swarnim</p>
-          </div>
-        </div>
-        {onClose && (
-          <button
-            onClick={onClose}
-            aria-label="Close navigation menu"
-            className="lg:hidden p-2 rounded-lg hover:bg-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          >
-            <X className="w-5 h-5 text-slate-600" aria-hidden="true" />
-          </button>
-        )}
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-3" aria-label="Main navigation">
-        {NAV_GROUPS.map((group, gi) => (
-          <React.Fragment key={group.label}>
-            {gi > 0 && <Separator />}
-            <section>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">{group.label}</p>
-              <div className="space-y-0.5">
-                {group.items.map((item) => (
-                  <NavItem key={item.title} item={item} onClick={onClose} />
-                ))}
-              </div>
-            </section>
-          </React.Fragment>
-        ))}
-      </nav>
-
-      {/* User footer */}
-      <div className="border-t-2 border-slate-200 p-4 bg-slate-50 space-y-2">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md"
-            aria-hidden="true"
-          >
-            {user?.full_name?.[0]?.toUpperCase() || "U"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-slate-900 text-sm truncate">{user?.full_name || "Loading..."}</p>
-            <p className="text-xs text-slate-500 truncate">{user?.role || ""}</p>
-          </div>
-        </div>
-        <button
-          onClick={onLogout}
-          aria-label="Sign out of CliniCals"
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        >
-          <LogOut className="w-4 h-4" aria-hidden="true" />
-          <span>Sign Out</span>
-        </button>
-        <button
-          onClick={() => {
-            if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-              toast.error("Account deletion initiated. Contact support to complete.");
-            }
-          }}
-          aria-label="Delete your account"
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-        >
-          <Trash2 className="w-4 h-4" aria-hidden="true" />
-          <span>Delete Account</span>
-        </button>
-      </div>
-    </>
-  );
-}
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -331,7 +140,7 @@ export default function Layout({ children, currentPageName }) {
           style={{ backgroundColor: "var(--sidebar-bg)", borderColor: "var(--border-color)" }}
           aria-label="Desktop sidebar navigation"
         >
-          <SidebarContent user={user} onLogout={handleLogout} />
+          <WorkspaceSidebar user={user} onLogout={handleLogout} />
         </aside>
 
         {/* ── Mobile Drawer ── */}
@@ -365,7 +174,7 @@ export default function Layout({ children, currentPageName }) {
                 aria-modal="true"
                 aria-label="Navigation menu"
               >
-                <SidebarContent user={user} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
+                <WorkspaceSidebar user={user} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
               </motion.aside>
             </>
           )}
