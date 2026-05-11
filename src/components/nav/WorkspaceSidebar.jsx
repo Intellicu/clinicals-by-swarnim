@@ -49,24 +49,23 @@ const HUB_NAV = [
     items: [
       { title: "Dashboard", url: createPageUrl("Hub"), icon: Home },
       { title: "AI Assistant", url: createPageUrl("AIAssistant"), icon: Sparkles },
+      { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
     ]
   },
   {
-    label: "Knowledge Base",
-    icon: BookMarked,
+    label: "Nephrology & Urology",
+    icon: Droplet,
     items: [
       {
-        title: "Pediatric Nephrology",
+        title: "Unified Hub",
         icon: Droplet,
         children: [
-          { title: "Nephrology Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
+          { title: "Nephrology & Urology Hub", url: createPageUrl("UrologyNephrologyHub"), icon: Droplet },
           { title: "Glomerular Diseases", url: createPageUrl("GlomerularDiseases"), icon: Microscope },
-          { title: "Dialysis & RRT", url: createPageUrl("RRTAssistant"), icon: Activity },
+          { title: "Clinical Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
           { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: TestTube },
-          { title: "CAKUT & Urology Hub", url: createPageUrl("UrologyNephrologyHub"), icon: Droplet },
-          { title: "Neurogenic Bladder / UDS", url: createPageUrl("UrologyNephrologyHub"), icon: Activity },
-          { title: "BBD & ICCS Module", url: createPageUrl("UrologyNephrologyHub"), icon: TestTube },
-          { title: "UTI Master Module", url: createPageUrl("UrologyNephrologyHub"), icon: Microscope },
+          { title: "Dialysis & RRT", url: createPageUrl("RRTAssistant"), icon: Activity },
+          { title: "BP Percentiles", url: createPageUrl("BPPercentiles"), icon: Heart },
         ]
       },
       {
@@ -77,16 +76,14 @@ const HUB_NAV = [
           { title: "Lab Immunology", url: createPageUrl("LabPathways"), icon: FlaskConical },
         ]
       },
+    ]
+  },
+  {
+    label: "Clinical Tools",
+    icon: Stethoscope,
+    items: [
       {
-        title: "Emergency Hub",
-        icon: AlertTriangle,
-        children: [
-          { title: "Emergency Protocols", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
-          { title: "Differential Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
-        ]
-      },
-      {
-        title: "Drugs & Biologics",
+        title: "Drugs & AI Prescriber",
         icon: Pill,
         children: [
           { title: "Drug Database & Dosing", url: createPageUrl("DrugsDosing"), icon: Pill },
@@ -94,43 +91,42 @@ const HUB_NAV = [
         ]
       },
       {
-        title: "Monitoring & Scores",
-        icon: BarChart2,
+        title: "Differential & Cases",
+        icon: Brain,
         children: [
-          { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
+          { title: "Differential Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
+          { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
         ]
       },
       {
-        title: "Evidence Updates",
-        icon: RefreshCw,
+        title: "Guidelines & Evidence",
+        icon: BookOpen,
         children: [
           { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
           { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
-          { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
+          { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
         ]
       },
     ]
   },
   {
-    label: "Calculators Engine",
+    label: "Calculators",
     icon: Calculator,
     items: [
       { title: "All Calculators", url: createPageUrl("CalculatorsHub"), icon: Calculator },
       { title: "Schwartz GFR", url: createPageUrl("SchwartzGFR"), icon: Activity },
-      { title: "BP Percentiles", url: createPageUrl("BPPercentiles"), icon: Heart },
       { title: "ABG Interpreter", url: createPageUrl("ABGInterpreter"), icon: Wind },
       { title: "AKI Stager", url: createPageUrl("AKIStager"), icon: AlertTriangle },
     ]
   },
   {
-    label: "Research",
+    label: "Research & Academia",
     icon: Layers,
     items: [
       { title: "Research Hub", url: createPageUrl("ResearchHub"), icon: Layers },
       { title: "Research OS", url: createPageUrl("ResearchOS"), icon: Database },
       { title: "Research Methods", url: createPageUrl("ResearchMethodsHub"), icon: FileSearch },
       { title: "Teaching Hub", url: createPageUrl("TeachingHub"), icon: GraduationCap },
-      { title: "Biostatistics Academy", url: createPageUrl("UrologyNephrologyHub"), icon: BarChart2 },
     ]
   },
 ];
@@ -138,33 +134,32 @@ const HUB_NAV = [
 // ── Clinic Mode sidebar nav ───────────────────────────────────────────────
 const CLINIC_NAV = [
   {
-    label: "Clinic Workflow",
-    icon: Users,
+    label: "Patient Cockpit",
+    icon: Stethoscope,
     items: [
+      { title: "OPD Cockpit", url: createPageUrl("ClinicOPDCockpit"), icon: BarChart2 },
+      { title: "Patient Timeline", url: createPageUrl("PatientCockpit"), icon: Stethoscope },
+      { title: "Patient Manager", url: createPageUrl("PatientManager"), icon: Users },
       { title: "Clinic Dashboard", url: createPageUrl("ClinicDashboard"), icon: Home },
       { title: "Appointments", url: createPageUrl("ClinicWorkflow"), icon: Clock },
-      { title: "Patient Charts", url: createPageUrl("PatientCockpit"), icon: Stethoscope },
-      { title: "Patient Manager", url: createPageUrl("PatientManager"), icon: Users },
-      { title: "OPD Cockpit", url: createPageUrl("ClinicOPDCockpit"), icon: BarChart2 },
     ]
   },
   {
     label: "Clinical Tools",
-    icon: Stethoscope,
+    icon: FileText,
     items: [
       { title: "Prescriptions", url: createPageUrl("PrescriptionWorkflow"), icon: FileText },
       { title: "Monitoring", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
-      { title: "OCR Uploads", url: createPageUrl("AIPrescriber"), icon: FileSearch },
-      { title: "Clinical AI", url: createPageUrl("AIClinicalPathway"), icon: Brain },
       { title: "Lab Results", url: createPageUrl("LabResults"), icon: TestTube },
+      { title: "Clinical AI", url: createPageUrl("AIClinicalPathway"), icon: Brain },
+      { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
     ]
   },
   {
-    label: "Emergency Workflows",
+    label: "Emergency",
     icon: AlertTriangle,
     items: [
       { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
-      { title: "Admission Orders", url: createPageUrl("AdmissionOrders"), icon: ClipboardList },
     ]
   },
 ];

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Droplet, Brain, Activity, TestTube, BookOpen,
-  AlertTriangle, Microscope, BarChart2, Users, Heart, FlaskConical,
+  AlertTriangle, Microscope, BarChart2, Heart, FlaskConical,
   ChevronDown, ChevronUp, ExternalLink, ArrowRight
 } from "lucide-react";
 
@@ -16,9 +16,7 @@ import UroflowAIAnalyzer from "../components/urology/UroflowAIAnalyzer";
 import UDSInterpreter from "../components/urology/UDSInterpreter";
 import BBDICCSModule from "../components/urology/BBDICCSModule";
 import TubularDisorderLab from "../components/tubular/TubularDisorderLab";
-import BiostatisticsAcademy from "../components/research/BiostatisticsAcademy";
-import PatientFamilyEducation from "../components/urology/PatientFamilyEducation";
-import PatientCockpitTimeline from "../components/nephrology/PatientCockpitTimeline";
+// BiostatisticsAcademy, PatientFamilyEducation, PatientCockpitTimeline moved to Research Hub / Clinic Mode
 
 // ── UTI Master Module (inline — preserved from previous) ────────────────────
 const AGE_PATHWAYS = {
@@ -278,28 +276,186 @@ function GNBridgePanel() {
   );
 }
 
+// ── GN Full Pathways Link Panel ─────────────────────────────────────────────
+function GNPathwaysLink() {
+  const navigate = useNavigate();
+  const links = [
+    { label: "Nephrotic Syndrome Pathway", desc: "ISKDC / KDIGO full decision tree", path: "/GlomerularDiseases" },
+    { label: "RPGN / Rapidly Progressive GN", desc: "Crescentic GN, ANCA, anti-GBM", path: "/GlomerularDiseases" },
+    { label: "Lupus Nephritis Pathways", desc: "ISN/RPS classification, MPA/steroids", path: "/GlomerularDiseases" },
+    { label: "C3 Glomerulopathy", desc: "C3G, MPGN, dense deposit disease", path: "/GlomerularDiseases" },
+    { label: "IgA Vasculitis Nephritis", desc: "ISKDC, Oxford MEST-C", path: "/GlomerularDiseases" },
+    { label: "TMA & HUS Pathways", desc: "STEC-HUS, aHUS, TTP differentiation", path: "/GlomerularDiseases" },
+  ];
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-gradient-to-r from-pink-700 to-rose-600 p-4 text-white">
+        <h2 className="text-lg font-bold">Full GN & Glomerular Pathways</h2>
+        <p className="text-pink-100 text-sm">Detailed decision pathways, biopsy guidance, KDIGO 2021</p>
+      </div>
+      <div className="space-y-2">
+        {links.map((l, i) => (
+          <button key={i} onClick={() => navigate(l.path)}
+            className="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-pink-300 hover:shadow-sm transition-all text-left">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">{l.label}</p>
+              <p className="text-xs text-slate-500">{l.desc}</p>
+            </div>
+            <ExternalLink className="w-4 h-4 text-pink-500 flex-shrink-0" />
+          </button>
+        ))}
+      </div>
+      <Card className="border-pink-200 bg-pink-50">
+        <CardContent className="p-3 flex items-center gap-3">
+          <FlaskConical className="w-5 h-5 text-pink-600 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-pink-800">Renal Biopsy AI Analyzer</p>
+            <p className="text-xs text-pink-600">Available inside Clinical AI Hub → Biopsy Analyzer</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ── Dialysis Reference Panel ────────────────────────────────────────────────
+function DialysisReferencePanel() {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(null);
+  const items = [
+    { label: "Hemodialysis (HD)", badge: "Adequacy · Access · Complications", keys: ["Kt/V target ≥1.2 (thrice-weekly)", "Blood flow: 5–7 mL/kg/min children", "Membrane: HDPE / High-flux preferred", "AVF first; Permcath if urgent access", "Intradialytic hypotension: reduce UF rate"] },
+    { label: "Peritoneal Dialysis (PD)", badge: "CCPD · CAPD · Peritonitis", keys: ["CCPD preferred in children (<6 yr)", "Dwell volume: 800–1000 mL/m²", "Peritonitis: intraperitoneal antibiotics", "PET for membrane function assessment", "Kt/V ≥1.7/week (ISPD target)"] },
+    { label: "CRRT (Continuous RRT)", badge: "CVVH · CVVHDF · ICU", keys: ["Dose: 20–25 mL/kg/hr (minimum)", "Citrate anticoagulation preferred", "Filter life: aim >24h", "Fluid overload >10%: initiate early", "CRRT → iHD transition when stable"] },
+    { label: "PLEX (Plasma Exchange)", badge: "TTP · aHUS · ANCA", keys: ["Volume: 1–1.5× plasma volume/session", "Replacement: FFP (TTP) or Albumin (others)", "TTP: daily until remission", "aHUS: Bridge to Eculizumab", "ANCA: pulsed steroids + CYC concurrent"] },
+    { label: "Dialysis Adequacy", badge: "Kt/V · URR · PET", keys: ["HD Kt/V ≥1.2 (spKt/V)", "URR ≥65%", "PD Kt/V ≥1.7/week (anuric)", "Monthly labs: albumin, Ca, P, PTH, Hb", "Annual PET + access review"] },
+  ];
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 p-4 text-white">
+        <h2 className="text-lg font-bold">Dialysis & ICU Nephrology</h2>
+        <p className="text-blue-100 text-sm">HD · PD · CRRT · PLEX · Adequacy — ISPD / KDIGO</p>
+      </div>
+      <div className="space-y-2">
+        {items.map((item, i) => (
+          <Card key={i} className="border-slate-200 shadow-sm">
+            <CardContent className="p-0">
+              <button className="w-full flex items-center justify-between p-3 text-left" onClick={() => setOpen(open === i ? null : i)}>
+                <div>
+                  <p className="font-semibold text-sm text-slate-800">{item.label}</p>
+                  <p className="text-xs text-slate-500">{item.badge}</p>
+                </div>
+                {open === i ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
+              </button>
+              {open === i && (
+                <div className="px-3 pb-3 border-t border-slate-100 pt-2 space-y-1.5">
+                  {item.keys.map((k, j) => (
+                    <div key={j} className="flex items-start gap-2">
+                      <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-slate-700">{k}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <button onClick={() => navigate("/RRTAssistant")}
+        className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">
+        <ExternalLink className="w-4 h-4" /> Full RRT Assistant & Templates
+      </button>
+    </div>
+  );
+}
+
+// ── HTN Reference Panel ─────────────────────────────────────────────────────
+function HTNReferencePanel() {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(null);
+  const items = [
+    { label: "Pediatric HTN Classification", badge: "AAP 2017 · ESCAPE Trial", keys: ["Normal: <90th percentile for age/sex/height", "Elevated BP: 90th–95th percentile", "Stage 1 HTN: 95th–99th + 12 mmHg", "Stage 2 HTN: >99th + 12 mmHg", "Confirm with ABPM — white coat excl."] },
+    { label: "Neonatal Hypertension", badge: "NICU · Renovascular", keys: ["Systolic >113 mmHg (term neonates)", "Common causes: RAS, coarctation, CKD, polycythemia", "Amlodipine 0.1–0.3 mg/kg/dose preferred", "Hydralazine IV for acute neonatal HTN", "Captopril: 0.01–0.05 mg/kg/dose (avoid in <28 wk)"] },
+    { label: "Monogenic / Secondary HTN", badge: "Gordon · Liddle · GRA", keys: ["Low renin, low K: Gordon, Liddle, GRA", "High renin: RAS, coarctation, parenchymal", "Genetic panel if HTN + electrolyte anomaly", "Phaeochromocytoma: urine metanephrines", "MEN screening if bilateral adrenal tumors"] },
+    { label: "ABPM Interpretation", badge: "Daytime · Nighttime · Dipping", keys: ["Load >25% = hypertension on ABPM", "Nocturnal dipping <10% = non-dipper (CKD risk)", "Masked HTN: normal clinic, high ABPM", "White coat HTN: high clinic, normal ABPM", "Mean arterial pressure target in CKD: <50th %ile"] },
+    { label: "Hypertensive Emergency", badge: "Encephalopathy · Eclampsia", keys: ["Goal: reduce MAP by 25% in first hour", "Labetalol 0.2–1 mg/kg IV (max 20 mg)", "Sodium nitroprusside 0.3–8 mcg/kg/min", "Nicardipine infusion: 1–3 mcg/kg/min", "Avoid over-rapid correction — cerebral risk"] },
+  ];
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-gradient-to-r from-orange-600 to-red-600 p-4 text-white">
+        <h2 className="text-lg font-bold">Pediatric Hypertension</h2>
+        <p className="text-orange-100 text-sm">AAP 2017 · ABPM · Monogenic HTN · Emergency protocols</p>
+      </div>
+      <div className="space-y-2">
+        {items.map((item, i) => (
+          <Card key={i} className="border-slate-200 shadow-sm">
+            <CardContent className="p-0">
+              <button className="w-full flex items-center justify-between p-3 text-left" onClick={() => setOpen(open === i ? null : i)}>
+                <div>
+                  <p className="font-semibold text-sm text-slate-800">{item.label}</p>
+                  <p className="text-xs text-slate-500">{item.badge}</p>
+                </div>
+                {open === i ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
+              </button>
+              {open === i && (
+                <div className="px-3 pb-3 border-t border-slate-100 pt-2 space-y-1.5">
+                  {item.keys.map((k, j) => (
+                    <div key={j} className="flex items-start gap-2">
+                      <ArrowRight className="w-3 h-3 text-orange-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-slate-700">{k}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <button onClick={() => navigate("/BPPercentiles")}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-orange-600 text-white rounded-xl text-sm font-semibold hover:bg-orange-700 transition-colors">
+          <ExternalLink className="w-4 h-4" /> BP Percentile Calculator
+        </button>
+        <button onClick={() => navigate("/EmergencyHub")}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors">
+          <AlertTriangle className="w-4 h-4" /> HTN Emergency
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Hub sections config ────────────────────────────────────────────────
 const SECTIONS = [
   {
-    id: "nephrology",
-    label: "Nephrology",
-    subtitle: "Core kidney modules",
-    icon: Droplet,
-    color: "from-blue-600 to-indigo-600",
+    id: "glomerular",
+    label: "Glomerular",
+    subtitle: "NS · GN · Vasculitis · TMA",
+    icon: FlaskConical,
+    color: "from-pink-600 to-rose-600",
     tabs: [
-      { id: "cakut", label: "CAKUT", icon: Droplet, badge: "8 conditions" },
-      { id: "tubular", label: "Tubular Lab", icon: TestTube, badge: "RTA · Stones" },
-      { id: "uti", label: "UTI Master", icon: Microscope, badge: "ISPN" },
-      { id: "gn", label: "Glomerular / GN", icon: FlaskConical, badge: "Pathways" },
+      { id: "gn", label: "GN & NS", icon: FlaskConical, badge: "KDIGO 2021" },
+      { id: "gn_pathways", label: "Full GN Pathways", icon: ExternalLink, badge: "Detailed" },
     ]
   },
   {
-    id: "urology",
-    label: "Urology & Bladder",
-    subtitle: "Functional & structural",
+    id: "tubular",
+    label: "Tubular & Electrolytes",
+    subtitle: "RTA · Bartter · Stones",
+    icon: TestTube,
+    color: "from-teal-600 to-cyan-600",
+    tabs: [
+      { id: "tubular", label: "Tubular Lab", icon: TestTube, badge: "RTA · Stones" },
+    ]
+  },
+  {
+    id: "cakut_urology",
+    label: "CAKUT & Urology",
+    subtitle: "Structural · Functional · UDS",
     icon: Activity,
     color: "from-violet-600 to-purple-600",
     tabs: [
+      { id: "cakut", label: "CAKUT", icon: Droplet, badge: "8 conditions" },
+      { id: "uti", label: "UTI Master", icon: Microscope, badge: "ISPN" },
       { id: "neuro_bladder", label: "Neurogenic Bladder", icon: Brain, badge: "Flagship" },
       { id: "bbd", label: "BBD / ICCS", icon: BookOpen, badge: "ICCS 2016" },
       { id: "uroflow", label: "Uroflow AI", icon: Activity, badge: "ICCS" },
@@ -307,42 +463,30 @@ const SECTIONS = [
     ]
   },
   {
-    id: "cockpit",
-    label: "Patient Cockpit",
-    subtitle: "Timeline & PDF export",
+    id: "dialysis",
+    label: "Dialysis & ICU",
+    subtitle: "HD · PD · CRRT · PLEX",
     icon: Heart,
     color: "from-blue-700 to-indigo-700",
     tabs: [
-      { id: "timeline", label: "Clinical Timeline", icon: Heart, badge: "Multi-module" },
+      { id: "dialysis_ref", label: "Dialysis Reference", icon: Heart, badge: "HD · PD · CRRT" },
     ]
   },
   {
-    id: "education",
-    label: "Patient & Family",
-    subtitle: "Education & counseling",
-    icon: Users,
-    color: "from-emerald-600 to-teal-600",
+    id: "hypertension",
+    label: "Hypertension",
+    subtitle: "Pediatric HTN · ABPM",
+    icon: AlertTriangle,
+    color: "from-orange-600 to-red-600",
     tabs: [
-      { id: "family_edu", label: "Family Education", icon: Users, badge: "CIC · CKD · Tx" },
-    ]
-  },
-  {
-    id: "research",
-    label: "Research & Stats",
-    subtitle: "Academic tools",
-    icon: BarChart2,
-    color: "from-slate-600 to-slate-800",
-    tabs: [
-      { id: "biostat", label: "Biostatistics Academy", icon: BarChart2, badge: "Full course" },
+      { id: "htn_ref", label: "HTN Pathways", icon: AlertTriangle, badge: "AAP 2017" },
     ]
   },
 ];
 
-const ALL_TABS = SECTIONS.flatMap(s => s.tabs);
-
 function SectionNav({ activeSectionId, onSelectSection }) {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
       {SECTIONS.map(s => {
         const Icon = s.icon;
         const active = activeSectionId === s.id;
@@ -366,7 +510,7 @@ function SectionNav({ activeSectionId, onSelectSection }) {
 
 export default function UrologyNephrologyHub() {
   const [activeSection, setActiveSection] = useState(SECTIONS[0]);
-  const [activeTab, setActiveTab] = useState("cakut");
+  const [activeTab, setActiveTab] = useState("gn");
 
   const handleSectionChange = (section) => {
     setActiveSection(section);
@@ -383,9 +527,9 @@ export default function UrologyNephrologyHub() {
       case "tubular": return <TubularDisorderLab />;
       case "uti": return <UTIMasterModule />;
       case "gn": return <GNBridgePanel />;
-      case "timeline": return <PatientCockpitTimeline />;
-      case "family_edu": return <PatientFamilyEducation />;
-      case "biostat": return <BiostatisticsAcademy />;
+      case "gn_pathways": return <GNPathwaysLink />;
+      case "dialysis_ref": return <DialysisReferencePanel />;
+      case "htn_ref": return <HTNReferencePanel />;
       default: return null;
     }
   };
@@ -399,14 +543,14 @@ export default function UrologyNephrologyHub() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">Pediatric Nephrology & Urology Hub</h1>
-              <p className="text-blue-100 text-sm mt-1">CAKUT · GN · Tubular · UTI · Neurogenic Bladder · BBD · UDS · Patient Cockpit · Education</p>
+              <p className="text-blue-100 text-sm mt-1">Glomerular · Tubular · CAKUT · Urology · Dialysis · Hypertension · Unified Clinical Reference</p>
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {["ICCS 2016", "ISPN-based", "AI-powered", "Fellowship-grade", "Mobile-native"].map(t => (
                   <span key={t} className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{t}</span>
                 ))}
               </div>
             </div>
-            <Badge className="bg-white/20 text-white border-white/30 border text-xs flex-shrink-0">v3.0</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 border text-xs flex-shrink-0">v4.0</Badge>
           </div>
         </div>
 

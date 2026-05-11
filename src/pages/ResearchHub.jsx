@@ -20,6 +20,7 @@ import ResearchOSWorkspace from "../components/research/ResearchOSWorkspace";
 import LiteratureSearch from "../components/research/LiteratureSearch";
 import StatisticalAnalysis from "../components/research/StatisticalAnalysis";
 import ResearchContinuationWorkspace from "../components/research/ResearchContinuationWorkspace";
+import BiostatisticsAcademy from "../components/research/BiostatisticsAcademy";
 
 // ─── Quick Reference Tools ─────────────────────────────────────────────────
 function QuickToolsPanel() {
@@ -299,11 +300,11 @@ export default function ResearchHub() {
             </div>
           </div>
           <div className="flex gap-2 flex-wrap items-center">
-            <Badge className="bg-white/20 backdrop-blur text-white">Adaptive Methodology Engine</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Import & Continue</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">11 Study Classifiers</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Reporting Tracker</Badge>
-            <Badge className="bg-white/20 backdrop-blur text-white">Live DB Sync</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Research OS</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Biostatistics Academy</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">STROBE · CONSORT · PRISMA</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Study Design Studio</Badge>
+            <Badge className="bg-white/20 backdrop-blur text-white">Landmark Trials</Badge>
             <Badge className="bg-white/20 backdrop-blur text-white">{projects.length} Projects</Badge>
             {gate.isAdmin ? (
               <Badge className="bg-amber-400/90 text-amber-900 gap-1 font-semibold">
@@ -321,15 +322,18 @@ export default function ResearchHub() {
       {/* Content */}
       <div className="max-w-7xl mx-auto p-6">
         <Tabs defaultValue="os" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 text-xs">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-xs">
             <TabsTrigger value="os" className="gap-1.5">
               <FlaskConical className="w-3.5 h-3.5" />Research OS
             </TabsTrigger>
             <TabsTrigger value="import" className="gap-1.5">
-              <Upload className="w-3.5 h-3.5" />Import & Continue
+              <Upload className="w-3.5 h-3.5" />Import
             </TabsTrigger>
             <TabsTrigger value="methods" className="gap-1.5">
               <Brain className="w-3.5 h-3.5" />Methods
+            </TabsTrigger>
+            <TabsTrigger value="biostat" className="gap-1.5">
+              <BarChart3 className="w-3.5 h-3.5" />Biostatistics
             </TabsTrigger>
             <TabsTrigger value="tools" className="gap-1.5">
               <Calculator className="w-3.5 h-3.5" />Tools
@@ -374,6 +378,22 @@ export default function ResearchHub() {
               </CardHeader>
               <CardContent className="p-4">
                 <ResearchContinuationWorkspace />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Biostatistics Academy ── */}
+          <TabsContent value="biostat">
+            <Card className="shadow-xl border-2 border-purple-100 overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b py-3 px-5">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <BarChart3 className="w-5 h-5 text-purple-600" />
+                  Biostatistics Visual Academy
+                  <Badge className="bg-purple-100 text-purple-700 ml-auto">p-values · CI · OR · ROC · KM</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <BiostatisticsAcademy />
               </CardContent>
             </Card>
           </TabsContent>
