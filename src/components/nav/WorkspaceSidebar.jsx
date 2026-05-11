@@ -64,7 +64,8 @@ const HUB_NAV = [
           { title: "Dialysis & RRT", url: createPageUrl("RRTAssistant"), icon: Activity },
           { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: TestTube },
           { title: "CAKUT & Urology Hub", url: createPageUrl("UrologyNephrologyHub"), icon: Droplet },
-          { title: "Tubular Disorder Lab", url: createPageUrl("UrologyNephrologyHub"), icon: TestTube },
+          { title: "Neurogenic Bladder / UDS", url: createPageUrl("UrologyNephrologyHub"), icon: Activity },
+          { title: "BBD & ICCS Module", url: createPageUrl("UrologyNephrologyHub"), icon: TestTube },
           { title: "UTI Master Module", url: createPageUrl("UrologyNephrologyHub"), icon: Microscope },
         ]
       },
