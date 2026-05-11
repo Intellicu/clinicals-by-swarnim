@@ -147,6 +147,27 @@ const MEDICATIONS = [
   },
 ];
 
+const FamilyAccordion = ({ section }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <Card className={`border-2 ${section.color}`}>
+      <button className="w-full flex items-center justify-between p-3 text-left" onClick={() => setOpen(!open)}>
+        <span className="font-semibold text-sm text-slate-800">{section.title}</span>
+        {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+      </button>
+      {open && (
+        <div className="px-3 pb-3 border-t border-slate-100 pt-2 space-y-1.5">
+          {section.content.map((line, j) => (
+            <p key={j} className="text-xs text-slate-700 flex items-start gap-2">
+              <span className="text-emerald-500 font-bold flex-shrink-0">•</span>{line}
+            </p>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+};
+
 const AccordionItem = ({ title, children, color = "border-slate-200" }) => {
   const [open, setOpen] = useState(false);
   return (
@@ -275,6 +296,7 @@ export default function NeurogenicBladderCenter() {
           <TabsTrigger value="meds" className="text-xs flex-shrink-0">Drug Cards</TabsTrigger>
           <TabsTrigger value="escalation" className="text-xs flex-shrink-0">Surgical Escalation</TabsTrigger>
           <TabsTrigger value="teaching" className="text-xs flex-shrink-0">Teaching</TabsTrigger>
+          <TabsTrigger value="family" className="text-xs flex-shrink-0">Family Education</TabsTrigger>
         </TabsList>
 
         <TabsContent value="uds" className="mt-3 space-y-3">
@@ -418,6 +440,100 @@ export default function NeurogenicBladderCenter() {
                 </div>
               </div>
             </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="family" className="mt-3 space-y-3">
+          <div className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white">
+            <h3 className="font-bold text-lg">Family & Parent Education</h3>
+            <p className="text-emerald-100 text-sm">CIC teaching · Urotherapy · Hydration · Warning signs · FAQs</p>
+          </div>
+
+          {[
+            {
+              title: "Understanding Clean Intermittent Catheterization (CIC)",
+              color: "border-blue-200 bg-blue-50",
+              content: [
+                "CIC is a safe, clean (not sterile) procedure done at home to empty the bladder completely.",
+                "It prevents bladder overflow, high pressure, infections, and protects the kidneys.",
+                "Frequency: Usually every 4–6 hours during the day. Your doctor will set the schedule.",
+                "Equipment: Catheter (reusable or single-use), lubricant, clean basin, soap and water.",
+                "For girls: clean the urethral opening from front to back. Gentle insertion with lubricant.",
+                "For boys: retract foreskin if not circumcised, clean tip, insert catheter until urine flows.",
+                "Always wash hands thoroughly before and after.",
+              ]
+            },
+            {
+              title: "Urotherapy — Bladder Retraining Tips",
+              color: "border-green-200 bg-green-50",
+              content: [
+                "Timed voiding: visit the toilet every 2–3 hours even if your child does not feel the urge.",
+                "Double voiding: after urinating, wait 2 minutes and try again to empty the bladder fully.",
+                "Relaxed voiding posture: feet flat on footstool, knees slightly apart, lean forward.",
+                "Never rush — allow complete emptying. No straining or pushing.",
+                "Bladder diary: record voiding times, volumes, leaks, and any accidents. Bring to every visit.",
+              ]
+            },
+            {
+              title: "Constipation Management (Critical for Bladder Health)",
+              color: "border-amber-200 bg-amber-50",
+              content: [
+                "Constipation worsens bladder overactivity and increases UTI risk significantly.",
+                "High fibre foods: fruits, vegetables, whole grains, legumes every meal.",
+                "Water intake: 30–40 mL/kg/day (spread throughout the day, not just with meals).",
+                "Regular toilet sitting after meals: use the gastrocolic reflex — 10 minutes after breakfast.",
+                "Laxatives: if dietary measures fail, ask your doctor about Polyethylene Glycol (PEG/Movicol).",
+                "Target: soft, formed stools daily or every 1–2 days.",
+              ]
+            },
+            {
+              title: "Hydration Advice",
+              color: "border-cyan-200 bg-cyan-50",
+              content: [
+                "Children with neurogenic bladder need to drink enough — not too much, not too little.",
+                "Recommended: 1–1.5 L/day for young children; 1.5–2 L/day for older children.",
+                "Drink regularly throughout the day — small sips, not large amounts at once.",
+                "Avoid caffeine and carbonated drinks — they irritate the bladder.",
+                "Evening restriction: reduce fluids 2 hours before bed if nighttime leakage is a problem.",
+              ]
+            },
+            {
+              title: "Warning Signs — When to Seek Help Immediately",
+              color: "border-red-200 bg-red-50",
+              content: [
+                "Fever >38°C with no other cause — may indicate kidney or bladder infection.",
+                "Foul-smelling or cloudy urine with symptoms — possible UTI.",
+                "Blood in urine (not just minor traces after catheterization).",
+                "Child appears unwell, lethargic, or refuses feeds/fluids.",
+                "Sudden increase in incontinence or wetting more than usual.",
+                "Difficulty passing catheter or increased resistance — do not force.",
+                "Swelling of the kidney area or abdominal pain.",
+              ]
+            },
+            {
+              title: "FAQs — Common Parent Questions",
+              color: "border-purple-200 bg-purple-50",
+              content: [
+                "Q: Can my child go to school with CIC? → Yes. Provide a letter for the school nurse. Plan toilet breaks every 4 hours. Carry spare catheters.",
+                "Q: How long will CIC be needed? → Usually lifelong for neurogenic bladder. Some conditions improve with treatment.",
+                "Q: Is CIC painful? → With practice, it is usually not painful. Lubricant and correct technique minimize discomfort.",
+                "Q: Can my child swim? → Yes, with appropriate protection. Discuss with your doctor.",
+                "Q: What if we miss a catheterization? → Do it as soon as remembered. Never skip two in a row.",
+                "Q: Will the bladder medicine cause any problems? → Common side effects of oxybutynin: dry mouth, constipation, flushing. Tell the doctor if severe.",
+              ]
+            },
+          ].map((section, i) => (
+            <FamilyAccordion key={i} section={section} />
+          ))}
+
+          <Card className="border-slate-200 bg-slate-50">
+            <div className="p-3 text-center">
+              <p className="text-xs text-slate-500 mb-2 font-medium">Printable handouts available at your clinic visit</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {["CIC Step-by-Step Guide", "Bladder Diary Template", "Constipation Action Plan", "Warning Signs Card"].map(h => (
+                  <span key={h} className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">{h}</span>
+                ))}
+              </div>
+            </div>
           </Card>
         </TabsContent>
       </Tabs>

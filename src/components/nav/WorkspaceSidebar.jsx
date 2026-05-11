@@ -52,31 +52,18 @@ const HUB_NAV = [
     ]
   },
   {
-    label: "Pediatric Nephrology & Urology",
-    icon: Droplet,
+    label: "Knowledge Base",
+    icon: BookMarked,
     items: [
       {
-        title: "Nephrology & Urology Hub",
+        title: "Pediatric Nephrology & Urology",
         icon: Droplet,
         children: [
-          { title: "Glomerular Diseases (GN)", url: createPageUrl("UrologyNephrologyHub"), icon: FlaskConical },
-          { title: "Tubular & Electrolytes", url: createPageUrl("UrologyNephrologyHub"), icon: TestTube },
-          { title: "CAKUT & Urology", url: createPageUrl("UrologyNephrologyHub"), icon: Activity },
-          { title: "Neurogenic Bladder / CIC", url: createPageUrl("UrologyNephrologyHub"), icon: Brain },
-          { title: "BBD & ICCS Module", url: createPageUrl("UrologyNephrologyHub"), icon: BookOpen },
-          { title: "UTI Master Module", url: createPageUrl("UrologyNephrologyHub"), icon: Microscope },
+          { title: "Nephrology & Urology Hub", url: createPageUrl("UrologyNephrologyHub"), icon: Droplet },
+          { title: "Clinical Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
+          { title: "Glomerular Diseases", url: createPageUrl("GlomerularDiseases"), icon: Microscope },
           { title: "Dialysis & RRT", url: createPageUrl("RRTAssistant"), icon: Activity },
-          { title: "Hypertension & ABPM", url: createPageUrl("BPPercentiles"), icon: Heart },
-        ]
-      },
-      {
-        title: "Clinical Pathways",
-        icon: GitBranch,
-        children: [
-          { title: "Nephrology Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
-          { title: "Glomerular Pathways", url: createPageUrl("GlomerularDiseases"), icon: Microscope },
           { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: TestTube },
-          { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
         ]
       },
       {
@@ -87,12 +74,14 @@ const HUB_NAV = [
           { title: "Lab Immunology", url: createPageUrl("LabPathways"), icon: FlaskConical },
         ]
       },
-    ]
-  },
-  {
-    label: "Clinical Tools",
-    icon: Stethoscope,
-    items: [
+      {
+        title: "Emergency Hub",
+        icon: AlertTriangle,
+        children: [
+          { title: "Emergency Protocols", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
+          { title: "Differential Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
+        ]
+      },
       {
         title: "Drugs & Biologics",
         icon: Pill,
@@ -102,26 +91,25 @@ const HUB_NAV = [
         ]
       },
       {
-        title: "Differential & Decision",
-        icon: Brain,
+        title: "Monitoring & Scores",
+        icon: BarChart2,
         children: [
-          { title: "Differential Engine", url: createPageUrl("DifferentialEngine"), icon: Brain },
-          { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
-          { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
+          { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
         ]
       },
       {
-        title: "Guidelines & Evidence",
+        title: "Evidence Updates",
         icon: RefreshCw,
         children: [
           { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
-          { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
+          { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
+          { title: "Case Library", url: createPageUrl("CaseLibrary"), icon: BookOpen },
         ]
       },
     ]
   },
   {
-    label: "Calculators",
+    label: "Calculators Engine",
     icon: Calculator,
     items: [
       { title: "All Calculators", url: createPageUrl("CalculatorsHub"), icon: Calculator },
@@ -132,12 +120,11 @@ const HUB_NAV = [
     ]
   },
   {
-    label: "Research & Academia",
+    label: "Research",
     icon: Layers,
     items: [
       { title: "Research Hub", url: createPageUrl("ResearchHub"), icon: Layers },
       { title: "Research OS", url: createPageUrl("ResearchOS"), icon: Database },
-      { title: "Biostatistics Academy", url: createPageUrl("ResearchHub"), icon: BarChart2 },
       { title: "Research Methods", url: createPageUrl("ResearchMethodsHub"), icon: FileSearch },
       { title: "Teaching Hub", url: createPageUrl("TeachingHub"), icon: GraduationCap },
     ]
@@ -155,16 +142,6 @@ const CLINIC_NAV = [
       { title: "Patient Charts", url: createPageUrl("PatientCockpit"), icon: Stethoscope },
       { title: "Patient Manager", url: createPageUrl("PatientManager"), icon: Users },
       { title: "OPD Cockpit", url: createPageUrl("ClinicOPDCockpit"), icon: BarChart2 },
-    ]
-  },
-  {
-    label: "Patient Cockpit",
-    icon: LineChart,
-    items: [
-      { title: "Clinical Timeline", url: createPageUrl("PatientCockpit"), icon: LineChart },
-      { title: "CKD Progression", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
-      { title: "Monitoring Shortcuts", url: createPageUrl("MonitoringHub"), icon: Star },
-      { title: "Follow-up Templates", url: createPageUrl("PrescriptionWorkflow"), icon: FileText },
     ]
   },
   {

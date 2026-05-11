@@ -17,7 +17,6 @@ import { usePremiumGate } from "@/lib/usePremiumGate";
 import ResearchMethodsContent from "../components/research/ResearchMethodsContent";
 import KnowledgeBase from "../components/research/KnowledgeBase";
 import ResearchOSWorkspace from "../components/research/ResearchOSWorkspace";
-import LiteratureSearch from "../components/research/LiteratureSearch";
 import StatisticalAnalysis from "../components/research/StatisticalAnalysis";
 import ResearchContinuationWorkspace from "../components/research/ResearchContinuationWorkspace";
 import BiostatisticsAcademy from "../components/research/BiostatisticsAcademy";
@@ -322,29 +321,29 @@ export default function ResearchHub() {
       {/* Content */}
       <div className="max-w-7xl mx-auto p-6">
         <Tabs defaultValue="os" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-xs">
-            <TabsTrigger value="os" className="gap-1.5">
+          <TabsList className="flex w-full h-auto overflow-x-auto text-xs gap-0.5 p-1">
+            <TabsTrigger value="os" className="gap-1.5 flex-shrink-0 text-xs">
               <FlaskConical className="w-3.5 h-3.5" />Research OS
             </TabsTrigger>
-            <TabsTrigger value="import" className="gap-1.5">
-              <Upload className="w-3.5 h-3.5" />Import & Continue
-            </TabsTrigger>
-            <TabsTrigger value="methods" className="gap-1.5">
-              <Brain className="w-3.5 h-3.5" />Methods
-            </TabsTrigger>
-            <TabsTrigger value="biostat" className="gap-1.5">
+            <TabsTrigger value="biostat" className="gap-1.5 flex-shrink-0 text-xs">
               <BarChart3 className="w-3.5 h-3.5" />Biostatistics
             </TabsTrigger>
-            <TabsTrigger value="tools" className="gap-1.5">
+            <TabsTrigger value="import" className="gap-1.5 flex-shrink-0 text-xs">
+              <Upload className="w-3.5 h-3.5" />Import & Continue
+            </TabsTrigger>
+            <TabsTrigger value="methods" className="gap-1.5 flex-shrink-0 text-xs">
+              <Brain className="w-3.5 h-3.5" />Methods
+            </TabsTrigger>
+            <TabsTrigger value="tools" className="gap-1.5 flex-shrink-0 text-xs">
               <Calculator className="w-3.5 h-3.5" />Tools
             </TabsTrigger>
-            <TabsTrigger value="templates" className="gap-1.5">
+            <TabsTrigger value="templates" className="gap-1.5 flex-shrink-0 text-xs">
               <FileText className="w-3.5 h-3.5" />Templates
             </TabsTrigger>
-            <TabsTrigger value="reporting" className="gap-1.5">
+            <TabsTrigger value="reporting" className="gap-1.5 flex-shrink-0 text-xs">
               <FileBarChart className="w-3.5 h-3.5" />Reporting
             </TabsTrigger>
-            <TabsTrigger value="knowledge" className="gap-1.5">
+            <TabsTrigger value="knowledge" className="gap-1.5 flex-shrink-0 text-xs">
               <BookOpen className="w-3.5 h-3.5" />Knowledge
             </TabsTrigger>
           </TabsList>
@@ -361,6 +360,15 @@ export default function ResearchHub() {
               </CardHeader>
               <CardContent className="p-0">
                 <ResearchOSWorkspace />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Biostatistics Academy ── */}
+          <TabsContent value="biostat">
+            <Card className="shadow-xl border-2 border-indigo-100 overflow-hidden">
+              <CardContent className="p-4">
+                <BiostatisticsAcademy />
               </CardContent>
             </Card>
           </TabsContent>
@@ -392,20 +400,6 @@ export default function ResearchHub() {
               </CardHeader>
               <CardContent className="p-4">
                 <ResearchMethodsContent />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* ── Biostatistics Academy ── */}
-          <TabsContent value="biostat">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b">
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-purple-600" />Biostatistics Visual Academy
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <BiostatisticsAcademy />
               </CardContent>
             </Card>
           </TabsContent>
