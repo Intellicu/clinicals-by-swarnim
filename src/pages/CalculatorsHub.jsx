@@ -16,6 +16,7 @@ import RheumatologyCalculators from "../components/calculators/RheumatologyCalcu
 import SteroidTaperEngine from "../components/calculators/SteroidTaperEngine";
 import DoseCalculatorEngine from "../components/calculators/DoseCalculatorEngine";
 import CounselingEngine from "../components/calculators/CounselingEngine";
+import ScoringClassificationHub from "../components/scoring/ScoringClassificationHub";
 
 // ── Calculator registry ───────────────────────────────────────────────────
 const CALC_REGISTRY = [
@@ -82,6 +83,7 @@ const SPECIALTY_TABS = [
   { id: "steroid", label: "Steroid Taper", icon: Pill, color: "bg-orange-600", badge: "Taper + Equivalence" },
   { id: "dosing", label: "Drug Dosing", icon: Calculator, color: "bg-teal-600", badge: "Weight + BSA + Renal" },
   { id: "counseling", label: "Counseling", icon: MessageSquare, color: "bg-cyan-600", badge: "Multilingual Sheets" },
+  { id: "scoring", label: "Scoring", icon: BarChart2, color: "bg-slate-700", badge: "SLEDAI, JADAS, KDIGO" },
 ];
 
 export default function CalculatorsHub() {
@@ -202,6 +204,7 @@ export default function CalculatorsHub() {
               {activeTab === "steroid" && <SteroidTaperEngine />}
               {activeTab === "dosing" && <DoseCalculatorEngine />}
               {activeTab === "counseling" && <CounselingEngine />}
+              {activeTab === "scoring" && <ScoringClassificationHub />}
             </div>
           </>
         ) : (

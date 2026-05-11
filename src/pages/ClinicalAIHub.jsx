@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Microscope, ScanLine, TestTube, Stethoscope, Brain, Sparkles
+  Microscope, ScanLine, TestTube, Stethoscope, Brain, Sparkles, Droplet
 } from 'lucide-react';
 import BiopsyAnalyzer from '../components/clinical-ai/BiopsyAnalyzer';
 import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
 import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
+import UDSAnalyzer from '../components/clinical-ai/UDSAnalyzer';
 
 export default function ClinicalAIHub() {
   return (
@@ -38,25 +39,33 @@ export default function ClinicalAIHub() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="biopsy" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 h-auto">
-            <TabsTrigger value="biopsy" className="flex flex-col items-center gap-2 py-3">
+        <Tabs defaultValue="uds" className="w-full">
+          <TabsList className="flex w-full h-auto overflow-x-auto">
+            <TabsTrigger value="uds" className="flex flex-col items-center gap-1 py-3 flex-shrink-0">
+              <Droplet className="w-5 h-5" />
+              <span className="text-xs">Urine Analyzer</span>
+            </TabsTrigger>
+            <TabsTrigger value="biopsy" className="flex flex-col items-center gap-1 py-3 flex-shrink-0">
               <Microscope className="w-5 h-5" />
               <span className="text-xs">Renal Biopsy</span>
             </TabsTrigger>
-            <TabsTrigger value="radiology" className="flex flex-col items-center gap-2 py-3">
+            <TabsTrigger value="radiology" className="flex flex-col items-center gap-1 py-3 flex-shrink-0">
               <ScanLine className="w-5 h-5" />
               <span className="text-xs">Radiology</span>
             </TabsTrigger>
-            <TabsTrigger value="labs" className="flex flex-col items-center gap-2 py-3">
+            <TabsTrigger value="labs" className="flex flex-col items-center gap-1 py-3 flex-shrink-0">
               <TestTube className="w-5 h-5" />
               <span className="text-xs">Lab Reports</span>
             </TabsTrigger>
-            <TabsTrigger value="case" className="flex flex-col items-center gap-2 py-3">
+            <TabsTrigger value="case" className="flex flex-col items-center gap-1 py-3 flex-shrink-0">
               <Stethoscope className="w-5 h-5" />
               <span className="text-xs">Case Analysis</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="uds" className="mt-6">
+            <UDSAnalyzer />
+          </TabsContent>
 
           <TabsContent value="biopsy" className="mt-6">
             <BiopsyAnalyzer />

@@ -3,11 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Search, ChevronDown, ChevronRight, AlertTriangle, CheckCircle, 
   Microscope, Activity, Heart, Droplet, Eye, Brain, 
-  ArrowRight, BookOpen, Stethoscope, FlaskConical, List
+  ArrowRight, BookOpen, Stethoscope, FlaskConical, List, Layers
 } from "lucide-react";
+import CommonApproachesHub from "../components/approaches/CommonApproachesHub";
+import ScoringClassificationHub from "../components/scoring/ScoringClassificationHub";
 
 const APPROACHES = [
   {
@@ -630,33 +633,47 @@ export default function ClinicalApproaches() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6 rounded-2xl bg-gradient-to-r from-cyan-700 via-teal-600 to-blue-700 p-6 text-white shadow-xl">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="mb-4 rounded-2xl bg-gradient-to-r from-cyan-700 via-teal-600 to-blue-700 p-6 text-white shadow-xl">
+          <div className="flex items-center gap-3 mb-1">
             <Stethoscope className="w-8 h-8" />
             <div>
               <h1 className="text-3xl font-bold">Clinical Approaches</h1>
-              <p className="text-cyan-100 text-sm">Structured diagnostic & management algorithms for pediatric nephrology presentations</p>
+              <p className="text-cyan-100 text-sm">Structured diagnostic & management algorithms — Nephrology + Rheumatology + Critical Care</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 mt-3">
-            {APPROACHES.map(a => (
-              <button
-                key={a.id}
-                onClick={() => { setSelected(a.id); setActiveSection("initial_assessment"); }}
-                className={`text-xs px-3 py-1 rounded-full border border-white/30 transition-all ${selected === a.id ? "bg-white text-cyan-800 font-bold" : "bg-white/20 hover:bg-white/30 text-white"}`}
-              >
-                {a.title}
-              </button>
-            ))}
-          </div>
         </div>
+
+        {/* Main Tabs */}
+        <Tabs defaultValue="common">
+          <TabsList className="flex w-full bg-white border shadow-sm h-auto mb-4 overflow-x-auto">
+            <TabsTrigger value="common" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
+              <Layers className="w-4 h-4" /> Common Approaches
+            </TabsTrigger>
+            <TabsTrigger value="scoring" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
+              <Activity className="w-4 h-4" /> Scoring & Classifications
+            </TabsTrigger>
+            <TabsTrigger value="nephrology" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
+              <Droplet className="w-4 h-4" /> Nephrology Approaches
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="common">
+            <CommonApproachesHub />
+          </TabsContent>
+
+          <TabsContent value="scoring">
+            <ScoringClassificationHub />
+          </TabsContent>
+
+          <TabsContent value="nephrology">
+            {/* original nephrology content below */}
 
         {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
             className="pl-10 bg-white border-2 border-slate-200 h-11"
-            placeholder="Search approaches..."
+            placeholder="Search nephrology approaches..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -773,6 +790,8 @@ export default function ClinicalApproaches() {
             </div>
           </div>
         )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

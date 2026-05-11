@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Apple, Activity, FlaskConical, Settings, BookOpen } from "lucide-react";
+import { Apple, Activity, FlaskConical, Settings, BookOpen, Utensils } from "lucide-react";
 import NutritionAssessment from "../components/nutrition/NutritionAssessment";
 import NutritionPrescription from "../components/nutrition/NutritionPrescription";
 import NutritionDietPlanner from "../components/nutrition/NutritionDietPlanner";
 import NutritionAdvancedTools from "../components/nutrition/NutritionAdvancedTools";
+import RenalDietGenerator from "../components/nutrition/RenalDietGenerator";
 
 export default function NutritionHub() {
   const [patientData, setPatientData] = useState(null);
@@ -33,22 +34,28 @@ export default function NutritionHub() {
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="assessment">
-          <TabsList className="grid grid-cols-4 w-full bg-white border shadow-sm">
-            <TabsTrigger value="assessment" className="flex items-center gap-1.5 text-xs md:text-sm">
+        <Tabs defaultValue="diet-generator">
+          <TabsList className="flex w-full bg-white border shadow-sm overflow-x-auto h-auto">
+            <TabsTrigger value="diet-generator" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
+              <Utensils className="w-4 h-4" /> Diet Generator
+            </TabsTrigger>
+            <TabsTrigger value="assessment" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
               <Activity className="w-4 h-4" /> Assessment
             </TabsTrigger>
-            <TabsTrigger value="prescription" className="flex items-center gap-1.5 text-xs md:text-sm">
+            <TabsTrigger value="prescription" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
               <FlaskConical className="w-4 h-4" /> Prescription
             </TabsTrigger>
-            <TabsTrigger value="diet" className="flex items-center gap-1.5 text-xs md:text-sm">
+            <TabsTrigger value="diet" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
               <Apple className="w-4 h-4" /> Diet Planner
             </TabsTrigger>
-            <TabsTrigger value="advanced" className="flex items-center gap-1.5 text-xs md:text-sm">
+            <TabsTrigger value="advanced" className="flex items-center gap-1.5 text-xs md:text-sm flex-shrink-0">
               <Settings className="w-4 h-4" /> Advanced
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="diet-generator" className="mt-4">
+            <RenalDietGenerator />
+          </TabsContent>
           <TabsContent value="assessment">
             <NutritionAssessment onPatientData={setPatientData} />
           </TabsContent>
