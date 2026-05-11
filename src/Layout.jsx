@@ -218,7 +218,7 @@ export default function Layout({ children, currentPageName }) {
                 )}
 
                 <h1 className="text-sm md:text-base font-bold text-slate-900 leading-tight truncate">
-                  CliniCals <span className="text-slate-400 font-normal hidden sm:inline">by Swarnim</span>
+                  CliniCals Hub <span className="text-slate-400 font-normal hidden sm:inline">by Swarnim</span>
                 </h1>
               </div>
 
@@ -260,7 +260,7 @@ export default function Layout({ children, currentPageName }) {
 
           {/* Desktop footer */}
           <footer className="hidden lg:block bg-white border-t border-slate-200 px-6 py-3 text-center text-xs text-slate-400">
-            CliniCals by Swarnim — For informational purposes only. Not a substitute for clinical judgment.
+            CliniCals Hub by Swarnim — Pediatric Clinical Intelligence. For informational purposes only.
           </footer>
         </main>
 

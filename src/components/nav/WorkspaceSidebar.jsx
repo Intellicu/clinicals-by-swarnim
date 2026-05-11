@@ -358,7 +358,7 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
               <ws.icon className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="font-bold text-slate-900 text-sm leading-tight">CliniCals</h2>
+              <h2 className="font-bold text-slate-900 text-sm leading-tight">CliniCals Hub</h2>
               <p className="text-xs text-slate-500">{ws.label}</p>
             </div>
           </div>

@@ -177,7 +177,7 @@ export default function Hub() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">CliniCals Hub</h1>
-                <p className="text-blue-100 text-sm md:text-base">Pediatric Nephrology & Rheumatology Intelligence Platform</p>
+                <p className="text-blue-100 text-sm md:text-base">Pediatric Clinical Intelligence Hub</p>
                 <p className="text-blue-200 text-xs mt-1">by Swarnim</p>
               </div>
               <div className="flex flex-col items-end gap-2">
@@ -285,7 +285,7 @@ export default function Hub() {
         <Alert className="bg-blue-50 border-blue-200">
           <Info className="w-4 h-4 text-blue-600" />
           <AlertDescription className="text-blue-800 text-xs">
-            <strong>CliniCals by Swarnim</strong> — Evidence-based pediatric clinical decision support. Integrates KDIGO, IPNA, ISPD, IAP, ESPN guidelines. For educational & informational purposes. Always exercise independent clinical judgment.
+            <strong>CliniCals Hub by Swarnim</strong> — Pediatric Clinical Intelligence Hub. Integrates KDIGO, IPNA, ISPD, IAP, ESPN, IAP guidelines across specialties. For educational & informational purposes. Always exercise independent clinical judgment.
           </AlertDescription>
         </Alert>
       </div>
