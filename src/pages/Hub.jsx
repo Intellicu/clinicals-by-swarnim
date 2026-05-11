@@ -15,20 +15,36 @@ import {
   RefreshCw, Shield, Info, BarChart2, Search, Star, Clock,
   Database, TrendingUp, LineChart
 } from "lucide-react";
+import QuickPatientEntry from "../components/QuickPatientEntry";
+import QuickCalculations from "../components/QuickCalculations";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
 import { Input } from "@/components/ui/input";
 
 // ── Quick-access sections (reference-first, no clinic/EMR/queue content) ──
 const QUICK_TOOLS = [
-  { name: "Pathways", icon: GitBranch, color: "bg-blue-600", page: "ClinicalSupport", tag: "nephro" },
-  { name: "Guidelines", icon: BookOpen, color: "bg-indigo-600", page: "Guidelines", tag: "evidence" },
-  { name: "Calculators", icon: Calculator, color: "bg-cyan-600", page: "CalculatorsHub", tag: "calc" },
-  { name: "Rheumatology", icon: Stethoscope, color: "bg-violet-600", page: "PediatricRheumatology", tag: "rheum" },
-  { name: "Emergency", icon: AlertCircle, color: "bg-red-600", page: "EmergencyHub", tag: "emergency" },
-  { name: "Drugs", icon: Pill, color: "bg-purple-600", page: "DrugsDosing", tag: "drugs" },
-  { name: "AI Assistant", icon: Sparkles, color: "bg-amber-600", page: "AIAssistant", tag: "ai" },
-  { name: "Research", icon: Layers, color: "bg-teal-600", page: "ResearchHub", tag: "research" },
+  { name: "Schwartz GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR" },
+  { name: "BP Percentiles", icon: Heart, color: "bg-red-600", page: "BPPercentiles" },
+  { name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
+  { name: "Guidelines", icon: BookOpen, color: "bg-blue-700", page: "Guidelines" },
+  { name: "Emergency Hub", icon: AlertCircle, color: "bg-red-700", page: "EmergencyHub" },
+  { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
+  { name: "RRT Assistant", icon: Droplet, color: "bg-cyan-600", page: "RRTAssistant" },
+  { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
+  { name: "Diet Generator", icon: UtensilsCrossed, color: "bg-green-600", page: "DietGenerator" },
+  { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
+  { name: "AI Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub" },
+  { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer" },
+  { name: "Research Methods", icon: Layers, color: "bg-rose-700", page: "ResearchMethodsHub" },
+  { name: "Clinical Approaches", icon: Stethoscope, color: "bg-cyan-700", page: "ClinicalApproaches" },
+  { name: "Lab Pathways", icon: FlaskConical, color: "bg-amber-700", page: "LabPathways" },
+  { name: "Admit Orders", icon: ClipboardList, color: "bg-indigo-700", page: "AdmissionOrders" },
+  { name: "Differential Dx", icon: Brain, color: "bg-violet-700", page: "DifferentialEngine" },
+  { name: "Case Library", icon: BookOpen, color: "bg-emerald-700", page: "CaseLibrary" },
+  { name: "Discharge Summary", icon: FileText, color: "bg-slate-700", page: "DischargeSummary" },
+  { name: "Research OS", icon: Layers, color: "bg-indigo-700", page: "ResearchOS" },
+  { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-teal-700", page: "NutritionHub" },
+  { name: "Rheumatology", icon: Stethoscope, color: "bg-violet-600", page: "PediatricRheumatology" },
 ];
 
 const KNOWLEDGE_SECTIONS = [
@@ -194,26 +210,39 @@ export default function Hub() {
           />
         </div>
 
-        {/* ── Quick Access ── */}
+        {/* ── Quick Patient Entry ── */}
+        {!search && <QuickPatientEntry />}
+
+        {/* ── Quick Calculations ── */}
+        {!search && <QuickCalculations />}
+
+        {/* ── Quick Access Tools ── */}
         {!search && (
-          <div>
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Access</h2>
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 md:gap-3">
-              {QUICK_TOOLS.map(tool => {
-                const Icon = tool.icon;
-                return (
-                  <Link key={tool.name} to={createPageUrl(tool.page)}>
-                    <div className="flex flex-col items-center gap-1.5 p-2 md:p-3 bg-white rounded-xl border border-slate-100 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
-                      <div className={`w-10 h-10 md:w-12 md:h-12 ${tool.color} rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow`}>
-                        <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-slate-700 text-center leading-tight">{tool.name}</span>
-                    </div>
-                  </Link>
-                );
-              })}
+          <Card className="bg-white shadow-xl border-2 border-blue-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-blue-200 px-6 py-4 flex items-center gap-2">
+              <Zap className="w-6 h-6 text-blue-600" />
+              <h2 className="font-bold text-lg text-slate-900">Quick Access Tools</h2>
             </div>
-          </div>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {QUICK_TOOLS.map(tool => {
+                  const Icon = tool.icon;
+                  return (
+                    <Link key={tool.name} to={createPageUrl(tool.page)}>
+                      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-400 hover:scale-105 group">
+                        <CardContent className="p-4 flex flex-col items-center text-center">
+                          <div className={`w-14 h-14 ${tool.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg`}>
+                            <Icon className="w-7 h-7 text-white" />
+                          </div>
+                          <span className="text-sm font-semibold text-slate-800">{tool.name}</span>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* ── Knowledge Base Sections ── */}
