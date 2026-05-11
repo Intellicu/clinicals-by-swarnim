@@ -1670,9 +1670,9 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-3">
             <Brain className="w-10 h-10 text-purple-600" />
-            Clinical Decision Support
+            Pediatric Nephrology Pathways
           </h1>
-          <p className="text-slate-600">Evidence-based protocols with file upload, guided symptom entry, and comprehensive pathways - {clinicalScenarios.length}+ scenarios</p>
+          <p className="text-slate-600">Evidence-based protocols with file upload, guided symptom entry, and comprehensive pathways — {clinicalScenarios.length}+ scenarios</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">

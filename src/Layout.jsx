@@ -67,6 +67,7 @@ const NAV_GROUPS = [
     items: [
       { title: "Hub", url: createPageUrl("Hub"), icon: Home },
       { title: "Clinical Tools Hub", url: createPageUrl("ClinicalToolsHub"), icon: Calculator },
+      { title: "Clinical Calculators", url: createPageUrl("CalculatorsHub"), icon: Calculator },
       { title: "Drugs & Dosing", url: createPageUrl("DrugsDosing"), icon: Pill },
       { title: "Reference Ranges", url: createPageUrl("ReferenceRanges"), icon: TestTube },
       { title: "Diet Generator", url: createPageUrl("DietChartGenerator"), icon: UtensilsCrossed },
@@ -76,7 +77,7 @@ const NAV_GROUPS = [
     label: "Clinical Care",
     items: [
       { title: "Guidelines Library", url: createPageUrl("Guidelines"), icon: BookOpen },
-      { title: "Clinical Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
+      { title: "Pediatric Nephrology Pathways", url: createPageUrl("ClinicalSupport"), icon: GitBranch },
       { title: "Pediatric Rheumatology", url: createPageUrl("PediatricRheumatology"), icon: Stethoscope },
       { title: "Emergency Hub", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
       { title: "AI Prescriber", url: createPageUrl("AIPrescriber"), icon: Sparkles },
