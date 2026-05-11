@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Droplet, Brain, Activity, TestTube, BookOpen, Stethoscope,
+  Droplet, Brain, Activity, TestTube, BookOpen,
   AlertTriangle, Microscope, BarChart2, Users, Heart, FlaskConical,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, ExternalLink, ArrowRight
 } from "lucide-react";
 
 // Core modules
@@ -193,6 +194,90 @@ function UTIMasterModule() {
   );
 }
 
+// ── GN Bridge Panel — links to existing GN pathways ────────────────────────
+const GN_CONDITIONS = [
+  { name: "Minimal Change Disease (MCD)", tag: "Nephrotic", color: "bg-purple-100 text-purple-800", keys: ["Empirical steroids in children", "No biopsy first episode", "Prednisolone 60 mg/m² × 4–6 wks", "SR: >90% children"] },
+  { name: "FSGS", tag: "Nephrotic", color: "bg-purple-100 text-purple-800", keys: ["Biopsy essential", "Steroid trial 8–16 wks", "Calcineurin inhibitors second-line", "Genetic testing in children"] },
+  { name: "Membranous Nephropathy (MN)", tag: "Nephrotic", color: "bg-purple-100 text-purple-800", keys: ["PLA2R antibody testing", "KDIGO 2021 — conservative first", "Rituximab preferred over CYC", "Monitor PLA2R titres"] },
+  { name: "IgA Nephropathy (IgAN)", tag: "Haematuria/Mixed", color: "bg-rose-100 text-rose-800", keys: ["Oxford MEST-C score", "SGLT2i: nephroprotection", "Budesonide if high risk", "ACEi/ARB first-line"] },
+  { name: "IgA Vasculitis (HSP) Nephritis", tag: "Vasculitis", color: "bg-orange-100 text-orange-800", keys: ["ISKDC criteria", "UPCR monitoring", "Steroids if nephrotic/nephritic", "KDIGO 2021 guidance"] },
+  { name: "Lupus Nephritis (LN)", tag: "Autoimmune", color: "bg-pink-100 text-pink-800", keys: ["ISN/RPS class I–VI", "MPA + steroids standard", "Belimumab/voclosporin add-on", "Renal biopsy mandatory"] },
+  { name: "ANCA Vasculitis (GPA/MPA)", tag: "Vasculitis", color: "bg-orange-100 text-orange-800", keys: ["Rituximab preferred over CYC", "Pulse MP induction", "ANCA monitoring", "Maintenance 12–24 months"] },
+  { name: "HUS / TMA", tag: "TMA", color: "bg-red-100 text-red-800", keys: ["STEC-HUS: supportive", "aHUS: Eculizumab urgent", "ADAMTS13 for TTP", "Plasma exchange in TTP"] },
+  { name: "Nephrotic Syndrome (Childhood)", tag: "Nephrotic", color: "bg-purple-100 text-purple-800", keys: ["ISKDC protocol", "Relapse: >3+ dipstick × 3 days", "Frequent relapse: MMF / Levamisole", "SRNS: CNI / Rituximab"] },
+  { name: "Post-Streptococcal GN (PSGN)", tag: "Nephritic", color: "bg-blue-100 text-blue-800", keys: ["ASO / anti-DNase B", "Low C3, normal C4", "Mostly self-limiting", "HTN management key"] },
+  { name: "Congenital Nephrotic Syndrome", tag: "Genetic", color: "bg-indigo-100 text-indigo-800", keys: ["NPHS1 / NPHS2 mutations", "Albumin infusions + nutrition", "Early bilateral nephrectomy + dialysis", "Transplant after 9 kg"] },
+];
+
+function GNBridgePanel() {
+  const navigate = useNavigate();
+  const [filter, setFilter] = useState("All");
+  const filters = ["All", "Nephrotic", "Haematuria/Mixed", "Vasculitis", "Autoimmune", "TMA", "Nephritic", "Genetic"];
+  const filtered = filter === "All" ? GN_CONDITIONS : GN_CONDITIONS.filter(c => c.tag === filter);
+  const [open, setOpen] = useState(null);
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl bg-gradient-to-r from-pink-700 to-rose-600 p-5 text-white">
+        <div className="flex items-center gap-3">
+          <FlaskConical className="w-7 h-7" />
+          <div>
+            <h2 className="text-xl font-bold">Glomerular Diseases & GN</h2>
+            <p className="text-pink-100 text-sm">KDIGO 2021 · ISKDC · Pediatric pathways · Biopsy guidance</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        {filters.map(f => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${filter === f ? "bg-pink-600 text-white border-pink-600" : "bg-white text-slate-600 border-slate-200 hover:border-pink-300"}`}>
+            {f}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        {filtered.map((cond, i) => (
+          <Card key={i} className="border-slate-200 shadow-sm">
+            <CardContent className="p-0">
+              <button className="w-full flex items-center justify-between p-3 text-left" onClick={() => setOpen(open === i ? null : i)}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-semibold text-sm text-slate-800">{cond.name}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cond.color}`}>{cond.tag}</span>
+                </div>
+                {open === i ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
+              </button>
+              {open === i && (
+                <div className="px-3 pb-3 border-t border-slate-100 pt-2 space-y-1">
+                  {cond.keys.map((k, j) => (
+                    <div key={j} className="flex items-start gap-2">
+                      <ArrowRight className="w-3 h-3 text-pink-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-slate-700">{k}</p>
+                    </div>
+                  ))}
+                  <Button size="sm" variant="outline"
+                    className="mt-2 text-xs border-pink-200 text-pink-700 hover:bg-pink-50"
+                    onClick={() => navigate("/GlomerularDiseases")}>
+                    <ExternalLink className="w-3 h-3 mr-1" /> Full GN Pathways
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="border-slate-200 bg-slate-50">
+        <CardContent className="p-3">
+          <p className="text-xs font-bold text-slate-500 mb-1">References</p>
+          <p className="text-xs text-slate-600">KDIGO 2021 Glomerular Diseases · ISKDC Criteria · IPNA Clinical Practice Recommendations · SHARE Guidelines</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // ── Main Hub sections config ────────────────────────────────────────────────
 const SECTIONS = [
   {
@@ -253,72 +338,11 @@ const SECTIONS = [
   },
 ];
 
-// ── GN Bridge Panel — links to GlomerularDiseases page + inline quick-ref ──
-const GN_CONDITIONS = [
-  { name: "Minimal Change Disease (MCD)", tag: "Nephrotic", color: "border-blue-200 bg-blue-50", points: ["Empirical steroids without biopsy in children", "Prednisolone 60mg/m²/day × 4–6 weeks", "Steroid-sensitive in >90% children", "Relapse: cyclophosphamide 2mg/kg × 8–12 wks"] },
-  { name: "FSGS", tag: "Nephrotic", color: "border-purple-200 bg-purple-50", points: ["Biopsy required for diagnosis", "Genetic testing (NPHS2, TRPC6, INF2) for familial", "Steroid-resistant: CNI + MMF", "SRNS: consider rituximab"] },
-  { name: "Membranous Nephropathy (MN)", tag: "Nephrotic", color: "border-indigo-200 bg-indigo-50", points: ["PLA2R antibody in primary MN (adults)", "Children: secondary causes first (SLE, HBV)", "Rituximab — first-line immunotherapy", "Monitor anti-PLA2R titres for response"] },
-  { name: "IgA Nephropathy (IgAN)", tag: "Haematuria/Mixed", color: "border-pink-200 bg-pink-50", points: ["Oxford MEST-C score guides prognosis", "SGLT2i: reduces CKD progression", "Budesonide (Nefecon): targeted gut mucosal IgA", "ACE/ARB: mandatory for proteinuria >0.5g/day"] },
-  { name: "PSGN", tag: "Nephritic", color: "border-amber-200 bg-amber-50", points: ["Post-Strep: 2–4 weeks after throat/skin infection", "Low C3 (returns normal in 6–8 weeks)", "Conservative: fluid, salt restriction, antihypertensives", "Prognosis: excellent in children"] },
-  { name: "Lupus Nephritis (LN)", tag: "Autoimmune", color: "border-rose-200 bg-rose-50", points: ["Class III/IV: MMF + steroids (induction)", "Maintenance: MMF or azathioprine × 3+ years", "Belimumab/voclosporin: new adjunct agents", "Renal biopsy: guides class and treatment"] },
-  { name: "ANCA Vasculitis", tag: "Nephritic", color: "border-orange-200 bg-orange-50", points: ["MPA/GPA: MPO-ANCA or PR3-ANCA", "Induction: rituximab + steroids preferred over CYC", "PLEX: rapidly progressive GN with pulmonary haemorrhage", "Maintenance: rituximab every 6 months × 2 years"] },
-  { name: "HUS (Atypical / STEC)", tag: "TMA", color: "border-red-200 bg-red-50", points: ["STEC-HUS: supportive, no antibiotics, no antimotility", "aHUS: eculizumab — life-saving, start early", "TTP: ADAMTS13 deficiency → plasma exchange urgent", "Monitor: smear, LDH, platelets, creatinine"] },
-];
-
-function GNBridgePanel() {
-  const [open, setOpen] = useState(null);
-  return (
-    <div className="space-y-4">
-      <div className="rounded-xl bg-gradient-to-r from-pink-700 to-rose-700 p-5 text-white">
-        <div className="flex items-center gap-3">
-          <FlaskConical className="w-7 h-7" />
-          <div>
-            <h2 className="text-xl font-bold">Glomerular Diseases Quick Reference</h2>
-            <p className="text-pink-100 text-sm">KDIGO-based · Key management points · Links to full GN module</p>
-          </div>
-        </div>
-      </div>
-      <Card className="border-pink-200 bg-pink-50">
-        <CardContent className="p-3">
-          <p className="text-xs text-pink-800 font-semibold">
-            For the full interactive Glomerular Diseases module with AI analysis, pathway navigator, and biopsy patterns —
-            visit <strong>Nephrology Pathways → Glomerular Diseases</strong> from the main Hub.
-          </p>
-        </CardContent>
-      </Card>
-      <div className="space-y-2">
-        {GN_CONDITIONS.map((c, i) => (
-          <Card key={c.name} className={`border-2 ${c.color}`}>
-            <CardContent className="p-0">
-              <button className="w-full flex items-center justify-between p-3" onClick={() => setOpen(open === i ? null : i)}>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-slate-800">{c.name}</span>
-                  <Badge className="bg-white text-slate-600 border text-xs">{c.tag}</Badge>
-                </div>
-                {open === i ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-              </button>
-              {open === i && (
-                <div className="px-3 pb-3 space-y-1">
-                  {c.points.map((p, j) => (
-                    <p key={j} className="text-xs text-slate-700 flex items-start gap-2">
-                      <span className="w-4 h-4 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 text-xs flex-shrink-0 font-bold">{j+1}</span>{p}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 const ALL_TABS = SECTIONS.flatMap(s => s.tabs);
 
 function SectionNav({ activeSectionId, onSelectSection }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="grid grid-cols-2 gap-2">
       {SECTIONS.map(s => {
         const Icon = s.icon;
         const active = activeSectionId === s.id;
@@ -326,12 +350,12 @@ function SectionNav({ activeSectionId, onSelectSection }) {
           <button
             key={s.id}
             onClick={() => onSelectSection(s)}
-            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all text-left flex-shrink-0 ${active ? "bg-gradient-to-r " + s.color + " text-white border-transparent shadow-md" : "bg-white border-slate-200 hover:border-slate-300 text-slate-700"}`}
+            className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left ${active ? "bg-gradient-to-r " + s.color + " text-white border-transparent shadow-md" : "bg-white border-slate-200 hover:border-slate-300 text-slate-700"}`}
           >
-            <Icon className="w-4 h-4 flex-shrink-0" />
+            <Icon className="w-5 h-5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-xs whitespace-nowrap">{s.label}</p>
-              <p className={`text-xs whitespace-nowrap ${active ? "text-white/70" : "text-slate-400"}`}>{s.subtitle}</p>
+              <p className="font-semibold text-xs">{s.label}</p>
+              <p className={`text-xs ${active ? "text-white/70" : "text-slate-400"}`}>{s.subtitle}</p>
             </div>
           </button>
         );
@@ -375,7 +399,7 @@ export default function UrologyNephrologyHub() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">Pediatric Nephrology & Urology Hub</h1>
-              <p className="text-blue-100 text-sm mt-1">GN · CAKUT · Neurogenic Bladder · UDS · Tubular · UTI · BBD · Patient Cockpit · Education</p>
+              <p className="text-blue-100 text-sm mt-1">CAKUT · GN · Tubular · UTI · Neurogenic Bladder · BBD · UDS · Patient Cockpit · Education</p>
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {["ICCS 2016", "ISPN-based", "AI-powered", "Fellowship-grade", "Mobile-native"].map(t => (
                   <span key={t} className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{t}</span>
