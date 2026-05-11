@@ -45,6 +45,9 @@ const QUICK_TOOLS = [
   { name: "Research OS", icon: Layers, color: "bg-indigo-700", page: "ResearchOS" },
   { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-teal-700", page: "NutritionHub" },
   { name: "Rheumatology", icon: Stethoscope, color: "bg-violet-600", page: "PediatricRheumatology" },
+  { name: "CAKUT & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
+  { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub" },
+  { name: "Tubular Lab", icon: Beaker, color: "bg-slate-700", page: "UrologyNephrologyHub" },
 ];
 
 const KNOWLEDGE_SECTIONS = [
@@ -132,6 +135,20 @@ const KNOWLEDGE_SECTIONS = [
       { name: "Research OS", page: "ResearchOS", icon: Database },
       { name: "Research Methods", page: "ResearchMethodsHub", icon: FileText },
       { name: "Nutrition Hub", page: "NutritionHub", icon: UtensilsCrossed },
+      { name: "Biostatistics Academy", page: "UrologyNephrologyHub", icon: BarChart2 },
+    ]
+  },
+  {
+    title: "CAKUT & Urology",
+    icon: Droplet,
+    color: "border-blue-300 bg-blue-50",
+    iconColor: "text-blue-700",
+    items: [
+      { name: "CAKUT Master Center", page: "UrologyNephrologyHub", icon: Droplet },
+      { name: "Neurogenic Bladder", page: "UrologyNephrologyHub", icon: Brain },
+      { name: "Uroflow AI Analyzer", page: "UrologyNephrologyHub", icon: Activity },
+      { name: "UTI Master Module", page: "UrologyNephrologyHub", icon: Microscope },
+      { name: "Tubular Disorder Lab", page: "UrologyNephrologyHub", icon: TestTube },
     ]
   },
   {

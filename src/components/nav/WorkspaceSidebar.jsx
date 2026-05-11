@@ -63,6 +63,9 @@ const HUB_NAV = [
           { title: "Glomerular Diseases", url: createPageUrl("GlomerularDiseases"), icon: Microscope },
           { title: "Dialysis & RRT", url: createPageUrl("RRTAssistant"), icon: Activity },
           { title: "Clinical Approaches", url: createPageUrl("ClinicalApproaches"), icon: TestTube },
+          { title: "CAKUT & Urology Hub", url: createPageUrl("UrologyNephrologyHub"), icon: Droplet },
+          { title: "Tubular Disorder Lab", url: createPageUrl("UrologyNephrologyHub"), icon: TestTube },
+          { title: "UTI Master Module", url: createPageUrl("UrologyNephrologyHub"), icon: Microscope },
         ]
       },
       {
@@ -126,6 +129,7 @@ const HUB_NAV = [
       { title: "Research OS", url: createPageUrl("ResearchOS"), icon: Database },
       { title: "Research Methods", url: createPageUrl("ResearchMethodsHub"), icon: FileSearch },
       { title: "Teaching Hub", url: createPageUrl("TeachingHub"), icon: GraduationCap },
+      { title: "Biostatistics Academy", url: createPageUrl("UrologyNephrologyHub"), icon: BarChart2 },
     ]
   },
 ];
