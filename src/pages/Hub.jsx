@@ -12,14 +12,13 @@ import {
   Stethoscope, TestTube, Baby, Zap, Sparkles, Brain, AlertCircle,
   UtensilsCrossed, GraduationCap, Layers, FlaskConical, ClipboardList,
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
-  RefreshCw, Shield, Info, BarChart2, Search, Star, Clock,
+  RefreshCw, Shield, Info, BarChart2, Star, Clock,
   Database, TrendingUp, LineChart
 } from "lucide-react";
 import QuickPatientEntry from "../components/QuickPatientEntry";
 import QuickCalculations from "../components/QuickCalculations";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
-import { Input } from "@/components/ui/input";
 
 // ── Quick-access sections (reference-first, no clinic/EMR/queue content) ──
 const QUICK_TOOLS = [
@@ -167,7 +166,7 @@ const KNOWLEDGE_SECTIONS = [
 
 export default function Hub() {
   const isOnline = useOnlineStatus();
-  const [search, setSearch] = useState("");
+
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -176,13 +175,7 @@ export default function Hub() {
 
   const isAdmin = user?.role === "admin";
 
-  // Filter sections by search
-  const filteredSections = search.trim()
-    ? KNOWLEDGE_SECTIONS.map(s => ({
-        ...s,
-        items: s.items.filter(i => i.name.toLowerCase().includes(search.toLowerCase()))
-      })).filter(s => s.items.length > 0)
-    : KNOWLEDGE_SECTIONS;
+  const filteredSections = KNOWLEDGE_SECTIONS;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 overflow-x-hidden">
@@ -217,56 +210,47 @@ export default function Hub() {
         </div>
 
         {/* ── Search ── */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          <Input
-            className="pl-9 bg-white shadow-sm border-slate-200 text-sm"
-            placeholder="Search pathways, drugs, calculators, guidelines…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
+        <GlobalSearch
+          placeholder="Search C3G, membranous GN, sample size, AKI steroids, rituximab…"
+          className="bg-white shadow-sm rounded-lg"
+        />
 
         {/* ── Quick Patient Entry ── */}
-        {!search && <QuickPatientEntry />}
+        <QuickPatientEntry />
 
         {/* ── Quick Calculations ── */}
-        {!search && <QuickCalculations />}
+        <QuickCalculations />
 
         {/* ── Quick Access Tools ── */}
-        {!search && (
-          <Card className="bg-white shadow-xl border-2 border-blue-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-blue-200 px-6 py-4 flex items-center gap-2">
-              <Zap className="w-6 h-6 text-blue-600" />
-              <h2 className="font-bold text-lg text-slate-900">Quick Access Tools</h2>
+        <Card className="bg-white shadow-xl border-2 border-blue-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-blue-200 px-6 py-4 flex items-center gap-2">
+            <Zap className="w-6 h-6 text-blue-600" />
+            <h2 className="font-bold text-lg text-slate-900">Quick Access Tools</h2>
+          </div>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {QUICK_TOOLS.map(tool => {
+                const Icon = tool.icon;
+                return (
+                  <Link key={tool.name} to={createPageUrl(tool.page)}>
+                    <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-400 hover:scale-105 group">
+                      <CardContent className="p-4 flex flex-col items-center text-center">
+                        <div className={`w-14 h-14 ${tool.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg`}>
+                          <Icon className="w-7 h-7 text-white" />
+                        </div>
+                        <span className="text-sm font-semibold text-slate-800">{tool.name}</span>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {QUICK_TOOLS.map(tool => {
-                  const Icon = tool.icon;
-                  return (
-                    <Link key={tool.name} to={createPageUrl(tool.page)}>
-                      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-400 hover:scale-105 group">
-                        <CardContent className="p-4 flex flex-col items-center text-center">
-                          <div className={`w-14 h-14 ${tool.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg`}>
-                            <Icon className="w-7 h-7 text-white" />
-                          </div>
-                          <span className="text-sm font-semibold text-slate-800">{tool.name}</span>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          </CardContent>
+        </Card>
 
         {/* ── Knowledge Base Sections ── */}
         <div>
-          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-            {search ? `Search results for "${search}"` : "Knowledge Base"}
-          </h2>
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Knowledge Base</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filteredSections.map(section => {
               const SectionIcon = section.icon;
