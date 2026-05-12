@@ -6,20 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { AlertTriangle, RefreshCw, ChevronDown, ChevronUp, ExternalLink, Loader2, CheckCircle, BookOpen, Edit2, Save, X, Plus, Trash2, GitBranch, FileText, Dna, Zap } from "lucide-react";
+import { AlertTriangle, RefreshCw, ChevronDown, ChevronUp, ExternalLink, Loader2, CheckCircle, BookOpen, Edit2, Save, X, GitBranch, FileText } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
 import GlomerularDecisionEngine from "../nephrology/GlomerularDecisionEngine";
-import DialysisDecisionSupport from "../nephrology/DialysisDecisionSupport";
 import NephroticSyndromePathwayDetail from "../nephrology/NephroticSyndromePathwayDetail";
 import GNApproaches from "../gn/GNApproaches";
 import GNDrugs from "../gn/GNDrugs";
 import GNMonitoring from "../gn/GNMonitoring";
 import GNEvidence from "../gn/GNEvidence";
-import TubularDisordersCenter from "../nephrology/TubularDisordersCenter";
-import CAKUTCenter from "../nephrology/CAKUTCenter";
-import ImmunologyLabPathways from "../immunology/ImmunologyLabPathways";
 import SteroidEquivalentEngine from "../nephrology/SteroidEquivalentEngine";
 
 // ── Flowchart component (pure CSS/div based) ─────────────────────────────────
@@ -727,7 +723,7 @@ export default function GlomerularDiseasesPathway() {
         </AlertDescription>
       </Alert>
 
-      {/* Main Tabs */}
+      {/* Main Tabs — Glomerular-only content */}
       <div className="flex gap-1.5 flex-wrap bg-slate-100 p-1 rounded-xl">
         {[
         { id: "diseases", label: "📋 Pathways" },
@@ -735,13 +731,9 @@ export default function GlomerularDiseasesPathway() {
         { id: "drugs", label: "💊 Drugs" },
         { id: "monitoring", label: "📊 Monitoring" },
         { id: "evidence", label: "📡 Evidence" },
-        { id: "tubular", label: "🧪 Tubular" },
-        { id: "cakut", label: "🍼 CAKUT" },
-        { id: "immunology", label: "🔬 Immunology" },
         { id: "steroids", label: "⚗️ Steroids" },
         { id: "decision", label: "🧠 Decision" },
-        { id: "ns-detail", label: "🩺 NS Protocol" },
-        { id: "dialysis", label: "💧 Dialysis" }].
+        { id: "ns-detail", label: "🩺 NS Protocol" }].
         map((t) =>
         <button key={t.id} onClick={() => setMainTab(t.id)}
           className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all ${mainTab === t.id ? "bg-blue-600 text-white shadow" : "bg-white text-slate-600 hover:bg-slate-200"}`}>
@@ -754,13 +746,9 @@ export default function GlomerularDiseasesPathway() {
       {mainTab === "drugs" && <GNDrugs />}
       {mainTab === "monitoring" && <GNMonitoring />}
       {mainTab === "evidence" && <GNEvidence isAdmin={isAdmin} />}
-      {mainTab === "tubular" && <TubularDisordersCenter />}
-      {mainTab === "cakut" && <CAKUTCenter />}
-      {mainTab === "immunology" && <ImmunologyLabPathways />}
       {mainTab === "steroids" && <SteroidEquivalentEngine />}
       {mainTab === "decision" && <GlomerularDecisionEngine />}
       {mainTab === "ns-detail" && <NephroticSyndromePathwayDetail />}
-      {mainTab === "dialysis" && <DialysisDecisionSupport />}
 
       {/* Disease Pathways tab content */}
       {mainTab === "diseases" && <>
