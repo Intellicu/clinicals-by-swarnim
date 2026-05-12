@@ -40,18 +40,21 @@ const SEARCH_INDEX = [
   { title: "NS Steroid Protocol – Prednisolone", category: "Pathway", page: "ClinicalSupport", tags: ["prednisolone", "steroid protocol", "60 mg/m2", "NS steroids", "taper", "alternate day"] },
 
   // ── AKI ───────────────────────────────────────────────────────────────────
-  { title: "AKI – KDIGO Staging & Management", category: "Pathway", page: "AKIStager", tags: ["AKI", "acute kidney injury", "KDIGO", "creatinine", "oliguria", "staging", "pRIFLE"] },
-  { title: "AKI – Steroids", category: "Pathway", page: "ClinicalSupport", tags: ["AKI steroids", "steroid AKI", "interstitial nephritis AIN", "methylprednisolone AKI", "ANCA AKI", "rapidly progressive"] },
-  { title: "AKI in Neonates", category: "Pathway", page: "ClinicalSupport", tags: ["neonatal AKI", "neonate AKI", "neonatal kidney injury", "perinatal asphyxia"] },
-  { title: "AKI-to-CKD Transition", category: "Pathway", page: "ClinicalSupport", tags: ["AKI CKD", "post-AKI", "transition", "chronic kidney", "recovery"] },
-  { title: "Nephrotoxin Stewardship", category: "Pathway", page: "ClinicalSupport", tags: ["nephrotoxin", "aminoglycoside", "vancomycin", "NSAID", "contrast", "amphotericin", "nephrotoxic"] },
+  { title: "AKI – KDIGO Staging & Management", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-prifle", tags: ["AKI", "acute kidney injury", "KDIGO", "creatinine", "oliguria", "staging", "pRIFLE"] },
+  { title: "AKI – Steroids / AIN", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-prifle", tags: ["AKI steroids", "steroid AKI", "interstitial nephritis AIN", "methylprednisolone AKI", "ANCA AKI", "rapidly progressive"] },
+  { title: "AKI in Neonates", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-prifle", tags: ["neonatal AKI", "neonate AKI", "neonatal kidney injury", "perinatal asphyxia"] },
+  { title: "AKI-to-CKD Transition", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-comprehensive", tags: ["AKI CKD", "post-AKI", "transition", "chronic kidney", "recovery"] },
+  { title: "Nephrotoxin / Contrast AKI Prevention", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=contrast-nephropathy", tags: ["nephrotoxin", "aminoglycoside", "vancomycin", "NSAID", "contrast", "amphotericin", "nephrotoxic"] },
   { title: "AKI Stager – KDIGO/pRIFLE", category: "Calculator", page: "AKIStager", tags: ["AKI staging", "pRIFLE", "KDIGO AKI", "creatinine ratio", "urine output"] },
+  { title: "AKI – Dialysis Indications (AEIOU)", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-dialysis-timing", tags: ["dialysis AKI", "AKI dialysis timing", "AEIOU", "RRT indications"] },
+  { title: "Fluid Management in AKI", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=fluid-electrolyte", tags: ["fluid AKI", "fluid management", "overload", "Holliday-Segar", "maintenance fluid"] },
   { title: "Tumor Lysis Syndrome (TLS)", category: "Emergency", page: "EmergencyHub", tags: ["TLS", "tumor lysis", "uric acid", "rasburicase", "hyperkalemia", "hyperphosphatemia"] },
 
   // ── CKD ───────────────────────────────────────────────────────────────────
-  { title: "CKD Staging (KDIGO G1-G5)", category: "Pathway", page: "CKDStager", tags: ["CKD", "chronic kidney disease", "KDIGO", "eGFR", "staging", "G1 G2 G3 G4 G5"] },
-  { title: "CKD-MBD – Mineral Bone Disease", category: "Pathway", page: "ClinicalSupport", tags: ["CKD-MBD", "mineral bone", "PTH", "phosphorus", "calcium", "vitamin D", "cinacalcet", "calcification"] },
-  { title: "Anemia of CKD – EPO & Iron", category: "Pathway", page: "ClinicalSupport", tags: ["anemia CKD", "EPO", "erythropoietin", "iron deficiency", "ferritin", "transferrin saturation", "darbepoetin"] },
+  { title: "CKD Staging (KDIGO G1-G5)", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-staging", tags: ["CKD", "chronic kidney disease", "KDIGO", "eGFR", "staging", "G1 G2 G3 G4 G5"] },
+  { title: "CKD-MBD – Mineral Bone Disease", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-mbd", tags: ["CKD-MBD", "mineral bone", "PTH", "phosphorus", "calcium", "vitamin D", "cinacalcet", "calcification"] },
+  { title: "Anemia of CKD – EPO & Iron", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-anemia-mbd", tags: ["anemia CKD", "EPO", "erythropoietin", "iron deficiency", "ferritin", "transferrin saturation", "darbepoetin"] },
+  { title: "CKD Comprehensive Management", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-comprehensive", tags: ["CKD management", "CKD nutrition", "CKD hypertension", "RRT planning", "dialysis preparation", "transplant referral"] },
   { title: "CKD Nutrition & Growth", category: "Pathway", page: "NutritionHub", tags: ["CKD nutrition", "renal diet", "growth CKD", "protein restriction", "phosphorus diet"] },
   { title: "CKD Calculator (Schwartz GFR)", category: "Calculator", page: "SchwartzGFR", tags: ["Schwartz", "GFR", "eGFR", "creatinine", "height", "CKiD", "CKD-EPI"] },
 
@@ -212,8 +215,10 @@ const SEARCH_INDEX = [
   // ── GENETICS ─────────────────────────────────────────────────────────────
   { title: "Genetic Report Analyzer (ACMG)", category: "AI Tool", page: "GeneticReportAnalyzer", tags: ["genetic", "variant", "ACMG", "pathogenic", "VUS", "NGS", "exome", "OMIM"] },
   { title: "Cystinosis – Diagnosis & Management", category: "Pathway", page: "ClinicalApproaches", tags: ["cystinosis", "cysteamine", "Fanconi", "cystine", "corneal crystals"] },
-  { title: "Primary Hyperoxaluria (PH1/2/3)", category: "Pathway", page: "ClinicalApproaches", tags: ["hyperoxaluria", "primary hyperoxaluria", "AGXT", "oxalate", "lumasiran", "liver transplant", "stones genetic"] },
-  { title: "ARPKD / ADPKD – Polycystic Kidney", category: "Pathway", page: "ClinicalApproaches", tags: ["ARPKD", "ADPKD", "polycystic kidney", "PKD1 PKD2", "tolvaptan", "cysts"] },
+  { title: "Primary Hyperoxaluria (PH1/2/3)", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=cystic-kidney", tags: ["hyperoxaluria", "primary hyperoxaluria", "AGXT", "oxalate", "lumasiran", "liver transplant", "stones genetic"] },
+  { title: "ARPKD / ADPKD – Polycystic Kidney", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=cystic-kidney", tags: ["ARPKD", "ADPKD", "polycystic kidney", "PKD1 PKD2", "tolvaptan", "cysts"] },
+  { title: "Nephronophthisis / Ciliopathies", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=cystic-kidney", tags: ["NPHP", "nephronophthisis", "ciliopathy", "Bardet-Biedl", "Joubert", "Senior-Loken"] },
+  { title: "Genetic Nephrotic Syndrome (SRNS)", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=steroid-resistant-ns", tags: ["genetic nephrotic", "SRNS genetic", "NPHS1 NPHS2 WT1", "podocyte gene"] },
 
   // ── MONITORING TEMPLATES ──────────────────────────────────────────────────
   { title: "CKD Monitoring Template", category: "Monitoring", page: "UrologyNephrologyHub", tags: ["CKD monitoring", "monitoring template", "eGFR schedule", "PTH", "CBC monitoring"] },
@@ -302,8 +307,11 @@ export default function GlobalSearch({ placeholder = "Search pathways, drugs, ca
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const navigate_to = (page) => {
-    navigate(createPageUrl(page));
+  const navigate_to = (item) => {
+    // Support deep-link params appended to page URL
+    const base = createPageUrl(item.page);
+    const url = item.params ? `${base}${item.params}` : base;
+    navigate(url);
     setQuery("");
     setOpen(false);
   };
@@ -312,7 +320,7 @@ export default function GlobalSearch({ placeholder = "Search pathways, drugs, ca
     if (!open) return;
     if (e.key === "ArrowDown") { e.preventDefault(); setFocused(f => Math.min(f + 1, results.length - 1)); }
     if (e.key === "ArrowUp") { e.preventDefault(); setFocused(f => Math.max(f - 1, 0)); }
-    if (e.key === "Enter" && results[focused]) navigate_to(results[focused].page);
+    if (e.key === "Enter" && results[focused]) navigate_to(results[focused]);
     if (e.key === "Escape") setOpen(false);
   };
 
@@ -341,7 +349,7 @@ export default function GlobalSearch({ placeholder = "Search pathways, drugs, ca
           {results.map((item, i) => (
             <button
               key={i}
-              onClick={() => navigate_to(item.page)}
+              onClick={() => navigate_to(item)}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0 ${focused === i ? "bg-indigo-50" : ""}`}
             >
               <div className="flex-1 min-w-0">

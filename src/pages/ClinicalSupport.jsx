@@ -626,8 +626,13 @@ const LabReportAnalyzerContent = () => <LabReportAnalyzer />;
 const ClinicalCaseAnalyzerContent = () => <ClinicalCaseAnalyzer />;
 
 export default function ClinicalSupport() {
-  const [activeTab, setActiveTab] = useState("scenarios");
-  const [selectedScenario, setSelectedScenario] = useState(null);
+  // Deep-link support: ?tab=pathways&scenario=aki-prifle
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialTab = searchParams.get("tab") || "scenarios";
+  const initialScenario = searchParams.get("scenario") || null;
+
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [selectedScenario, setSelectedScenario] = useState(initialScenario);
 
   // Diagnostic AI state
   const [diagnosticStep, setDiagnosticStep] = useState(1);
