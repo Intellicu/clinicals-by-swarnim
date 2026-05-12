@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +6,7 @@ import {
   FlaskConical, Heart, Shield, Brain, Droplets, Activity, Pill,
   ChevronDown, ChevronUp, ArrowRight, ExternalLink, Stethoscope,
   CheckCircle, TestTube, BookOpen, Users, Microscope, Beaker,
-  Baby, Layers, GraduationCap
+  Baby, Layers, GraduationCap, Search, X
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -364,8 +364,9 @@ const PILLARS = [
 // SUB-COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
-function GroupCard({ group }) {
+function GroupCard({ group, searchActive }) {
   const [open, setOpen] = useState(false);
+  const isOpen = searchActive || open;
   const Icon = group.icon;
   const groupHref = `/${group.groupPage}${group.groupParams}`;
 
@@ -391,7 +392,7 @@ function GroupCard({ group }) {
           </button>
         </div>
 
-        {open && (
+        {isOpen && (
           <div className="px-4 pb-4 border-t border-slate-100 pt-3 space-y-1">
             {group.items.map((item, i) => {
               const href = `/${item.page}${item.params}`;
@@ -420,8 +421,9 @@ function GroupCard({ group }) {
   );
 }
 
-function PillarSection({ pillar }) {
+function PillarSection({ pillar, searchActive }) {
   const [open, setOpen] = useState(false);
+  const isOpen = searchActive || open;
   const Icon = pillar.icon;
 
   return (
@@ -447,10 +449,10 @@ function PillarSection({ pillar }) {
       </button>
 
       {/* Groups inside pillar */}
-      {open && (
+      {isOpen && (
         <div className="p-3 bg-slate-50 space-y-2">
           {pillar.groups.map((group, i) => (
-            <GroupCard key={i} group={group} />
+            <GroupCard key={i} group={group} searchActive={searchActive} />
           ))}
         </div>
       )}
@@ -462,6 +464,33 @@ function PillarSection({ pillar }) {
 // MAIN EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 export default function HubNephrologyPathways() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter pillars/groups/items by search query
+  const filteredPillars = useMemo(() => {
+    if (!searchQuery.trim()) return PILLARS;
+    const q = searchQuery.toLowerCase();
+    return PILLARS.map(pillar => ({
+      ...pillar,
+      groups: pillar.groups.map(group => ({
+        ...group,
+        items: group.items.filter(item => item.label.toLowerCase().includes(q))
+      })).filter(group =>
+        group.group.toLowerCase().includes(q) ||
+        group.items.length > 0 ||
+        pillar.pillar.toLowerCase().includes(q)
+      )
+    })).filter(pillar =>
+      pillar.pillar.toLowerCase().includes(q) ||
+      pillar.description.toLowerCase().includes(q) ||
+      pillar.groups.length > 0
+    );
+  }, [searchQuery]);
+
+  const totalMatches = searchQuery
+    ? filteredPillars.reduce((acc, p) => acc + p.groups.reduce((a, g) => a + g.items.length, 0), 0)
+    : null;
+
   return (
     <div className="space-y-4">
       {/* Hero */}
@@ -478,10 +507,38 @@ export default function HubNephrologyPathways() {
         <CheckCircle className="w-3 h-3 text-green-500" /> = validated canonical content &nbsp;·&nbsp; tap pillar to expand
       </p>
 
+      {/* Search bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+        <input
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Search pathways, diseases, topics…"
+          className="w-full pl-9 pr-8 py-2 text-sm rounded-xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery("")}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {searchQuery && (
+        <p className="text-xs text-slate-500 px-1">
+          {totalMatches === 0
+            ? "No results — try a different keyword"
+            : `${totalMatches} match${totalMatches !== 1 ? "es" : ""} for "${searchQuery}"`
+          }
+        </p>
+      )}
+
       {/* Pillars */}
       <div className="space-y-3">
-        {PILLARS.map((p, i) => (
-          <PillarSection key={i} pillar={p} />
+        {filteredPillars.map((p, i) => (
+          <PillarSection key={i} pillar={p} searchActive={!!searchQuery} />
         ))}
       </div>
     </div>

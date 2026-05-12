@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -13,7 +13,7 @@ import {
   UtensilsCrossed, GraduationCap, Layers, FlaskConical, ClipboardList,
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
   RefreshCw, Shield, Info, BarChart2, Star, Clock,
-  Database, TrendingUp, LineChart
+  Database, TrendingUp, LineChart, Search, X
 } from "lucide-react";
 import QuickPatientEntry from "../components/QuickPatientEntry";
 import QuickCalculations from "../components/QuickCalculations";
@@ -174,8 +174,20 @@ export default function Hub() {
   });
 
   const isAdmin = user?.role === "admin";
+  const [sectionQuery, setSectionQuery] = useState("");
 
-  const filteredSections = KNOWLEDGE_SECTIONS;
+  const filteredSections = useMemo(() => {
+    if (!sectionQuery.trim()) return KNOWLEDGE_SECTIONS;
+    const q = sectionQuery.toLowerCase();
+    return KNOWLEDGE_SECTIONS
+      .map(section => ({
+        ...section,
+        items: section.items.filter(item => item.name.toLowerCase().includes(q))
+      }))
+      .filter(section =>
+        section.title.toLowerCase().includes(q) || section.items.length > 0
+      );
+  }, [sectionQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 overflow-x-hidden">
@@ -250,7 +262,26 @@ export default function Hub() {
 
         {/* ── Knowledge Base Sections ── */}
         <div>
-          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Knowledge Base</h2>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Knowledge Base</h2>
+            <div className="relative flex-1 max-w-xs">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+              <input
+                value={sectionQuery}
+                onChange={e => setSectionQuery(e.target.value)}
+                placeholder="Filter sections…"
+                className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+              {sectionQuery && (
+                <button
+                  onClick={() => setSectionQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filteredSections.map(section => {
               const SectionIcon = section.icon;
