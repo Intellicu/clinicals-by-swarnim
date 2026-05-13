@@ -5,7 +5,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle, CheckCircle, Info, RotateCcw, Search, ChevronRight } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertTriangle, CheckCircle, Info, RotateCcw, Search, ChevronRight, Dna } from "lucide-react";
+import FabryScreeningTool from "./FabryScreeningTool";
 
 const FIELDS = [
   {
@@ -123,6 +125,21 @@ export default function RapidScreening({ isAdmin }) {
   const filledCount = Object.values(values).filter(v => v && v !== "No" && v !== "None" && v !== "Not known").length;
 
   return (
+    <Tabs defaultValue="general">
+      <TabsList className="w-full grid grid-cols-2 mb-4 bg-white border border-violet-200 rounded-xl p-1">
+        <TabsTrigger value="general" className="text-xs rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">
+          <Search className="w-3.5 h-3.5 mr-1" />General Rare Disease Screen
+        </TabsTrigger>
+        <TabsTrigger value="fabry" className="text-xs rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">
+          <Dna className="w-3.5 h-3.5 mr-1" />💜 Fabry Disease Screening
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="fabry">
+        <FabryScreeningTool isAdmin={isAdmin} />
+      </TabsContent>
+
+      <TabsContent value="general">
     <div className="space-y-4">
       <Card className="bg-white shadow-sm border border-violet-200">
         <CardHeader className="bg-violet-50 border-b py-4 px-5">
@@ -240,5 +257,7 @@ export default function RapidScreening({ isAdmin }) {
         </div>
       )}
     </div>
+      </TabsContent>
+    </Tabs>
   );
 }

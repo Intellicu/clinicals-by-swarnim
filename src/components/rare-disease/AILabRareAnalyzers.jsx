@@ -98,6 +98,28 @@ Clinical data:`,
     ]
   },
   {
+    id: "fabry_pattern",
+    name: "Fabry Pattern Analyzer",
+    icon: "💜",
+    color: "violet",
+    prompt_prefix: `You are an expert in Fabry disease and lysosomal storage disorders. Analyze the following clinical and laboratory data for Fabry disease. Provide:
+1. Probability of Fabry disease (Low/Possible/High/Confirmed)
+2. Pattern recognition — which features are most diagnostic
+3. Recommended investigations in priority order
+4. GLA mutation class prediction based on phenotype
+5. ERT/chaperone eligibility assessment
+Format as structured JSON: fabry_probability, diagnostic_pattern (key features and why), investigations (array ordered by priority), mutation_class_prediction, ert_eligibility, family_screening_plan, monitoring_plan, pearls.
+Clinical data:`,
+    fields: [
+      { id: "age_sex", label: "Age, sex, clinical presentation" },
+      { id: "enzyme", label: "Alpha-galactosidase A enzyme activity result" },
+      { id: "lyso_gb3", label: "Lyso-Gb3 level (urine/plasma, if available)" },
+      { id: "gla_mutation", label: "GLA mutation (if known)" },
+      { id: "organ_involvement", label: "Organ involvement: kidney, heart, neuro, skin, eye" },
+      { id: "family_fabry", label: "Family history (maternal lineage, affected relatives)" },
+    ]
+  },
+  {
     id: "complement_tma",
     name: "Complement / TMA Analyzer",
     icon: "🔴",
@@ -127,6 +149,7 @@ const COLOR_MAP = {
   violet: { badge: "bg-violet-100 text-violet-800", header: "bg-violet-50", btn: "bg-violet-600 hover:bg-violet-700" },
   purple: { badge: "bg-purple-100 text-purple-800", header: "bg-purple-50", btn: "bg-purple-600 hover:bg-purple-700" },
   red: { badge: "bg-red-100 text-red-800", header: "bg-red-50", btn: "bg-red-600 hover:bg-red-700" },
+  pink: { badge: "bg-pink-100 text-pink-800", header: "bg-pink-50", btn: "bg-pink-600 hover:bg-pink-700" },
 };
 
 function AnalyzerCard({ analyzer }) {
