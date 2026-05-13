@@ -23,16 +23,16 @@ export default function StickyToolNav() {
           const isActive = location.pathname === url || location.pathname === `/${page}`;
           return (
             <Link key={page} to={url}>
-              <button
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap hidden ${
-                isActive ?
-                "bg-blue-600 text-white shadow-sm" :
-                "text-slate-600 hover:bg-blue-50 hover:text-blue-700"}`
-                }>
-                
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-              </button>
+              
+
+
+
+
+
+
+
+
+              
             </Link>);
 
         })}
