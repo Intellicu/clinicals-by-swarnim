@@ -4,13 +4,13 @@ import { createPageUrl } from "@/utils";
 import { Sparkles, Pill, GitBranch, Baby, Layers, Home } from "lucide-react";
 
 const NAV_ITEMS = [
-  { label: "Hub", icon: Home, page: "Hub" },
-  { label: "AI Prescriber", icon: Sparkles, page: "AIPrescriber" },
-  { label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing" },
-  { label: "Pathways", icon: GitBranch, page: "ClinicalSupport" },
-  { label: "Growth", icon: Baby, page: "Anthropometry" },
-  { label: "Research", icon: Layers, page: "ResearchHub" },
-];
+{ label: "Hub", icon: Home, page: "Hub" },
+{ label: "AI Prescriber", icon: Sparkles, page: "AIPrescriber" },
+{ label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing" },
+{ label: "Pathways", icon: GitBranch, page: "ClinicalSupport" },
+{ label: "Growth", icon: Baby, page: "Anthropometry" },
+{ label: "Research", icon: Layers, page: "ResearchHub" }];
+
 
 export default function StickyToolNav() {
   const location = useLocation();
@@ -24,19 +24,19 @@ export default function StickyToolNav() {
           return (
             <Link key={page} to={url}>
               <button
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                  isActive
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-                }`}
-              >
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap hidden ${
+                isActive ?
+                "bg-blue-600 text-white shadow-sm" :
+                "text-slate-600 hover:bg-blue-50 hover:text-blue-700"}`
+                }>
+                
                 <Icon className="w-3.5 h-3.5" />
                 {label}
               </button>
-            </Link>
-          );
+            </Link>);
+
         })}
       </div>
-    </div>
-  );
+    </div>);
+
 }
