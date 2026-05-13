@@ -8,6 +8,7 @@ import {
   CheckCircle, TestTube, BookOpen, Users, Microscope, Beaker,
   Baby, Layers, GraduationCap, Search, X
 } from "lucide-react";
+import PathwayModuleList from "./PathwayModuleList";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CANONICAL KNOWLEDGE ARCHITECTURE — 5 PILLARS
@@ -28,6 +29,19 @@ const PILLARS = [
         color: "from-pink-600 to-rose-600",
         groupPage: "GlomerularDiseases",
         groupParams: "",
+        moduleCategory: "Glomerular Diseases",
+        moduleItems: [
+          { label: "Nephrotic Syndrome (MCD, FSGS, MN)", titleKeyword: "nephrotic syndrome" },
+          { label: "IgA Nephropathy / IgA Vasculitis", titleKeyword: "iga" },
+          { label: "Lupus Nephritis (ISN/RPS I-VI)", titleKeyword: "lupus nephritis" },
+          { label: "ANCA Vasculitis (GPA / MPA)", titleKeyword: "anca" },
+          { label: "Anti-GBM / Goodpasture", titleKeyword: "anti-gbm" },
+          { label: "HUS / TMA / aHUS", titleKeyword: "hus" },
+          { label: "C3 Glomerulopathy (C3GN / DDD)", titleKeyword: "c3 glomerulopathy" },
+          { label: "PSGN / Infection-related GN", titleKeyword: "psgn" },
+          { label: "Congenital Nephrotic Syndrome", titleKeyword: "congenital nephrotic" },
+          { label: "Alport Syndrome / COL4 Nephropathy", titleKeyword: "alport" },
+        ],
         items: [
           { label: "MCD – Minimal Change Disease", page: "GlomerularDiseases", params: "", validated: true },
           { label: "FSGS – Focal Segmental Glomerulosclerosis", page: "GlomerularDiseases", params: "", validated: true },
@@ -50,6 +64,15 @@ const PILLARS = [
         color: "from-red-600 to-rose-600",
         groupPage: "ClinicalSupport",
         groupParams: "?tab=pathways&scenario=aki-prifle",
+        moduleCategory: "AKI",
+        moduleItems: [
+          { label: "KDIGO AKI staging (pRIFLE / KDIGO)", titleKeyword: "kdigo aki staging" },
+          { label: "Pre-renal vs intrinsic vs post-renal", titleKeyword: "classification" },
+          { label: "AKI in neonates", titleKeyword: "neonates" },
+          { label: "Nephrotoxin stewardship", titleKeyword: "nephrotoxin" },
+          { label: "AKI-to-CKD transition monitoring", titleKeyword: "aki-to-ckd" },
+          { label: "Fluid management in AKI", titleKeyword: "fluid management" },
+        ],
         items: [
           { label: "KDIGO AKI Staging (pRIFLE / KDIGO)", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-prifle", validated: true },
           { label: "Pre-renal vs Intrinsic vs Post-renal", page: "ClinicalApproaches", params: "", validated: true },
@@ -66,6 +89,16 @@ const PILLARS = [
         color: "from-blue-600 to-indigo-600",
         groupPage: "ClinicalSupport",
         groupParams: "?tab=pathways&scenario=ckd-comprehensive",
+        moduleCategory: "CKD",
+        moduleItems: [
+          { label: "CKD staging (KDIGO G1-G5)", titleKeyword: "ckd staging" },
+          { label: "CKD-MBD (mineral bone disease)", titleKeyword: "ckd-mbd" },
+          { label: "Anemia of CKD (EPO, iron)", titleKeyword: "anaemia of ckd" },
+          { label: "Growth failure in CKD", titleKeyword: "growth failure" },
+          { label: "Nutrition in CKD", titleKeyword: "renal nutrition" },
+          { label: "Cardiovascular risk in CKD", titleKeyword: "cardiovascular risk" },
+          { label: "CKD progression monitoring", titleKeyword: "ckd progression" },
+        ],
         items: [
           { label: "CKD Staging (KDIGO G1–G5)", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-staging", validated: true },
           { label: "CKD-MBD – Mineral Bone Disease", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-mbd", validated: true },
@@ -100,6 +133,15 @@ const PILLARS = [
         color: "from-purple-600 to-violet-600",
         groupPage: "ClinicalApproaches",
         groupParams: "",
+        moduleCategory: "Metabolic & Genetic",
+        moduleItems: [
+          { label: "Cystinosis", titleKeyword: "cystinosis" },
+          { label: "Fabry disease", titleKeyword: "fabry" },
+          { label: "Primary hyperoxaluria", titleKeyword: "primary hyperoxaluria" },
+          { label: "Polycystic kidney disease (ARPKD/ADPKD)", titleKeyword: "polycystic" },
+          { label: "Nephronophthisis / ciliopathies", titleKeyword: "nephronophthisis" },
+          { label: "Genetic nephrotic syndromes", titleKeyword: "genetic nephrotic" },
+        ],
         items: [
           { label: "Cystinosis", page: "ClinicalApproaches", params: "", validated: true },
           { label: "Fabry Disease", page: "GeneticReportAnalyzer", params: "", validated: true },
@@ -369,6 +411,8 @@ function GroupCard({ group, searchActive }) {
   const isOpen = searchActive || open;
   const Icon = group.icon;
   const groupHref = `/${group.groupPage}${group.groupParams}`;
+  const hasModuleItems = !!(group.moduleItems && group.moduleCategory);
+  const displayCount = hasModuleItems ? group.moduleItems.length : group.items.length;
 
   return (
     <Card className="border-slate-200 shadow-sm overflow-hidden">
@@ -380,7 +424,7 @@ function GroupCard({ group, searchActive }) {
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-sm text-slate-800 group-hover:text-blue-700 transition-colors">{group.group}</p>
-              <p className="text-xs text-slate-500">{group.items.length} items</p>
+              <p className="text-xs text-slate-500">{displayCount} items{hasModuleItems ? " · linked modules" : ""}</p>
             </div>
           </a>
           <button
@@ -394,21 +438,28 @@ function GroupCard({ group, searchActive }) {
 
         {isOpen && (
           <div className="px-4 pb-4 border-t border-slate-100 pt-3 space-y-1">
-            {group.items.map((item, i) => {
-              const href = `/${item.page}${item.params}`;
-              return (
-                <a key={i} href={href}>
-                  <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-blue-50 transition-colors group cursor-pointer">
-                    <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0" />
-                    <p className="text-xs text-slate-700 group-hover:text-blue-700 transition-colors flex-1">{item.label}</p>
-                    {item.validated
-                      ? <CheckCircle className="w-3 h-3 text-green-400 shrink-0" />
-                      : <Badge className="text-xs bg-slate-100 text-slate-500 px-1 py-0">Soon</Badge>
-                    }
-                  </div>
-                </a>
-              );
-            })}
+            {hasModuleItems ? (
+              <PathwayModuleList
+                category={group.moduleCategory}
+                items={group.moduleItems}
+              />
+            ) : (
+              group.items.map((item, i) => {
+                const href = `/${item.page}${item.params}`;
+                return (
+                  <a key={i} href={href}>
+                    <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-blue-50 transition-colors group cursor-pointer">
+                      <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0" />
+                      <p className="text-xs text-slate-700 group-hover:text-blue-700 transition-colors flex-1">{item.label}</p>
+                      {item.validated
+                        ? <CheckCircle className="w-3 h-3 text-green-400 shrink-0" />
+                        : <Badge className="text-xs bg-slate-100 text-slate-500 px-1 py-0">Soon</Badge>
+                      }
+                    </div>
+                  </a>
+                );
+              })
+            )}
             <a href={groupHref}>
               <Button size="sm" variant="outline" className="mt-2 text-xs border-blue-200 text-blue-700 hover:bg-blue-50 w-full">
                 <ExternalLink className="w-3 h-3 mr-1" /> Open Full Module
