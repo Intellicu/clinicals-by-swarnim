@@ -9,26 +9,40 @@ import TeachingModuleViewer from "./TeachingModuleViewer";
 /**
  * PathwayModuleList
  * Props:
- *   category: string — TeachingModule category to query
- *   items: Array<{ label: string, titleKeyword: string }>
+ *   category: string — default TeachingModule category to query
+ *   items: Array<{ label: string, titleKeyword: string, category?: string }>
  *     titleKeyword: substring to match in TeachingModule.title (case-insensitive)
+ *     category: optional per-item category override
  */
 export default function PathwayModuleList({ category, items }) {
   const [viewingId, setViewingId] = useState(null);
 
-  const { data: modules = [], isLoading } = useQuery({
+  // Collect all extra categories from per-item overrides
+  const extraCategories = [...new Set(items.map(i => i.category).filter(c => c && c !== category))];
+
+  const { data: primaryModules = [], isLoading: loading1 } = useQuery({
     queryKey: ["TeachingModule", "category", category],
     queryFn: () => base44.entities.TeachingModule.filter({ "data.category": category }),
     staleTime: 5 * 60 * 1000,
   });
 
-  // Build a lookup: keyword → module id
-  function findModule(keyword) {
-    const kw = keyword.toLowerCase();
-    return modules.find(m => {
-      const title = (m.data?.title || "").toLowerCase();
-      return title.includes(kw);
-    });
+  // Fetch extra category if present (at most one extra for now)
+  const extraCat = extraCategories[0] || null;
+  const { data: extraModules = [], isLoading: loading2 } = useQuery({
+    queryKey: ["TeachingModule", "category", extraCat],
+    queryFn: () => extraCat ? base44.entities.TeachingModule.filter({ "data.category": extraCat }) : Promise.resolve([]),
+    enabled: !!extraCat,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const allModules = [...primaryModules, ...extraModules];
+  const isLoading = loading1 || loading2;
+
+  function findModule(item) {
+    const kw = item.titleKeyword.toLowerCase();
+    const cat = item.category || category;
+    const pool = allModules.filter(m => (m.data?.category || "") === cat);
+    return pool.find(m => (m.data?.title || "").toLowerCase().includes(kw));
   }
 
   if (viewingId) {
@@ -43,7 +57,7 @@ export default function PathwayModuleList({ category, items }) {
         </div>
       )}
       {items.map((item, i) => {
-        const mod = findModule(item.titleKeyword);
+        const mod = findModule(item);
         const hasModule = !!mod;
         return (
           <div
