@@ -45,6 +45,7 @@ const QUICK_TOOLS = [
   { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-teal-700", page: "NutritionHub" },
   { name: "Rheumatology", icon: Stethoscope, color: "bg-violet-600", page: "PediatricRheumatology" },
   { name: "CAKUT & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
+  { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
   { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub" },
   { name: "Tubular Lab", icon: Beaker, color: "bg-slate-700", page: "UrologyNephrologyHub" },
 ];
@@ -148,6 +149,19 @@ const KNOWLEDGE_SECTIONS = [
       { name: "Uroflow AI Analyzer", page: "UrologyNephrologyHub", icon: Activity },
       { name: "UTI Master Module", page: "UrologyNephrologyHub", icon: Microscope },
       { name: "Tubular Disorder Lab", page: "UrologyNephrologyHub", icon: TestTube },
+    ]
+  },
+  {
+    title: "Rare Disease Module",
+    icon: Dna,
+    color: "border-violet-200 bg-violet-50",
+    iconColor: "text-violet-600",
+    items: [
+      { name: "Rapid Screening Tool", page: "RareDiseaseModule", icon: Dna },
+      { name: "Disease Clusters", page: "RareDiseaseModule", icon: Layers },
+      { name: "aHUS · Cystinosis · Fabry", page: "RareDiseaseModule", icon: FlaskConical },
+      { name: "NPRD & CoE Network", page: "RareDiseaseModule", icon: Shield },
+      { name: "AI Lab Rare Analyzers", page: "RareDiseaseModule", icon: Brain },
     ]
   },
   {
