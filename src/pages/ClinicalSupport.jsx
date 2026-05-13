@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   ArrowLeft,
   Brain,
+  Search,
   AlertTriangle,
   CheckCircle2,
   Circle,
@@ -100,6 +101,9 @@ import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
 import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
 import GlomerularDiseasesPathway from '../components/pathways/GlomerularDiseasesPathway';
+import MetabolicGeneticPathways from '../components/pathways/MetabolicGeneticPathways';
+import TubularDisorderPathways from '../components/pathways/TubularDisorderPathways';
+import HypertensionPathways from '../components/pathways/HypertensionPathways';
 
 
 // Symptom templates based on chief complaints
@@ -615,6 +619,144 @@ const clinicalScenarios = [
   priority: "warning",
   description: "Calcium correction, vitamin D, causes and IV calcium protocol",
   icon: Zap,
+  hasFullPathway: true
+},
+// ── Metabolic & Genetic ──
+{
+  id: "cystinosis",
+  title: "Cystinosis",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "Lysosomal cystine storage, Fanconi syndrome, cysteamine therapy — ISPN/ERKNet + India access notes",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "fabry",
+  title: "Fabry Disease",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "Alpha-galactosidase A deficiency, ERT, migalastat — ERKNet + India access",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "primary-hyperoxaluria",
+  title: "Primary Hyperoxaluria (Lumasiran)",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "PH1/PH2/PH3, lumasiran (RNAi), pre-emptive liver-kidney transplant — OHF 2023 + India",
+  icon: TestTube,
+  hasFullPathway: true
+},
+{
+  id: "arpkd-adpkd",
+  title: "ARPKD / ADPKD",
+  category: "Metabolic & Genetic",
+  priority: "secondary",
+  description: "PKHD1 / PKD1+PKD2, tolvaptan in ADPKD, liver complications — KDIGO + ERKNet",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "nephronophthisis",
+  title: "Nephronophthisis & Ciliopathies (BBS, Joubert)",
+  category: "Metabolic & Genetic",
+  priority: "secondary",
+  description: "NPHP genes, molar tooth sign, Bardet-Biedl, setmelanotide — CilioPathy Alliance + ISPN",
+  icon: Brain,
+  hasFullPathway: true
+},
+{
+  id: "genetic-nephrotic",
+  title: "Genetic Nephrotic Syndromes",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "NPHS1/NPHS2/WT1/COQ mutations, WES indication, transplant outcomes — ISPN 2023 + India WES",
+  icon: Microscope,
+  hasFullPathway: true
+},
+// ── Tubular Disorders ──
+{
+  id: "distal-rta",
+  title: "Distal RTA (Type 1) — ERKNet/ESPN 2021",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "ATP6V1B1/ATP6V0A4 mutations, nephrocalcinosis, potassium citrate therapy",
+  icon: TestTube,
+  hasFullPathway: true
+},
+{
+  id: "proximal-rta",
+  title: "Proximal RTA (Type 2) & Fanconi Syndrome",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "SLC4A4, high-dose alkali, phosphopenic rickets, cystinosis, Lowe syndrome",
+  icon: TestTube,
+  hasFullPathway: true
+},
+{
+  id: "bartter",
+  title: "Bartter Syndrome Types 1–5",
+  category: "Tubular Disorders",
+  priority: "warning",
+  description: "TAL salt wasting, indomethacin, polyhydramnios, deafness (Type 4) — ERKNet/ESPN",
+  icon: TestTube,
+  hasFullPathway: true
+},
+{
+  id: "gitelman",
+  title: "Gitelman Syndrome",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "NCCT/SLC12A3, hypomagnesemia + hypokalemia, amiloride, magnesium replacement — ERKNet/ESPN 2022",
+  icon: TestTube,
+  hasFullPathway: true
+},
+{
+  id: "ndi",
+  title: "Nephrogenic Diabetes Insipidus",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "AVPR2/AQP2, HCTZ + amiloride + indomethacin triple therapy, neonatal hypernatremia",
+  icon: Droplet,
+  hasFullPathway: true
+},
+// ── Hypertension ──
+{
+  id: "bp-classification",
+  title: "BP Measurement & Classification",
+  category: "Hypertension",
+  priority: "secondary",
+  description: "AAP 2017, Omron HBP-1120 (India recommendation), ABPM, home BP, percentile interpretation",
+  icon: Heart,
+  hasFullPathway: true
+},
+{
+  id: "htn-pres",
+  title: "Hypertensive Emergency & PRES",
+  category: "Hypertension",
+  priority: "danger",
+  description: "IV labetalol/nicardipine protocol, 25% MAP reduction goal, PRES MRI — ISPN/AAP",
+  icon: AlertTriangle,
+  hasFullPathway: true
+},
+{
+  id: "secondary-htn",
+  title: "Secondary Hypertension — Renovascular & Endocrine",
+  category: "Hypertension",
+  priority: "warning",
+  description: "FMD, pheochromocytoma, coarctation, hyperaldosteronism, systematic workup — ISPN",
+  icon: Heart,
+  hasFullPathway: true
+},
+{
+  id: "neonatal-htn",
+  title: "Neonatal Hypertension",
+  category: "Hypertension",
+  priority: "warning",
+  description: "UAC thrombosis, RAS, amlodipine/captopril dosing, 4-limb BP — AAP/ISPN/NeoKidney",
+  icon: Baby,
   hasFullPathway: true
 }];
 
@@ -1306,29 +1448,58 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
     </div>;
 
 
-  const groupedScenarios = {
-    "Emergency": clinicalScenarios.filter((s) => s.priority === "danger"),
-    "Urgent": clinicalScenarios.filter((s) => s.priority === "warning"),
-    "Routine": clinicalScenarios.filter((s) => s.priority === "secondary")
+  const [scenarioSearch, setScenarioSearch] = useState("");
+
+  const CATEGORY_ORDER = ["Metabolic & Genetic", "Tubular Disorders", "Hypertension", "Nephrotic Syndrome", "Acute Kidney Disease", "CKD", "Glomerular Disease", "Electrolytes", "Fluids & Electrolytes", "Transplant", "Infection", "Peritoneal Dialysis", "Hemodialysis", "Developmental Kidney", "Urinary Tract", "Lower Urinary Tract"];
+
+  const filteredScenarios = clinicalScenarios.filter(s =>
+    !scenarioSearch.trim() ||
+    s.title.toLowerCase().includes(scenarioSearch.toLowerCase()) ||
+    s.category.toLowerCase().includes(scenarioSearch.toLowerCase()) ||
+    s.description.toLowerCase().includes(scenarioSearch.toLowerCase())
+  );
+
+  const groupedScenarios = CATEGORY_ORDER.reduce((acc, cat) => {
+    const items = filteredScenarios.filter(s => s.category === cat);
+    if (items.length > 0) acc[cat] = items;
+    return acc;
+  }, {});
+
+  const CATEGORY_COLORS = {
+    "Metabolic & Genetic": "bg-violet-600",
+    "Tubular Disorders": "bg-amber-600",
+    "Hypertension": "bg-red-600",
+    "Nephrotic Syndrome": "bg-purple-600",
+    "Acute Kidney Disease": "bg-red-700",
+    "CKD": "bg-blue-600",
+    "Glomerular Disease": "bg-pink-600",
+    "Electrolytes": "bg-cyan-600",
+    "Fluids & Electrolytes": "bg-sky-600",
+    "Transplant": "bg-green-600",
+    "Infection": "bg-orange-600",
+    "Peritoneal Dialysis": "bg-indigo-600",
+    "Hemodialysis": "bg-indigo-700",
+    "Developmental Kidney": "bg-teal-600",
+    "Urinary Tract": "bg-teal-700",
+    "Lower Urinary Tract": "bg-emerald-600",
   };
 
   const renderScenarioList = () =>
   <div className="space-y-6">
+      {Object.keys(groupedScenarios).length === 0 && (
+        <p className="text-center text-slate-400 py-8">No scenarios match your search</p>
+      )}
       {Object.entries(groupedScenarios).map(([group, scenarios]) =>
     <div key={group}>
-          <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-            <Badge className={
-        group === "Emergency" ? "bg-red-600" :
-        group === "Urgent" ? "bg-amber-600" :
-        "bg-blue-600"
-        }>
+          <h3 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <Badge className={CATEGORY_COLORS[group] || "bg-slate-600"}>
               {group}
             </Badge>
-            <span className="text-slate-600 text-sm">({scenarios.length} scenarios)</span>
+            <span className="text-slate-500 text-xs">({scenarios.length})</span>
           </h3>
           <div className="space-y-3">
       {scenarios.map((scenario) => {
-          const IconComponent = scenario.icon;
+          const ScenarioIcon = scenario.icon;
           const priorityColors = {
             danger: "bg-red-50 border-red-300 hover:bg-red-100 hover:shadow-lg", // Added hover effects
             warning: "bg-amber-50 border-amber-300 hover:bg-amber-100 hover:shadow-lg",
@@ -1357,11 +1528,11 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                     scenario.priority === "warning" ? "bg-amber-200" :
                     "bg-blue-200"}`
                     }>
-                    <IconComponent className={`w-7 h-7 ${ // Increased icon size
-                      scenario.priority === "danger" ? "text-red-700" :
-                      scenario.priority === "warning" ? "text-amber-700" :
-                      "text-blue-700"}`
-                      } />
+                    <ScenarioIcon className={`w-7 h-7 ${
+                     scenario.priority === "danger" ? "text-red-700" :
+                     scenario.priority === "warning" ? "text-amber-700" :
+                     "text-blue-700"}`
+                     } />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-slate-900 mb-1 text-lg">{scenario.title}</h3> {/* Increased font size */}
@@ -1611,6 +1782,21 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         {selectedScenario === "steroid-resistant-ns" && <SteroidResistantNSPathway />}
         {selectedScenario === "ckd-comprehensive" && <ChronicKidneyDiseasePathway />}
         {selectedScenario === "hypocalcemia" && <HypocalcemiaPathway />}
+        {selectedScenario === "cystinosis" && <MetabolicGeneticPathways condition="cystinosis" />}
+        {selectedScenario === "fabry" && <MetabolicGeneticPathways condition="fabry" />}
+        {selectedScenario === "primary-hyperoxaluria" && <MetabolicGeneticPathways condition="hyperoxaluria" />}
+        {selectedScenario === "arpkd-adpkd" && <MetabolicGeneticPathways condition="arpkd_adpkd" />}
+        {selectedScenario === "nephronophthisis" && <MetabolicGeneticPathways condition="nephronophthisis" />}
+        {selectedScenario === "genetic-nephrotic" && <MetabolicGeneticPathways condition="genetic_nephrotic" />}
+        {selectedScenario === "distal-rta" && <TubularDisorderPathways condition="distal_rta" />}
+        {selectedScenario === "proximal-rta" && <TubularDisorderPathways condition="proximal_rta" />}
+        {selectedScenario === "bartter" && <TubularDisorderPathways condition="bartter" />}
+        {selectedScenario === "gitelman" && <TubularDisorderPathways condition="gitelman" />}
+        {selectedScenario === "ndi" && <TubularDisorderPathways condition="ndi" />}
+        {selectedScenario === "bp-classification" && <HypertensionPathways condition="bp_classification" />}
+        {selectedScenario === "htn-pres" && <HypertensionPathways condition="htn_emergency" />}
+        {selectedScenario === "secondary-htn" && <HypertensionPathways condition="secondary_htn" />}
+        {selectedScenario === "neonatal-htn" && <HypertensionPathways condition="neonatal_htn" />}
         {scenario.hasFullPathway && ![
         "nephrotic-syndrome",
         "iga-nephropathy",
@@ -1774,9 +1960,18 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               <CardHeader className="bg-slate-50 border-b">
                 <CardTitle className="flex items-center gap-2">
                   <Stethoscope className="w-6 h-6 text-blue-600" />
-                  Clinical Scenarios Library - {clinicalScenarios.length} Pathways
+                  Clinical Scenarios Library — {clinicalScenarios.length} Pathways
                 </CardTitle>
-                <p className="text-sm text-slate-600 mt-1">Select a scenario to view evidence-based management pathways</p>
+                <p className="text-sm text-slate-600 mt-1">Grouped by category · Select a scenario to view evidence-based pathways</p>
+                <div className="relative mt-3">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <input
+                    value={scenarioSearch}
+                    onChange={e => setScenarioSearch(e.target.value)}
+                    placeholder="Search scenarios, categories, keywords…"
+                    className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                  />
+                </div>
               </CardHeader>
               <CardContent className="p-6">
                 {renderScenarioList()}

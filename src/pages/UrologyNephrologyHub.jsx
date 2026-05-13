@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -45,6 +45,7 @@ const SECTIONS = [
 
 export default function UrologyNephrologyHub() {
   const [activeSection, setActiveSection] = useState("nephrology");
+  const [sectionHistory, setSectionHistory] = useState([]);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -87,18 +88,37 @@ export default function UrologyNephrologyHub() {
           </div>
         </div>
 
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-          <Link to="/" className="hover:text-blue-600">Hub</Link>
-          <span>›</span>
-          <span className="text-slate-700 font-semibold">{currentSection.label}</span>
+        {/* Breadcrumb + Back */}
+        <div className="flex items-center gap-2">
+          {sectionHistory.length > 0 ? (
+            <button
+              onClick={() => {
+                const prev = [...sectionHistory];
+                const last = prev.pop();
+                setSectionHistory(prev);
+                setActiveSection(last);
+              }}
+              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
+            >
+              ← Back to {SECTIONS.find(s => s.id === sectionHistory[sectionHistory.length - 1])?.label || "Previous"}
+            </button>
+          ) : (
+            <Link to="/" className="text-xs text-slate-500 hover:text-blue-600 px-2 py-1">← Hub</Link>
+          )}
+          <span className="text-slate-400 text-xs">›</span>
+          <span className="text-xs text-slate-700 font-semibold">{currentSection.label}</span>
         </div>
 
         {/* Sticky Section Navigator */}
         <HubSectionNav
           sections={SECTIONS}
           activeId={activeSection}
-          onSelect={setActiveSection}
+          onSelect={(id) => {
+            if (id !== activeSection) {
+              setSectionHistory(prev => [...prev, activeSection]);
+            }
+            setActiveSection(id);
+          }}
         />
 
         {/* Content */}

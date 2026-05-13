@@ -28,13 +28,6 @@ const PATHWAYS = [
     scenario: "childhood-nephrotic"
   },
   {
-    name: "Hypertension in CKD",
-    tag: "Hypertension",
-    color: "bg-orange-100 text-orange-800",
-    keys: ["2017 AAP BP classification", "Target <50th percentile in CKD", "ACEi/ARB first-line", "Ambulatory BP monitoring (ABPM)"],
-    scenario: "htn-diagnosis"
-  },
-  {
     name: "Proteinuria Workup",
     tag: "Diagnostic",
     color: "bg-teal-100 text-teal-800",
@@ -92,7 +85,7 @@ const PATHWAYS = [
   },
 ];
 
-const TAGS = ["All", "Emergency", "Chronic", "Nephrotic", "Hypertension", "Diagnostic", "Electrolyte", "Tubular", "Urological", "Transplant", "Dialysis"];
+const TAGS = ["All", "Emergency", "Chronic", "Nephrotic", "Diagnostic", "Electrolyte", "Tubular", "Urological", "Transplant", "Dialysis"];
 
 export default function HubNephrologyPathways() {
   const navigate = useNavigate();
