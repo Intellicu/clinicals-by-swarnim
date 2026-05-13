@@ -14,9 +14,11 @@ import MonitoringSurveillance from "../components/rare-disease/MonitoringSurveil
 import AILabRareAnalyzers from "../components/rare-disease/AILabRareAnalyzers";
 import RegistryResearch from "../components/rare-disease/RegistryResearch";
 import FamilyEducation from "../components/rare-disease/FamilyEducation";
+import OtherDiseaseScreeningTools from "../components/rare-disease/OtherDiseaseScreeningTools";
 
 const TABS = [
   { value: "screening",   label: "Rapid Screening",       icon: Search,       short: "Screen" },
+  { value: "disease_screens", label: "Disease Screens",   icon: FlaskConical, short: "Screens" },
   { value: "clusters",    label: "Disease Clusters",       icon: Dna,          short: "Clusters" },
   { value: "symptoms",    label: "Symptom Approach",       icon: AlertTriangle, short: "Symptoms" },
   { value: "pathways",    label: "Pathways",               icon: BookOpen,     short: "Pathways" },
@@ -52,13 +54,14 @@ export default function RareDiseaseModule() {
                   </div>
                   <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-white">Rare Disease Module</h1>
-                    <p className="text-violet-200 text-sm">Pediatric Rare Kidney & Genetic Disorders</p>
+                    <p className="text-violet-200 text-sm">Rare Disease Module by Swarnim · Pediatric Rare Kidney & Genetic Disorders</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
                   <Badge className="bg-white/20 text-xs">aHUS · Cystinosis · Fabry · ARPKD</Badge>
                   <Badge className="bg-white/20 text-xs">Alport · NPHP · PH1 · Genetic NS</Badge>
                   <Badge className="bg-green-400/80 text-xs">NPRD Guidelines 2024</Badge>
+                  <Badge className="bg-white/20 text-xs">⚠️ Learning Tool · Clinician Discretion Advised</Badge>
                   {isAdmin && <Badge className="bg-amber-400/80 text-xs">Admin Mode</Badge>}
                 </div>
               </div>
@@ -71,7 +74,7 @@ export default function RareDiseaseModule() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Mobile: 2-row scrollable */}
           <div className="overflow-x-auto pb-1 mb-4">
-            <TabsList className="inline-flex h-auto gap-1 bg-white border border-violet-200 rounded-xl p-1 shadow-sm min-w-full md:grid md:grid-cols-10">
+            <TabsList className="inline-flex h-auto gap-1 bg-white border border-violet-200 rounded-xl p-1 shadow-sm min-w-full md:grid md:grid-cols-11">
               {TABS.map(t => {
                 const Icon = t.icon;
                 return (
@@ -90,6 +93,7 @@ export default function RareDiseaseModule() {
           </div>
 
           <TabsContent value="screening"><RapidScreening isAdmin={isAdmin} /></TabsContent>
+          <TabsContent value="disease_screens"><OtherDiseaseScreeningTools isAdmin={isAdmin} /></TabsContent>
           <TabsContent value="clusters"><DiseaseClusters isAdmin={isAdmin} /></TabsContent>
           <TabsContent value="symptoms"><SymptomBasedApproach isAdmin={isAdmin} /></TabsContent>
           <TabsContent value="pathways"><RareDiseasePathways isAdmin={isAdmin} /></TabsContent>

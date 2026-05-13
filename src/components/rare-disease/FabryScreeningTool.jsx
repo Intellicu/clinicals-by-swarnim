@@ -419,7 +419,7 @@ export default function FabryScreeningTool({ isAdmin }) {
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-xl">💜</div>
           <div>
             <h2 className="text-lg font-bold">Fabry Disease Screening Tool</h2>
-            <p className="text-violet-200 text-xs">Pediatric Nephrology · Rapid OPD Workflow</p>
+            <p className="text-violet-200 text-xs">Rare Disease Module by Swarnim · Pediatric Nephrology · Rapid OPD Workflow</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
@@ -478,21 +478,41 @@ export default function FabryScreeningTool({ isAdmin }) {
         </Card>
       ))}
 
-      {/* Sticky Calculate Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-xl">
-        <div className="max-w-2xl mx-auto flex gap-3">
+      {/* Non-sticky inline Calculate Button (always visible) */}
+      <div className="bg-white border-2 border-violet-300 rounded-2xl p-4 shadow-md">
+        <div className="flex gap-3 mb-3">
           <Button
             onClick={handleCalculate}
             className="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm h-12 shadow-lg"
             disabled={checkedCount === 0}
           >
             <Zap className="w-4 h-4 mr-2" />
-            Calculate Fabry Risk {checkedCount > 0 && `· ${checkedCount} features · Score ${total}`}
+            {checkedCount === 0 ? "Select features above to calculate" : `Calculate Fabry Risk · ${checkedCount} features · Score ${total}`}
           </Button>
-          <Button variant="outline" onClick={handleReset} className="px-4 h-12">
+          <Button variant="outline" onClick={handleReset} className="px-4 h-12 border-violet-300">
             <RotateCcw className="w-4 h-4" />
           </Button>
         </div>
+        <Alert className="bg-amber-50 border-amber-200 py-2">
+          <AlertDescription className="text-xs text-amber-800">
+            ⚠️ <strong>Learning Tool Only.</strong> This is an AI-assisted clinical decision support tool for educational purposes. It is <strong>not a diagnostic tool</strong>. All clinical decisions must be made by a qualified clinician. Clinician discretion is advised. <strong>Rare Disease Module by Swarnim.</strong>
+          </AlertDescription>
+        </Alert>
+      </div>
+
+      {/* Sticky floating button for mobile scroll convenience */}
+      <div className="fixed bottom-20 right-4 z-50 lg:hidden">
+        <Button
+          onClick={handleCalculate}
+          disabled={checkedCount === 0}
+          className="bg-violet-600 hover:bg-violet-700 text-white rounded-full h-14 w-14 shadow-xl p-0 flex items-center justify-center"
+          title={`Calculate Fabry Risk (Score: ${total})`}
+        >
+          <Zap className="w-6 h-6" />
+        </Button>
+        {checkedCount > 0 && (
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">{total}</div>
+        )}
       </div>
 
       {/* ─── RESULTS ──────────────────────────────────────────────────────────── */}
