@@ -60,7 +60,7 @@ const KNOWLEDGE_SECTIONS = [
       { name: "Nephrology Pathways (50+)", page: "ClinicalSupport", icon: GitBranch },
       { name: "AKI & Dialysis", page: "RRTAssistant", icon: Activity },
       { name: "CKD Management", page: "CKDStager", icon: TrendingUp },
-      { name: "Tubular Disorders", page: "ClinicalApproaches", icon: TestTube },
+      { name: "Tubular Disorders", page: "UrologyNephrologyHub", icon: TestTube },
       { name: "Hypertension", page: "BPPercentiles", icon: Heart },
     ]
   },
