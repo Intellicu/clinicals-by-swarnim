@@ -13,8 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ArrowLeft, Search, Pill, AlertTriangle, Info, Calculator, Shield,
-  Printer, MessageCircle, Plus, Trash2, CheckCircle, Activity, Beaker, X
+  Printer, MessageCircle, Plus, Trash2, CheckCircle, Activity, Beaker, X,
+  FlaskConical, BookOpen, Syringe
 } from "lucide-react";
+import DrugDetailCard from "../components/drugs/DrugDetailCard";
+import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
+import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
 import StickyToolNav from "../components/StickyToolNav";
@@ -346,11 +350,14 @@ CliniCals by Swarnim | Verify all doses independently`;
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-4">
-            <TabsTrigger value="search">🔍 Drug Search</TabsTrigger>
-            <TabsTrigger value="calculator">💊 Dose Calculator</TabsTrigger>
-            <TabsTrigger value="interactions">⚡ Interactions</TabsTrigger>
-            <TabsTrigger value="prescription">📋 Prescription {rxDrugs.length > 0 && `(${rxDrugs.length})`}</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 mb-4 h-auto gap-1">
+            <TabsTrigger value="search" className="text-xs">🔍 Search</TabsTrigger>
+            <TabsTrigger value="calculator" className="text-xs">💊 Dose Calc</TabsTrigger>
+            <TabsTrigger value="interactions" className="text-xs">⚡ Interactions</TabsTrigger>
+            <TabsTrigger value="prescription" className="text-xs">📋 Rx {rxDrugs.length > 0 && `(${rxDrugs.length})`}</TabsTrigger>
+            <TabsTrigger value="steroids" className="text-xs">🔄 Steroids</TabsTrigger>
+            <TabsTrigger value="eculizumab" className="text-xs">🛡️ Eculizumab</TabsTrigger>
+            <TabsTrigger value="ckd-dosing" className="text-xs">🫘 CKD Dosing</TabsTrigger>
           </TabsList>
 
           {/* ── SEARCH TAB ─────────────────────────────────────── */}
@@ -605,6 +612,9 @@ CliniCals by Swarnim | Verify all doses independently`;
                       </CardContent>
                     </Card>
                   )}
+
+                  {/* Practical guidance + quick bedside card */}
+                  <DrugDetailCard drug={focusDrug} weight={parseFloat(weight)} egfr={parseFloat(effectiveEgfr)} />
                 </div>
               );
             })()}
@@ -784,6 +794,93 @@ CliniCals by Swarnim | Verify all doses independently`;
                 </Card>
               </>
             )}
+          </TabsContent>
+          {/* ── STEROID TAB ───────────────────────────────── */}
+          <TabsContent value="steroids">
+            <SteroidEquivalenceEngine />
+          </TabsContent>
+
+          {/* ── ECULIZUMAB TAB ────────────────────────────── */}
+          <TabsContent value="eculizumab">
+            <EculizumabGuidance />
+          </TabsContent>
+
+          {/* ── CKD DOSING TAB ────────────────────────────── */}
+          <TabsContent value="ckd-dosing" className="space-y-4">
+            <Card className="bg-gradient-to-r from-indigo-600 to-blue-700 text-white border-0">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-8 h-8" />
+                  <div>
+                    <h2 className="font-bold text-lg">CKD & Dialysis Dosing Reference</h2>
+                    <p className="text-indigo-100 text-sm">Dose adjustments by eGFR · HD · PD · CRRT notes</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-slate-200">
+              <CardHeader className="bg-slate-50 border-b py-3 px-5">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-indigo-600" /> CKD Stage Dosing Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100">
+                        <th className="text-left px-3 py-2 font-semibold">Drug</th>
+                        <th className="text-center px-2 py-2 font-semibold">eGFR 30–60</th>
+                        <th className="text-center px-2 py-2 font-semibold">eGFR 15–30</th>
+                        <th className="text-center px-2 py-2 font-semibold">eGFR &lt;15 / ESRD</th>
+                        <th className="text-center px-2 py-2 font-semibold">HD</th>
+                        <th className="text-center px-2 py-2 font-semibold">PD</th>
+                        <th className="text-center px-2 py-2 font-semibold">CRRT</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { drug: "Enalapril/Ramipril", g30_60: "50–75% dose, monitor K+", g15_30: "50% dose, monitor weekly K+", esrd: "25–50%, HD supplemental", hd: "Supplement post-HD", pd: "No extra", crrt: "Normal dose" },
+                        { drug: "Furosemide", g30_60: "Higher doses needed (40–80 mg)", g15_30: "80–160 mg, may be ineffective", esrd: "Usually ineffective", hd: "Not removed by HD", pd: "Residual renal support", crrt: "Adjunct" },
+                        { drug: "Amlodipine", g30_60: "No adjustment", g15_30: "No adjustment", esrd: "No adjustment", hd: "Not dialysed", pd: "No adjustment", crrt: "No adjustment" },
+                        { drug: "Metoprolol", g30_60: "No adjustment", g15_30: "No adjustment", esrd: "No adjustment", hd: "Not significantly removed", pd: "No adjustment", crrt: "No adjustment" },
+                        { drug: "Tacrolimus", g30_60: "TDM-guided", g15_30: "TDM-guided", esrd: "TDM-guided", hd: "Not dialysed — TDM", pd: "Not removed", crrt: "Not removed" },
+                        { drug: "Mycophenolate", g30_60: "No adjustment", g15_30: "No adjustment (MPAG accumulates — monitor)", esrd: "Monitor toxicity", hd: "Partial MPAG removal", pd: "No adjustment", crrt: "Standard dose" },
+                        { drug: "Prednisolone", g30_60: "No adjustment", g15_30: "No adjustment", esrd: "No adjustment", hd: "Not dialysed", pd: "Not removed", crrt: "Standard dose" },
+                        { drug: "Cotrimoxazole", g30_60: "75% dose", g15_30: "50% dose", esrd: "Avoid if possible", hd: "Supplement post-HD", pd: "Reduce 50%", crrt: "50–75% dose" },
+                        { drug: "Acyclovir", g30_60: "Reduce dose 50%", g15_30: "Reduce 75%", esrd: "5 mg/kg per 24h", hd: "Supplement post-HD", pd: "Reduce 50%", crrt: "Monitor" },
+                        { drug: "Vancomycin", g30_60: "Extend interval, TDM", g15_30: "TDM-guided", esrd: "Single dose, TDM", hd: "Supplement post-HD (TDM)", pd: "IP or systemic — TDM", crrt: "Continuous infusion, TDM" },
+                        { drug: "Gentamicin", g30_60: "Extended interval (q48h)", g15_30: "q72h, TDM", esrd: "Single dose, TDM only", hd: "Supplement post-HD", pd: "Avoid or TDM", crrt: "Continuous, TDM" },
+                        { drug: "Metformin", g30_60: "Halve dose, review", g15_30: "STOP", esrd: "CONTRAINDICATED", hd: "Contraindicated", pd: "Contraindicated", crrt: "Contraindicated" },
+                        { drug: "Cyclophosphamide IV", g30_60: "Full dose, monitor", g15_30: "Reduce 25%", esrd: "Reduce 50%", hd: "Supplement post-HD", pd: "Reduce 25%", crrt: "Reduce 25%" },
+                        { drug: "Rituximab", g30_60: "Standard dose", g15_30: "Standard dose", esrd: "Standard dose (HD risk — infection)", hd: "Not dialysed", pd: "Not removed", crrt: "Standard" },
+                        { drug: "Heparin (CRRT)", g30_60: "Standard", g15_30: "Standard", esrd: "Standard", hd: "Standard", pd: "N/A", crrt: "UFH 5–20 U/kg/hr or regional citrate" },
+                      ].map((row, i) => (
+                        <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                          <td className="px-3 py-2 font-semibold text-slate-900">{row.drug}</td>
+                          <td className="px-2 py-2 text-center text-slate-700">{row.g30_60}</td>
+                          <td className="px-2 py-2 text-center text-amber-700">{row.g15_30}</td>
+                          <td className="px-2 py-2 text-center text-red-700">{row.esrd}</td>
+                          <td className="px-2 py-2 text-center text-indigo-700">{row.hd}</td>
+                          <td className="px-2 py-2 text-center text-purple-700">{row.pd}</td>
+                          <td className="px-2 py-2 text-center text-blue-700">{row.crrt}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Alert className="bg-amber-50 border-amber-300">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <AlertDescription className="text-xs text-amber-800">
+                <strong>CKD Dosing Principles:</strong> All doses should be verified with current renal dosing references (Renal Drug Database, KDIGO, BNFc).
+                Specific patient factors (residual renal function, dialysis efficiency, protein binding) must be considered.
+                TDM = Therapeutic Drug Monitoring. Consult clinical pharmacist for complex cases.
+              </AlertDescription>
+            </Alert>
           </TabsContent>
         </Tabs>
       </div>
