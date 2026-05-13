@@ -15,6 +15,7 @@ import NotificationEngine from "./components/notifications/NotificationEngine";
 import FloatingHubButton from "./components/FloatingHubButton";
 import { useQueryClient } from "@tanstack/react-query";
 import WorkspaceSidebar from "./components/nav/WorkspaceSidebar";
+import TopQuickAccessBar from "./components/nav/TopQuickAccessBar";
 
 // Tab root URLs — re-tapping the active tab resets to these
 const TAB_ROOTS = {
@@ -236,6 +237,9 @@ export default function Layout({ children, currentPageName }) {
               </Link>
             </div>
           </header>
+
+          {/* Quick Access Bar */}
+          <TopQuickAccessBar />
 
           {/* Page content */}
           <div className="flex-1 overflow-auto">

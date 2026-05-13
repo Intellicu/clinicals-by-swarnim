@@ -51,59 +51,13 @@ import {
 import { toast } from "sonner";
 import HSPNPathway from "../components/pathways/HSPNPathway";
 import EnhancedNephroticPathway from "../components/pathways/EnhancedNephroticPathway";
-import AKIPathway from "../components/pathways/AKIPathway"; // New import
-import HypertensiveEmergencyPathway from "../components/pathways/HypertensiveEmergencyPathway"; // New import
-import HyperkalemiaPathway from "../components/pathways/HyperkalemiaPathway"; // New import
-import UTIPathway from "../components/pathways/UTIPathway"; // New import
-import HUSPathway from "../components/pathways/HUSPathway"; // New import
-import TumorLysisPathway from "../components/pathways/TumorLysisPathway"; // New import
-import LupusNephritisPathway from "../components/pathways/LupusNephritisPathway";
-import PSGNPathway from "../components/pathways/PSGNPathway";
-import HyponatremiaPathway from "../components/pathways/HyponatremiaPathway";
-import HypercalcemiaPathway from "../components/pathways/HypercalcemiaPathway";
-import TransplantRejectionPathway from "../components/pathways/TransplantRejectionPathway";
-import DialysisCatheterInfectionPathway from "../components/pathways/DialysisCatheterInfectionPathway";
-import CKDMBDPathway from "../components/pathways/CKDMBDPathway";
-import RenalStonePathway from "../components/pathways/RenalStonePathway";
-import BladderDysfunctionPathway from "../components/pathways/BladderDysfunctionPathway";
-import RTAPathway from "../components/pathways/RTAPathway";
-import TubularFunctionPathway from "../components/pathways/TubularFunctionPathway";
-import HypokalemiaPathway from "../components/pathways/HypokalemiaPathway";
-import SevereEdemaPathway from "../components/pathways/SevereEdemaPathway";
-import SBPPathway from "../components/pathways/SBPPathway";
-import MetabolicAcidosisPathway from "../components/pathways/MetabolicAcidosisPathway";
-import SteroidResistantNSPathway from "../components/pathways/SteroidResistantNSPathway";
-import ChronicKidneyDiseasePathway from "../components/pathways/ChronicKidneyDiseasePathway";
-import HypocalcemiaPathway from "../components/pathways/HypocalcemiaPathway";
-import ContrastNephropathyPathway from "../components/pathways/ContrastNephropathyPathway";
-import FluidElectrolytePathway from "../components/pathways/FluidElectrolytePathway";
-import AcidBasePathway from "../components/pathways/AcidBasePathway";
-import HypertensionDiagnosisPathway from "../components/pathways/HypertensionDiagnosisPathway";
-import HypertensionTreatmentPathway from "../components/pathways/HypertensionTreatmentPathway";
-import VURPathway from "../components/pathways/VURPathway";
-import HydronephrosisPathway from "../components/pathways/HydronephrosisPathway";
-import NephroticSyndromeChildhoodPathway from "../components/pathways/NephroticSyndromeChildhoodPathway";
-import CongenitalNephroticPathway from "../components/pathways/CongenitalNephroticPathway";
-import IgAVasculitisPathway from "../components/pathways/IgAVasculitisPathway";
-import ANCAbVasculitisPathway from "../components/pathways/ANCAbVasculitisPathway";
-import MembranousNephropathyPathway from "../components/pathways/MembranousNephropathyPathway";
-import PeritonealDialysisPathway from "../components/pathways/PeritonealDialysisPathway";
-import HemodialysisPathway from "../components/pathways/HemodialysisPathway";
-import CKDStagingPathway from "../components/pathways/CKDStagingPathway";
-import CKDAnemiaMBDPathway from "../components/pathways/CKDAnemiaMBDPathway";
-import KidneyTransplantPathway from "../components/pathways/KidneyTransplantPathway";
-import HematuriaPathway from "../components/pathways/HematuriaPathway";
-import ProteinuriaPathway from "../components/pathways/ProteinuriaPathway";
-import CysticKidneyPathway from "../components/pathways/CysticKidneyPathway";
 import { useQuery } from '@tanstack/react-query';
 import BiopsyAnalyzer from '../components/clinical-ai/BiopsyAnalyzer';
 import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
 import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
 import GlomerularDiseasesPathway from '../components/pathways/GlomerularDiseasesPathway';
-import MetabolicGeneticPathways from '../components/pathways/MetabolicGeneticPathways';
-import TubularDisorderPathways from '../components/pathways/TubularDisorderPathways';
-import HypertensionPathways from '../components/pathways/HypertensionPathways';
+import PathwayRenderer from '../components/pathways/PathwayRenderer';
 
 
 // Symptom templates based on chief complaints
@@ -1737,122 +1691,14 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
         {selectedScenario === "nephrotic-syndrome" && renderNephroticSyndromePathway()}
         {selectedScenario === "iga-nephropathy" && renderIgANephropathyPathway()}
-        {selectedScenario === "hspn" && <HSPNPathway />}
-        {selectedScenario === "aki-prifle" && <AKIPathway />}
-        {selectedScenario === "htn-emergency" && <HypertensiveEmergencyPathway />}
-        {selectedScenario === "hyperkalemia" && <HyperkalemiaPathway />}
-        {selectedScenario === "uti-febrile" && <UTIPathway />}
-        {selectedScenario === "hemolytic-uremic" && <HUSPathway />}
-        {selectedScenario === "tumor-lysis" && <TumorLysisPathway />}
-        {selectedScenario === "lupus-nephritis" && <LupusNephritisPathway />}
-        {selectedScenario === "post-strep-gn" && <PSGNPathway />}
-        {selectedScenario === "hyponatremia" && <HyponatremiaPathway />}
-        {selectedScenario === "hypercalcemia" && <HypercalcemiaPathway />}
-        {selectedScenario === "transplant-rejection" && <TransplantRejectionPathway />}
-        {selectedScenario === "dialysis-catheter-infection" && <DialysisCatheterInfectionPathway />}
-        {selectedScenario === "ckd-mbd" && <CKDMBDPathway />}
-        {selectedScenario === "renal-stone" && <RenalStonePathway />}
-        {selectedScenario === "bladder-dysfunction" && <BladderDysfunctionPathway />}
-        {selectedScenario === "rta-diagnosis" && <RTAPathway />}
-        {selectedScenario === "tubular-function" && <TubularFunctionPathway />}
-        {selectedScenario === "hypokalemia" && <HypokalemiaPathway />}
-        {selectedScenario === "severe-edema-ns" && <SevereEdemaPathway />}
-        {selectedScenario === "sbp" && <SBPPathway />}
-        {selectedScenario === "metabolic-acidosis" && <MetabolicAcidosisPathway />}
-        {selectedScenario === "contrast-nephropathy" && <ContrastNephropathyPathway />}
-        {selectedScenario === "fluid-electrolyte" && <FluidElectrolytePathway />}
-        {selectedScenario === "acid-base" && <AcidBasePathway />}
-        {selectedScenario === "htn-diagnosis" && <HypertensionDiagnosisPathway />}
-        {selectedScenario === "htn-treatment" && <HypertensionTreatmentPathway />}
-        {selectedScenario === "vur" && <VURPathway />}
-        {selectedScenario === "hydronephrosis" && <HydronephrosisPathway />}
-        {selectedScenario === "childhood-nephrotic" && <NephroticSyndromeChildhoodPathway />}
-        {selectedScenario === "congenital-nephrotic" && <CongenitalNephroticPathway />}
-        {selectedScenario === "iga-vasculitis" && <IgAVasculitisPathway />}
-        {selectedScenario === "anca-vasculitis" && <ANCAbVasculitisPathway />}
-        {selectedScenario === "membranous-nephropathy" && <MembranousNephropathyPathway />}
-        {selectedScenario === "peritoneal-dialysis" && <PeritonealDialysisPathway />}
-        {selectedScenario === "hemodialysis" && <HemodialysisPathway />}
-        {selectedScenario === "ckd-staging" && <CKDStagingPathway />}
-        {selectedScenario === "ckd-anemia-mbd" && <CKDAnemiaMBDPathway />}
-        {selectedScenario === "kidney-transplant" && <KidneyTransplantPathway />}
-        {selectedScenario === "hematuria-approach" && <HematuriaPathway />}
-        {selectedScenario === "proteinuria-approach" && <ProteinuriaPathway />}
-        {selectedScenario === "cystic-kidney" && <CysticKidneyPathway />}
-        {selectedScenario === "steroid-resistant-ns" && <SteroidResistantNSPathway />}
-        {selectedScenario === "ckd-comprehensive" && <ChronicKidneyDiseasePathway />}
-        {selectedScenario === "hypocalcemia" && <HypocalcemiaPathway />}
-        {selectedScenario === "cystinosis" && <MetabolicGeneticPathways condition="cystinosis" />}
-        {selectedScenario === "fabry" && <MetabolicGeneticPathways condition="fabry" />}
-        {selectedScenario === "primary-hyperoxaluria" && <MetabolicGeneticPathways condition="hyperoxaluria" />}
-        {selectedScenario === "arpkd-adpkd" && <MetabolicGeneticPathways condition="arpkd_adpkd" />}
-        {selectedScenario === "nephronophthisis" && <MetabolicGeneticPathways condition="nephronophthisis" />}
-        {selectedScenario === "genetic-nephrotic" && <MetabolicGeneticPathways condition="genetic_nephrotic" />}
-        {selectedScenario === "distal-rta" && <TubularDisorderPathways condition="distal_rta" />}
-        {selectedScenario === "proximal-rta" && <TubularDisorderPathways condition="proximal_rta" />}
-        {selectedScenario === "bartter" && <TubularDisorderPathways condition="bartter" />}
-        {selectedScenario === "gitelman" && <TubularDisorderPathways condition="gitelman" />}
-        {selectedScenario === "ndi" && <TubularDisorderPathways condition="ndi" />}
-        {selectedScenario === "bp-classification" && <HypertensionPathways condition="bp_classification" />}
-        {selectedScenario === "htn-pres" && <HypertensionPathways condition="htn_emergency" />}
-        {selectedScenario === "secondary-htn" && <HypertensionPathways condition="secondary_htn" />}
-        {selectedScenario === "neonatal-htn" && <HypertensionPathways condition="neonatal_htn" />}
-        {scenario.hasFullPathway && ![
-        "nephrotic-syndrome",
-        "iga-nephropathy",
-        "hspn",
-        "aki-prifle",
-        "htn-emergency",
-        "hyperkalemia",
-        "uti-febrile",
-        "hemolytic-uremic",
-        "tumor-lysis",
-        "lupus-nephritis",
-        "post-strep-gn",
-        "hyponatremia",
-        "hypercalcemia",
-        "transplant-rejection",
-        "dialysis-catheter-infection",
-        "ckd-mbd",
-        "renal-stone",
-        "bladder-dysfunction",
-        "rta-diagnosis",
-        "tubular-function",
-        "hypokalemia",
-        "severe-edema-ns",
-        "sbp",
-        "metabolic-acidosis",
-        "contrast-nephropathy",
-        "fluid-electrolyte",
-        "acid-base",
-        "htn-diagnosis",
-        "htn-treatment",
-        "vur",
-        "hydronephrosis",
-        "childhood-nephrotic",
-        "congenital-nephrotic",
-        "iga-vasculitis",
-        "anca-vasculitis",
-        "membranous-nephropathy",
-        "peritoneal-dialysis",
-        "hemodialysis",
-        "ckd-staging",
-        "ckd-anemia-mbd",
-        "kidney-transplant",
-        "hematuria-approach",
-        "proteinuria-approach",
-        "cystic-kidney",
-        "steroid-resistant-ns",
-        "ckd-comprehensive",
-        "hypocalcemia"].
-        includes(selectedScenario) &&
-        <Alert className="bg-blue-50 border-blue-200">
-            <Info className="w-5 h-5 text-blue-600" />
-            <AlertDescription className="text-blue-800">
-              <strong>{scenario.title} Pathway:</strong> Detailed clinical pathway available in Guidelines section. Check related protocols and use AI Assistant for management guidance.
-            </AlertDescription>
-          </Alert>
-        }
+        {selectedScenario !== "nephrotic-syndrome" && selectedScenario !== "iga-nephropathy" && (
+          <PathwayRenderer
+            scenarioId={selectedScenario}
+            scenario={scenario}
+            onAIPrompt={handleAIPromptFromPathway}
+            isAdmin={user?.role === 'admin'}
+          />
+        )}
       </div>);
 
   };
