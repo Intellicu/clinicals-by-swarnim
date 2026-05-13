@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -626,13 +626,22 @@ const LabReportAnalyzerContent = () => <LabReportAnalyzer />;
 const ClinicalCaseAnalyzerContent = () => <ClinicalCaseAnalyzer />;
 
 export default function ClinicalSupport() {
-  // Deep-link support: ?tab=pathways&scenario=aki-prifle
-  const searchParams = new URLSearchParams(window.location.search);
-  const initialTab = searchParams.get("tab") || "scenarios";
-  const initialScenario = searchParams.get("scenario") || null;
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [selectedScenario, setSelectedScenario] = useState(initialScenario);
+  const getUrlParams = () => {
+    const p = new URLSearchParams(location.search);
+    return { tab: p.get("tab") || "scenarios", scenario: p.get("scenario") || null };
+  };
+
+  const [activeTab, setActiveTab] = useState(() => getUrlParams().tab);
+  const [selectedScenario, setSelectedScenario] = useState(() => getUrlParams().scenario);
+
+  // Re-read URL params whenever location changes (e.g. navigation from hub)
+  useEffect(() => {
+    const { tab, scenario } = getUrlParams();
+    if (tab) setActiveTab(tab);
+    if (scenario) setSelectedScenario(scenario);
+  }, [location.search]);
 
   // Diagnostic AI state
   const [diagnosticStep, setDiagnosticStep] = useState(1);

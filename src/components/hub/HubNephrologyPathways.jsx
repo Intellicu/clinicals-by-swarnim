@@ -11,84 +11,84 @@ const PATHWAYS = [
     tag: "Emergency",
     color: "bg-red-100 text-red-800",
     keys: ["KDIGO staging 1–3 by SCr/UO", "Identify prerenal vs intrinsic vs postrenal", "Fluid challenge, stop nephrotoxins", "RRT indications: AEIOU criteria"],
-    scenario: "AKI"
+    scenario: "aki-prifle"
   },
   {
     name: "CKD Staging & Management",
     tag: "Chronic",
     color: "bg-blue-100 text-blue-800",
     keys: ["KDIGO G1–G5 + A1–A3 albuminuria", "Schwartz/CKiD GFR estimation", "ACEi/ARB nephroprotection", "CKD-MBD: calcium, phosphate, PTH"],
-    scenario: "CKD"
+    scenario: "ckd-staging"
   },
   {
     name: "Nephrotic Syndrome",
     tag: "Nephrotic",
     color: "bg-purple-100 text-purple-800",
     keys: ["ISKDC protocol: prednisolone 60 mg/m²", "Relapse: >3+ dipstick × 3 days", "Frequent relapse: MMF/Levamisole", "SRNS: CNI/Rituximab, genetic testing"],
-    scenario: "NephroticSyndrome"
+    scenario: "childhood-nephrotic"
   },
   {
     name: "Hypertension in CKD",
     tag: "Hypertension",
     color: "bg-orange-100 text-orange-800",
     keys: ["2017 AAP BP classification", "Target <50th percentile in CKD", "ACEi/ARB first-line", "Ambulatory BP monitoring (ABPM)"],
-    scenario: "Hypertension"
+    scenario: "htn-diagnosis"
   },
   {
     name: "Proteinuria Workup",
     tag: "Diagnostic",
     color: "bg-teal-100 text-teal-800",
     keys: ["UPCR: >0.2 mg/mg abnormal", "Orthostatic vs persistent", "Nephrotic range >3.5 g/day", "Biopsy indications: persistent, symptomatic"],
-    scenario: "Proteinuria"
+    scenario: "proteinuria-approach"
   },
   {
     name: "Haematuria Pathway",
     tag: "Diagnostic",
     color: "bg-rose-100 text-rose-800",
     keys: ["Glomerular vs non-glomerular RBCs", "Dysmorphic RBCs/RBC casts = glomerular", "IgAN: episodic macrohaematuria", "ASO, ANA, ANCA, complement panel"],
-    scenario: "Haematuria"
+    scenario: "hematuria-approach"
   },
   {
     name: "Electrolytes — Hyponatraemia",
     tag: "Electrolyte",
     color: "bg-cyan-100 text-cyan-800",
     keys: ["Serum osmolality first", "Urine Na, urine osmolality", "SIADH vs hypovolaemic vs hypervolaemic", "Correction rate: ≤10 mEq/L/24h"],
-    scenario: "Hyponatremia"
+    scenario: "hyponatremia"
   },
   {
     name: "Electrolytes — Hyperkalaemia",
     tag: "Emergency",
     color: "bg-red-100 text-red-800",
     keys: ["K+ >6: immediate ECG", "IV calcium gluconate for cardiac protection", "Insulin+dextrose, Salbutamol nebulisation", "Kayexalate/Patiromer: K+ binding"],
-    scenario: "Hyperkalemia"
+    scenario: "hyperkalemia"
   },
   {
     name: "Metabolic Acidosis / RTA",
     tag: "Tubular",
     color: "bg-amber-100 text-amber-800",
     keys: ["Anion gap vs non-AG acidosis", "Urine anion gap for dRTA vs GI loss", "Type 1 dRTA: nephrocalcinosis, stones", "Type 2 pRTA: Fanconi syndrome"],
-    scenario: "MetabolicAcidosis"
+    scenario: "metabolic-acidosis"
   },
   {
     name: "Renal Stone Disease",
     tag: "Urological",
     color: "bg-yellow-100 text-yellow-800",
     keys: ["24h urine: Ca, oxalate, citrate, urate", "Hypercalciuria: thiazide diuretics", "Hyperoxaluria: B6, hydration", "Cystinuria: D-penicillamine/tiopronin"],
-    scenario: "RenalStone"
+    scenario: "renal-stone"
   },
   {
     name: "Renal Transplant — Basics",
     tag: "Transplant",
     color: "bg-green-100 text-green-800",
     keys: ["Tacrolimus + MMF + prednisolone standard", "Acute rejection: pulse methylprednisolone", "BK nephropathy: reduce IS", "Annual monitoring: eGFR, proteinuria, DSA"],
-    scenario: "Transplant"
+    scenario: "kidney-transplant"
   },
   {
     name: "Peritoneal Dialysis",
     tag: "Dialysis",
     color: "bg-indigo-100 text-indigo-800",
     keys: ["CAPD vs APD", "Peritonitis: cloudy effluent, WBC>100", "Empirical: vancomycin + ceftazidime IP", "Adequacy: weekly Kt/V ≥1.7"],
-    scenario: "PeritonealDialysis"
+    scenario: "peritoneal-dialysis"
   },
 ];
 
