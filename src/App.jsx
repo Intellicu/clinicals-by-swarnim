@@ -29,6 +29,8 @@ import PediatricRheumatology from './pages/PediatricRheumatology';
 import CalculatorsHub from './pages/CalculatorsHub';
 import UrologyNephrologyHub from './pages/UrologyNephrologyHub';
 import RareDiseaseModule from './pages/RareDiseaseModule';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -102,6 +104,8 @@ const AuthenticatedApp = () => {
       <Route path="/CalculatorsHub" element={<LayoutWrapper currentPageName="CalculatorsHub"><CalculatorsHub /></LayoutWrapper>} />
       <Route path="/UrologyNephrologyHub" element={<LayoutWrapper currentPageName="UrologyNephrologyHub"><UrologyNephrologyHub /></LayoutWrapper>} />
       <Route path="/RareDiseaseModule" element={<LayoutWrapper currentPageName="RareDiseaseModule"><RareDiseaseModule /></LayoutWrapper>} />
+      <Route path="/About" element={<LayoutWrapper currentPageName="About"><About /></LayoutWrapper>} />
+      <Route path="/Contact" element={<LayoutWrapper currentPageName="Contact"><Contact /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

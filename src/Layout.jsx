@@ -265,7 +265,11 @@ export default function Layout({ children, currentPageName }) {
 
           {/* Desktop footer */}
           <footer className="hidden lg:block bg-white border-t border-slate-200 px-6 py-3 text-center text-xs text-slate-400">
-            CliniCals Hub by Swarnim — Pediatric Clinical Intelligence. For informational purposes only.
+            <span>CliniCals Hub by Swarnim — Pediatric Clinical Intelligence. For informational purposes only.</span>
+            <span className="mx-2">·</span>
+            <Link to="/About" className="hover:text-slate-600 underline-offset-2 hover:underline">About</Link>
+            <span className="mx-2">·</span>
+            <Link to="/Contact" className="hover:text-slate-600 underline-offset-2 hover:underline">Contact</Link>
           </footer>
         </main>
 
