@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, AlertTriangle, Zap, Plus, Trash2, X, Check } from "lucide-react";
+import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
 
 const PATHWAYS = [
   // ── Glomerular Diseases (GN) ──────────────────────────────────────────
@@ -230,10 +231,13 @@ export default function HubNephrologyPathways() {
             </div>
           </div>
           {isAdmin && (
-            <button onClick={openAdd}
-              className="flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded-full border border-white/30 transition-colors">
-              <Plus className="w-3.5 h-3.5" /> Add
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button onClick={openAdd}
+                className="flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded-full border border-white/30 transition-colors">
+                <Plus className="w-3.5 h-3.5" /> Add
+              </button>
+              <AdminPathwayGenerator specialty="Nephrology" onCreated={() => {}} />
+            </div>
           )}
         </div>
       </div>

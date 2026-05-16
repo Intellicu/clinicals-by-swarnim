@@ -6,12 +6,17 @@
       "type": "string",
       "description": "Reference to Patient entity"
     },
+    "title": {
+      "type": "string",
+      "description": "Document title"
+    },
     "document_type": {
       "type": "string",
       "enum": [
         "Lab Report",
         "Prescription",
         "Imaging",
+        "imaging",
         "Referral Letter",
         "Insurance Card",
         "Consent Form",
@@ -38,83 +43,63 @@
     },
     "ocr_edited": {
       "type": "boolean",
-      "default": false,
-      "description": "Whether OCR text has been manually edited"
+      "default": false
     },
     "document_date": {
       "type": "string",
-      "format": "date",
-      "description": "Date of document"
+      "format": "date"
     },
     "notes": {
-      "type": "string",
-      "description": "Additional notes"
+      "type": "string"
     },
     "tags": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Document tags for filtering"
+      }
     },
     "uploaded_by": {
+      "type": "string"
+    },
+    "modality": {
       "type": "string",
-      "description": "User who uploaded"
+      "description": "Imaging modality: Renal Ultrasound, Biopsy Slide, DMSA Scan, CT, MRI, etc."
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relX": {
+            "type": "number"
+          },
+          "relY": {
+            "type": "number"
+          },
+          "color": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "annotated_by": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Image annotations with coordinates and notes"
+    },
+    "ai_report": {
+      "type": "string",
+      "description": "AI analysis report for this image"
     }
   },
   "required": [
     "patient_id",
     "document_type",
     "file_url"
-  ],
-  "rls": {
-    "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.uploaded_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.uploaded_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.uploaded_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    }
-  }
+  ]
 }

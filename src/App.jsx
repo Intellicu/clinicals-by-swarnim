@@ -34,6 +34,7 @@ import Contact from './pages/Contact';
 import GuidelinesLibrary from './pages/GuidelinesLibrary';
 import ClinicalWorkspace from './pages/ClinicalWorkspace';
 import GeneralPediatricsHub from './pages/GeneralPediatricsHub';
+import ImagingViewer from './pages/ImagingViewer';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -112,6 +113,7 @@ const AuthenticatedApp = () => {
       <Route path="/GuidelinesLibrary" element={<LayoutWrapper currentPageName="GuidelinesLibrary"><GuidelinesLibrary /></LayoutWrapper>} />
       <Route path="/ClinicalWorkspace" element={<LayoutWrapper currentPageName="ClinicalWorkspace"><ClinicalWorkspace /></LayoutWrapper>} />
       <Route path="/GeneralPediatricsHub" element={<LayoutWrapper currentPageName="GeneralPediatricsHub"><GeneralPediatricsHub /></LayoutWrapper>} />
+      <Route path="/ImagingViewer" element={<LayoutWrapper currentPageName="ImagingViewer"><ImagingViewer /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
