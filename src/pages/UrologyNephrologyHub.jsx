@@ -30,7 +30,7 @@ import HubImagingPanel from "../components/hub/HubImagingPanel";
 
 const SECTIONS = [
   { id: "nephrology", label: "Nephrology Pathways", icon: Stethoscope, badge: "Umbrella" },
-  { id: "cakut", label: "Nephrology & Urology", icon: Droplet, badge: "8+" },
+  { id: "cakut", label: "CAKUT & Urology", icon: Droplet, badge: "8+" },
   { id: "neuro_bbd", label: "NGB & BBD", icon: Brain, badge: "ICCS" },
   { id: "uti", label: "UTI & Antimicrobial", icon: Microscope, badge: "ISPN" },
   { id: "tubular", label: "Tubular & Electrolytes", icon: TestTube, badge: "RTA" },
@@ -38,7 +38,7 @@ const SECTIONS = [
   { id: "transplant", label: "Transplant", icon: Syringe, badge: "IS" },
   { id: "htn", label: "Hypertension", icon: Shield, badge: "AAP" },
   { id: "imaging", label: "Imaging & Dx", icon: Camera, badge: "RBUS" },
-  { id: "ai_lab", label: "AI Lab Analyzer", icon: FlaskConical, badge: "AI" },
+  { id: "ai_lab", label: "AI Analysers", icon: FlaskConical, badge: "AI" },
   { id: "monitoring", label: "Monitoring", icon: ClipboardList },
   { id: "education", label: "Patient Education", icon: Users },
 ];
