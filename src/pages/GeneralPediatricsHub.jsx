@@ -13,7 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft, Baby, Syringe, Scale, TrendingUp, MessageCircle, Apple,
   Brain, Activity, ChevronDown, ChevronUp, Plus, Trash2, Loader2,
-  Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X, Star, Info
+  Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X, Star,
+  Info, BookOpen, TestTube, Microscope, Zap, Wind
 } from "lucide-react";
 import { toast } from "sonner";
 import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
@@ -22,19 +23,26 @@ import VaccDrugChatbot from "../components/pediatrics/VaccDrugChatbot.jsx";
 import SimpleVaccinationSchedule from "../components/pediatrics/SimpleVaccinationSchedule.jsx";
 import NutritionIntakeTracker from "../components/pediatrics/NutritionIntakeTracker.jsx";
 import InteractiveGrowthChart from "../components/pediatrics/InteractiveGrowthChart.jsx";
+import DevQuotientTool from "../components/pediatrics/DevQuotientTool.jsx";
+import EndocrineSection from "../components/pediatrics/EndocrineSection.jsx";
+import PedsReferenceSection from "../components/pediatrics/PedsReferenceSection.jsx";
+import PedsAIAnalysers from "../components/pediatrics/PedsAIAnalysers.jsx";
 
-// ── Tab config ──────────────────────────────────────────────────────────────
+// ── Tab config — Pathways FIRST ──────────────────────────────────────────────
 const TABS = [
+  { id: "pathways", label: "Pathways", icon: Brain, color: "bg-teal-600" },
   { id: "assistant", label: "AI Assistant", icon: MessageCircle, color: "bg-green-600", badge: "AI" },
   { id: "vaccination", label: "Vaccines", icon: Syringe, color: "bg-blue-600" },
-  { id: "growth", label: "Growth", icon: TrendingUp, color: "bg-purple-600" },
+  { id: "pediatrics", label: "Pediatrics", icon: TrendingUp, color: "bg-purple-600" },
+  { id: "dev", label: "Development", icon: Baby, color: "bg-cyan-600", badge: "DQ" },
   { id: "nutrition", label: "Nutrition", icon: Apple, color: "bg-orange-600" },
-  { id: "pathways", label: "Pathways", icon: Brain, color: "bg-teal-600" },
-  { id: "guidelines", label: "Guidelines", icon: Scale, color: "bg-indigo-600" },
+  { id: "analysers", label: "AI Analysers", icon: Sparkles, color: "bg-violet-600", badge: "AI" },
+  { id: "endocrine", label: "Endocrine", icon: Zap, color: "bg-amber-600" },
+  { id: "references", label: "References", icon: BookOpen, color: "bg-indigo-600" },
 ];
 
 // ── Built-in clinical pathways ──────────────────────────────────────────────
-const BUILT_IN_PATHWAYS = [
+const INITIAL_PATHWAYS = [
   {
     id: "sam",
     name: "SAM Management",
@@ -70,9 +78,9 @@ const BUILT_IN_PATHWAYS = [
       "TRANSITION (Day 2-7): Switch to F-100 when: oedema reducing, eating, no infection",
       "REHABILITATION (Phase 2): F-100 or RUTF; 150-220 kcal/kg/day; weekly weight gain >10-15 g/kg/day",
       "RUTF (Plumpy'Nut): 200 kcal/sachet; 200 kcal/kg/day; do NOT mix with water",
-      "Micronutrients: Vitamin A D3 E K, zinc, folate, Fe (ONLY in rehabilitation phase — NOT in stabilisation)",
+      "Micronutrients: Vitamin A D3 E K, zinc, folate, Fe (ONLY in rehabilitation phase)",
       "Iron: start ONLY when weight gaining; premature iron worsens oxidative stress",
-      "DISCHARGE criteria: WHZ > -2 SD; MUAC > 12.5 cm; no oedema; eating well; no medical complications",
+      "DISCHARGE: WHZ > -2 SD; MUAC > 12.5 cm; no oedema; eating well",
     ],
     monitoring: [
       "Weight DAILY (morning, naked, same time)",
@@ -82,58 +90,8 @@ const BUILT_IN_PATHWAYS = [
       "Fluid balance: input/output charting",
       "Oedema grading: + (foot/ankle), ++ (lower limb+), +++ (generalised)",
       "Weekly: height/length, MUAC, appetite test (RUTF)",
-      "Alert if weight loss, return of oedema, refusal to eat, fever worsening",
     ],
-    references: ["WHO SAM Protocol 2013", "IAP SAM Guidelines 2023", "NIN India 2020", "CMAM Forum 2022"]
-  },
-  {
-    id: "child-dev",
-    name: "Child Development",
-    full: "Child Development Monitoring — Developmental Surveillance & Milestones",
-    color: "teal",
-    badge: "Developmental",
-    overview: "Developmental surveillance (every well-child visit) + developmental screening (standardised tools at 9, 18, 24/30 months, and when concern arises). Flag early for intervention — optimal neuroplasticity window is birth to 3 years. CDC milestones (2022 revised) are the standard; IAP/WHO norms adapted for Indian populations.",
-    criteria: [
-      "Gross Motor: holds head 3m, sits 6m, walks 12m, runs 18m, stairs 24m, tricycle 36m",
-      "Fine Motor: transfers 6m, pincer 9m, scribbles 12m, tower 2 blocks 15m, copies circle 3y",
-      "Language: coos 2m, babbles 6m, words 12m, 2-word phrases 24m, sentences 36m",
-      "Social/Adaptive: smiles 2m, stranger anxiety 9m, parallel play 2y, interactive play 3y",
-      "Red flags: No babble by 12m, no words by 16m, no 2-word phrases by 24m, ANY regression",
-      "Vision: follows 2m, binocular fixation 4m; refer if squint, nystagmus, no response to visual threat",
-    ],
-    danger_signs: [
-      "No social smile by 3 months",
-      "No babbling by 12 months",
-      "No single words by 16 months",
-      "No 2-word spontaneous phrases by 24 months",
-      "Loss of previously acquired language or social skills at any age",
-      "Failure to walk by 18 months",
-      "Persistent fisting beyond 4 months",
-      "Persistent tonic neck reflex beyond 6 months",
-    ],
-    management: [
-      "SCREENING TOOLS: M-CHAT-R/F (autism 16-30m), PEDS (all ages), DASII (India)",
-      "Refer to developmental paediatrician/child psychologist if screening positive",
-      "Early intervention referral: physiotherapy, occupational therapy, speech therapy",
-      "Early Intervention Centre (EIC) — under 6 years (National Trust Act, India)",
-      "Sarva Shiksha Abhiyan: Inclusive education support for school-age children",
-      "Parent counselling: books, play, responsive parenting, screen time limits (<1h <5y)",
-      "Nutritional adequacy: iron, iodine, DHA for brain development",
-      "Hearing screen: at birth (OAE/AABR), recheck if concern at any age",
-      "Vision screen: cover test, red reflex at birth; formal test before school entry",
-      "Developmental follow-up: every 3 months in first 2 years for high-risk neonates",
-    ],
-    monitoring: [
-      "Plot developmental milestones at every well-child visit",
-      "Use structured surveillance questions (CDC/IAP Parent questionnaire)",
-      "Document milestone acquisition date — not just 'appropriate for age'",
-      "M-CHAT-R: complete at 16–30 months routinely",
-      "Head circumference: plot every visit up to 2 years",
-      "Growth monitoring: weight, height, HC at same visit as developmental check",
-      "School performance: obtain teacher report from age 5",
-      "Behaviour screen: SDQ (Strengths and Difficulties Questionnaire) from age 4",
-    ],
-    references: ["CDC Developmental Milestones 2022", "IAP Child Development Guidelines 2021", "WHO IMCI 2024", "NIN India 2019"]
+    references: ["WHO SAM Protocol 2013", "IAP SAM Guidelines 2023", "NIN India 2020"],
   },
   {
     id: "autism",
@@ -141,55 +99,131 @@ const BUILT_IN_PATHWAYS = [
     full: "Autism Spectrum Disorder (ASD) — Screening & Early Intervention Pathway",
     color: "violet",
     badge: "Neurodevelopmental",
-    overview: "ASD prevalence: ~1 in 100 children globally; 1 in 66 in India (INCLEN 2017). Early detection (before age 2-3) and intensive early intervention dramatically improves outcomes. Universal screening at 18 and 24 months is recommended. Early referral is critical.",
+    overview: "ASD prevalence: ~1 in 100 children globally; 1 in 66 in India (INCLEN 2017). Early detection (before age 2-3) and intensive early intervention dramatically improves outcomes. Universal screening at 18 and 24 months is recommended.",
     criteria: [
-      "Core features: persistent deficits in social communication + interaction (across contexts)",
+      "Core features: persistent deficits in social communication + interaction",
       "Restricted/repetitive behaviours, interests, or activities (RRBs)",
-      "Symptoms present from early developmental period (not necessarily presenting early)",
-      "Cause clinically significant impairment in social, occupational, or other areas",
-      "DSM-5 specifiers: with/without intellectual impairment, language impairment, known genetic/medical condition",
-      "ASD levels 1-3: Level 1 (requiring support), Level 2 (substantial support), Level 3 (very substantial support)",
+      "DSM-5 specifiers: with/without intellectual impairment, language impairment",
+      "ASD levels 1-3: Level 1 (requiring support) → Level 3 (very substantial support)",
+      "Screening: M-CHAT-R/F at 16, 18, 24 months all children",
     ],
     danger_signs: [
-      "No back-and-forth sharing of sounds, smiles, or facial expressions by 9 months",
+      "No back-and-forth sharing of sounds/smiles/facial expressions by 9 months",
       "No babbling by 12 months",
-      "No pointing, showing, reaching, or waving by 12 months",
+      "No pointing/showing/reaching/waving by 12 months",
       "No words by 16 months",
       "No meaningful 2-word phrases (not echolalia) by 24 months",
       "Any loss of speech or social skills at any age",
       "No response to own name by 12 months",
-      "Not pointing to show interest (proto-declarative pointing) by 14 months",
     ],
     management: [
-      "SCREENING: M-CHAT-R/F at 16, 18, and 24 months — all children (not just high-risk)",
       "M-CHAT-R/F scoring: 0-2 low risk; 3-7 medium risk (follow-up interview); 8+ high risk (refer immediately)",
       "ADOS-2: Gold standard diagnostic tool (specialist referral)",
-      "ADI-R: Autism Diagnostic Interview (caregiver interview)",
       "AIIMS ISAA: Indian Scale for Assessment of Autism — validated for Indian context",
-      "REFERRAL PATHWAY: Developmental paediatrician → Child psychiatrist → NIMHANS / AIIMS",
-      "EARLY INTERVENTION (<3 years): ABA (Applied Behaviour Analysis), Early Intensive Behavioural Intervention (EIBI)",
-      "Speech and Language Therapy: core component — begin as early as diagnosis",
-      "Occupational Therapy: sensory processing, ADL skills, handwriting",
-      "Social skills training: from school age; parent-mediated interventions for <3y",
-      "EDUCATION: Inclusive education (RTE 2009), special schools, resource rooms",
-      "INDIA RESOURCES: National Trust (nationaltrustIndia.gov.in), ASHA workers, Anganwadi referral",
-      "CO-MORBIDITIES: ADHD (50-70%), anxiety, intellectual disability, epilepsy (25-30%), sleep disorders",
-      "MEDICATIONS: No drug cures ASD; address comorbidities: melatonin for sleep, SSRIs for anxiety, risperidone/aripiprazole for irritability/aggression (ONLY if needed)",
+      "EARLY INTERVENTION (<3 years): ABA, Early Intensive Behavioural Intervention (EIBI)",
+      "Speech and Language Therapy: begin as early as diagnosis",
+      "Occupational Therapy: sensory processing, ADL skills",
+      "INDIA RESOURCES: National Trust, ASHA workers, Anganwadi referral",
+      "CO-MORBIDITIES: ADHD (50-70%), epilepsy (25-30%), sleep disorders",
+      "MEDICATIONS: risperidone/aripiprazole for irritability (ONLY if needed); melatonin for sleep",
     ],
     monitoring: [
-      "M-CHAT-R/F: 16, 18, 24 months (routine), 30 months if any concern",
-      "CARS-2 (Childhood Autism Rating Scale) annually: track severity",
+      "M-CHAT-R/F: 16, 18, 24 months routine; 30 months if any concern",
+      "CARS-2 annually: track severity",
       "Adaptive behaviour: Vineland Adaptive Behaviour Scales — baseline and annually",
-      "IQ/cognitive: MISIC or Stanford-Binet (age >3) — baseline and at school entry",
       "Language assessment: annually by speech therapist",
-      "Sensory profile: SPM-2 — every 2 years",
-      "Epilepsy: EEG if any suspicion of seizures (25-30% lifetime risk)",
-      "Sleep diary: every visit",
+      "Epilepsy: EEG if any suspicion of seizures",
       "GI symptoms (50% ASD): dietary history, constipation/diarrhoea diary",
-      "Parent stress and coping: PSI (Parenting Stress Index) annually",
     ],
-    references: ["DSM-5 ASD Criteria 2013", "IAP Autism Guidelines 2022", "M-CHAT-R/F Robins 2014", "INCLEN India ASD 2017", "NIMHANS ASD Guidelines 2022"]
-  }
+    references: ["DSM-5 ASD Criteria 2013", "IAP Autism Guidelines 2022", "INCLEN India ASD 2017"],
+  },
+  {
+    id: "fever",
+    name: "Fever Management",
+    full: "Approach to Fever in Children — IAP/WHO Protocol",
+    color: "rose",
+    badge: "Common Emergency",
+    overview: "Fever (temp >38°C axillary) is the most common pediatric complaint. Key is to identify the source, rule out serious bacterial infection (SBI), and manage appropriately. Avoid antibiotics unless clear bacterial source. Fever itself is not harmful; manage discomfort.",
+    criteria: [
+      "Fever >38°C axillary, >38.5°C rectal",
+      "Neonates <28 days: any fever = admit and full sepsis workup",
+      "Infants 28-90 days: low-threshold sepsis screen",
+      "Age-appropriate: assess for source (URTI, UTI, LRTI, gastroenteritis)",
+      "Fever >5 days: consider Kawasaki, typhoid, JIA, occult bacteraemia",
+      "Fever + petechiae: meningococcaemia until proven otherwise",
+    ],
+    danger_signs: [
+      "Infant <3 months with fever ≥38°C",
+      "Fever >5 days without source",
+      "Fever + rash (especially non-blanching/petechiae)",
+      "Lethargy, poor perfusion, CRT >3s",
+      "Severe headache + neck stiffness (meningitis)",
+      "Respiratory distress with fever",
+      "Febrile seizure — first episode or prolonged (>5 min)",
+    ],
+    management: [
+      "Antipyretics: Paracetamol 15 mg/kg/dose q4-6h (max 5 doses/24h) OR Ibuprofen 10 mg/kg/dose q6-8h (>3 months)",
+      "Do NOT combine routinely; can alternate if inadequate response",
+      "Avoid aspirin in viral illness (Reye syndrome risk)",
+      "Hydration: encourage oral fluids; tepid sponging for comfort",
+      "Febrile seizure: airway, position, lorazepam 0.05-0.1 mg/kg IV if >5 min",
+      "Antibiotics ONLY if: SBI confirmed, severely unwell, infant <3 months",
+      "UTI: confirm with urine culture; treat with appropriate antibiotic",
+      "Malaria endemic area: malaria RDT/smear if fever >3 days",
+    ],
+    monitoring: [
+      "Temperature every 4-6 hours",
+      "Hydration status (urine output, fontanelle, skin turgor)",
+      "Rash surveillance — check at each visit",
+      "Response to antipyretics",
+      "Daily clinical review if fever persists >48h without source",
+      "CBC, CRP, blood culture if high risk or not responding",
+    ],
+    references: ["WHO IMCI 2024", "IAP Fever Guidelines 2022", "AAP Fever Guidelines 2021"],
+  },
+  {
+    id: "diarrhoea",
+    name: "Acute Diarrhoea & ORS",
+    full: "Acute Diarrhoea & Dehydration Management — WHO/IAPSMCON",
+    color: "blue",
+    badge: "GI Emergency",
+    overview: "Diarrhoea: ≥3 loose/watery stools in 24h. Leading cause of under-5 mortality globally. Dehydration is the main killer. Oral rehydration therapy (ORT) is the cornerstone of management. Antibiotics are rarely needed. Zinc supplementation reduces duration and severity.",
+    criteria: [
+      "Acute: <14 days; Persistent: 14-30 days; Chronic: >30 days",
+      "Dehydration: No (0%) → Some (1-9%) → Severe (≥10%)",
+      "Some dehydration: sunken eyes, dry mouth, restless, thirsty, CRT 2-3s",
+      "Severe dehydration: very sunken eyes, no tears, lethargic, unable to drink",
+      "Bloody diarrhoea (dysentery): Shigella most common → treat with antibiotics",
+      "Cholera suspected: profuse rice-water stools, adults, IV fluids urgently",
+    ],
+    danger_signs: [
+      "Severe dehydration: lethargic, sunken fontanelle, no urine >8h",
+      "Unable to drink or keep fluids down",
+      "Fever >39°C with diarrhoea in infant <3 months",
+      "Bloody diarrhoea + high fever",
+      "Marked abdominal distension",
+      "Seizures with diarrhoea (hyponatraemia/hypernatraemia)",
+    ],
+    management: [
+      "ORS Plan A (No dehydration): 50-100 mL ORS after each loose stool; continue breastfeeding",
+      "ORS Plan B (Some dehydration): 75 mL/kg ORS over 4 hours; reassess",
+      "IV Plan C (Severe): Ringer's lactate 100 mL/kg: 30 mL/kg over 30min (infant) or 1h, then 70 mL/kg over 2.5h",
+      "WHO ORS: Na 75, Cl 65, K 20, citrate 10, glucose 75 mEq/L, osmolarity 245",
+      "Zinc: 10 mg/day (<6m) or 20 mg/day (≥6m) for 14 days — reduces duration by 25%",
+      "Feed: continue breastfeeding; do NOT restrict food; BRAT diet NOT recommended",
+      "Antibiotics: ONLY for dysentery (azithromycin 12 mg/kg/day × 3d) or cholera",
+      "Ondansetron: 0.15 mg/kg (max 4mg) if vomiting prevents ORS",
+    ],
+    monitoring: [
+      "Hydration assessment every 1-2h during ORT",
+      "Stool frequency and character",
+      "Urine output (target >1 mL/kg/hr)",
+      "Weight before and after ORT",
+      "Electrolytes: Na, K if severe or prolonged",
+      "Blood glucose if altered consciousness",
+    ],
+    references: ["WHO IMCI 2024", "IAPSMCON Diarrhoea Guidelines 2020", "AAP Diarrhoea 2022"],
+  },
 ];
 
 const COLOR_MAP = {
@@ -207,22 +241,22 @@ function SectionCard({ title, items, isList = true }) {
   return (
     <div className="border border-slate-200 rounded-lg overflow-hidden">
       <button onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left">
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-left">
         <span className="font-semibold text-sm text-slate-800">{title}</span>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>
       {open && (
-        <div className="p-4 bg-white">
+        <div className="p-3 bg-white">
           {isList ? (
             <ul className="space-y-1.5">
               {items.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                  <span className="text-indigo-400 font-bold min-w-[20px] mt-0.5">{i + 1}.</span>{item}
+                <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                  <span className="text-indigo-400 font-bold min-w-[18px] mt-0.5">{i + 1}.</span>{item}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-700 leading-relaxed">{items}</p>
+            <p className="text-xs text-slate-700 leading-relaxed">{items}</p>
           )}
         </div>
       )}
@@ -230,24 +264,31 @@ function SectionCard({ title, items, isList = true }) {
   );
 }
 
-// ── Edit modal for built-in pathways (admin) ─────────────────────────────────
-function EditPathwayModal({ pathway, onSave, onClose }) {
+// ── Edit/Add/Delete Pathway Modal ─────────────────────────────────────────────
+function PathwayModal({ pathway, onSave, onClose }) {
+  const isNew = !pathway.id;
   const [data, setData] = useState({
-    full: pathway.full,
-    badge: pathway.badge,
-    overview: pathway.overview,
-    criteria: pathway.criteria.join('\n'),
-    danger_signs: pathway.danger_signs.join('\n'),
-    management: pathway.management.join('\n'),
-    monitoring: pathway.monitoring.join('\n'),
-    references: pathway.references.join('\n'),
+    name: pathway.name || "",
+    full: pathway.full || "",
+    badge: pathway.badge || "",
+    color: pathway.color || "blue",
+    overview: pathway.overview || "",
+    criteria: Array.isArray(pathway.criteria) ? pathway.criteria.join('\n') : "",
+    danger_signs: Array.isArray(pathway.danger_signs) ? pathway.danger_signs.join('\n') : "",
+    management: Array.isArray(pathway.management) ? pathway.management.join('\n') : "",
+    monitoring: Array.isArray(pathway.monitoring) ? pathway.monitoring.join('\n') : "",
+    references: Array.isArray(pathway.references) ? pathway.references.join('\n') : "",
   });
 
   const handleSave = () => {
+    if (!data.name.trim() || !data.full.trim()) { toast.error("Name and full title required"); return; }
     onSave({
       ...pathway,
+      id: pathway.id || `custom_${Date.now()}`,
+      name: data.name,
       full: data.full,
       badge: data.badge,
+      color: data.color,
       overview: data.overview,
       criteria: data.criteria.split('\n').filter(s => s.trim()),
       danger_signs: data.danger_signs.split('\n').filter(s => s.trim()),
@@ -257,39 +298,64 @@ function EditPathwayModal({ pathway, onSave, onClose }) {
     });
   };
 
+  const COLORS = ["amber", "blue", "teal", "violet", "green", "rose"];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-3 pb-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-3 pb-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl">
+        <div className="flex items-center justify-between px-4 py-3 border-b bg-slate-50 rounded-t-2xl">
           <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <Pencil className="w-4 h-4 text-blue-600" /> Edit Pathway
+            <Pencil className="w-4 h-4 text-blue-600" />
+            {isNew ? "Add New Pathway" : "Edit Pathway"}
           </h3>
           <button onClick={onClose}><X className="w-4 h-4 text-slate-400" /></button>
         </div>
         <div className="p-4 space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-xs font-semibold text-slate-600">Short Name *</Label>
+              <Input value={data.name} onChange={e => setData(d => ({ ...d, name: e.target.value }))}
+                placeholder="e.g. Kawasaki Disease" className="mt-1 h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs font-semibold text-slate-600">Badge Label</Label>
+              <Input value={data.badge} onChange={e => setData(d => ({ ...d, badge: e.target.value }))}
+                placeholder="e.g. Vasculitis" className="mt-1 h-8 text-sm" />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-slate-600">Full Title *</Label>
+            <Input value={data.full} onChange={e => setData(d => ({ ...d, full: e.target.value }))}
+              className="mt-1 h-8 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-slate-600">Color Theme</Label>
+            <div className="flex gap-2 mt-1">
+              {COLORS.map(c => (
+                <button key={c} onClick={() => setData(d => ({ ...d, color: c }))}
+                  className={`w-7 h-7 rounded-full border-2 transition-all ${data.color === c ? "border-slate-800 scale-110" : "border-transparent opacity-60"} ${
+                    c === "amber" ? "bg-amber-400" : c === "blue" ? "bg-blue-500" : c === "teal" ? "bg-teal-500" :
+                    c === "violet" ? "bg-violet-500" : c === "green" ? "bg-green-500" : "bg-rose-500"}`} />
+              ))}
+            </div>
+          </div>
           {[
-            { label: "Full Title", key: "full", rows: 1 },
-            { label: "Badge Label", key: "badge", rows: 1 },
-            { label: "Overview", key: "overview", rows: 4 },
-            { label: "Criteria (one per line)", key: "criteria", rows: 5 },
-            { label: "Danger Signs (one per line)", key: "danger_signs", rows: 5 },
-            { label: "Management Steps (one per line)", key: "management", rows: 8 },
-            { label: "Monitoring (one per line)", key: "monitoring", rows: 5 },
-            { label: "References (one per line)", key: "references", rows: 3 },
+            { label: "Overview", key: "overview", rows: 3, placeholder: "Brief overview paragraph..." },
+            { label: "Criteria / Diagnostic Features (one per line)", key: "criteria", rows: 4, placeholder: "Criterion 1\nCriterion 2..." },
+            { label: "Danger Signs / Red Flags (one per line)", key: "danger_signs", rows: 4, placeholder: "Red flag 1\nRed flag 2..." },
+            { label: "Management Steps (one per line)", key: "management", rows: 6, placeholder: "Step 1\nStep 2..." },
+            { label: "Monitoring (one per line)", key: "monitoring", rows: 4, placeholder: "Monitor 1\nMonitor 2..." },
+            { label: "References (one per line)", key: "references", rows: 2, placeholder: "WHO Guidelines 2023\nIAP 2022..." },
           ].map(f => (
             <div key={f.key}>
               <Label className="text-xs font-semibold text-slate-600">{f.label}</Label>
-              <Textarea
-                value={data[f.key]}
-                onChange={e => setData(d => ({ ...d, [f.key]: e.target.value }))}
-                rows={f.rows}
-                className="mt-1 text-sm resize-y"
-              />
+              <Textarea value={data[f.key]} onChange={e => setData(d => ({ ...d, [f.key]: e.target.value }))}
+                rows={f.rows} placeholder={f.placeholder} className="mt-1 text-xs resize-y" />
             </div>
           ))}
           <div className="flex gap-2 pt-2">
             <Button onClick={handleSave} size="sm" className="bg-blue-600 hover:bg-blue-700 flex-1">
-              <Check className="w-3.5 h-3.5 mr-1" /> Save Changes
+              <Check className="w-3.5 h-3.5 mr-1" /> {isNew ? "Add Pathway" : "Save Changes"}
             </Button>
             <Button onClick={onClose} size="sm" variant="outline">Cancel</Button>
           </div>
@@ -300,56 +366,58 @@ function EditPathwayModal({ pathway, onSave, onClose }) {
 }
 
 // ── Pathway display card ─────────────────────────────────────────────────────
-function PathwayCard({ pathway, isAdmin, onEdit }) {
+function PathwayCard({ pathway, onEdit, onDelete }) {
   const c = COLOR_MAP[pathway.color] || COLOR_MAP.blue;
   return (
     <Card className="bg-white border border-slate-200 shadow-sm">
-      <CardHeader className={`border-b py-4 px-5 ${c.header}`}>
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div className="flex-1">
-            <CardTitle className="text-base">{pathway.full}</CardTitle>
-            <Badge className={`${c.badge} mt-2 text-xs`}>{pathway.badge}</Badge>
+      <CardHeader className={`border-b py-3 px-4 ${c.header}`}>
+        <div className="flex items-start justify-between gap-2 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-sm leading-snug">{pathway.full}</CardTitle>
+            <Badge className={`${c.badge} mt-1.5 text-xs`}>{pathway.badge}</Badge>
           </div>
-          {isAdmin && (
-            <Button size="sm" variant="outline"
-              className="h-7 text-xs border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
-              onClick={() => onEdit(pathway)}>
-              <Pencil className="w-3 h-3 mr-1" /> Edit
+          <div className="flex gap-1.5 flex-shrink-0">
+            <Button size="sm" variant="outline" onClick={() => onEdit(pathway)}
+              className="h-7 text-xs border-blue-200 text-blue-700 hover:bg-blue-50 px-2">
+              <Pencil className="w-3 h-3" />
             </Button>
-          )}
+            <Button size="sm" variant="outline" onClick={() => onDelete(pathway.id)}
+              className="h-7 text-xs border-red-200 text-red-600 hover:bg-red-50 px-2">
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 space-y-3">
-        <SectionCard title="Overview" items={pathway.overview} isList={false} />
-        <SectionCard title="📋 Criteria / Features" items={pathway.criteria} />
-        <SectionCard title="🚨 Danger Signs / Red Flags" items={pathway.danger_signs} />
-        <SectionCard title="🩺 Management Protocol" items={pathway.management} />
-        <SectionCard title="📊 Monitoring" items={pathway.monitoring} />
-        <div className="border border-slate-200 rounded-lg p-3 bg-slate-50">
-          <p className="text-xs font-semibold text-slate-600 mb-1">References</p>
-          <div className="flex flex-wrap gap-1.5">
-            {pathway.references.map((r, i) => (
-              <Badge key={i} variant="outline" className="text-xs">{r}</Badge>
-            ))}
+      <CardContent className="p-3 space-y-2">
+        {pathway.overview && <SectionCard title="Overview" items={pathway.overview} isList={false} />}
+        {pathway.criteria?.length > 0 && <SectionCard title="📋 Criteria / Features" items={pathway.criteria} />}
+        {pathway.danger_signs?.length > 0 && <SectionCard title="🚨 Danger Signs / Red Flags" items={pathway.danger_signs} />}
+        {pathway.management?.length > 0 && <SectionCard title="🩺 Management Protocol" items={pathway.management} />}
+        {pathway.monitoring?.length > 0 && <SectionCard title="📊 Monitoring" items={pathway.monitoring} />}
+        {pathway.references?.length > 0 && (
+          <div className="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+            <p className="text-xs font-semibold text-slate-600 mb-1">References</p>
+            <div className="flex flex-wrap gap-1">
+              {pathway.references.map((r, i) => <Badge key={i} variant="outline" className="text-xs">{r}</Badge>)}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-// ── AI Pathway Generator (admin) ─────────────────────────────────────────────
+// ── AI Pathway Generator ─────────────────────────────────────────────────────
 function AIPathwayGenerator({ onGenerated }) {
   const [mode, setMode] = useState("web");
   const [topic, setTopic] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const qc = useQueryClient();
 
   const generate = async () => {
     if (!topic.trim() && !file) { toast.error("Enter a topic or upload a document"); return; }
     setLoading(true);
-    toast.info("AI generating pathway — this may take 30-60 seconds…");
+    toast.info("AI generating pathway — 30-60 seconds…");
     try {
       let fileUrls = [];
       if (file) {
@@ -357,11 +425,8 @@ function AIPathwayGenerator({ onGenerated }) {
         fileUrls = [file_url];
       }
       const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an expert pediatric physician. Generate a comprehensive clinical pathway for: "${topic || 'the uploaded document topic'}".
-${file ? 'Use the uploaded document as primary source.' : 'Use current evidence-based guidelines, WHO, IAP, AAP standards.'}
-Return a detailed clinical pathway JSON with these exact fields:
-- name, full, badge, color (one of: amber/teal/violet/blue/green/rose), overview (paragraph),
-- criteria (array), danger_signs (array), management (array 10-15 items), monitoring (array), references (array)`,
+        prompt: `Expert pediatric physician. Generate comprehensive clinical pathway for: "${topic || 'the document topic'}".
+Return JSON: name, full, badge, color (amber/teal/violet/blue/green/rose), overview, criteria (array), danger_signs (array), management (array 10-15 items), monitoring (array), references (array)`,
         file_urls: fileUrls.length ? fileUrls : undefined,
         add_context_from_internet: !file,
         model: "claude_sonnet_4_6",
@@ -378,16 +443,10 @@ Return a detailed clinical pathway JSON with these exact fields:
           }
         }
       });
-      await base44.entities.CustomSection.create({
-        title: res.full || res.name, section_type: "pathway",
-        content: res, status: "draft", created_by_admin: true,
-      });
-      qc.invalidateQueries({ queryKey: ["custom-pathways"] });
-      toast.success("Pathway generated! Review drafts below.");
+      onGenerated({ ...res, id: `ai_${Date.now()}` });
       setTopic(""); setFile(null);
-      onGenerated?.();
     } catch (e) {
-      toast.error("Generation failed — " + (e.message || "unknown error"));
+      toast.error("Generation failed: " + (e.message || "unknown error"));
     }
     setLoading(false);
   };
@@ -399,34 +458,24 @@ Return a detailed clinical pathway JSON with these exact fields:
         <h3 className="text-sm font-bold text-violet-900">AI Pathway Generator</h3>
         <Badge className="bg-violet-100 text-violet-700 text-xs">Uses AI Credits</Badge>
       </div>
-      <Alert className="bg-amber-50 border-amber-200 py-2">
-        <AlertDescription className="text-xs text-amber-800">
-          AI-generated pathways saved as <strong>drafts</strong> — review before publishing.
-        </AlertDescription>
-      </Alert>
       <div className="flex gap-2">
-        <button onClick={() => setMode("web")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold border transition-colors ${mode === "web" ? "bg-violet-600 text-white border-violet-600" : "bg-white text-slate-600 border-slate-200 hover:bg-violet-50"}`}>
-          <Globe className="w-3.5 h-3.5" />Web Search
-        </button>
-        <button onClick={() => setMode("file")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold border transition-colors ${mode === "file" ? "bg-violet-600 text-white border-violet-600" : "bg-white text-slate-600 border-slate-200 hover:bg-violet-50"}`}>
-          <Upload className="w-3.5 h-3.5" />Upload Document
-        </button>
+        {["web", "file"].map(m => (
+          <button key={m} onClick={() => setMode(m)}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold border transition-colors ${mode === m ? "bg-violet-600 text-white border-violet-600" : "bg-white text-slate-600 border-slate-200 hover:bg-violet-50"}`}>
+            {m === "web" ? <><Globe className="w-3.5 h-3.5" />Web Search</> : <><Upload className="w-3.5 h-3.5" />Upload Doc</>}
+          </button>
+        ))}
       </div>
-      <div>
-        <Label className="text-xs font-semibold text-slate-700">Pathway Topic *</Label>
-        <Input value={topic} onChange={e => setTopic(e.target.value)}
-          placeholder="e.g. Kawasaki Disease, Neonatal Sepsis, Febrile Seizures…"
-          className="mt-1 h-9 text-sm bg-white" />
-      </div>
+      <Input value={topic} onChange={e => setTopic(e.target.value)}
+        placeholder="e.g. Kawasaki Disease, Neonatal Sepsis, Febrile Seizures…"
+        className="h-9 text-sm bg-white" />
       {mode === "file" && (
         <div>
           <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" id="pathway-doc-upload" className="hidden"
             onChange={e => setFile(e.target.files?.[0] || null)} />
           <label htmlFor="pathway-doc-upload"
             className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-violet-300 text-violet-700 rounded-lg bg-white hover:bg-violet-50">
-            <Upload className="w-3.5 h-3.5" />{file ? file.name : "Choose file (PDF/image/doc)"}
+            <Upload className="w-3.5 h-3.5" />{file ? file.name : "Choose file"}
           </label>
         </div>
       )}
@@ -437,101 +486,61 @@ Return a detailed clinical pathway JSON with these exact fields:
   );
 }
 
-// ── Custom pathway card (AI-generated) ──────────────────────────────────────
-function CustomPathwayCard({ record, isAdmin, onDelete, onPublish }) {
-  const data = record.content || {};
-  const c = COLOR_MAP[data.color] || COLOR_MAP.blue;
-  const isDraft = record.status === "draft";
-  return (
-    <Card className={`border-2 ${isDraft ? "border-amber-300" : "border-green-300"} bg-white`}>
-      <CardHeader className={`border-b py-3 px-4 ${c.header}`}>
-        <div className="flex items-start justify-between gap-2 flex-wrap">
-          <div>
-            <CardTitle className="text-sm">{data.full || record.title}</CardTitle>
-            <div className="flex gap-1.5 mt-1.5 flex-wrap">
-              {data.badge && <Badge className={`${c.badge} text-xs`}>{data.badge}</Badge>}
-              <Badge className={isDraft ? "bg-amber-100 text-amber-700 text-xs" : "bg-green-100 text-green-700 text-xs"}>
-                {isDraft ? "Draft" : "Published"}
-              </Badge>
-              <Badge className="bg-violet-100 text-violet-700 text-xs"><Sparkles className="w-2.5 h-2.5 mr-0.5 inline" />AI</Badge>
-            </div>
-          </div>
-          {isAdmin && (
-            <div className="flex gap-1.5">
-              {isDraft && (
-                <Button size="sm" onClick={() => onPublish(record.id)} className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white">
-                  <Check className="w-3 h-3 mr-1" />Publish
-                </Button>
-              )}
-              <Button size="sm" variant="outline" onClick={() => onDelete(record.id)} className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50">
-                <Trash2 className="w-3 h-3" />
-              </Button>
-            </div>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="p-4 space-y-3">
-        {data.overview && <SectionCard title="Overview" items={data.overview} isList={false} />}
-        {data.criteria?.length > 0 && <SectionCard title="📋 Criteria" items={data.criteria} />}
-        {data.danger_signs?.length > 0 && <SectionCard title="🚨 Danger Signs" items={data.danger_signs} />}
-        {data.management?.length > 0 && <SectionCard title="🩺 Management" items={data.management} />}
-        {data.monitoring?.length > 0 && <SectionCard title="📊 Monitoring" items={data.monitoring} />}
-      </CardContent>
-    </Card>
-  );
-}
-
 // ── Main ─────────────────────────────────────────────────────────────────────
 export default function GeneralPediatricsHub() {
-  const [activeTab, setActiveTab] = useState("assistant");
+  const [activeTab, setActiveTab] = useState("pathways");
   const [search, setSearch] = useState("");
   const [showGenerator, setShowGenerator] = useState(false);
   const [editingPathway, setEditingPathway] = useState(null);
-  const [localOverrides, setLocalOverrides] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("peds_pathway_overrides") || "{}"); } catch { return {}; }
-  });
-  const qc = useQueryClient();
+  const [addingNew, setAddingNew] = useState(false);
 
-  const { data: user } = useQuery({ queryKey: ["currentUser"], queryFn: () => base44.auth.me() });
-  const isAdmin = user?.role === "admin";
-
-  const { data: customPathways = [] } = useQuery({
-    queryKey: ["custom-pathways"],
-    queryFn: () => base44.entities.CustomSection.filter({ section_type: "pathway" }, "-created_date", 50),
+  // All pathways stored in state (persisted in localStorage)
+  const [pathways, setPathways] = useState(() => {
+    try {
+      const saved = localStorage.getItem("peds_pathways_v2");
+      return saved ? JSON.parse(saved) : INITIAL_PATHWAYS;
+    } catch { return INITIAL_PATHWAYS; }
   });
 
-  const handleDelete = async (id) => {
-    await base44.entities.CustomSection.delete(id);
-    qc.invalidateQueries({ queryKey: ["custom-pathways"] });
+  const savePathways = (updated) => {
+    setPathways(updated);
+    localStorage.setItem("peds_pathways_v2", JSON.stringify(updated));
+  };
+
+  const handleSave = (updated) => {
+    const exists = pathways.find(p => p.id === updated.id);
+    const newList = exists
+      ? pathways.map(p => p.id === updated.id ? updated : p)
+      : [...pathways, updated];
+    savePathways(newList);
+    setEditingPathway(null);
+    setAddingNew(false);
+    toast.success(exists ? "Pathway updated" : "Pathway added!");
+  };
+
+  const handleDelete = (id) => {
+    if (!confirm("Delete this pathway?")) return;
+    savePathways(pathways.filter(p => p.id !== id));
     toast.success("Pathway deleted");
   };
 
-  const handlePublish = async (id) => {
-    await base44.entities.CustomSection.update(id, { status: "published" });
-    qc.invalidateQueries({ queryKey: ["custom-pathways"] });
-    toast.success("Pathway published!");
+  const handleAIGenerated = (pathway) => {
+    savePathways([...pathways, pathway]);
+    setShowGenerator(false);
+    toast.success("AI pathway added!");
   };
 
-  // Save edited built-in pathway locally
-  const handleSaveEdit = (updated) => {
-    const overrides = { ...localOverrides, [updated.id]: updated };
-    setLocalOverrides(overrides);
-    localStorage.setItem("peds_pathway_overrides", JSON.stringify(overrides));
-    setEditingPathway(null);
-    toast.success("Pathway updated");
+  const handleResetPathways = () => {
+    if (!confirm("Reset all pathways to defaults? This cannot be undone.")) return;
+    savePathways(INITIAL_PATHWAYS);
+    toast.success("Pathways reset to defaults");
   };
 
-  const publishedCustom = customPathways.filter(p => p.status === "published");
-  const draftCustom = customPathways.filter(p => p.status === "draft");
-
-  // Merge local admin overrides into built-in pathways
-  const resolvedBuiltIn = BUILT_IN_PATHWAYS.map(p => localOverrides[p.id] ? { ...p, ...localOverrides[p.id] } : p);
-
-  const filteredBuiltIn = resolvedBuiltIn.filter(p =>
+  const filtered = pathways.filter(p =>
     !search.trim() ||
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.full.toLowerCase().includes(search.toLowerCase()) ||
-    p.badge.toLowerCase().includes(search.toLowerCase())
+    p.name?.toLowerCase().includes(search.toLowerCase()) ||
+    p.full?.toLowerCase().includes(search.toLowerCase()) ||
+    p.badge?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -550,45 +559,90 @@ export default function GeneralPediatricsHub() {
             </div>
             <div className="min-w-0">
               <h1 className="text-base font-bold text-slate-900 leading-tight truncate">General Pediatrics Hub</h1>
-              <p className="text-xs text-slate-500 hidden sm:block">IAP · WHO · Growth · Vaccination · SAM · ASD · Nutrition</p>
+              <p className="text-xs text-slate-500 hidden sm:block">IAP · WHO · Growth · Vaccines · SAM · ASD · Endocrine · AI</p>
             </div>
           </div>
-          {isAdmin && activeTab === "pathways" && (
-            <Button size="sm" onClick={() => setShowGenerator(v => !v)}
-              className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1 flex-shrink-0">
-              <Sparkles className="w-3.5 h-3.5" />{showGenerator ? "Close" : "AI Generate"}
-            </Button>
+          {activeTab === "pathways" && (
+            <div className="flex gap-1.5">
+              <Button size="sm" onClick={() => { setAddingNew(true); setShowGenerator(false); }}
+                className="bg-green-600 hover:bg-green-700 text-white text-xs h-8 gap-1 flex-shrink-0">
+                <Plus className="w-3.5 h-3.5" />Add
+              </Button>
+              <Button size="sm" onClick={() => setShowGenerator(v => !v)}
+                className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1 flex-shrink-0">
+                <Sparkles className="w-3.5 h-3.5" />AI
+              </Button>
+            </div>
           )}
         </div>
       </div>
 
       {/* Tab Bar */}
-      <div className="bg-green-50 px-2 py-2 sticky top-[57px] z-10 shadow-sm border-b border-green-200">
-        <div className="max-w-5xl mx-auto overflow-x-auto">
-          <div className="flex gap-1.5 min-w-max">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-lg min-w-[68px] transition-all text-xs font-semibold shadow-sm border
-                    ${isActive ? `${tab.color} text-white border-transparent` : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
-                  <Icon className="w-4 h-4" />
-                  <span className="text-[10px] font-bold whitespace-nowrap">{tab.label}</span>
-                  {tab.badge && (
-                    <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">{tab.badge}</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      <div className="bg-green-50 px-2 py-2 sticky top-[57px] z-10 shadow-sm border-b border-green-200 overflow-x-auto">
+        <div className="flex gap-1.5 min-w-max max-w-5xl mx-auto">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-lg min-w-[62px] transition-all text-xs font-semibold shadow-sm border
+                  ${isActive ? `${tab.color} text-white border-transparent` : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
+                <Icon className="w-4 h-4" />
+                <span className="text-[10px] font-bold whitespace-nowrap">{tab.label}</span>
+                {tab.badge && (
+                  <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">{tab.badge}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Content */}
       <div className="max-w-5xl mx-auto p-4">
 
-        {/* AI Assistant */}
+        {/* ── PATHWAYS (first tab) ── */}
+        {activeTab === "pathways" && (
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Search pathways…"
+                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
+            </div>
+
+            {showGenerator && <AIPathwayGenerator onGenerated={handleAIGenerated} />}
+
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500">{filtered.length} pathways — tap ✏️ to edit, 🗑️ to delete</span>
+              <button onClick={handleResetPathways} className="text-xs text-slate-400 hover:text-red-500 transition-colors">
+                Reset to defaults
+              </button>
+            </div>
+
+            {filtered.map(p => (
+              <PathwayCard key={p.id} pathway={p} onEdit={setEditingPathway} onDelete={handleDelete} />
+            ))}
+
+            {filtered.length === 0 && (
+              <div className="text-center py-10">
+                <p className="text-slate-400 text-sm mb-3">No pathways match your search</p>
+                <Button size="sm" onClick={() => setAddingNew(true)} className="bg-green-600 text-white">
+                  <Plus className="w-4 h-4 mr-1" /> Add New Pathway
+                </Button>
+              </div>
+            )}
+
+            <Alert className="bg-blue-50 border-blue-200">
+              <Info className="w-4 h-4 text-blue-600" />
+              <AlertDescription className="text-blue-800 text-xs">
+                Based on WHO, IAP, AAP, CDC guidelines. All users can add/edit/delete pathways.
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {/* ── AI ASSISTANT ── */}
         {activeTab === "assistant" && (
           <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-green-200">
             <div className="bg-green-600 px-4 py-3 flex items-center justify-between">
@@ -596,7 +650,7 @@ export default function GeneralPediatricsHub() {
                 <p className="font-bold text-white text-sm flex items-center gap-2">
                   <MessageCircle className="w-5 h-5" />Vaccination & Drug AI Assistant
                 </p>
-                <p className="text-green-100 text-xs mt-0.5">Ask about vaccines, drug doses, treatment plans</p>
+                <p className="text-green-100 text-xs mt-0.5">Ask about vaccines, drug doses, growth, development, treatment plans</p>
               </div>
               <Badge className="bg-yellow-400/90 text-yellow-900 text-xs border-0">IAP 2023</Badge>
             </div>
@@ -604,7 +658,7 @@ export default function GeneralPediatricsHub() {
           </div>
         )}
 
-        {/* Vaccination */}
+        {/* ── VACCINATION ── */}
         {activeTab === "vaccination" && (
           <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-blue-600 rounded-xl shadow">
@@ -618,8 +672,8 @@ export default function GeneralPediatricsHub() {
           </div>
         )}
 
-        {/* Growth */}
-        {activeTab === "growth" && (
+        {/* ── PEDIATRICS (was Growth) ── */}
+        {activeTab === "pediatrics" && (
           <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-purple-600 rounded-xl shadow">
               <TrendingUp className="w-5 h-5 text-white shrink-0" />
@@ -632,103 +686,73 @@ export default function GeneralPediatricsHub() {
           </div>
         )}
 
-        {/* Nutrition */}
+        {/* ── DEVELOPMENT + DQ ── */}
+        {activeTab === "dev" && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 p-3 bg-cyan-600 rounded-xl shadow">
+              <Baby className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">Developmental Quotient (DQ) & Milestone Checker</p>
+                <p className="text-cyan-100 text-xs">Calculate DQ across 4 domains · Mark milestones · Identify delays</p>
+              </div>
+            </div>
+            <DevQuotientTool />
+          </div>
+        )}
+
+        {/* ── NUTRITION ── */}
         {activeTab === "nutrition" && (
           <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-orange-600 rounded-xl shadow">
               <Apple className="w-5 h-5 text-white shrink-0" />
               <div>
                 <p className="font-bold text-white text-sm">Nutrition Intake Tracker</p>
-                <p className="text-orange-100 text-xs">Log food + fluids · Compare vs requirements</p>
+                <p className="text-orange-100 text-xs">Log food + fluids · Compare vs requirements · IAP/ICMR guidelines</p>
               </div>
             </div>
             <NutritionIntakeTracker />
           </div>
         )}
 
-        {/* Pathways — SAM / Dev / Autism + AI generated */}
-        {activeTab === "pathways" && (
-          <div className="space-y-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search pathways…"
-                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
-            </div>
-
-            {/* AI Generator (admin) */}
-            {isAdmin && showGenerator && (
-              <AIPathwayGenerator onGenerated={() => setShowGenerator(false)} />
-            )}
-
-            {/* Draft custom pathways */}
-            {isAdmin && draftCustom.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-amber-100 text-amber-700">Drafts ({draftCustom.length})</Badge>
-                  <span className="text-xs text-slate-500">Review and publish AI-generated pathways</span>
-                </div>
-                {draftCustom.map(p => (
-                  <CustomPathwayCard key={p.id} record={p} isAdmin={isAdmin} onDelete={handleDelete} onPublish={handlePublish} />
-                ))}
-              </div>
-            )}
-
-            {/* Published custom */}
-            {publishedCustom.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-violet-500" />
-                  <span className="text-sm font-bold text-slate-700">AI-Generated Pathways ({publishedCustom.length})</span>
-                </div>
-                {publishedCustom.map(p => (
-                  <CustomPathwayCard key={p.id} record={p} isAdmin={isAdmin} onDelete={handleDelete} onPublish={handlePublish} />
-                ))}
-              </div>
-            )}
-
-            {/* Built-in pathways */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Baby className="w-4 h-4 text-teal-600" />
-                <span className="text-sm font-bold text-slate-700">Core Pediatric Pathways</span>
-              </div>
-              {filteredBuiltIn.map(p => (
-                <PathwayCard key={p.id} pathway={p} isAdmin={isAdmin} onEdit={setEditingPathway} />
-              ))}
-              {filteredBuiltIn.length === 0 && (
-                <p className="text-center text-slate-400 py-8 text-sm">No pathways match your search</p>
-              )}
-            </div>
-
-            <Alert className="bg-blue-50 border-blue-200">
-              <Info className="w-4 h-4 text-blue-600" />
-              <AlertDescription className="text-blue-800 text-xs">
-                Pathways based on WHO, IAP, AAP, CDC guidelines. AI-generated content should be reviewed by a specialist before clinical use.
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
-
-        {/* Guidelines */}
-        {activeTab === "guidelines" && (
+        {/* ── AI ANALYSERS ── */}
+        {activeTab === "analysers" && (
           <div>
-            <div className="flex items-center gap-2 mb-4 p-3 bg-indigo-600 rounded-xl shadow">
-              <Scale className="w-5 h-5 text-white shrink-0" />
+            <div className="flex items-center gap-2 mb-4 p-3 bg-violet-600 rounded-xl shadow">
+              <Sparkles className="w-5 h-5 text-white shrink-0" />
               <div>
-                <p className="font-bold text-white text-sm">IAP / ICMR Nutrition Guidelines</p>
-                <p className="text-indigo-100 text-xs">RDA table · Complementary feeding · Malnutrition management</p>
+                <p className="font-bold text-white text-sm">AI Clinical Analysers</p>
+                <p className="text-violet-100 text-xs">Lab · Urine · Biopsy · Radiology · Uroflow · UDS · ABG</p>
               </div>
             </div>
-            <PediatricNutritionPathway />
+            <PedsAIAnalysers />
           </div>
         )}
+
+        {/* ── ENDOCRINE ── */}
+        {activeTab === "endocrine" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-amber-600 rounded-xl shadow">
+              <Zap className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">Pediatric Endocrinology</p>
+                <p className="text-amber-100 text-xs">T1DM · Thyroid · Short Stature · Puberty · CAH · Obesity · Calculators</p>
+              </div>
+            </div>
+            <EndocrineSection />
+          </div>
+        )}
+
+        {/* ── REFERENCES ── */}
+        {activeTab === "references" && <PedsReferenceSection />}
       </div>
 
-      {/* Edit modal */}
-      {editingPathway && (
-        <EditPathwayModal pathway={editingPathway} onSave={handleSaveEdit} onClose={() => setEditingPathway(null)} />
+      {/* Edit/Add modal */}
+      {(editingPathway || addingNew) && (
+        <PathwayModal
+          pathway={addingNew ? {} : editingPathway}
+          onSave={handleSave}
+          onClose={() => { setEditingPathway(null); setAddingNew(false); }}
+        />
       )}
     </div>
   );
