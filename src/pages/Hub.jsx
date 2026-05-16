@@ -331,6 +331,34 @@ export default function Hub() {
         {/* ── Contextual Suggestions from patient data ── */}
         <ContextualSuggestions patientData={patientData} />
 
+        {/* ── Quick Access Chips ── */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Zap className="w-4 h-4 text-amber-500" />
+            <span className="text-sm font-bold text-slate-700">Quick Access</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { label: "AKI", page: "AKIStager", color: "bg-red-100 text-red-700 border-red-200" },
+              { label: "HyperK", page: "EmergencyHub", color: "bg-orange-100 text-orange-700 border-orange-200" },
+              { label: "NS", page: "ClinicalSupport", color: "bg-purple-100 text-purple-700 border-purple-200" },
+              { label: "Dialysis", page: "RRTAssistant", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+              { label: "BP", page: "BPPercentiles", color: "bg-rose-100 text-rose-700 border-rose-200" },
+              { label: "Growth", page: "Anthropometry", color: "bg-green-100 text-green-700 border-green-200" },
+              { label: "UDS", page: "UrologyNephrologyHub", color: "bg-teal-100 text-teal-700 border-teal-200" },
+              { label: "RPGN", page: "EmergencyHub", color: "bg-red-100 text-red-700 border-red-200" },
+              { label: "Discharge", page: "DischargeSummary", color: "bg-slate-100 text-slate-700 border-slate-200" },
+              { label: "Workspace", page: "ClinicalWorkspace", color: "bg-blue-100 text-blue-700 border-blue-200" },
+            ].map(chip => (
+              <Link key={chip.label} to={createPageUrl(chip.page)}>
+                <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border ${chip.color} active:scale-95 transition-transform`}>
+                  {chip.label}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* ── Quick Scan OCR ── */}
         <div>
           <div className="flex items-center gap-2 mb-2">

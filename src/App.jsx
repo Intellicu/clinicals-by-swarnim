@@ -32,6 +32,7 @@ import RareDiseaseModule from './pages/RareDiseaseModule';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import GuidelinesLibrary from './pages/GuidelinesLibrary';
+import ClinicalWorkspace from './pages/ClinicalWorkspace';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -108,6 +109,7 @@ const AuthenticatedApp = () => {
       <Route path="/About" element={<LayoutWrapper currentPageName="About"><About /></LayoutWrapper>} />
       <Route path="/Contact" element={<LayoutWrapper currentPageName="Contact"><Contact /></LayoutWrapper>} />
       <Route path="/GuidelinesLibrary" element={<LayoutWrapper currentPageName="GuidelinesLibrary"><GuidelinesLibrary /></LayoutWrapper>} />
+      <Route path="/ClinicalWorkspace" element={<LayoutWrapper currentPageName="ClinicalWorkspace"><ClinicalWorkspace /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

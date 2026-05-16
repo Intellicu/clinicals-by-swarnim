@@ -49,7 +49,7 @@ export default function ContextualBottomBar() {
     { icon: Home, label: "Home", to: createPageUrl("Hub") },
     { icon: Calculator, label: "Calc", to: createPageUrl("CalculatorsHub") },
     { icon: Sparkles, label: "AI", to: createPageUrl("ClinicalAIHub") },
-    { icon: BookOpen, label: "Knowledge", to: "/GuidelinesLibrary" },
+    { icon: BookOpen, label: "Knowledge", to: createPageUrl("ClinicalWorkspace") },
     { icon: Search, label: "Search", to: createPageUrl("Guidelines") },
   ];
 
