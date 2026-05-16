@@ -408,85 +408,44 @@ export default function QuickCalculations() {
           </div>
         </CardHeader>
         <CardContent className="pt-4">
-          <div className="grid md:grid-cols-3 gap-3 mb-4">
+          <div className="space-y-2 mb-4">
             {calculations.map((calc, idx) => {
               const IconComponent = calc.icon;
-              const colorClasses = {
-                green: "from-green-50 to-emerald-50 border-green-300",
-                amber: "from-amber-50 to-orange-50 border-amber-300",
-                red: "from-red-50 to-rose-50 border-red-300",
-                blue: "from-blue-50 to-cyan-50 border-blue-300"
-              };
+              const iconBg = {
+                green: "bg-green-100 text-green-600",
+                amber: "bg-amber-100 text-amber-600",
+                red: "bg-red-100 text-red-600",
+                blue: "bg-blue-100 text-blue-600"
+              }[calc.color] || "bg-slate-100 text-slate-600";
 
-              const handleClick = (e) => {
-                if (calc.clickAction) {
-                  e.preventDefault();
-                  calc.clickAction();
-                }
-              };
+              const rowBg = {
+                green: "bg-green-50 border-green-200",
+                amber: "bg-amber-50 border-amber-200",
+                red: "bg-red-50 border-red-200",
+                blue: "bg-blue-50 border-blue-200"
+              }[calc.color] || "bg-slate-50 border-slate-200";
 
-              return (
-                <div key={idx} onClick={handleClick}>
-                  {!calc.clickAction ? (
-                    <Link to={createPageUrl(calc.page)}>
-                      <Card className={`bg-gradient-to-br ${colorClasses[calc.color]} border-2 hover:shadow-xl transition-all cursor-pointer group h-full`}>
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start gap-3 flex-1">
-                              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                                calc.color === "green" ? "bg-green-200" :
-                                calc.color === "amber" ? "bg-amber-200" :
-                                calc.color === "red" ? "bg-red-200" :
-                                "bg-blue-200"
-                              }`}>
-                                <IconComponent className={`w-6 h-6 ${
-                                  calc.color === "green" ? "text-green-700" :
-                                  calc.color === "amber" ? "text-amber-700" :
-                                  calc.color === "red" ? "text-red-700" :
-                                  "text-blue-700"
-                                }`} />
-                              </div>
-                              <div className="flex-1">
-                                <div className="font-semibold text-sm mb-1 text-slate-700">{calc.name}</div>
-                                <div className="text-xl font-bold text-slate-900">{calc.value}</div>
-                                <div className="text-xs mt-1 text-slate-600">{calc.subtext}</div>
-                              </div>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ) : (
-                    <Card className={`bg-gradient-to-br ${colorClasses[calc.color]} border-2 hover:shadow-xl transition-all cursor-pointer group h-full`}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-3 flex-1">
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                              calc.color === "green" ? "bg-green-200" :
-                              calc.color === "amber" ? "bg-amber-200" :
-                              calc.color === "red" ? "bg-red-200" :
-                              "bg-blue-200"
-                            }`}>
-                              <IconComponent className={`w-6 h-6 ${
-                                calc.color === "green" ? "text-green-700" :
-                                calc.color === "amber" ? "text-amber-700" :
-                                calc.color === "red" ? "text-red-700" :
-                                "text-blue-700"
-                              }`} />
-                            </div>
-                            <div className="flex-1">
-                              <div className="font-semibold text-sm mb-1 text-slate-700">{calc.name}</div>
-                              <div className="text-xl font-bold text-slate-900">{calc.value}</div>
-                              <div className="text-xs mt-1 text-slate-600">{calc.subtext}</div>
-                            </div>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+              const inner = (
+                <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${rowBg} hover:shadow-md transition-all cursor-pointer group`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+                    <IconComponent className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-semibold text-slate-500 leading-tight">{calc.name}</div>
+                    <div className="text-lg font-bold text-slate-900 leading-tight">{calc.value}</div>
+                    <div className="text-xs text-slate-500 leading-tight">{calc.subtext}</div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
                 </div>
+              );
+
+              if (calc.clickAction) {
+                return (
+                  <div key={idx} onClick={calc.clickAction}>{inner}</div>
+                );
+              }
+              return (
+                <Link key={idx} to={createPageUrl(calc.page)}>{inner}</Link>
               );
             })}
           </div>
