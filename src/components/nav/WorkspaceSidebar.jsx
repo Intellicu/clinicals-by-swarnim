@@ -339,9 +339,9 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
   const ws = WORKSPACES[workspace];
 
   return (
-    <>
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className={`border-b border-slate-200 p-4 bg-gradient-to-r ${ws.color} bg-opacity-10`}>
+      <div className="border-b border-slate-200 p-4 bg-white">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5">
             <div className={`w-9 h-9 bg-gradient-to-br ${ws.color} rounded-xl flex items-center justify-center shadow-lg`}>
@@ -375,7 +375,7 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
       )}
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-3" aria-label="Workspace navigation">
+      <nav className="flex-1 overflow-y-auto p-3 space-y-3 bg-white" aria-label="Workspace navigation">
         {(workspace === "clinic" && !isClinicMode)
           ? null
           : nav.map((group, gi) => (
@@ -388,7 +388,7 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
       </nav>
 
       {/* User footer */}
-      <div className="border-t border-slate-200 p-3 bg-slate-50 space-y-1.5">
+      <div className="border-t border-slate-200 p-3 bg-white space-y-1.5">
         <div className="flex items-center gap-2.5 px-1 mb-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xs shadow">
             {user?.full_name?.[0]?.toUpperCase() || "U"}
@@ -417,6 +417,6 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
           Delete Account
         </button>
       </div>
-    </>
+    </div>
   );
 }

@@ -397,7 +397,7 @@ export default function Hub() {
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden pb-20">
-      <div className="max-w-2xl mx-auto px-3 py-3 space-y-4">
+      <div className="w-full max-w-3xl mx-auto px-3 py-3 space-y-4">
 
         {/* ── Hero strip ── */}
         <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 shadow">
@@ -506,13 +506,13 @@ export default function Hub() {
               <span className="text-xs text-blue-600 font-semibold">All AI →</span>
             </Link>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
             {AI_TOOLS.map(tool => {
               const Icon = tool.icon;
               const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
               return (
-                <Link key={tool.name} to={href}>
-                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm">
+                <Link key={tool.name} to={href} className="flex-shrink-0">
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm w-20">
                     <div className={`w-9 h-9 ${tool.color} rounded-xl flex items-center justify-center shadow-sm`}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
@@ -535,12 +535,12 @@ export default function Hub() {
               <span className="text-xs text-blue-600 font-semibold">All →</span>
             </Link>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
             {QUICK_CALCS.map(calc => {
               const Icon = calc.icon;
               return (
-                <Link key={calc.name} to={createPageUrl(calc.page)}>
-                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm">
+                <Link key={calc.name} to={createPageUrl(calc.page)} className="flex-shrink-0">
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm w-20">
                     <div className={`w-9 h-9 ${calc.color} rounded-xl flex items-center justify-center shadow-sm`}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
@@ -574,14 +574,17 @@ export default function Hub() {
           </div>
           <div className="grid grid-cols-2 gap-2">
             {[
+              { name: "Pediatrics Hub", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
+              { name: "Clinical Pathways", icon: GitBranch, color: "bg-sky-700", page: "ClinicalSupport" },
               { name: "Nephrology & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
               { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
               { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
               { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
               { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
-              { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
               { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
               { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
+              { name: "Calculators", icon: Calculator, color: "bg-blue-600", page: "CalculatorsHub" },
+              { name: "Pathway Builder", icon: GitBranch, color: "bg-violet-600", page: "PathwayBuilder" },
             ].map(chip => {
               const ChipIcon = chip.icon;
               return (

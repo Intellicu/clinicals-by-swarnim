@@ -118,6 +118,14 @@ export default function Layout({ children, currentPageName }) {
           -webkit-text-size-adjust: 100%;
           -webkit-font-smoothing: antialiased;
         }
+        button, a, nav, [role="navigation"] {
+          -webkit-user-select: none;
+          user-select: none;
+        }
+        p, span, h1, h2, h3, h4, h5, li, td, th, .prose, .clinical-content {
+          -webkit-user-select: text;
+          user-select: text;
+        }
         .overflow-y-auto, .overflow-auto { -webkit-overflow-scrolling: touch; }
         button, a { touch-action: manipulation; }
         input, select, textarea { font-size: 16px !important; }
@@ -242,7 +250,7 @@ export default function Layout({ children, currentPageName }) {
           <TopQuickAccessBar />
 
           {/* Page content */}
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto w-full">
             <PullToRefresh
               onRefresh={async () => {
                 await queryClient.invalidateQueries();
