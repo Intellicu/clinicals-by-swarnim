@@ -30,7 +30,7 @@ import HubImagingPanel from "../components/hub/HubImagingPanel";
 
 const SECTIONS = [
   { id: "nephrology", label: "Nephrology Pathways", icon: Stethoscope, badge: "Umbrella" },
-  { id: "cakut", label: "CAKUT & Urology", icon: Droplet, badge: "8+" },
+  { id: "cakut", label: "Nephrology & Urology", icon: Droplet, badge: "8+" },
   { id: "neuro_bbd", label: "NGB & BBD", icon: Brain, badge: "ICCS" },
   { id: "uti", label: "UTI & Antimicrobial", icon: Microscope, badge: "ISPN" },
   { id: "tubular", label: "Tubular & Electrolytes", icon: TestTube, badge: "RTA" },
@@ -74,7 +74,7 @@ export default function UrologyNephrologyHub() {
         <div className="rounded-2xl bg-gradient-to-br from-blue-800 via-indigo-700 to-violet-700 p-5 text-white shadow-xl">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Pediatric Nephrology & Urology Hub</h1>
+              <h1 className="text-xl md:text-2xl font-bold">Nephrology & Urology Hub</h1>
               <p className="text-blue-100 text-sm mt-1">
                 Nephrology · CAKUT · NGB/BBD · UTI · Tubular · Dialysis · Transplant · Hypertension · Imaging · AI Lab · Education
               </p>

@@ -13,56 +13,200 @@ import {
   UtensilsCrossed, GraduationCap, Layers, FlaskConical, ClipboardList,
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
   RefreshCw, Shield, Info, BarChart2, Star, Clock,
-  Database, TrendingUp, LineChart, Search, X
+  Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
+  ChevronDown, ChevronUp
 } from "lucide-react";
 import QuickPatientEntry from "../components/QuickPatientEntry";
-import QuickCalculations from "../components/QuickCalculations";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
+import ContextualSuggestions from "../components/hub/ContextualSuggestions";
+import { usePatient } from "../components/PatientContext";
+import QuickCalculations from "../components/QuickCalculations";
 
-// ── Quick-access sections (reference-first, no clinic/EMR/queue content) ──
-const QUICK_TOOLS = [
-  { name: "Schwartz GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR" },
-  { name: "BP Percentiles", icon: Heart, color: "bg-red-600", page: "BPPercentiles" },
-  { name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
-  { name: "Guidelines", icon: BookOpen, color: "bg-blue-700", page: "Guidelines" },
-  { name: "Emergency Hub", icon: AlertCircle, color: "bg-red-700", page: "EmergencyHub" },
-  { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
-  { name: "RRT Assistant", icon: Droplet, color: "bg-cyan-600", page: "RRTAssistant" },
-  { name: "Clinical Support", icon: Brain, color: "bg-indigo-600", page: "ClinicalSupport" },
-  { name: "Diet Generator", icon: UtensilsCrossed, color: "bg-green-600", page: "DietGenerator" },
-  { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
-  { name: "AI Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub" },
-  { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer" },
-  { name: "Research Methods", icon: Layers, color: "bg-rose-700", page: "ResearchMethodsHub" },
-  { name: "Clinical Approaches", icon: Stethoscope, color: "bg-cyan-700", page: "ClinicalApproaches" },
-  { name: "Lab Pathways", icon: FlaskConical, color: "bg-amber-700", page: "LabPathways" },
-  { name: "Admit Orders", icon: ClipboardList, color: "bg-indigo-700", page: "AdmissionOrders" },
-  { name: "Differential Dx", icon: Brain, color: "bg-violet-700", page: "DifferentialEngine" },
-  { name: "Case Library", icon: BookOpen, color: "bg-emerald-700", page: "CaseLibrary" },
-  { name: "Discharge Summary", icon: FileText, color: "bg-slate-700", page: "DischargeSummary" },
-  { name: "Research OS", icon: Layers, color: "bg-indigo-700", page: "ResearchOS" },
-  { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-teal-700", page: "NutritionHub" },
-  { name: "Rheumatology", icon: Stethoscope, color: "bg-violet-600", page: "PediatricRheumatology" },
-  { name: "CAKUT & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
-  { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
-  { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub" },
-  { name: "Tubular Lab", icon: Beaker, color: "bg-slate-700", page: "UrologyNephrologyHub" },
+// ── AI Analyser Tools ──
+const AI_TOOLS = [
+  { name: "Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub", desc: "Interpret labs with AI" },
+  { name: "Biopsy AI", icon: Layers, color: "bg-violet-700", page: "RareDiseaseModule", desc: "Renal biopsy patterns" },
+  { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer", desc: "Genetic report analysis" },
+  { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub", desc: "Uroflowmetry analysis" },
+  { name: "Tubular AI", icon: Beaker, color: "bg-slate-700", page: "UrologyNephrologyHub", desc: "Tubular function tests" },
+  { name: "Differential Dx", icon: Brain, color: "bg-indigo-600", page: "DifferentialEngine", desc: "AI differential diagnosis" },
+  { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-700", page: "AIPrescriber", desc: "Smart prescription builder" },
+  { name: "Literature AI", icon: BookOpen, color: "bg-emerald-700", page: "ResearchMethodsHub", desc: "Evidence search AI" },
 ];
 
+// ── Quick Calc Tools ──
+const QUICK_CALCS = [
+  { name: "Schwartz GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR" },
+  { name: "BP Percentiles", icon: Heart, color: "bg-red-600", page: "BPPercentiles" },
+  { name: "AKI Stager", icon: AlertCircle, color: "bg-red-700", page: "AKIStager" },
+  { name: "FENa", icon: TestTube, color: "bg-indigo-600", page: "FENaCalculator" },
+  { name: "ABG", icon: Wind, color: "bg-rose-600", page: "ABGInterpreter" },
+  { name: "Anion Gap", icon: Calculator, color: "bg-red-600", page: "AnionGap" },
+  { name: "Sodium Corr.", icon: Droplet, color: "bg-blue-500", page: "SodiumCalculator" },
+  { name: "K+ Calc", icon: Zap, color: "bg-amber-600", page: "PotassiumCalculator" },
+  { name: "Fluids", icon: Waves, color: "bg-cyan-600", page: "FluidCalculator" },
+  { name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
+  { name: "All Calcs →", icon: Calculator, color: "bg-slate-700", page: "CalculatorsHub" },
+];
+
+// ── Knowledge sections ──
 const KNOWLEDGE_SECTIONS = [
   {
-    title: "Pediatric Nephrology",
-    icon: Droplet,
-    color: "border-blue-200 bg-blue-50",
-    iconColor: "text-blue-600",
+    title: "Glomerular Diseases",
+    icon: Microscope,
+    color: "border-blue-300 bg-blue-50",
+    iconColor: "text-blue-700",
     items: [
-      { name: "GN & Glomerular Diseases", page: "GlomerularDiseases", icon: Microscope },
-      { name: "Nephrology Pathways (50+)", page: "ClinicalSupport", icon: GitBranch },
-      { name: "AKI & Dialysis", page: "RRTAssistant", icon: Activity },
-      { name: "CKD Management", page: "CKDStager", icon: TrendingUp },
-      { name: "Tubular Disorders", page: "UrologyNephrologyHub", icon: TestTube },
-      { name: "Hypertension", page: "BPPercentiles", icon: Heart },
+      { name: "GN & Glomerular Pathways", page: "GlomerularDiseases", icon: Microscope },
+      { name: "Nephrotic Syndrome", page: "ClinicalSupport", icon: Droplet },
+      { name: "SRNS & Biopsy Pathways", page: "ClinicalSupport", icon: Layers },
+      { name: "Lupus Nephritis", page: "ClinicalSupport", icon: Shield },
+      { name: "IgA & IgAV Nephropathy", page: "ClinicalSupport", icon: GitBranch },
+      { name: "ANCA Vasculitis", page: "ClinicalSupport", icon: Activity },
+      { name: "Membranous Nephropathy", page: "ClinicalSupport", icon: Microscope },
+    ]
+  },
+  {
+    title: "AKI & Emergency",
+    icon: AlertCircle,
+    color: "border-red-200 bg-red-50",
+    iconColor: "text-red-600",
+    items: [
+      { name: "Emergency Hub", page: "EmergencyHub", icon: AlertCircle },
+      { name: "AKI Management (KDIGO)", page: "AKIStager", icon: Zap },
+      { name: "HUS / TMA Protocols", page: "EmergencyHub", icon: AlertCircle },
+      { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
+      { name: "HTN Emergency", page: "EmergencyHub", icon: Heart },
+      { name: "RRT Initiation Triggers", page: "RRTAssistant", icon: Droplet },
+    ]
+  },
+  {
+    title: "CKD Management",
+    icon: TrendingUp,
+    color: "border-cyan-200 bg-cyan-50",
+    iconColor: "text-cyan-700",
+    items: [
+      { name: "CKD Staging (KDIGO)", page: "CKDStager", icon: TrendingUp },
+      { name: "CKD-MBD Protocols", page: "ClinicalSupport", icon: TestTube },
+      { name: "Anemia of CKD", page: "ClinicalSupport", icon: Activity },
+      { name: "Nutrition in CKD", page: "NutritionHub", icon: UtensilsCrossed },
+      { name: "Prediction Tools (ESRD)", page: "PredictionTools", icon: LineChart },
+    ]
+  },
+  {
+    title: "Tubular Disorders",
+    icon: Beaker,
+    color: "border-teal-200 bg-teal-50",
+    iconColor: "text-teal-700",
+    items: [
+      { name: "Tubular Disorder Lab", page: "UrologyNephrologyHub", icon: Beaker },
+      { name: "RTA Classifier", page: "RTAClassifier", icon: FlaskConical },
+      { name: "TRP & TmP/GFR", page: "TRPCalculator", icon: TestTube },
+      { name: "FEMg, FEUA Calculators", page: "FEMgCalculator", icon: Calculator },
+      { name: "Cystinuria & Rare Tubular", page: "RareDiseaseModule", icon: Dna },
+    ]
+  },
+  {
+    title: "Hypertension",
+    icon: Heart,
+    color: "border-rose-200 bg-rose-50",
+    iconColor: "text-rose-600",
+    items: [
+      { name: "BP Percentiles (AAP 2017)", page: "BPPercentiles", icon: Heart },
+      { name: "HTN Staging & Treatment", page: "ClinicalSupport", icon: Stethoscope },
+      { name: "HTN Emergency Protocol", page: "EmergencyHub", icon: AlertCircle },
+      { name: "Secondary HTN Workup", page: "ClinicalSupport", icon: GitBranch },
+      { name: "Antihypertensive Drugs", page: "DrugsDosing", icon: Pill },
+    ]
+  },
+  {
+    title: "Dialysis & RRT",
+    icon: Droplet,
+    color: "border-indigo-200 bg-indigo-50",
+    iconColor: "text-indigo-700",
+    items: [
+      { name: "RRT Assistant (HD/PD)", page: "RRTAssistant", icon: Droplet },
+      { name: "Kt/V Adequacy", page: "KtVCalculator", icon: Calculator },
+      { name: "PD Peritonitis Protocol", page: "EmergencyHub", icon: AlertCircle },
+      { name: "CRRT Prescriptions", page: "RRTAssistant", icon: Activity },
+      { name: "Dialysis Catheter Infection", page: "ClinicalSupport", icon: Shield },
+    ]
+  },
+  {
+    title: "Transplant",
+    icon: Shield,
+    color: "border-green-200 bg-green-50",
+    iconColor: "text-green-700",
+    items: [
+      { name: "Transplant Pathways", page: "ClinicalSupport", icon: Shield },
+      { name: "Rejection Protocols", page: "ClinicalSupport", icon: AlertCircle },
+      { name: "Post-Tx Monitoring", page: "ClinicalSupport", icon: Activity },
+      { name: "Immunosuppressants", page: "DrugsDosing", icon: Pill },
+    ]
+  },
+  {
+    title: "Nephrology & Urology",
+    icon: Droplet,
+    color: "border-blue-300 bg-blue-50",
+    iconColor: "text-blue-800",
+    items: [
+      { name: "CAKUT Master Center", page: "UrologyNephrologyHub", icon: Droplet },
+      { name: "Neurogenic Bladder", page: "UrologyNephrologyHub", icon: Brain },
+      { name: "Uroflow AI Analyzer", page: "UrologyNephrologyHub", icon: Activity },
+      { name: "UTI Master Module", page: "UrologyNephrologyHub", icon: Microscope },
+      { name: "VUR Pathways", page: "ClinicalSupport", icon: GitBranch },
+      { name: "Hydronephrosis Workup", page: "ClinicalSupport", icon: Waves },
+    ]
+  },
+  {
+    title: "Electrolyte Disorders",
+    icon: Zap,
+    color: "border-amber-200 bg-amber-50",
+    iconColor: "text-amber-700",
+    items: [
+      { name: "Hyponatremia / Hypernatremia", page: "SodiumCalculator", icon: Droplet },
+      { name: "Hypokalemia / Hyperkalemia", page: "PotassiumCalculator", icon: Zap },
+      { name: "Calcium & Phosphate", page: "ClinicalSupport", icon: TestTube },
+      { name: "Magnesium Disorders", page: "FEMgCalculator", icon: Beaker },
+      { name: "Acid-Base (ABG)", page: "ABGInterpreter", icon: Wind },
+    ]
+  },
+  {
+    title: "Genetics & Rare Disease",
+    icon: Dna,
+    color: "border-violet-200 bg-violet-50",
+    iconColor: "text-violet-700",
+    items: [
+      { name: "Rare Disease Module", page: "RareDiseaseModule", icon: Dna },
+      { name: "Genetic Report Analyzer", page: "GeneticReportAnalyzer", icon: Brain },
+      { name: "aHUS · Cystinosis · Fabry", page: "RareDiseaseModule", icon: FlaskConical },
+      { name: "NPRD & CoE Network", page: "RareDiseaseModule", icon: Shield },
+      { name: "AI Lab Rare Analyzers", page: "RareDiseaseModule", icon: Microscope },
+    ]
+  },
+  {
+    title: "Guidelines & Evidence",
+    icon: BookOpen,
+    color: "border-green-200 bg-green-50",
+    iconColor: "text-green-700",
+    items: [
+      { name: "Guidelines Library", page: "GuidelinesLibrary", icon: BookOpen },
+      { name: "Clinical OS (KDIGO/ISPN)", page: "ClinicalOS", icon: Brain },
+      { name: "Teaching Hub", page: "TeachingHub", icon: GraduationCap },
+      { name: "Case Library", page: "CaseLibrary", icon: Database },
+    ]
+  },
+  {
+    title: "Calculators Hub",
+    icon: Calculator,
+    color: "border-slate-200 bg-slate-50",
+    iconColor: "text-slate-700",
+    items: [
+      { name: "All Calculators →", page: "CalculatorsHub", icon: Calculator },
+      { name: "Schwartz GFR", page: "SchwartzGFR", icon: Activity },
+      { name: "ABG Interpreter", page: "ABGInterpreter", icon: Wind },
+      { name: "Drug Dosing Engine", page: "DrugsDosing", icon: Pill },
     ]
   },
   {
@@ -73,56 +217,7 @@ const KNOWLEDGE_SECTIONS = [
     items: [
       { name: "Rheumatology Hub", page: "PediatricRheumatology", icon: Stethoscope },
       { name: "JIA, SLE, Vasculitis", page: "PediatricRheumatology", icon: Shield },
-      { name: "Immunology Labs", page: "LabPathways", icon: FlaskConical },
-      { name: "Scoring Tools (JADAS, SLEDAI)", page: "CalculatorsHub", icon: BarChart2 },
-    ]
-  },
-  {
-    title: "Emergency Protocols",
-    icon: AlertCircle,
-    color: "border-red-200 bg-red-50",
-    iconColor: "text-red-600",
-    items: [
-      { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
-      { name: "Hypertensive Emergency", page: "EmergencyHub", icon: Heart },
-      { name: "MAS / TLS", page: "EmergencyHub", icon: AlertCircle },
-      { name: "Differential Engine", page: "DifferentialEngine", icon: Brain },
-    ]
-  },
-  {
-    title: "Calculators Engine",
-    icon: Calculator,
-    color: "border-cyan-200 bg-cyan-50",
-    iconColor: "text-cyan-600",
-    items: [
-      { name: "Schwartz GFR", page: "SchwartzGFR", icon: Activity },
-      { name: "BP Percentiles", page: "BPPercentiles", icon: Heart },
-      { name: "ABG Interpreter", page: "ABGInterpreter", icon: Wind },
-      { name: "All Calculators →", page: "CalculatorsHub", icon: Calculator },
-    ]
-  },
-  {
-    title: "Drugs & Biologics",
-    icon: Pill,
-    color: "border-purple-200 bg-purple-50",
-    iconColor: "text-purple-600",
-    items: [
-      { name: "Drug Database & Dosing", page: "DrugsDosing", icon: Pill },
-      { name: "AI Prescriber", page: "AIPrescriber", icon: Sparkles },
-      { name: "Drug Calculator", page: "DrugCalculator", icon: Calculator },
-      { name: "Prediction Tools", page: "PredictionTools", icon: LineChart },
-    ]
-  },
-  {
-    title: "Evidence & Education",
-    icon: BookOpen,
-    color: "border-green-200 bg-green-50",
-    iconColor: "text-green-600",
-    items: [
-      { name: "Guidelines Library", page: "Guidelines", icon: BookOpen },
-      { name: "Clinical OS", page: "ClinicalOS", icon: Brain },
-      { name: "Teaching Hub", page: "TeachingHub", icon: GraduationCap },
-      { name: "Case Library", page: "CaseLibrary", icon: Database },
+      { name: "Scoring (JADAS, SLEDAI)", page: "CalculatorsHub", icon: BarChart2 },
     ]
   },
   {
@@ -133,54 +228,41 @@ const KNOWLEDGE_SECTIONS = [
     items: [
       { name: "Research Hub", page: "ResearchHub", icon: Layers },
       { name: "Research OS", page: "ResearchOS", icon: Database },
-      { name: "Research Methods", page: "ResearchMethodsHub", icon: FileText },
       { name: "Nutrition Hub", page: "NutritionHub", icon: UtensilsCrossed },
-      { name: "Biostatistics Academy", page: "UrologyNephrologyHub", icon: BarChart2 },
-    ]
-  },
-  {
-    title: "CAKUT & Urology",
-    icon: Droplet,
-    color: "border-blue-300 bg-blue-50",
-    iconColor: "text-blue-700",
-    items: [
-      { name: "CAKUT Master Center", page: "UrologyNephrologyHub", icon: Droplet },
-      { name: "Neurogenic Bladder", page: "UrologyNephrologyHub", icon: Brain },
-      { name: "Uroflow AI Analyzer", page: "UrologyNephrologyHub", icon: Activity },
-      { name: "UTI Master Module", page: "UrologyNephrologyHub", icon: Microscope },
-      { name: "Tubular Disorder Lab", page: "UrologyNephrologyHub", icon: TestTube },
-    ]
-  },
-  {
-    title: "Rare Disease Module",
-    icon: Dna,
-    color: "border-violet-200 bg-violet-50",
-    iconColor: "text-violet-600",
-    items: [
-      { name: "Rapid Screening Tool", page: "RareDiseaseModule", icon: Dna },
-      { name: "Disease Clusters", page: "RareDiseaseModule", icon: Layers },
-      { name: "aHUS · Cystinosis · Fabry", page: "RareDiseaseModule", icon: FlaskConical },
-      { name: "NPRD & CoE Network", page: "RareDiseaseModule", icon: Shield },
-      { name: "AI Lab Rare Analyzers", page: "RareDiseaseModule", icon: Brain },
-    ]
-  },
-  {
-    title: "General Pediatrics",
-    icon: Baby,
-    color: "border-amber-200 bg-amber-50",
-    iconColor: "text-amber-600",
-    items: [
-      { name: "Pediatrics Hub", page: "PediatricsHub", icon: Baby },
-      { name: "Growth & Anthropometry", page: "Anthropometry", icon: BarChart2 },
-      { name: "Vaccination", page: "PediatricsHub", icon: Shield },
-      { name: "Genetic Analyzer", page: "GeneticReportAnalyzer", icon: Dna },
+      { name: "General Pediatrics", page: "PediatricsHub", icon: Baby },
     ]
   },
 ];
 
+// ── OCR Scan cards ──
+const OCR_CARDS = [
+  { name: "Scan Lab Report", icon: Microscope, color: "bg-blue-600", desc: "Auto-extract lab values" },
+  { name: "Scan Prescription", icon: Pill, color: "bg-purple-600", desc: "Extract Rx details" },
+  { name: "Scan Urine Report", icon: TestTube, color: "bg-teal-600", desc: "Dipstick & microscopy" },
+];
+
+function CollapsibleSection({ title, icon: Icon, iconColor, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        className="w-full flex items-center justify-between py-2 text-left focus:outline-none"
+        onClick={() => setOpen(o => !o)}
+      >
+        <div className="flex items-center gap-2">
+          <Icon className={`w-4 h-4 ${iconColor}`} />
+          <span className="text-sm font-bold text-slate-800">{title}</span>
+        </div>
+        {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+      </button>
+      {open && <div className="pb-2">{children}</div>}
+    </div>
+  );
+}
+
 export default function Hub() {
   const isOnline = useOnlineStatus();
-
+  const { patientData } = usePatient();
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -189,6 +271,8 @@ export default function Hub() {
 
   const isAdmin = user?.role === "admin";
   const [sectionQuery, setSectionQuery] = useState("");
+  const [showAllKnowledge, setShowAllKnowledge] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(null);
 
   const filteredSections = useMemo(() => {
     if (!sectionQuery.trim()) return KNOWLEDGE_SECTIONS;
@@ -203,160 +287,268 @@ export default function Hub() {
       );
   }, [sectionQuery]);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 overflow-x-hidden">
-      <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+  const visibleSections = showAllKnowledge ? filteredSections : filteredSections.slice(0, 6);
 
-        {/* ── Hero Header ── */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-6 md:p-8 shadow-xl">
-          <div className="relative z-10">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold text-white mb-1">CliniCals Hub</h1>
-                <p className="text-blue-100 text-sm">Pediatric Clinical Intelligence Hub</p>
-                <p className="text-blue-200 text-xs mt-0.5">by Swarnim</p>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
-                  {isOnline ? "Online" : "Offline"}
-                </span>
-                {isAdmin && (
-                  <Link to={createPageUrl("ClinicDashboard")}>
-                    <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7">
-                      <Users className="w-3 h-3 mr-1" />
-                      Clinic Mode
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </div>
+  const handleOCRScan = async (type, inputId) => {
+    const input = document.getElementById(inputId);
+    if (input) input.click();
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 overflow-x-hidden pb-20">
+      <div className="max-w-2xl mx-auto px-3 py-3 space-y-4">
+
+        {/* ── Hero strip ── */}
+        <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 shadow">
+          <div>
+            <h1 className="text-base font-bold text-white leading-tight">CliniCals Hub</h1>
+            <p className="text-blue-200 text-xs">Pediatric Nephrology Bedside Cockpit</p>
           </div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
+              {isOnline ? "Online" : "Offline"}
+            </span>
+            {isAdmin && (
+              <Link to={createPageUrl("ClinicDashboard")}>
+                <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2">
+                  <Users className="w-3 h-3" />
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* ── Search ── */}
         <GlobalSearch
-          placeholder="Search C3G, membranous GN, sample size, AKI steroids, rituximab…"
-          className="bg-white shadow-sm rounded-lg"
+          placeholder="Search calculators, pathways, drugs, AI tools…"
+          className="bg-white shadow-sm rounded-xl border border-slate-200"
         />
 
         {/* ── Quick Patient Entry ── */}
         <QuickPatientEntry />
 
-        {/* ── Quick Calculations ── */}
-        <QuickCalculations />
+        {/* ── Contextual Suggestions from patient data ── */}
+        <ContextualSuggestions patientData={patientData} />
 
-        {/* ── Quick Access Tools — horizontal scroll ── */}
+        {/* ── Quick Scan OCR ── */}
         <div>
-          <div className="flex items-center gap-2 mb-2 px-0.5">
-            <Zap className="w-4 h-4 text-blue-600" />
-            <h2 className="text-sm font-bold text-slate-700">Quick Access Tools</h2>
+          <div className="flex items-center gap-2 mb-2">
+            <ScanLine className="w-4 h-4 text-green-600" />
+            <h2 className="text-sm font-bold text-slate-700">Quick Scan</h2>
           </div>
-          {/* Urology chip — promoted from bottom nav */}
-          <div className="flex gap-2 mb-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            {[
-              { name: "CAKUT & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
-              { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
-              { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
-              { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
-              { name: "Rheumatology", icon: Stethoscope, color: "bg-violet-600", page: "PediatricRheumatology" },
-              { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
-            ].map(chip => {
-              const ChipIcon = chip.icon;
+          <div className="grid grid-cols-3 gap-2">
+            {OCR_CARDS.map((card, i) => {
+              const Icon = card.icon;
+              const inputId = `ocr-scan-${i}`;
               return (
-                <Link key={chip.name} to={createPageUrl(chip.page)} className="flex-shrink-0">
-                  <div className={`flex items-center gap-1.5 px-3 py-2 rounded-full ${chip.color} text-white text-xs font-semibold shadow-sm active:scale-95 transition-transform`}>
-                    <ChipIcon className="w-3.5 h-3.5" />
-                    {chip.name}
+                <div key={card.name}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    id={inputId}
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setOcrLoading(card.name);
+                      try {
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        await base44.integrations.Core.InvokeLLM({
+                          prompt: `Extract clinical values from this ${card.name.toLowerCase()} image.`,
+                          file_urls: [file_url],
+                          response_json_schema: { type: "object", properties: { values: { type: "string" } } }
+                        });
+                      } finally {
+                        setOcrLoading(null);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <label htmlFor={inputId} className="cursor-pointer block">
+                    <div className={`${card.color} rounded-xl p-3 flex flex-col items-center gap-1.5 active:scale-95 transition-transform shadow-sm`}>
+                      {ocrLoading === card.name
+                        ? <RefreshCw className="w-5 h-5 text-white animate-spin" />
+                        : <Icon className="w-5 h-5 text-white" />
+                      }
+                      <span className="text-white text-xs font-semibold text-center leading-tight">{card.name}</span>
+                      <span className="text-white/70 text-xs text-center leading-tight hidden sm:block">{card.desc}</span>
+                    </div>
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── AI Analysers Hub ── */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Brain className="w-4 h-4 text-violet-600" />
+              <h2 className="text-sm font-bold text-slate-700">AI Analysers</h2>
+            </div>
+            <Link to={createPageUrl("ClinicalAIHub")}>
+              <span className="text-xs text-blue-600 font-semibold">All AI →</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {AI_TOOLS.map(tool => {
+              const Icon = tool.icon;
+              return (
+                <Link key={tool.name} to={createPageUrl(tool.page)}>
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm">
+                    <div className={`w-9 h-9 ${tool.color} rounded-xl flex items-center justify-center shadow-sm`}>
+                      <Icon className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-slate-700 text-center leading-tight line-clamp-2">{tool.name}</span>
                   </div>
                 </Link>
               );
             })}
           </div>
-          {/* Horizontal scroll tool cards */}
-          <div className="relative">
-            <div
-              className="flex gap-3 overflow-x-auto pb-2"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollSnapType: "x mandatory" }}
-            >
-              {QUICK_TOOLS.map(tool => {
-                const Icon = tool.icon;
-                return (
-                  <Link key={tool.name} to={createPageUrl(tool.page)} className="flex-shrink-0" style={{ scrollSnapAlign: "start" }}>
-                    <div className="w-36 bg-white rounded-xl border border-slate-200 p-3 flex flex-col items-center text-center hover:border-blue-300 hover:shadow-md transition-all active:scale-95 h-28 justify-center gap-2">
-                      <div className={`w-11 h-11 ${tool.color} rounded-xl flex items-center justify-center shadow`}>
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-semibold text-slate-700 leading-tight line-clamp-2">{tool.name}</span>
-                    </div>
-                  </Link>
-                );
-              })}
+        </div>
+
+        {/* ── Quick Calculators ── */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Calculator className="w-4 h-4 text-blue-600" />
+              <h2 className="text-sm font-bold text-slate-700">Quick Calculators</h2>
             </div>
-            {/* Fade gradient right edge */}
-            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none rounded-r-xl" />
+            <Link to={createPageUrl("CalculatorsHub")}>
+              <span className="text-xs text-blue-600 font-semibold">All →</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {QUICK_CALCS.map(calc => {
+              const Icon = calc.icon;
+              return (
+                <Link key={calc.name} to={createPageUrl(calc.page)}>
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm">
+                    <div className={`w-9 h-9 ${calc.color} rounded-xl flex items-center justify-center shadow-sm`}>
+                      <Icon className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-slate-700 text-center leading-tight line-clamp-2">{calc.name}</span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
-        {/* ── Knowledge Base Sections ── */}
+        {/* ── Emergency Quick Access ── */}
+        <Link to={createPageUrl("EmergencyHub")}>
+          <div className="bg-red-600 rounded-xl px-4 py-3 flex items-center justify-between active:scale-95 transition-transform shadow">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-6 h-6 text-white" />
+              <div>
+                <p className="text-white font-bold text-sm">Emergency Hub</p>
+                <p className="text-red-200 text-xs">Hyperkalemia · HTN Crisis · HUS · RPGN · PD Peritonitis</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-red-200" />
+          </div>
+        </Link>
+
+        {/* ── Key Module Chips ── */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Layers className="w-4 h-4 text-slate-500" />
+            <h2 className="text-sm font-bold text-slate-700">Specialty Modules</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { name: "Nephrology & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
+              { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
+              { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
+              { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
+              { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
+              { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
+              { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
+              { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
+            ].map(chip => {
+              const ChipIcon = chip.icon;
+              return (
+                <Link key={chip.name} to={createPageUrl(chip.page)}>
+                  <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl ${chip.color} text-white active:scale-95 transition-transform shadow-sm`}>
+                    <ChipIcon className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-xs font-semibold leading-tight">{chip.name}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Knowledge Base ── */}
         <div>
           <div className="flex items-center justify-between gap-3 mb-3">
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Knowledge Base</h2>
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-green-600" />
+              <h2 className="text-sm font-bold text-slate-700">Knowledge Base</h2>
+            </div>
             <div className="relative flex-1 max-w-xs">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
               <input
                 value={sectionQuery}
                 onChange={e => setSectionQuery(e.target.value)}
-                placeholder="Filter sections…"
-                className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                placeholder="Filter…"
+                className="w-full pl-7 pr-6 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
               />
               {sectionQuery && (
-                <button
-                  onClick={() => setSectionQuery("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
+                <button onClick={() => setSectionQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400">
                   <X className="w-3 h-3" />
                 </button>
               )}
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {filteredSections.map(section => {
+
+          <div className="space-y-1 bg-white rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
+            {visibleSections.map(section => {
               const SectionIcon = section.icon;
               return (
-                <Card key={section.title} className={`border-2 ${section.color} shadow-sm hover:shadow-md transition-shadow`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <SectionIcon className={`w-4 h-4 ${section.iconColor}`} />
-                      <h3 className={`font-bold text-sm text-slate-800`}>{section.title}</h3>
-                    </div>
-                    <div className="space-y-1">
-                      {section.items.map(item => {
-                        const ItemIcon = item.icon;
-                        return (
-                          <Link key={item.name} to={createPageUrl(item.page)}>
-                            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white hover:shadow-sm transition-all cursor-pointer group">
-                              <ItemIcon className={`w-3.5 h-3.5 ${section.iconColor} flex-shrink-0`} />
-                              <span className="text-xs text-slate-600 group-hover:text-slate-900 flex-1">{item.name}</span>
-                              <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-slate-500" />
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
+                <CollapsibleSection
+                  key={section.title}
+                  title={section.title}
+                  icon={SectionIcon}
+                  iconColor={section.iconColor}
+                >
+                  <div className="px-2 pb-1 space-y-0.5">
+                    {section.items.map(item => {
+                      const ItemIcon = item.icon;
+                      return (
+                        <Link key={item.name} to={createPageUrl(item.page)}>
+                          <div className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-slate-50 transition-all cursor-pointer group active:bg-slate-100">
+                            <ItemIcon className={`w-3.5 h-3.5 ${section.iconColor} flex-shrink-0`} />
+                            <span className="text-xs text-slate-600 group-hover:text-slate-900 flex-1">{item.name}</span>
+                            <ChevronRight className="w-3 h-3 text-slate-300" />
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </CollapsibleSection>
               );
             })}
           </div>
+
+          {filteredSections.length > 6 && (
+            <button
+              onClick={() => setShowAllKnowledge(v => !v)}
+              className="w-full mt-2 py-2 text-xs font-semibold text-blue-600 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 transition-colors"
+            >
+              {showAllKnowledge ? "Show Less ↑" : `Show All ${filteredSections.length} Sections ↓`}
+            </button>
+          )}
         </div>
 
         {/* ── Disclaimer ── */}
         <Alert className="bg-blue-50 border-blue-200">
           <Info className="w-4 h-4 text-blue-600" />
           <AlertDescription className="text-blue-800 text-xs">
-            <strong>CliniCals Hub by Swarnim</strong> — Pediatric Clinical Intelligence Hub. Integrates KDIGO, IPNA, ISPD, IAP, ESPN, IAP guidelines across specialties. For educational & informational purposes. Always exercise independent clinical judgment.
+            <strong>CliniCals Hub by Swarnim</strong> — Pediatric Clinical Intelligence. Integrates KDIGO, IPNA, ISPD, IAP, ESPN guidelines. For educational & informational use only. Exercise independent clinical judgment.
           </AlertDescription>
         </Alert>
       </div>

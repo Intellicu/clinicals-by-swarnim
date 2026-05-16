@@ -1,13 +1,13 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Sparkles, Pill, GitBranch, TrendingUp, FlaskConical, BookOpen, Dna } from "lucide-react";
+import { Home, Sparkles, Pill, GitBranch, TrendingUp, FlaskConical, BookOpen, Dna, Droplet } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Hub", icon: Home, page: "Hub", color: "bg-blue-600 text-white", activeCheck: ["/Hub", "/"] },
   { label: "AI Prescriber", icon: Sparkles, page: "AIPrescriber", color: "bg-white text-slate-700", activeCheck: ["/AIPrescriber"] },
   { label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", color: "bg-white text-slate-700", activeCheck: ["/DrugsDosing", "/DrugCalculator"] },
-  { label: "Pathways", icon: GitBranch, page: "ClinicalSupport", color: "bg-white text-slate-700", activeCheck: ["/ClinicalSupport", "/UrologyNephrologyHub"] },
+  { label: "Nephrology & Urology", icon: Droplet, page: "UrologyNephrologyHub", color: "bg-white text-slate-700", activeCheck: ["/ClinicalSupport", "/UrologyNephrologyHub"] },
   { label: "Rare Disease", icon: Dna, page: "RareDiseaseModule", color: "bg-white text-slate-700", activeCheck: ["/RareDiseaseModule"] },
   { label: "Growth", icon: TrendingUp, page: "CalculatorsHub", color: "bg-white text-slate-700", activeCheck: ["/CalculatorsHub", "/BPPercentiles", "/SchwartzGFR", "/Anthropometry"] },
   { label: "Research", icon: FlaskConical, page: "ResearchHub", color: "bg-white text-slate-700", activeCheck: ["/ResearchHub", "/ResearchOS"] },

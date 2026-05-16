@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, BookOpen, ArrowLeft, ChevronRight, Calendar, Globe } from "lucide-react";
+import AdminEditButton from "../components/admin/AdminEditButton";
 
 const SOURCES = ["All", "ISPN", "KDIGO", "IPNA", "ERKNet", "EAU/ESPU", "EULAR/ACR", "KDOQI", "ISPD", "IAP", "AAP", "ESPN", "WHO"];
 
@@ -25,6 +26,9 @@ const SOURCE_COLORS = {
 };
 
 function GuidelineDetail({ guideline, onBack }) {
+  const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60000 });
+  const isAdmin = user?.role === "admin";
+
   return (
     <div className="space-y-4">
       <Button variant="outline" size="sm" onClick={onBack} className="gap-1.5 h-9 text-sm">
@@ -95,9 +99,19 @@ function GuidelineDetail({ guideline, onBack }) {
       )}
 
       {guideline.category && (
-        <div className="flex flex-wrap gap-2 pb-4">
+        <div className="flex flex-wrap gap-2 pb-4 items-center">
           <Badge variant="outline" className="text-xs">{guideline.category}</Badge>
           {guideline.evidence_level && <Badge variant="outline" className="text-xs">Evidence: {guideline.evidence_level}</Badge>}
+          {isAdmin && (
+            <AdminEditButton
+              label="Edit Guideline"
+              content={JSON.stringify({ summary: guideline.summary, key_recommendations: guideline.key_recommendations }, null, 2)}
+              onSave={async (val) => {
+                const parsed = JSON.parse(val);
+                await base44.entities.Guideline.update(guideline.id, parsed);
+              }}
+            />
+          )}
         </div>
       )}
     </div>
