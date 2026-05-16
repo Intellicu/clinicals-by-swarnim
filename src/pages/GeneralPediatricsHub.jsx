@@ -1,24 +1,39 @@
 import React, { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Baby, Brain, Activity, AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
-  Plus, Trash2, Loader2, Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X,
-  Star, Info
-} from "lucide-react";
-import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  ArrowLeft, Baby, Syringe, Scale, TrendingUp, MessageCircle, Apple,
+  Brain, Activity, ChevronDown, ChevronUp, Plus, Trash2, Loader2,
+  Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X, Star, Info
+} from "lucide-react";
+import { toast } from "sonner";
+import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
+import PediatricNutritionPathway from "../components/pathways/PediatricNutritionPathway.jsx";
+import VaccDrugChatbot from "../components/pediatrics/VaccDrugChatbot.jsx";
+import SimpleVaccinationSchedule from "../components/pediatrics/SimpleVaccinationSchedule.jsx";
+import NutritionIntakeTracker from "../components/pediatrics/NutritionIntakeTracker.jsx";
+import InteractiveGrowthChart from "../components/pediatrics/InteractiveGrowthChart.jsx";
 
-// ── Built-in pathways ──────────────────────────────────────────────────────
+// ── Tab config ──────────────────────────────────────────────────────────────
+const TABS = [
+  { id: "assistant", label: "AI Assistant", icon: MessageCircle, color: "bg-green-600", badge: "AI" },
+  { id: "vaccination", label: "Vaccines", icon: Syringe, color: "bg-blue-600" },
+  { id: "growth", label: "Growth", icon: TrendingUp, color: "bg-purple-600" },
+  { id: "nutrition", label: "Nutrition", icon: Apple, color: "bg-orange-600" },
+  { id: "pathways", label: "Pathways", icon: Brain, color: "bg-teal-600" },
+  { id: "guidelines", label: "Guidelines", icon: Scale, color: "bg-indigo-600" },
+];
+
+// ── Built-in clinical pathways ──────────────────────────────────────────────
 const BUILT_IN_PATHWAYS = [
   {
     id: "sam",
@@ -73,7 +88,7 @@ const BUILT_IN_PATHWAYS = [
   },
   {
     id: "child-dev",
-    name: "Child Development Monitoring",
+    name: "Child Development",
     full: "Child Development Monitoring — Developmental Surveillance & Milestones",
     color: "teal",
     badge: "Developmental",
@@ -122,11 +137,11 @@ const BUILT_IN_PATHWAYS = [
   },
   {
     id: "autism",
-    name: "Autism Screening",
+    name: "Autism Screening (M-CHAT)",
     full: "Autism Spectrum Disorder (ASD) — Screening & Early Intervention Pathway",
     color: "violet",
     badge: "Neurodevelopmental",
-    overview: "ASD prevalence: ~1 in 100 children globally; 1 in 66 in India (INCLEN 2017). Early detection (before age 2-3) and intensive early intervention dramatically improves outcomes. Primary care physicians are the first point of contact — universal screening at 18 and 24 months is recommended. Early referral is critical.",
+    overview: "ASD prevalence: ~1 in 100 children globally; 1 in 66 in India (INCLEN 2017). Early detection (before age 2-3) and intensive early intervention dramatically improves outcomes. Universal screening at 18 and 24 months is recommended. Early referral is critical.",
     criteria: [
       "Core features: persistent deficits in social communication + interaction (across contexts)",
       "Restricted/repetitive behaviours, interests, or activities (RRBs)",
@@ -178,14 +193,15 @@ const BUILT_IN_PATHWAYS = [
 ];
 
 const COLOR_MAP = {
-  amber: { badge: "bg-amber-100 text-amber-800", header: "bg-amber-50 border-amber-200", dot: "bg-amber-500" },
-  teal: { badge: "bg-teal-100 text-teal-800", header: "bg-teal-50 border-teal-200", dot: "bg-teal-500" },
-  violet: { badge: "bg-violet-100 text-violet-800", header: "bg-violet-50 border-violet-200", dot: "bg-violet-500" },
-  blue: { badge: "bg-blue-100 text-blue-800", header: "bg-blue-50 border-blue-200", dot: "bg-blue-500" },
-  green: { badge: "bg-green-100 text-green-800", header: "bg-green-50 border-green-200", dot: "bg-green-500" },
-  rose: { badge: "bg-rose-100 text-rose-800", header: "bg-rose-50 border-rose-200", dot: "bg-rose-500" },
+  amber: { badge: "bg-amber-100 text-amber-800", header: "bg-amber-50 border-amber-200" },
+  teal: { badge: "bg-teal-100 text-teal-800", header: "bg-teal-50 border-teal-200" },
+  violet: { badge: "bg-violet-100 text-violet-800", header: "bg-violet-50 border-violet-200" },
+  blue: { badge: "bg-blue-100 text-blue-800", header: "bg-blue-50 border-blue-200" },
+  green: { badge: "bg-green-100 text-green-800", header: "bg-green-50 border-green-200" },
+  rose: { badge: "bg-rose-100 text-rose-800", header: "bg-rose-50 border-rose-200" },
 };
 
+// ── Collapsible section ──────────────────────────────────────────────────────
 function SectionCard({ title, items, isList = true }) {
   const [open, setOpen] = useState(false);
   return (
@@ -214,16 +230,93 @@ function SectionCard({ title, items, isList = true }) {
   );
 }
 
-function PathwayCard({ pathway }) {
+// ── Edit modal for built-in pathways (admin) ─────────────────────────────────
+function EditPathwayModal({ pathway, onSave, onClose }) {
+  const [data, setData] = useState({
+    full: pathway.full,
+    badge: pathway.badge,
+    overview: pathway.overview,
+    criteria: pathway.criteria.join('\n'),
+    danger_signs: pathway.danger_signs.join('\n'),
+    management: pathway.management.join('\n'),
+    monitoring: pathway.monitoring.join('\n'),
+    references: pathway.references.join('\n'),
+  });
+
+  const handleSave = () => {
+    onSave({
+      ...pathway,
+      full: data.full,
+      badge: data.badge,
+      overview: data.overview,
+      criteria: data.criteria.split('\n').filter(s => s.trim()),
+      danger_signs: data.danger_signs.split('\n').filter(s => s.trim()),
+      management: data.management.split('\n').filter(s => s.trim()),
+      monitoring: data.monitoring.split('\n').filter(s => s.trim()),
+      references: data.references.split('\n').filter(s => s.trim()),
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-3 pb-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <Pencil className="w-4 h-4 text-blue-600" /> Edit Pathway
+          </h3>
+          <button onClick={onClose}><X className="w-4 h-4 text-slate-400" /></button>
+        </div>
+        <div className="p-4 space-y-3">
+          {[
+            { label: "Full Title", key: "full", rows: 1 },
+            { label: "Badge Label", key: "badge", rows: 1 },
+            { label: "Overview", key: "overview", rows: 4 },
+            { label: "Criteria (one per line)", key: "criteria", rows: 5 },
+            { label: "Danger Signs (one per line)", key: "danger_signs", rows: 5 },
+            { label: "Management Steps (one per line)", key: "management", rows: 8 },
+            { label: "Monitoring (one per line)", key: "monitoring", rows: 5 },
+            { label: "References (one per line)", key: "references", rows: 3 },
+          ].map(f => (
+            <div key={f.key}>
+              <Label className="text-xs font-semibold text-slate-600">{f.label}</Label>
+              <Textarea
+                value={data[f.key]}
+                onChange={e => setData(d => ({ ...d, [f.key]: e.target.value }))}
+                rows={f.rows}
+                className="mt-1 text-sm resize-y"
+              />
+            </div>
+          ))}
+          <div className="flex gap-2 pt-2">
+            <Button onClick={handleSave} size="sm" className="bg-blue-600 hover:bg-blue-700 flex-1">
+              <Check className="w-3.5 h-3.5 mr-1" /> Save Changes
+            </Button>
+            <Button onClick={onClose} size="sm" variant="outline">Cancel</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Pathway display card ─────────────────────────────────────────────────────
+function PathwayCard({ pathway, isAdmin, onEdit }) {
   const c = COLOR_MAP[pathway.color] || COLOR_MAP.blue;
   return (
     <Card className="bg-white border border-slate-200 shadow-sm">
       <CardHeader className={`border-b py-4 px-5 ${c.header}`}>
         <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
+          <div className="flex-1">
             <CardTitle className="text-base">{pathway.full}</CardTitle>
             <Badge className={`${c.badge} mt-2 text-xs`}>{pathway.badge}</Badge>
           </div>
+          {isAdmin && (
+            <Button size="sm" variant="outline"
+              className="h-7 text-xs border-blue-200 text-blue-700 hover:bg-blue-50 flex-shrink-0"
+              onClick={() => onEdit(pathway)}>
+              <Pencil className="w-3 h-3 mr-1" /> Edit
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="p-4 space-y-3">
@@ -245,9 +338,9 @@ function PathwayCard({ pathway }) {
   );
 }
 
-// ── Admin: AI Pathway Generator ────────────────────────────────────────────
+// ── AI Pathway Generator (admin) ─────────────────────────────────────────────
 function AIPathwayGenerator({ onGenerated }) {
-  const [mode, setMode] = useState("web"); // "web" | "file"
+  const [mode, setMode] = useState("web");
   const [topic, setTopic] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -263,35 +356,19 @@ function AIPathwayGenerator({ onGenerated }) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         fileUrls = [file_url];
       }
-
-      const prompt = `You are an expert pediatric physician. Generate a comprehensive clinical pathway for: "${topic || 'the uploaded document topic'}".
-
-${file ? 'Use the uploaded document as primary source. Supplement with current evidence.' : 'Use current evidence-based guidelines, WHO, IAP, AAP standards.'}
-
-Return a detailed clinical pathway JSON with these exact fields:
-- name: short name (2-4 words)
-- full: full descriptive title
-- badge: category label
-- color: one of: amber, teal, violet, blue, green, rose
-- overview: 3-4 sentence overview paragraph
-- criteria: array of 5-8 diagnostic criteria or clinical features
-- danger_signs: array of 6-10 red flag signs
-- management: array of 10-15 management steps (WHO/IAP based where applicable)
-- monitoring: array of 7-12 monitoring parameters
-- references: array of 3-6 key references (guidelines/journals)`;
-
       const res = await base44.integrations.Core.InvokeLLM({
-        prompt,
+        prompt: `You are an expert pediatric physician. Generate a comprehensive clinical pathway for: "${topic || 'the uploaded document topic'}".
+${file ? 'Use the uploaded document as primary source.' : 'Use current evidence-based guidelines, WHO, IAP, AAP standards.'}
+Return a detailed clinical pathway JSON with these exact fields:
+- name, full, badge, color (one of: amber/teal/violet/blue/green/rose), overview (paragraph),
+- criteria (array), danger_signs (array), management (array 10-15 items), monitoring (array), references (array)`,
         file_urls: fileUrls.length ? fileUrls : undefined,
         add_context_from_internet: !file,
         model: "claude_sonnet_4_6",
         response_json_schema: {
           type: "object",
           properties: {
-            name: { type: "string" },
-            full: { type: "string" },
-            badge: { type: "string" },
-            color: { type: "string" },
+            name: { type: "string" }, full: { type: "string" }, badge: { type: "string" }, color: { type: "string" },
             overview: { type: "string" },
             criteria: { type: "array", items: { type: "string" } },
             danger_signs: { type: "array", items: { type: "string" } },
@@ -301,18 +378,12 @@ Return a detailed clinical pathway JSON with these exact fields:
           }
         }
       });
-
-      // Save to CustomSection entity
       await base44.entities.CustomSection.create({
-        title: res.full || res.name,
-        section_type: "pathway",
-        content: res,
-        status: "draft",
-        created_by_admin: true,
+        title: res.full || res.name, section_type: "pathway",
+        content: res, status: "draft", created_by_admin: true,
       });
-
       qc.invalidateQueries({ queryKey: ["custom-pathways"] });
-      toast.success("Pathway generated! Review and publish from the list below.");
+      toast.success("Pathway generated! Review drafts below.");
       setTopic(""); setFile(null);
       onGenerated?.();
     } catch (e) {
@@ -322,15 +393,15 @@ Return a detailed clinical pathway JSON with these exact fields:
   };
 
   return (
-    <div className="bg-gradient-to-br from-violet-50 to-indigo-50 border-2 border-violet-200 rounded-xl p-4 space-y-4">
+    <div className="bg-gradient-to-br from-violet-50 to-indigo-50 border-2 border-violet-200 rounded-xl p-4 space-y-3">
       <div className="flex items-center gap-2">
         <Sparkles className="w-5 h-5 text-violet-600" />
-        <h3 className="text-sm font-bold text-violet-900">AI Pathway Generator (Admin)</h3>
+        <h3 className="text-sm font-bold text-violet-900">AI Pathway Generator</h3>
         <Badge className="bg-violet-100 text-violet-700 text-xs">Uses AI Credits</Badge>
       </div>
       <Alert className="bg-amber-50 border-amber-200 py-2">
         <AlertDescription className="text-xs text-amber-800">
-          AI-generated pathways are saved as <strong>drafts</strong>. Review and edit before publishing. Uses integration credits.
+          AI-generated pathways saved as <strong>drafts</strong> — review before publishing.
         </AlertDescription>
       </Alert>
       <div className="flex gap-2">
@@ -351,30 +422,26 @@ Return a detailed clinical pathway JSON with these exact fields:
       </div>
       {mode === "file" && (
         <div>
-          <Label className="text-xs font-semibold text-slate-700">Upload Guideline / Document</Label>
-          <div className="mt-1">
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" id="pathway-doc-upload" className="hidden"
-              onChange={e => setFile(e.target.files?.[0] || null)} />
-            <label htmlFor="pathway-doc-upload"
-              className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-violet-300 text-violet-700 rounded-lg bg-white hover:bg-violet-50">
-              <Upload className="w-3.5 h-3.5" />{file ? file.name : "Choose file (PDF/image/doc)"}
-            </label>
-          </div>
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" id="pathway-doc-upload" className="hidden"
+            onChange={e => setFile(e.target.files?.[0] || null)} />
+          <label htmlFor="pathway-doc-upload"
+            className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-violet-300 text-violet-700 rounded-lg bg-white hover:bg-violet-50">
+            <Upload className="w-3.5 h-3.5" />{file ? file.name : "Choose file (PDF/image/doc)"}
+          </label>
         </div>
       )}
       <Button onClick={generate} disabled={loading} className="w-full bg-violet-600 hover:bg-violet-700 text-white h-9 text-sm">
-        {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating pathway…</> : <><Sparkles className="w-4 h-4 mr-2" />Generate Pathway with AI</>}
+        {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating…</> : <><Sparkles className="w-4 h-4 mr-2" />Generate with AI</>}
       </Button>
     </div>
   );
 }
 
-// ── Custom Pathway viewer & editor ─────────────────────────────────────────
+// ── Custom pathway card (AI-generated) ──────────────────────────────────────
 function CustomPathwayCard({ record, isAdmin, onDelete, onPublish }) {
   const data = record.content || {};
   const c = COLOR_MAP[data.color] || COLOR_MAP.blue;
   const isDraft = record.status === "draft";
-
   return (
     <Card className={`border-2 ${isDraft ? "border-amber-300" : "border-green-300"} bg-white`}>
       <CardHeader className={`border-b py-3 px-4 ${c.header}`}>
@@ -386,19 +453,17 @@ function CustomPathwayCard({ record, isAdmin, onDelete, onPublish }) {
               <Badge className={isDraft ? "bg-amber-100 text-amber-700 text-xs" : "bg-green-100 text-green-700 text-xs"}>
                 {isDraft ? "Draft" : "Published"}
               </Badge>
-              <Badge className="bg-violet-100 text-violet-700 text-xs"><Sparkles className="w-2.5 h-2.5 mr-0.5 inline" />AI Generated</Badge>
+              <Badge className="bg-violet-100 text-violet-700 text-xs"><Sparkles className="w-2.5 h-2.5 mr-0.5 inline" />AI</Badge>
             </div>
           </div>
           {isAdmin && (
             <div className="flex gap-1.5">
               {isDraft && (
-                <Button size="sm" onClick={() => onPublish(record.id)}
-                  className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white">
+                <Button size="sm" onClick={() => onPublish(record.id)} className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white">
                   <Check className="w-3 h-3 mr-1" />Publish
                 </Button>
               )}
-              <Button size="sm" variant="outline" onClick={() => onDelete(record.id)}
-                className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50">
+              <Button size="sm" variant="outline" onClick={() => onDelete(record.id)} className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50">
                 <Trash2 className="w-3 h-3" />
               </Button>
             </div>
@@ -407,27 +472,24 @@ function CustomPathwayCard({ record, isAdmin, onDelete, onPublish }) {
       </CardHeader>
       <CardContent className="p-4 space-y-3">
         {data.overview && <SectionCard title="Overview" items={data.overview} isList={false} />}
-        {data.criteria?.length > 0 && <SectionCard title="📋 Criteria / Features" items={data.criteria} />}
+        {data.criteria?.length > 0 && <SectionCard title="📋 Criteria" items={data.criteria} />}
         {data.danger_signs?.length > 0 && <SectionCard title="🚨 Danger Signs" items={data.danger_signs} />}
         {data.management?.length > 0 && <SectionCard title="🩺 Management" items={data.management} />}
         {data.monitoring?.length > 0 && <SectionCard title="📊 Monitoring" items={data.monitoring} />}
-        {data.references?.length > 0 && (
-          <div className="border border-slate-200 rounded-lg p-3 bg-slate-50">
-            <p className="text-xs font-semibold text-slate-600 mb-1">References</p>
-            <div className="flex flex-wrap gap-1.5">
-              {data.references.map((r, i) => <Badge key={i} variant="outline" className="text-xs">{r}</Badge>)}
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────
+// ── Main ─────────────────────────────────────────────────────────────────────
 export default function GeneralPediatricsHub() {
+  const [activeTab, setActiveTab] = useState("assistant");
   const [search, setSearch] = useState("");
   const [showGenerator, setShowGenerator] = useState(false);
+  const [editingPathway, setEditingPathway] = useState(null);
+  const [localOverrides, setLocalOverrides] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("peds_pathway_overrides") || "{}"); } catch { return {}; }
+  });
   const qc = useQueryClient();
 
   const { data: user } = useQuery({ queryKey: ["currentUser"], queryFn: () => base44.auth.me() });
@@ -450,10 +512,22 @@ export default function GeneralPediatricsHub() {
     toast.success("Pathway published!");
   };
 
+  // Save edited built-in pathway locally
+  const handleSaveEdit = (updated) => {
+    const overrides = { ...localOverrides, [updated.id]: updated };
+    setLocalOverrides(overrides);
+    localStorage.setItem("peds_pathway_overrides", JSON.stringify(overrides));
+    setEditingPathway(null);
+    toast.success("Pathway updated");
+  };
+
   const publishedCustom = customPathways.filter(p => p.status === "published");
   const draftCustom = customPathways.filter(p => p.status === "draft");
 
-  const filteredBuiltIn = BUILT_IN_PATHWAYS.filter(p =>
+  // Merge local admin overrides into built-in pathways
+  const resolvedBuiltIn = BUILT_IN_PATHWAYS.map(p => localOverrides[p.id] ? { ...p, ...localOverrides[p.id] } : p);
+
+  const filteredBuiltIn = resolvedBuiltIn.filter(p =>
     !search.trim() ||
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     p.full.toLowerCase().includes(search.toLowerCase()) ||
@@ -461,83 +535,201 @@ export default function GeneralPediatricsHub() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      <div className="max-w-3xl mx-auto px-3 py-4 space-y-4">
-        {/* Header */}
-        <div className="rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-4 py-4 shadow">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <h1 className="text-lg font-bold text-white">General Pediatrics Hub</h1>
-              <p className="text-teal-100 text-xs mt-0.5">SAM · Child Development · Autism · AI-Generated Pathways</p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      {/* Header */}
+      <div className="bg-white border-b-2 border-slate-200 px-4 py-3 sticky top-0 z-20 shadow-sm">
+        <div className="flex items-center gap-3 max-w-5xl mx-auto">
+          <Link to={createPageUrl("Hub")}>
+            <Button variant="outline" size="sm" className="h-8 px-2 shrink-0">
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          </Link>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center shadow shrink-0">
+              <Baby className="w-5 h-5 text-white" />
             </div>
-            {isAdmin && (
-              <Button size="sm" onClick={() => setShowGenerator(v => !v)}
-                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs h-8 gap-1">
-                <Sparkles className="w-3.5 h-3.5" />{showGenerator ? "Close Generator" : "AI Pathway Generator"}
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search pathways…"
-            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
-        </div>
-
-        {/* Admin: AI Generator */}
-        {isAdmin && showGenerator && (
-          <AIPathwayGenerator onGenerated={() => setShowGenerator(false)} />
-        )}
-
-        {/* Admin: Draft pathways */}
-        {isAdmin && draftCustom.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-amber-100 text-amber-700">Drafts ({draftCustom.length})</Badge>
-              <span className="text-xs text-slate-500">Review and publish AI-generated pathways</span>
+            <div className="min-w-0">
+              <h1 className="text-base font-bold text-slate-900 leading-tight truncate">General Pediatrics Hub</h1>
+              <p className="text-xs text-slate-500 hidden sm:block">IAP · WHO · Growth · Vaccination · SAM · ASD · Nutrition</p>
             </div>
-            {draftCustom.map(p => (
-              <CustomPathwayCard key={p.id} record={p} isAdmin={isAdmin} onDelete={handleDelete} onPublish={handlePublish} />
-            ))}
           </div>
-        )}
-
-        {/* Published custom pathways */}
-        {publishedCustom.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-violet-500" />
-              <span className="text-sm font-bold text-slate-700">AI-Generated Pathways ({publishedCustom.length})</span>
-            </div>
-            {publishedCustom.map(p => (
-              <CustomPathwayCard key={p.id} record={p} isAdmin={isAdmin} onDelete={handleDelete} onPublish={handlePublish} />
-            ))}
-          </div>
-        )}
-
-        {/* Built-in pathways */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Baby className="w-4 h-4 text-teal-600" />
-            <span className="text-sm font-bold text-slate-700">Core Pediatric Pathways</span>
-          </div>
-          {filteredBuiltIn.map(p => <PathwayCard key={p.id} pathway={p} />)}
-          {filteredBuiltIn.length === 0 && (
-            <p className="text-center text-slate-400 py-8 text-sm">No pathways match your search</p>
+          {isAdmin && activeTab === "pathways" && (
+            <Button size="sm" onClick={() => setShowGenerator(v => !v)}
+              className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1 flex-shrink-0">
+              <Sparkles className="w-3.5 h-3.5" />{showGenerator ? "Close" : "AI Generate"}
+            </Button>
           )}
         </div>
-
-        {/* Disclaimer */}
-        <Alert className="bg-blue-50 border-blue-200">
-          <Info className="w-4 h-4 text-blue-600" />
-          <AlertDescription className="text-blue-800 text-xs">
-            <strong>CliniCals Hub</strong> — General Pediatrics pathways based on WHO, IAP, AAP, CDC guidelines. AI-generated content should be reviewed by a specialist before clinical use. Exercise independent clinical judgment.
-          </AlertDescription>
-        </Alert>
       </div>
+
+      {/* Tab Bar */}
+      <div className="bg-green-50 px-2 py-2 sticky top-[57px] z-10 shadow-sm border-b border-green-200">
+        <div className="max-w-5xl mx-auto overflow-x-auto">
+          <div className="flex gap-1.5 min-w-max">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                  className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-lg min-w-[68px] transition-all text-xs font-semibold shadow-sm border
+                    ${isActive ? `${tab.color} text-white border-transparent` : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
+                  <Icon className="w-4 h-4" />
+                  <span className="text-[10px] font-bold whitespace-nowrap">{tab.label}</span>
+                  {tab.badge && (
+                    <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">{tab.badge}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-5xl mx-auto p-4">
+
+        {/* AI Assistant */}
+        {activeTab === "assistant" && (
+          <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-green-200">
+            <div className="bg-green-600 px-4 py-3 flex items-center justify-between">
+              <div>
+                <p className="font-bold text-white text-sm flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />Vaccination & Drug AI Assistant
+                </p>
+                <p className="text-green-100 text-xs mt-0.5">Ask about vaccines, drug doses, treatment plans</p>
+              </div>
+              <Badge className="bg-yellow-400/90 text-yellow-900 text-xs border-0">IAP 2023</Badge>
+            </div>
+            <VaccDrugChatbot />
+          </div>
+        )}
+
+        {/* Vaccination */}
+        {activeTab === "vaccination" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-blue-600 rounded-xl shadow">
+              <Syringe className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">NIS + IAP 2023 Vaccination Schedule</p>
+                <p className="text-blue-100 text-xs">Tap any vaccine to mark given · Search by name or disease</p>
+              </div>
+            </div>
+            <SimpleVaccinationSchedule />
+          </div>
+        )}
+
+        {/* Growth */}
+        {activeTab === "growth" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-purple-600 rounded-xl shadow">
+              <TrendingUp className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">WHO Growth Charts — Interactive</p>
+                <p className="text-purple-100 text-xs">Weight, Height, Head Circumference · Z-scores · Centile curves</p>
+              </div>
+            </div>
+            <InteractiveGrowthChart />
+          </div>
+        )}
+
+        {/* Nutrition */}
+        {activeTab === "nutrition" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-orange-600 rounded-xl shadow">
+              <Apple className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">Nutrition Intake Tracker</p>
+                <p className="text-orange-100 text-xs">Log food + fluids · Compare vs requirements</p>
+              </div>
+            </div>
+            <NutritionIntakeTracker />
+          </div>
+        )}
+
+        {/* Pathways — SAM / Dev / Autism + AI generated */}
+        {activeTab === "pathways" && (
+          <div className="space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Search pathways…"
+                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
+            </div>
+
+            {/* AI Generator (admin) */}
+            {isAdmin && showGenerator && (
+              <AIPathwayGenerator onGenerated={() => setShowGenerator(false)} />
+            )}
+
+            {/* Draft custom pathways */}
+            {isAdmin && draftCustom.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-amber-100 text-amber-700">Drafts ({draftCustom.length})</Badge>
+                  <span className="text-xs text-slate-500">Review and publish AI-generated pathways</span>
+                </div>
+                {draftCustom.map(p => (
+                  <CustomPathwayCard key={p.id} record={p} isAdmin={isAdmin} onDelete={handleDelete} onPublish={handlePublish} />
+                ))}
+              </div>
+            )}
+
+            {/* Published custom */}
+            {publishedCustom.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-violet-500" />
+                  <span className="text-sm font-bold text-slate-700">AI-Generated Pathways ({publishedCustom.length})</span>
+                </div>
+                {publishedCustom.map(p => (
+                  <CustomPathwayCard key={p.id} record={p} isAdmin={isAdmin} onDelete={handleDelete} onPublish={handlePublish} />
+                ))}
+              </div>
+            )}
+
+            {/* Built-in pathways */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Baby className="w-4 h-4 text-teal-600" />
+                <span className="text-sm font-bold text-slate-700">Core Pediatric Pathways</span>
+              </div>
+              {filteredBuiltIn.map(p => (
+                <PathwayCard key={p.id} pathway={p} isAdmin={isAdmin} onEdit={setEditingPathway} />
+              ))}
+              {filteredBuiltIn.length === 0 && (
+                <p className="text-center text-slate-400 py-8 text-sm">No pathways match your search</p>
+              )}
+            </div>
+
+            <Alert className="bg-blue-50 border-blue-200">
+              <Info className="w-4 h-4 text-blue-600" />
+              <AlertDescription className="text-blue-800 text-xs">
+                Pathways based on WHO, IAP, AAP, CDC guidelines. AI-generated content should be reviewed by a specialist before clinical use.
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {/* Guidelines */}
+        {activeTab === "guidelines" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-indigo-600 rounded-xl shadow">
+              <Scale className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">IAP / ICMR Nutrition Guidelines</p>
+                <p className="text-indigo-100 text-xs">RDA table · Complementary feeding · Malnutrition management</p>
+              </div>
+            </div>
+            <PediatricNutritionPathway />
+          </div>
+        )}
+      </div>
+
+      {/* Edit modal */}
+      {editingPathway && (
+        <EditPathwayModal pathway={editingPathway} onSave={handleSaveEdit} onClose={() => setEditingPathway(null)} />
+      )}
     </div>
   );
 }

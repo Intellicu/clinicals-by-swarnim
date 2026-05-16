@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePatient } from './PatientContext';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,14 @@ import { base44 } from "@/api/base44Client";
 
 export default function QuickPatientEntry({ compact = false }) {
   const { patientData, updatePatientData, clearPatientData } = usePatient();
-  const [localData, setLocalData] = useState(patientData);
+  const [localData, setLocalData] = useState(() => ({ ...patientData }));
   const [ocrLoading, setOcrLoading] = useState(false);
+
+  // On mount load saved data from context (localStorage-backed)
+  useEffect(() => {
+    setLocalData({ ...patientData });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const set = (key, val) => setLocalData(d => ({ ...d, [key]: val }));
 
