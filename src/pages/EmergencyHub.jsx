@@ -54,7 +54,7 @@ const PROTOCOLS = [
       { step: "1", action: "Confirm BP in both arms, correct cuff size; repeat in 5 min", time: "0 min", color: "bg-slate-600" },
       { step: "2", action: "Rapid neurological assessment — GCS, pupils, fundoscopy (PRES?)", time: "2 min", color: "bg-red-600" },
       { step: "3", action: "Establish IV access. ECG, CXR, echo if available. Labs: CBC, creatinine, electrolytes, urine dipstick", time: "5 min", color: "bg-red-500" },
-      { step: "4", action: "GOAL: Reduce MAP by max 25% in first hour only — rapid reduction causes watershed ischemia", time: "10 min", color: "bg-orange-600" },
+      { step: "4", action: "GOAL: Reduce MAP by ≤25% in first hour — this is the UPPER LIMIT of safe reduction, NOT a target to reach. Any faster reduction risks watershed ischaemia and stroke. Do NOT aim to hit 25% — aim for a controlled, gradual reduction.", time: "10 min", color: "bg-orange-600" },
       { step: "5", action: "IV Labetalol 0.2–1 mg/kg/dose (max 40mg) slow IV push over 2 min; or 0.25–3 mg/kg/hr infusion (contraindicated in asthma, heart block)", time: "10–15 min", color: "bg-orange-500" },
       { step: "6", action: "OR IV Nicardipine 0.5–5 mcg/kg/min (preferred in hypertensive encephalopathy, PRES, post-surgical)", time: "10–15 min", color: "bg-amber-600" },
       { step: "7", action: "Hypertensive encephalopathy/PRES: IV MgSO4 if seizures; anti-epileptics; urgent MRI brain", time: "20 min", color: "bg-yellow-600" },
@@ -69,7 +69,7 @@ const PROTOCOLS = [
     ],
     monitoring: ["Continuous arterial BP monitoring (arterial line preferred)", "Hourly urine output", "Neurological checks every 30 min", "ECG monitoring", "Glucose every 2–4h"],
     pitfalls: [
-      "NEVER reduce BP faster than 25% in first hour — risk of stroke, visual loss",
+      "MAP reduction ≤25% in first hour is an UPPER LIMIT, NOT a target — reducing MAP by exactly 25% can itself cause ischaemia. Reduce gradually and titrate to clinical response",
       "Nifedipine sublingual is CONTRAINDICATED — unpredictable drop, fatal strokes reported",
       "Labetalol contraindicated in asthma, severe bradycardia, 2nd/3rd degree heart block",
       "PRES: MRI > CT; DWI usually spared in PRES unlike ischemic stroke"
@@ -226,6 +226,255 @@ const PROTOCOLS = [
     ]
   },
   {
+    id: "rpgn",
+    title: "RPGN — Rapidly Progressive GN",
+    icon: AlertTriangle,
+    color: "bg-red-800",
+    severity: "CRITICAL",
+    summary: "Creatinine doubling within days + red cell casts = NEPHROLOGY EMERGENCY — do NOT wait for biopsy to start treatment",
+    icu_triggers: ["Creatinine doubling within days to weeks", "Red cell casts on urine microscopy", "Oliguria or anuria", "Haemoptysis (pulmonary-renal syndrome)", "Rapidly rising serum creatinine despite fluids"],
+    algorithm: [
+      { step: "1", action: "NEPHROLOGY EMERGENCY — call nephrology NOW. Do NOT wait for biopsy before starting treatment", time: "0 min", color: "bg-red-700" },
+      { step: "2", action: "Urine microscopy STAT — red cell casts confirm glomerular haematuria. Urine protein:creatinine ratio", time: "0 min", color: "bg-red-600" },
+      { step: "3", action: "SAME DAY blood tests: ANCA (MPO + PR3), anti-GBM antibodies, ANA, anti-dsDNA, C3/C4, ASO, ASCA, hepatitis B&C, HIV. Do NOT delay for results", time: "0–30 min", color: "bg-red-600" },
+      { step: "4", action: "IV Methylprednisolone pulse: 10–30 mg/kg/day (max 1g) for 3 days, then oral prednisolone 1–2 mg/kg/day", time: "1 h", color: "bg-orange-600" },
+      { step: "5", action: "Organise URGENT renal biopsy — within 24h if possible. Crescentic GN on biopsy confirms RPGN", time: "24 h", color: "bg-amber-600" },
+      { step: "6", action: "If ANCA-positive or anti-GBM positive: add cyclophosphamide IV 500–750 mg/m² monthly (pulsed) or PO 2 mg/kg/day", time: "24–48 h", color: "bg-yellow-700" },
+      { step: "7", action: "Plasma exchange: INDICATED for anti-GBM disease OR ANCA-vasculitis with pulmonary haemorrhage or severe AKI requiring dialysis", time: "Urgent if indicated", color: "bg-blue-700" },
+      { step: "8", action: "Renal replacement therapy if AKI severe (K >6.5, pH <7.1, fluid overload). Do NOT delay treatment for biopsy", time: "As needed", color: "bg-blue-600" },
+    ],
+    drugs: [
+      { name: "Methylprednisolone IV pulse", dose: "10–30 mg/kg/day (max 1g/day)", route: "IV over 30–60 min", duration: "3 days, then oral prednisolone", purpose: "Immediate anti-inflammatory — do not delay" },
+      { name: "Cyclophosphamide (pulsed)", dose: "500–750 mg/m² IV monthly OR 2 mg/kg/day PO", route: "IV / PO", duration: "3–6 months depending on response", purpose: "ANCA vasculitis, anti-GBM disease" },
+      { name: "Rituximab", dose: "375 mg/m² weekly × 4 OR 2 × 1g", route: "IV infusion", duration: "Alternative to cyclophosphamide in ANCA-AAV", purpose: "ANCA-AAV — non-inferior to CYC, preferred if fertility concerns" },
+      { name: "Prednisolone", dose: "1–2 mg/kg/day (max 60mg)", route: "PO", duration: "Taper over 6–12 months", purpose: "Maintenance immunosuppression after pulse" },
+    ],
+    monitoring: ["Creatinine daily while on pulse steroids", "Urine output hourly", "BP 4-hourly", "Blood glucose daily (steroid hyperglycaemia)", "ANCA titres at 3 and 6 months", "Urinalysis weekly"],
+    pitfalls: [
+      "NEVER delay steroids waiting for biopsy in RPGN — days matter, kidneys lost",
+      "Anti-GBM disease: linear IgG on biopsy — requires PLASMA EXCHANGE daily × 14 days, NOT optional",
+      "Check ANCA and anti-GBM on the SAME DAY — treatment differs: pauci-immune vs anti-GBM vs immune complex GN",
+      "Plasmapheresis contraindicated with active haemorrhage — use FFP as replacement fluid if pulmonary haemorrhage"
+    ]
+  },
+  {
+    id: "antigbm",
+    title: "Anti-GBM Disease / Goodpasture",
+    icon: AlertTriangle,
+    color: "bg-red-900",
+    severity: "CRITICAL",
+    summary: "Linear IgG on biopsy + haemoptysis = EMERGENCY. Plasma exchange DAILY × 14 days mandatory.",
+    icu_triggers: ["Haemoptysis (any amount)", "Anti-GBM antibody positive", "Rapidly rising creatinine + haematuria", "Pulmonary-renal syndrome", "Bilateral pulmonary infiltrates on CXR"],
+    algorithm: [
+      { step: "1", action: "LIFE-THREATENING EMERGENCY — dual pulmonary and renal involvement. Admit ICU immediately if haemoptysis present", time: "0 min", color: "bg-red-700" },
+      { step: "2", action: "Anti-GBM antibody STAT. Renal biopsy urgently — linear IgG on immunofluorescence confirms diagnosis", time: "0–2 h", color: "bg-red-600" },
+      { step: "3", action: "IV Methylprednisolone 10–30 mg/kg (max 1g) × 3 days — do NOT wait for biopsy", time: "0–1 h", color: "bg-red-600" },
+      { step: "4", action: "PLASMA EXCHANGE daily for 14 days (or until anti-GBM antibody undetectable). Volume: 4L per session in adults, 50 mL/kg in children. Replacement: 5% albumin; use FFP if pulmonary haemorrhage active (clotting factors preserved)", time: "Day 1", color: "bg-orange-700" },
+      { step: "5", action: "Cyclophosphamide 2 mg/kg/day PO (reduce in renal failure). Continue until remission (3–6 months)", time: "Day 1", color: "bg-orange-600" },
+      { step: "6", action: "Oral prednisolone 1 mg/kg/day after pulse, taper over 6–9 months", time: "Day 4", color: "bg-amber-600" },
+      { step: "7", action: "Monitor anti-GBM titre every 2 weeks — aim for undetectable. Discontinue plasma exchange once negative", time: "Ongoing", color: "bg-yellow-600" },
+      { step: "8", action: "Renal replacement therapy if needed — recovery less likely if >80% crescents on biopsy + dialysis-dependent at presentation", time: "As indicated", color: "bg-blue-700" },
+    ],
+    drugs: [
+      { name: "Methylprednisolone IV", dose: "10–30 mg/kg (max 1g) × 3 days", route: "IV over 30–60 min", duration: "3 days pulse, then oral", purpose: "Suppress active inflammation urgently" },
+      { name: "Cyclophosphamide", dose: "2 mg/kg/day PO (reduce by 25–50% if GFR <30)", route: "PO daily", duration: "3–6 months", purpose: "Suppress autoantibody production" },
+      { name: "Plasma exchange fluid — Albumin 5%", dose: "50 mL/kg exchange volume per session", route: "Via central access", duration: "Daily × 14 days (or until anti-GBM negative)", purpose: "Remove circulating anti-GBM antibodies" },
+      { name: "Fresh Frozen Plasma (FFP)", dose: "Replace last 2L of each session with FFP", route: "IV", duration: "While pulmonary haemorrhage active", purpose: "Preserve clotting factors during active haemoptysis" },
+    ],
+    monitoring: ["Anti-GBM antibody titre every 2 weeks", "Daily creatinine", "Daily urine haemoglobin / haematuria", "SpO2 continuous if pulmonary involvement", "Coagulation profile if on FFP replacement", "Urinalysis + protein:creatinine weekly"],
+    pitfalls: [
+      "Plasma exchange with ALBUMIN ONLY during active haemoptysis → coagulopathy and MORE bleeding — ALWAYS use FFP if haemoptysis",
+      "Anti-GBM disease rarely responds to steroids alone — plasma exchange is NOT optional",
+      "Goodpasture syndrome = pulmonary + renal; anti-GBM nephritis = renal only — both require same treatment",
+      "Smoking cessation mandatory — smoking precipitates pulmonary haemorrhage in anti-GBM disease"
+    ]
+  },
+  {
+    id: "tma-ahus",
+    title: "aHUS / TMA Emergency",
+    icon: Droplet,
+    color: "bg-rose-800",
+    severity: "CRITICAL",
+    summary: "TMA triad: MAHA + thrombocytopenia + AKI. DO NOT transfuse platelets. Anti-FH commonest cause in India.",
+    icu_triggers: ["MAHA (fragmented RBCs / schistocytes on blood film)", "Thrombocytopenia + AKI", "Falling Hb + rising LDH + low haptoglobin", "Oliguria / anuria with TMA picture", "Neurological symptoms (seizure, confusion) with TMA"],
+    algorithm: [
+      { step: "1", action: "CONFIRM TMA: Blood film for schistocytes, LDH, haptoglobin, reticulocyte count, direct Coombs test (usually negative in TMA)", time: "0 min", color: "bg-red-700" },
+      { step: "2", action: "SAME DAY investigations: ADAMTS13 activity (for TTP), ANCA, anti-GBM, stool STEC PCR (E.coli O157:H7, O26), complement screen (C3, C4, CH50, CFH, CFI, MCP), anti-CFH antibody", time: "0–1 h", color: "bg-red-600" },
+      { step: "3", action: "DO NOT transfuse platelets unless <10,000/µL or life-threatening haemorrhage — platelet transfusion WORSENS TMA (fuels microthrombi)", time: "Immediate caution", color: "bg-red-600" },
+      { step: "4", action: "Anti-CFH antibody: commonest cause of aHUS in India (ISPN 2025). If positive: PLASMA EXCHANGE 1.5× volume daily until antibody undetectable + prednisolone + mycophenolate/rituximab", time: "1 h", color: "bg-orange-700" },
+      { step: "5", action: "If anti-CFH pending and severe TMA: START plasma exchange empirically (treats anti-CFH AND supplies CFH)", time: "2–4 h", color: "bg-orange-600" },
+      { step: "6", action: "Eculizumab: if genetic aHUS confirmed (C3/CFH/CFI/MCP/CFB mutation) OR anti-CFH negative + severe TMA not responding to plasma exchange. Dose: 900mg weekly × 4, then 1200mg q2wk (adult dosing; weight-based in children)", time: "If indicated", color: "bg-amber-700" },
+      { step: "7", action: "RRT if AKI severe — HD or CRRT. Avoid PD in acute TMA (abdominal microthrombi risk)", time: "As needed", color: "bg-blue-600" },
+      { step: "8", action: "Monitor: platelet count, LDH, Hb, creatinine DAILY. TMA response = rising platelets + falling LDH", time: "Daily", color: "bg-blue-500" },
+    ],
+    drugs: [
+      { name: "Plasma (FFP / Octaplas)", dose: "25–30 mL/kg/session infusion OR exchange at 1.5× plasma volume", route: "IV via central access", duration: "Daily until platelet count sustained >150,000 and LDH normalising", purpose: "Supplies functional CFH; removes anti-CFH antibody (during exchange)" },
+      { name: "Eculizumab", dose: "Weight-based: <10kg: 300mg wk1, 300mg wk2, 300mg wk3, 300mg q3wk maintenance", route: "IV infusion over 35 min", duration: "Ongoing for genetic aHUS; 6–12 months for anti-CFH aHUS", purpose: "Terminal complement inhibition (C5 blocker) for genetic/refractory aHUS" },
+      { name: "Prednisolone", dose: "1–2 mg/kg/day", route: "PO", duration: "Taper over 6–12 months", purpose: "Suppress anti-CFH antibody production" },
+      { name: "Mycophenolate mofetil", dose: "600 mg/m²/dose BD", route: "PO", duration: "12–24 months for anti-CFH aHUS", purpose: "Prevent anti-CFH antibody relapse" },
+    ],
+    monitoring: ["Platelet count DAILY (target >150,000 = TMA response)", "LDH daily — falls before platelet rise", "Blood film for schistocytes every 48h", "Creatinine and urine output daily", "Anti-CFH titre every 2 weeks", "Monitor for meningococcal infection if on eculizumab (vaccinate before starting)"],
+    pitfalls: [
+      "NEVER transfuse platelets empirically in TMA — can trigger catastrophic clotting",
+      "Anti-CFH is the COMMONEST cause of paediatric aHUS in India — always send anti-CFH on day 1",
+      "STEC-HUS and aHUS look identical at presentation — STEC PCR stool is mandatory to differentiate (management differs completely)",
+      "Eculizumab without meningococcal vaccination = high risk of fatal meningococcal sepsis — vaccinate urgently (or use prophylactic penicillin V if vaccine unavailable)"
+    ]
+  },
+  {
+    id: "stec-hus",
+    title: "STEC-HUS (Bloody Diarrhoea)",
+    icon: AlertTriangle,
+    color: "bg-orange-800",
+    severity: "CRITICAL",
+    summary: "Bloody diarrhoea + TMA. NEVER give antibiotics (increases Shiga toxin). NEVER transfuse platelets. IV fluids EARLY.",
+    icu_triggers: ["Bloody diarrhoea + falling Hb + thrombocytopenia", "Oliguria or anuria following diarrhoeal illness", "Creatinine rising acutely", "Neurological symptoms (seizure, encephalopathy) in HUS", "Platelet count <80,000 + schistocytes"],
+    algorithm: [
+      { step: "1", action: "CONFIRM: Blood film for schistocytes + LDH + haptoglobin + direct Coombs. Stool STEC PCR (O157:H7, O26, O111, O103) SAME DAY — mandatory", time: "0 min", color: "bg-red-600" },
+      { step: "2", action: "IV FLUIDS EARLY — this is the single most evidence-based intervention in STEC-HUS. Start isotonic saline 10–20 mL/kg bolus then maintain generous hydration BEFORE oliguria develops", time: "0 min", color: "bg-red-600" },
+      { step: "3", action: "DO NOT GIVE ANTIBIOTICS — antibiotics lyse STEC bacteria → massive Shiga toxin (Stx2) release → worsens HUS and increases neurological complications. ABSOLUTE contraindication", time: "Ongoing", color: "bg-red-700" },
+      { step: "4", action: "DO NOT TRANSFUSE PLATELETS unless <10,000/µL or active life-threatening haemorrhage only — fuels microthrombi", time: "Ongoing", color: "bg-red-600" },
+      { step: "5", action: "Monitor urine output hourly. If oliguric despite IV fluids: URGENT nephrology review. RRT (PD preferred in children) if: K >6.5, fluid overload, or anuric >24h", time: "Ongoing", color: "bg-orange-600" },
+      { step: "6", action: "Neurological STEC-HUS (seizures, coma): IV methylprednisolone 10–30 mg/kg + consider eculizumab (off-label but supported by evidence in neurological HUS)", time: "If neuro involved", color: "bg-amber-700" },
+      { step: "7", action: "Red cell transfusion if Hb <7 g/dL or symptomatic anaemia — transfuse SLOWLY (2.5–5 mL/kg/hr) to avoid fluid overload", time: "As needed", color: "bg-blue-600" },
+      { step: "8", action: "Supportive care until TMA resolves: typically 1–3 weeks. Most children recover renal function. Long-term BP monitoring essential", time: "1–3 weeks", color: "bg-green-600" },
+    ],
+    drugs: [
+      { name: "0.9% NaCl", dose: "10–20 mL/kg bolus; then generous maintenance (1.5× normal)", route: "IV", duration: "Until haemodynamically stable and adequate urine output", purpose: "Early volume resuscitation — reduces HUS severity" },
+      { name: "Packed Red Cells", dose: "10 mL/kg over 3–4h if Hb <7 or symptomatic", route: "IV slow transfusion", duration: "PRN", purpose: "Correct anaemia — NOT for thrombocytopenia" },
+      { name: "Eculizumab", dose: "Weight-based (see aHUS protocol)", route: "IV", duration: "Short course for neurological STEC-HUS", purpose: "Neurological STEC-HUS — off-label, evidence emerging (ECULIZE trial data)" },
+    ],
+    monitoring: ["Urine output hourly", "Platelet count + LDH daily", "Creatinine daily", "Blood glucose 4-hourly (pancreatic involvement can cause hyperglycaemia)", "BP 4-hourly", "Neurological status — any change = urgent review"],
+    pitfalls: [
+      "ANTIBIOTICS in STEC-HUS = CONTRAINDICATED — risk of fatal neurological HUS rises 17-fold",
+      "Antibiotic-like drugs: avoid antimotility agents (loperamide) for same reason",
+      "Platelet transfusion worsens microvascular thrombosis — only for active major haemorrhage with platelets <10,000",
+      "STEC-HUS vs aHUS: STEC has bloody diarrhoea prodrome + positive stool PCR; aHUS has no diarrhoeal prodrome — management is opposite"
+    ]
+  },
+  {
+    id: "pres-status-epilepticus",
+    title: "Status Epilepticus in PRES/Hypertensive Encephalopathy",
+    icon: Brain,
+    color: "bg-purple-800",
+    severity: "CRITICAL",
+    summary: "Seizure + severe HTN = PRES until proven otherwise. Treat BP AND seizures simultaneously. MRI shows posterior T2/FLAIR changes.",
+    icu_triggers: ["Generalised seizure + severe HTN", "Altered consciousness + high BP", "Visual disturbance (cortical blindness) + HTN", "Seizure not responding to first-line anticonvulsant", "Posterior white matter changes on MRI (T2/FLAIR hyperintensity)"],
+    algorithm: [
+      { step: "1", action: "ABC. Secure airway. High-flow O2. IV access × 2. Check blood glucose IMMEDIATELY (hypoglycaemia mimics seizure)", time: "0 min", color: "bg-red-700" },
+      { step: "2", action: "Levetiracetam IV LOAD: 20–40 mg/kg (max 3g) over 15 min — PREFERRED in PRES/hypertensive encephalopathy", time: "0 min", color: "bg-red-600" },
+      { step: "3", action: "DO NOT USE SODIUM VALPROATE in hypertensive encephalopathy — hepatotoxicity risk and poor evidence in PRES seizures. Use levetiracetam or midazolam instead", time: "Important contraindication", color: "bg-red-600" },
+      { step: "4", action: "IV Nicardipine 0.5–5 mcg/kg/min — PREFERRED antihypertensive in PRES. Goal: reduce MAP by ≤25% in first hour (upper limit, NOT a target — never reduce faster)", time: "0–10 min", color: "bg-orange-700" },
+      { step: "5", action: "PRES resolves when BP is controlled — anticonvulsants are temporising. BP treatment is definitive treatment", time: "Ongoing", color: "bg-orange-600" },
+      { step: "6", action: "Midazolam 0.1–0.2 mg/kg IV (or intranasal if no IV) for seizure still ongoing at 5 min", time: "5 min if still seizing", color: "bg-amber-600" },
+      { step: "7", action: "Urgent MRI brain: posterior T2/FLAIR hyperintensity = PRES. DWI usually spared (vs ischaemic stroke where DWI positive)", time: "After stabilisation", color: "bg-yellow-600" },
+      { step: "8", action: "Status epilepticus (seizure >30 min or 2 seizures without recovery): escalate to thiopentone infusion or general anaesthesia with ICU support", time: "30 min if refractory", color: "bg-blue-700" },
+    ],
+    drugs: [
+      { name: "Levetiracetam IV", dose: "20–40 mg/kg (max 3000mg) LOAD over 15 min; then 20–30 mg/kg/day BD maintenance", route: "IV over 15 min", duration: "Continue until PRES resolves and BP controlled", purpose: "First-line anticonvulsant in PRES — no hepatotoxicity, no major interactions" },
+      { name: "Nicardipine", dose: "0.5–5 mcg/kg/min, titrate", route: "IV infusion", duration: "Until BP controlled, then transition oral", purpose: "Antihypertensive of choice in PRES/hypertensive encephalopathy" },
+      { name: "Midazolam", dose: "0.1–0.2 mg/kg IV (max 10mg) OR 0.2–0.3 mg/kg intranasal", route: "IV / intranasal", duration: "Acute seizure abort; may repeat once after 5 min", purpose: "Acute seizure termination" },
+      { name: "Lorazepam", dose: "0.1 mg/kg IV (max 4mg)", route: "IV over 2 min", duration: "Single dose; can repeat once", purpose: "Alternative benzodiazepine for acute seizure" },
+    ],
+    monitoring: ["Continuous BP (arterial line preferred)", "Continuous EEG or regular neuro observations if treated status epilepticus", "Blood glucose every 30 min after levetiracetam loading", "Hourly urine output", "Repeat neurological exam every 30 min", "MRI within 12h of stabilisation"],
+    pitfalls: [
+      "MAP reduction >25% in first hour causes watershed ischaemia — PRES goal is CONTROLLED reduction (≤25% over 1 hour as upper limit, not a target to hit)",
+      "Sodium valproate AVOID in hypertensive encephalopathy — risk of hepatotoxicity and no advantage over levetiracetam",
+      "PRES on CT may look normal — MRI is essential (CT misses >30% of PRES)",
+      "Seizures in PRES recur if BP not controlled — antiepileptic alone is insufficient"
+    ]
+  },
+  {
+    id: "aki-rrt-triggers",
+    title: "AKI — RRT Triggers",
+    icon: Activity,
+    color: "bg-amber-700",
+    severity: "URGENT",
+    summary: "Fluid overload >10% body weight, K >6.5, pH <7.1, urea >200 with symptoms, or pulmonary oedema = RRT NOW",
+    icu_triggers: ["Fluid overload >10% body weight", "K⁺ >6.5 mEq/L refractory to medical treatment", "pH <7.1 refractory", "Urea >200 mg/dL with symptoms (uraemic encephalopathy, pericarditis)", "Pulmonary oedema not responding to diuretics"],
+    algorithm: [
+      { step: "1", action: "Assess fluid overload: % FO = (fluid in – fluid out) / baseline weight × 100. >10% = mandatory RRT trigger", time: "0 min", color: "bg-orange-600" },
+      { step: "2", action: "ECG if K >5.5 mEq/L. Immediate Calcium gluconate if peaked T waves / K >6.5 (see Hyperkalaemia protocol)", time: "0 min", color: "bg-red-600" },
+      { step: "3", action: "ABG: if pH <7.1 refractory to bicarbonate, RRT indicated. NaHCO3 1–2 mEq/kg IV as bridge only — not definitive", time: "5 min", color: "bg-red-600" },
+      { step: "4", action: "Preferred RRT modality in India: ACUTE PERITONEAL DIALYSIS (ISPN 2023) — widely available, no vascular access required, more haemodynamically stable. Preferred for infants and haemodynamically unstable patients", time: "Decision", color: "bg-orange-600" },
+      { step: "5", action: "HD / CRRT: for haemodynamically stable patients with vascular access. CRRT preferred in multiorgan failure or haemodynamic instability", time: "If PD not available/feasible", color: "bg-amber-600" },
+      { step: "6", action: "PD catheter insertion (Tenckhoff or acute rigid catheter): urgent surgical/nephrology procedure. Start with low volume dwells (5–10 mL/kg per dwell) and increase gradually", time: "Urgent", color: "bg-yellow-600" },
+      { step: "7", action: "Nutritional support: continue enteral nutrition during RRT. RRT causes protein losses — increase protein intake to 2–3 g/kg/day", time: "Day 1 onwards", color: "bg-green-600" },
+    ],
+    drugs: [
+      { name: "Calcium gluconate 10%", dose: "0.5–1 mL/kg (max 20mL) over 5–10 min", route: "IV", duration: "Immediate cardiac stabilisation if K >6.5 or ECG changes", purpose: "Cardiac membrane stabilisation (not K lowering)" },
+      { name: "NaHCO3 8.4%", dose: "1–2 mEq/kg IV over 30–60 min", route: "IV", duration: "Bridge until RRT starts", purpose: "Temporary acidosis correction — not definitive treatment" },
+      { name: "Furosemide", dose: "2–5 mg/kg IV — trial dose. If no urine in 2h = dialysis", route: "IV bolus", duration: "One or two doses only — avoid further delay to RRT", purpose: "Test renal tubular function before committing to RRT" },
+    ],
+    monitoring: ["Fluid balance HOURLY — % fluid overload calculation daily", "K⁺, creatinine, urea, phosphate, bicarb 6–12 hourly", "Continuous ECG if K >5.5", "BP and HR 1-hourly", "Weight twice daily (if possible — oedema confounds)"],
+    pitfalls: [
+      "Delay in RRT for fluid overload >15% significantly increases mortality in AKI — do not wait for K or acidosis to mandate RRT",
+      "Low-dose dopamine does NOT protect kidneys — evidence discredited, avoid",
+      "Furosemide resistance in severe AKI — 2 failed bolus doses = RRT without further delay",
+      "Acute PD with peritonitis history: consider HD/CRRT as alternative"
+    ]
+  },
+  {
+    id: "pd-peritonitis",
+    title: "PD Peritonitis",
+    icon: AlertTriangle,
+    color: "bg-amber-800",
+    severity: "URGENT",
+    summary: "Cloudy effluent + fever = PD PERITONITIS until proven otherwise. Start IP antibiotics IMMEDIATELY — do NOT wait for culture.",
+    icu_triggers: ["Cloudy peritoneal effluent", "Abdominal pain + fever in PD patient", "Effluent cell count >100 cells/mm³ (>50% neutrophils)", "Blood in PD effluent + fever", "Haemodynamic instability in PD patient"],
+    algorithm: [
+      { step: "1", action: "CLOUDY EFFLUENT = PD PERITONITIS UNTIL PROVEN OTHERWISE. Drain effluent immediately and send for: cell count + differential, gram stain, culture and sensitivity", time: "0 min", color: "bg-orange-700" },
+      { step: "2", action: "If effluent WBC >100/mm³ with >50% neutrophils = START ANTIBIOTICS WITHOUT WAITING FOR CULTURE RESULT", time: "0–30 min", color: "bg-orange-600" },
+      { step: "3", action: "IP Vancomycin 30 mg/kg in one long dwell (max 2g per dwell) — covers gram-positive including Staph aureus and streptococcus", time: "Immediately", color: "bg-orange-500" },
+      { step: "4", action: "IP Ceftazidime 15 mg/kg per dwell (max 1g per dwell) — covers gram-negative organisms. CAN be given in same bag as vancomycin", time: "Simultaneously", color: "bg-amber-600" },
+      { step: "5", action: "Continue standard PD exchanges during treatment — no need to rest the peritoneum unless patient deteriorating. Repeat cultures at 72h", time: "Ongoing", color: "bg-yellow-600" },
+      { step: "6", action: "Culture results at 48–72h: de-escalate antibiotics based on sensitivities. Gram-positive: continue vancomycin alone. Gram-negative: ceftazidime ± adjust based on sensitivity", time: "48–72 h", color: "bg-green-600" },
+      { step: "7", action: "Catheter removal indicated: no response at 5 days, fungal peritonitis (ANY fungi = remove immediately), refractory/relapsing peritonitis, tunnel/exit site infection with same organism", time: "Day 5 if no response", color: "bg-red-600" },
+    ],
+    drugs: [
+      { name: "Vancomycin IP", dose: "30 mg/kg per dwell (max 2000mg)", route: "Intraperitoneal (one long dwell ≥6h)", duration: "Continue until 2 weeks AFTER last positive culture; minimum 14–21 days for Staph aureus", purpose: "Gram-positive peritonitis cover (ISPD 2022)" },
+      { name: "Ceftazidime IP", dose: "15 mg/kg per dwell (max 1000mg)", route: "Intraperitoneal", duration: "Minimum 14–21 days, adjust per culture", purpose: "Gram-negative peritonitis cover" },
+      { name: "Fluconazole / Liposomal Amphotericin", dose: "Fluconazole 3–6 mg/kg/day PO if fungal", route: "PO / IV (IV for amphotericin)", duration: "REMOVE catheter FIRST, then 2 weeks antifungal", purpose: "Fungal peritonitis — catheter removal is mandatory" },
+    ],
+    monitoring: ["Daily effluent appearance (cloudy = not resolving)", "Effluent cell count at 72h (should be falling)", "Temperature twice daily", "Blood cultures if febrile + systemically unwell", "Blood CRP at day 3", "Drain adequacy — check for fibrin/clots blocking catheter"],
+    pitfalls: [
+      "WAITING for culture before starting antibiotics = preventable bowel adhesions and catheter loss — NEVER wait",
+      "Fungal peritonitis: ANY fungal element on gram stain or culture = remove catheter SAME DAY, then antifungal",
+      "Staph aureus peritonitis: treat for MINIMUM 3 weeks; high relapse rate if shorter course",
+      "ISPD 2022: ceftazidime and vancomycin CAN be mixed in same bag — no incompatibility at standard doses"
+    ]
+  },
+  {
+    id: "transplant-creatinine-rise",
+    title: "Post-Transplant Creatinine Rise (First 48h)",
+    icon: Activity,
+    color: "bg-teal-700",
+    severity: "URGENT",
+    summary: "Any creatinine rise in first 48h post-transplant: Doppler ultrasound IMMEDIATELY to exclude vascular thrombosis — surgical emergency.",
+    icu_triggers: ["Creatinine not falling as expected post-transplant", "Any creatinine RISE in first 48–72h post-transplant", "Sudden oliguria or anuria post-transplant", "Graft pain or tenderness", "Haematuria + oliguria post-transplant"],
+    algorithm: [
+      { step: "1", action: "RENAL DOPPLER ULTRASOUND IMMEDIATELY — exclude vascular thrombosis. Renal artery or vein thrombosis = surgical emergency requiring return to theatre within 1–2 hours. Every minute of delay = graft loss", time: "0 min", color: "bg-teal-700" },
+      { step: "2", action: "Simultaneously: Check tacrolimus trough level (target 8–12 ng/mL in first month — high = nephrotoxicity, low = rejection risk), urine output hourly trend, drain output", time: "0–30 min", color: "bg-teal-600" },
+      { step: "3", action: "Doppler normal: assess for urological complications (urinoma, lymphocoele, obstruction). CT urogram or nuclear renogram if Doppler non-diagnostic", time: "After Doppler", color: "bg-orange-600" },
+      { step: "4", action: "Tacrolimus nephrotoxicity: high trough (>15 ng/mL) + rising creatinine. Reduce dose, repeat level in 24h", time: "If high trough", color: "bg-amber-600" },
+      { step: "5", action: "Delayed graft function (DGF): creatinine not falling despite Doppler normal, adequate tacrolimus. Maintain adequate hydration. Most DGF recovers within 2–6 weeks", time: "Days 1–14", color: "bg-yellow-600" },
+      { step: "6", action: "Acute rejection suspected (biopsy-proven): NEVER treat rejection without biopsy. IV methylprednisolone 10 mg/kg × 3 days for acute cellular rejection. T cell depletors / rituximab for antibody-mediated rejection", time: "If rejection suspected", color: "bg-orange-700" },
+      { step: "7", action: "Infection screen: CMV PCR, BK virus PCR, urine culture, blood culture, CXR. Immunosuppression reduction may be required for severe infection", time: "Day 3–7", color: "bg-blue-600" },
+    ],
+    drugs: [
+      { name: "Tacrolimus", dose: "Target trough 8–12 ng/mL (month 1), 5–8 (months 2–6)", route: "PO BD", duration: "Lifelong, dose adjusted per TDM", purpose: "Calcineurin inhibitor — primary immunosuppression" },
+      { name: "Methylprednisolone IV pulse", dose: "10 mg/kg/day (max 500–1000mg)", route: "IV over 30–60 min", duration: "3 days for acute rejection — biopsy-proven only", purpose: "Acute cellular rejection treatment" },
+      { name: "Ganciclovir / Valganciclovir", dose: "5 mg/kg IV BD or 900mg PO BD (renal dose adjusted)", route: "IV / PO", duration: "3–6 months prophylaxis OR treatment", purpose: "CMV prophylaxis/treatment — especially donor+/recipient- combinations" },
+    ],
+    monitoring: ["Hourly urine output first 48h", "Tacrolimus trough on day 1, 3, 7 and weekly thereafter", "Daily creatinine, electrolytes", "Doppler at 24h and if any creatinine change", "CMV PCR weekly for 3 months", "BK virus PCR monthly for 6 months"],
+    pitfalls: [
+      "Renal artery/vein thrombosis: 1–2 hour window for surgical salvage — never delay Doppler for ANY reason",
+      "NEVER treat rejection without biopsy — empirical rejection treatment risks infection, malignancy, unnecessary exposure",
+      "BK nephropathy mimics rejection on creatinine — do NOT pulse steroids for BK nephropathy (worsens it catastrophically)",
+      "Low tacrolimus trough (<5 ng/mL) = rejection risk; high trough (>15 ng/mL) = nephrotoxicity and infection risk"
+    ]
+  },
+  {
     id: "hypernatremia",
     title: "Hypernatremic Dehydration",
     icon: Droplet,
@@ -281,10 +530,10 @@ export default function EmergencyHub() {
         {/* Header */}
         <div className="mb-6 rounded-2xl bg-gradient-to-r from-red-700 via-red-600 to-orange-600 p-6 text-white shadow-2xl">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="w-9 h-9" />
+            <AlertTriangle className="w-7 h-7 flex-shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold">Emergency & ICU Hub</h1>
-              <p className="text-red-100 text-sm mt-0.5">Rapid-access protocols — Hyperkalemia · HTN Emergency · Pulmonary Edema · TLS · Dialysis Emergencies</p>
+              <h1 className="text-lg font-bold">Emergency & ICU Hub</h1>
+              <p className="text-red-100 text-xs mt-0.5">Hyperkalemia · HTN Emergency · RPGN · aHUS · STEC-HUS · Anti-GBM · PRES · TLS · Dialysis</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-4">

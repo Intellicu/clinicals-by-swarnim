@@ -212,9 +212,9 @@ export default function Hub() {
           <div className="relative z-10">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">CliniCals Hub</h1>
-                <p className="text-blue-100 text-sm md:text-base">Pediatric Clinical Intelligence Hub</p>
-                <p className="text-blue-200 text-xs mt-1">by Swarnim</p>
+                <h1 className="text-xl md:text-2xl font-bold text-white mb-1">CliniCals Hub</h1>
+                <p className="text-blue-100 text-sm">Pediatric Clinical Intelligence Hub</p>
+                <p className="text-blue-200 text-xs mt-0.5">by Swarnim</p>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
@@ -247,32 +247,57 @@ export default function Hub() {
         {/* ── Quick Calculations ── */}
         <QuickCalculations />
 
-        {/* ── Quick Access Tools ── */}
-        <Card className="bg-white shadow-xl border-2 border-blue-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-blue-200 px-6 py-4 flex items-center gap-2">
-            <Zap className="w-6 h-6 text-blue-600" />
-            <h2 className="font-bold text-lg text-slate-900">Quick Access Tools</h2>
+        {/* ── Quick Access Tools — horizontal scroll ── */}
+        <div>
+          <div className="flex items-center gap-2 mb-2 px-0.5">
+            <Zap className="w-4 h-4 text-blue-600" />
+            <h2 className="text-sm font-bold text-slate-700">Quick Access Tools</h2>
           </div>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* Urology chip — promoted from bottom nav */}
+          <div className="flex gap-2 mb-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            {[
+              { name: "CAKUT & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
+              { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
+              { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
+              { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
+              { name: "Rheumatology", icon: Stethoscope, color: "bg-violet-600", page: "PediatricRheumatology" },
+              { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
+            ].map(chip => {
+              const ChipIcon = chip.icon;
+              return (
+                <Link key={chip.name} to={createPageUrl(chip.page)} className="flex-shrink-0">
+                  <div className={`flex items-center gap-1.5 px-3 py-2 rounded-full ${chip.color} text-white text-xs font-semibold shadow-sm active:scale-95 transition-transform`}>
+                    <ChipIcon className="w-3.5 h-3.5" />
+                    {chip.name}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+          {/* Horizontal scroll tool cards */}
+          <div className="relative">
+            <div
+              className="flex gap-3 overflow-x-auto pb-2"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollSnapType: "x mandatory" }}
+            >
               {QUICK_TOOLS.map(tool => {
                 const Icon = tool.icon;
                 return (
-                  <Link key={tool.name} to={createPageUrl(tool.page)}>
-                    <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-400 hover:scale-105 group">
-                      <CardContent className="p-4 flex flex-col items-center text-center">
-                        <div className={`w-14 h-14 ${tool.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg`}>
-                          <Icon className="w-7 h-7 text-white" />
-                        </div>
-                        <span className="text-sm font-semibold text-slate-800">{tool.name}</span>
-                      </CardContent>
-                    </Card>
+                  <Link key={tool.name} to={createPageUrl(tool.page)} className="flex-shrink-0" style={{ scrollSnapAlign: "start" }}>
+                    <div className="w-36 bg-white rounded-xl border border-slate-200 p-3 flex flex-col items-center text-center hover:border-blue-300 hover:shadow-md transition-all active:scale-95 h-28 justify-center gap-2">
+                      <div className={`w-11 h-11 ${tool.color} rounded-xl flex items-center justify-center shadow`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-700 leading-tight line-clamp-2">{tool.name}</span>
+                    </div>
                   </Link>
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
+            {/* Fade gradient right edge */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none rounded-r-xl" />
+          </div>
+        </div>
 
         {/* ── Knowledge Base Sections ── */}
         <div>

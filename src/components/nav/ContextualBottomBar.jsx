@@ -4,7 +4,7 @@ import { createPageUrl } from "@/utils";
 import {
   Home, Search, Calculator, AlertTriangle, LayoutGrid,
   Users, Stethoscope, Pill, Clock, Star,
-  BarChart2, FileText, Droplet
+  BarChart2, FileText, Droplet, BookOpen
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -50,7 +50,7 @@ export default function ContextualBottomBar() {
     { icon: Search, label: "Search", to: createPageUrl("Guidelines") },
     { icon: Calculator, label: "Calc", to: createPageUrl("CalculatorsHub") },
     { icon: AlertTriangle, label: "Emergency", to: createPageUrl("EmergencyHub") },
-    { icon: Droplet, label: "Urology", to: createPageUrl("UrologyNephrologyHub") },
+    { icon: BookOpen, label: "Guidelines", to: "/GuidelinesLibrary" },
   ];
 
   const calcTabs = [
