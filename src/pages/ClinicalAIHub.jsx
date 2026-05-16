@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Microscope, ScanLine, TestTube, Stethoscope, Brain, Sparkles, Droplet
@@ -12,6 +10,9 @@ import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer
 import UDSAnalyzer from '../components/clinical-ai/UDSAnalyzer';
 
 export default function ClinicalAIHub() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const defaultTab = urlParams.get('tab') || 'uds';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -39,7 +40,7 @@ export default function ClinicalAIHub() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="uds" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="flex w-full h-auto overflow-x-auto">
             <TabsTrigger value="uds" className="flex flex-col items-center gap-1 py-3 flex-shrink-0">
               <Droplet className="w-5 h-5" />

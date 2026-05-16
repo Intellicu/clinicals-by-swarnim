@@ -11,7 +11,7 @@ import { Network, MapPin, Info, ChevronDown, ChevronUp, Plus, Pencil, Trash2, Se
 // --- Default data (used as fallback if no DB records) ---
 const DEFAULT_COE = [
   { name: "AIIMS New Delhi", city: "Delhi", specialty: "Nephrology, Genetics, Metabolic", level: "Tier 1" },
-  { name: "AIIMS Patna", city: "Patna", specialty: "Paediatric Nephrology, Genetics", level: "Tier 1" },
+  { name: "AIIMS Patna", city: "Patna", specialty: "Multi-specialty Centre of Excellence", level: "Tier 1" },
   { name: "PGIMER Chandigarh", city: "Chandigarh", specialty: "Paediatric Nephrology, Genetics", level: "Tier 1" },
   { name: "JIPMER Puducherry", city: "Puducherry", specialty: "Paediatric Nephrology", level: "Tier 1" },
   { name: "KEM Hospital Mumbai", city: "Mumbai", specialty: "Nephrology, Genetics", level: "Tier 1" },

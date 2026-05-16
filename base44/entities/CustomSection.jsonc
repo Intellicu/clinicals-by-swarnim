@@ -4,11 +4,15 @@
   "properties": {
     "specialty_id": {
       "type": "string",
-      "description": "Reference to Specialty entity"
+      "description": "Reference to Specialty entity (optional)"
     },
     "name": {
       "type": "string",
       "description": "Section name"
+    },
+    "title": {
+      "type": "string",
+      "description": "Full display title"
     },
     "description": {
       "type": "string",
@@ -32,52 +36,49 @@
     "order": {
       "type": "number",
       "description": "Display order"
+    },
+    "section_type": {
+      "type": "string",
+      "enum": [
+        "pathway",
+        "tool",
+        "template",
+        "calculator",
+        "general"
+      ],
+      "default": "general",
+      "description": "Type of custom section content"
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Flexible content storage for AI-generated pathways, tools, etc."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Publication status"
+    },
+    "created_by_admin": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this was created by an admin using AI generation"
+    },
+    "source_document_url": {
+      "type": "string",
+      "description": "URL of uploaded source document if generated from file"
+    },
+    "generation_topic": {
+      "type": "string",
+      "description": "Topic used for AI generation"
     }
   },
   "required": [
-    "specialty_id",
-    "name",
-    "description"
-  ],
-  "rls": {
-    "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    }
-  }
+    "title"
+  ]
 }

@@ -24,16 +24,16 @@ import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
 import FrequencyQuickAccess from "../components/hub/FrequencyQuickAccess";
 
-// ── AI Analyser Tools ──
+// ── AI Analyser Tools ── (url = full path, or page for createPageUrl)
 const AI_TOOLS = [
-  { name: "Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub", desc: "Interpret labs with AI" },
-  { name: "Biopsy AI", icon: Layers, color: "bg-violet-700", page: "RareDiseaseModule", desc: "Renal biopsy patterns" },
+  { name: "Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub", tab: "labs", desc: "Interpret labs with AI" },
+  { name: "Biopsy AI", icon: Layers, color: "bg-violet-700", page: "ClinicalAIHub", tab: "biopsy", desc: "Renal biopsy patterns" },
   { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer", desc: "Genetic report analysis" },
-  { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub", desc: "Uroflowmetry analysis" },
-  { name: "Tubular AI", icon: Beaker, color: "bg-slate-700", page: "UrologyNephrologyHub", desc: "Tubular function tests" },
+  { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub", tab: "uroflow", desc: "Uroflowmetry analysis" },
+  { name: "Urine/UDS AI", icon: TestTube, color: "bg-teal-600", page: "ClinicalAIHub", tab: "uds", desc: "Urine & UDS analysis" },
   { name: "Differential Dx", icon: Brain, color: "bg-indigo-600", page: "DifferentialEngine", desc: "AI differential diagnosis" },
   { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-700", page: "AIPrescriber", desc: "Smart prescription builder" },
-  { name: "Literature AI", icon: BookOpen, color: "bg-emerald-700", page: "ResearchMethodsHub", desc: "Evidence search AI" },
+  { name: "Case Analyzer", icon: BookOpen, color: "bg-emerald-700", page: "ClinicalAIHub", tab: "case", desc: "Full case AI analysis" },
 ];
 
 // ── Quick Calc Tools ──
@@ -506,8 +506,9 @@ export default function Hub() {
           <div className="grid grid-cols-4 gap-2">
             {AI_TOOLS.map(tool => {
               const Icon = tool.icon;
+              const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
               return (
-                <Link key={tool.name} to={createPageUrl(tool.page)}>
+                <Link key={tool.name} to={href}>
                   <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm">
                     <div className={`w-9 h-9 ${tool.color} rounded-xl flex items-center justify-center shadow-sm`}>
                       <Icon className="w-4 h-4 text-white" />
@@ -575,7 +576,7 @@ export default function Hub() {
               { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
               { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
               { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
-              { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "PediatricsHub" },
+              { name: "General Pediatrics", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
               { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
               { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
             ].map(chip => {
