@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Zap, LayoutGrid, ChevronRight } from "lucide-react";
+import { Zap } from "lucide-react";
 
 const DEFAULT_TOOLS = [
   { label: "AKI", page: "AKIStager" },
@@ -73,19 +73,6 @@ export default function FrequencyQuickAccess() {
         </div>
       </div>
 
-      {/* Clinical Workspace entry */}
-      <Link to={createPageUrl("ClinicalWorkspace")}>
-        <div className="flex items-center justify-between bg-gradient-to-r from-slate-700 to-slate-800 rounded-xl px-4 py-3 active:scale-95 transition-transform shadow-sm">
-          <div className="flex items-center gap-3">
-            <LayoutGrid className="w-5 h-5 text-slate-300" />
-            <div>
-              <p className="text-white font-bold text-sm">Clinical Workspace</p>
-              <p className="text-slate-300 text-xs">AI · Scan · Monitoring · Docs · Calculators · Pathways</p>
-            </div>
-          </div>
-          <ChevronRight className="w-4 h-4 text-slate-400" />
-        </div>
-      </Link>
     </div>
   );
 }

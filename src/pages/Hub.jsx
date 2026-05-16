@@ -233,6 +233,106 @@ const KNOWLEDGE_SECTIONS = [
       { name: "General Pediatrics", page: "PediatricsHub", icon: Baby },
     ]
   },
+  {
+    title: "General Pediatric Calculators",
+    icon: Calculator,
+    color: "border-green-200 bg-green-50",
+    iconColor: "text-green-700",
+    items: [
+      { name: "Maintenance Fluids (Holliday-Segar)", page: "FluidCalculator", icon: Waves },
+      { name: "Dehydration Correction", page: "FluidCalculator", icon: Droplet },
+      { name: "Corrected Sodium", page: "SodiumCalculator", icon: Droplet },
+      { name: "Corrected Calcium", page: "ClinicalSupport", icon: TestTube },
+      { name: "Anion Gap", page: "AnionGap", icon: Calculator },
+      { name: "Osmolar Gap", page: "OsmolarGap", icon: Calculator },
+      { name: "BP Percentiles (AAP)", page: "BPPercentiles", icon: Heart },
+      { name: "BMI Percentiles", page: "Anthropometry", icon: Baby },
+      { name: "Growth Percentiles", page: "Anthropometry", icon: Baby },
+      { name: "Glasgow Coma Scale", page: "CalculatorsHub", icon: Brain },
+      { name: "PEWS Score", page: "CalculatorsHub", icon: Activity },
+      { name: "Pediatric Sepsis Screening", page: "CalculatorsHub", icon: AlertCircle },
+      { name: "Drug Dose by Weight", page: "DrugsDosing", icon: Pill },
+      { name: "Resuscitation Drug Calc", page: "CalculatorsHub", icon: Zap },
+      { name: "Burns Fluid Calculator", page: "CalculatorsHub", icon: Waves },
+      { name: "Insulin Infusion Calc", page: "CalculatorsHub", icon: Activity },
+      { name: "DKA Corrected Sodium", page: "SodiumCalculator", icon: Droplet },
+      { name: "Neonatal Bilirubin", page: "CalculatorsHub", icon: Baby },
+      { name: "APGAR Reference", page: "CalculatorsHub", icon: Star },
+      { name: "Tanner Staging", page: "CalculatorsHub", icon: Users },
+    ]
+  },
+  {
+    title: "Pediatric Emergency Tools",
+    icon: AlertCircle,
+    color: "border-red-200 bg-red-50",
+    iconColor: "text-red-600",
+    items: [
+      { name: "Emergency Hub (All)", page: "EmergencyHub", icon: AlertCircle },
+      { name: "Sepsis & Septic Shock", page: "EmergencyHub", icon: Zap },
+      { name: "Status Epilepticus", page: "EmergencyHub", icon: Brain },
+      { name: "DKA Management", page: "EmergencyHub", icon: Activity },
+      { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
+      { name: "Hypertensive Emergency", page: "EmergencyHub", icon: Heart },
+      { name: "Anaphylaxis", page: "EmergencyHub", icon: AlertCircle },
+      { name: "Acute Severe Asthma", page: "EmergencyHub", icon: Wind },
+      { name: "Fluid Bolus Guidance", page: "FluidCalculator", icon: Droplet },
+      { name: "PICU Escalation Triggers", page: "EmergencyHub", icon: TrendingUp },
+      { name: "Intubation Quick Guide", page: "EmergencyHub", icon: Activity },
+      { name: "Toxicology Basics", page: "EmergencyHub", icon: Beaker },
+    ]
+  },
+  {
+    title: "General Pediatric Pathways",
+    icon: GitBranch,
+    color: "border-sky-200 bg-sky-50",
+    iconColor: "text-sky-700",
+    items: [
+      { name: "Fever Approach", page: "ClinicalApproaches", icon: Activity },
+      { name: "Failure to Thrive", page: "ClinicalApproaches", icon: Baby },
+      { name: "Developmental Delay", page: "ClinicalApproaches", icon: Brain },
+      { name: "Short Stature", page: "Anthropometry", icon: Baby },
+      { name: "Obesity & BMI", page: "Anthropometry", icon: Baby },
+      { name: "Anemia Approach", page: "ClinicalApproaches", icon: Droplet },
+      { name: "Neonatal Jaundice", page: "ClinicalApproaches", icon: Baby },
+      { name: "Dehydration", page: "FluidCalculator", icon: Waves },
+      { name: "Shock Approach", page: "EmergencyHub", icon: AlertCircle },
+      { name: "Seizures Pathway", page: "ClinicalApproaches", icon: Brain },
+      { name: "Poisoning Approach", page: "EmergencyHub", icon: Beaker },
+      { name: "Pediatric HTN Pathway", page: "BPPercentiles", icon: Heart },
+    ]
+  },
+  {
+    title: "Pediatric Procedures",
+    icon: ClipboardList,
+    color: "border-purple-200 bg-purple-50",
+    iconColor: "text-purple-700",
+    items: [
+      { name: "Lumbar Puncture Guide", page: "ClinicalApproaches", icon: Stethoscope },
+      { name: "Central Line Basics", page: "ClinicalApproaches", icon: Activity },
+      { name: "NG Tube Insertion", page: "ClinicalApproaches", icon: ClipboardList },
+      { name: "Urinary Catheterization", page: "ClinicalApproaches", icon: Droplet },
+      { name: "Intraosseous Access", page: "ClinicalApproaches", icon: Zap },
+      { name: "IV Access Pearls", page: "ClinicalApproaches", icon: Activity },
+      { name: "Airway Checklist", page: "EmergencyHub", icon: Wind },
+      { name: "Fluid Bolus Protocols", page: "FluidCalculator", icon: Waves },
+    ]
+  },
+  {
+    title: "Pediatric AI Analysers",
+    icon: Brain,
+    color: "border-violet-200 bg-violet-50",
+    iconColor: "text-violet-700",
+    items: [
+      { name: "CBC Analyzer", page: "ClinicalAIHub", icon: Microscope },
+      { name: "ABG Analyzer", page: "ABGInterpreter", icon: Wind },
+      { name: "DKA Analyzer", page: "ClinicalAIHub", icon: Activity },
+      { name: "Sepsis Risk Analyzer", page: "ClinicalAIHub", icon: AlertCircle },
+      { name: "Growth Failure Analyzer", page: "ClinicalAIHub", icon: Baby },
+      { name: "Nutrition Analyzer", page: "NutritionHub", icon: UtensilsCrossed },
+      { name: "Dehydration Analyzer", page: "ClinicalAIHub", icon: Droplet },
+      { name: "Lab Analyzer (Nephro)", page: "ClinicalAIHub", icon: FlaskConical },
+    ]
+  },
 ];
 
 // ── OCR Scan cards ──
@@ -310,6 +410,12 @@ export default function Hub() {
               <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
               {isOnline ? "Online" : "Offline"}
             </span>
+            <Link to={createPageUrl("ClinicalWorkspace")}>
+              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
+                <Layers className="w-3 h-3" />
+                <span>Workspace</span>
+              </Button>
+            </Link>
             {isAdmin && (
               <Link to={createPageUrl("ClinicDashboard")}>
                 <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2">
