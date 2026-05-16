@@ -435,6 +435,9 @@ export default function Hub() {
         {/* ── Quick Patient Entry ── */}
         <QuickPatientEntry />
 
+        {/* ── Auto Calculations ── */}
+        <QuickCalculations />
+
         {/* ── Contextual Suggestions from patient data ── */}
         <ContextualSuggestions patientData={patientData} />
 
