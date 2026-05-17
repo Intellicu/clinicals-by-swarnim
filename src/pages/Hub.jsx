@@ -357,12 +357,12 @@ const OCR_CARDS = [
   { name: "Scan Urine Report", icon: TestTube, color: "bg-teal-600", desc: "Dipstick & microscopy" },
 ];
 
-function CollapsibleSection({ title, icon: Icon, iconColor, children, defaultOpen = false }) {
+function CollapsibleSection({ title, icon: Icon, iconColor, children, defaultOpen = false, className = "" }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div>
+    <div className={`bg-white ${className}`}>
       <button
-        className="w-full flex items-center justify-between py-2 text-left focus:outline-none"
+        className="w-full flex items-center justify-between px-3 py-2.5 text-left focus:outline-none"
         onClick={() => setOpen(o => !o)}
       >
         <div className="flex items-center gap-2">
@@ -412,7 +412,7 @@ export default function Hub() {
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden pb-20">
-      <div className="w-full px-3 py-3 space-y-4 lg:max-w-3xl lg:mx-auto">
+      <div className="w-full px-3 py-3 space-y-4">
 
         {/* ── Hero strip ── */}
         <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 shadow">
@@ -465,7 +465,7 @@ export default function Hub() {
             <ScanLine className="w-4 h-4 text-green-600" />
             <h2 className="text-sm font-bold text-slate-700">Quick Scan</h2>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
             {OCR_CARDS.map((card, i) => {
               const Icon = card.icon;
               const inputId = `ocr-scan-${i}`;
@@ -521,13 +521,13 @@ export default function Hub() {
               <span className="text-xs text-blue-600 font-semibold">All AI →</span>
             </Link>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
             {AI_TOOLS.map(tool => {
               const Icon = tool.icon;
               const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
               return (
-                <Link key={tool.name} to={href} className="flex-shrink-0">
-                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm w-20">
+                <Link key={tool.name} to={href}>
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm">
                     <div className={`w-9 h-9 ${tool.color} rounded-xl flex items-center justify-center shadow-sm`}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
@@ -550,12 +550,12 @@ export default function Hub() {
               <span className="text-xs text-blue-600 font-semibold">All →</span>
             </Link>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
             {QUICK_CALCS.map(calc => {
               const Icon = calc.icon;
               return (
-                <Link key={calc.name} to={createPageUrl(calc.page)} className="flex-shrink-0">
-                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm w-20">
+                <Link key={calc.name} to={createPageUrl(calc.page)}>
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm">
                     <div className={`w-9 h-9 ${calc.color} rounded-xl flex items-center justify-center shadow-sm`}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
@@ -587,7 +587,7 @@ export default function Hub() {
             <Layers className="w-4 h-4 text-slate-500" />
             <h2 className="text-sm font-bold text-slate-700">Specialty Modules</h2>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {[
               { name: "Pediatrics Hub", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
               { name: "Clinical Pathways", icon: GitBranch, color: "bg-sky-700", page: "ClinicalSupport" },
@@ -638,7 +638,7 @@ export default function Hub() {
             </div>
           </div>
 
-          <div className="space-y-1 bg-white rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
+          <div className="grid md:grid-cols-2 gap-px bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
             {visibleSections.map(section => {
               const SectionIcon = section.icon;
               return (
@@ -647,6 +647,7 @@ export default function Hub() {
                   title={section.title}
                   icon={SectionIcon}
                   iconColor={section.iconColor}
+                  className="bg-white px-3"
                 >
                   <div className="px-2 pb-1 space-y-0.5">
                     {section.items.map(item => {
