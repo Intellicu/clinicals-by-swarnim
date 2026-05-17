@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
+import DeleteAccountDialog from "@/components/DeleteAccountDialog";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -72,6 +73,14 @@ const HUB_NAV = [
         children: [
           { title: "Rheumatology Hub", url: createPageUrl("PediatricRheumatology"), icon: Stethoscope },
           { title: "Lab Immunology", url: createPageUrl("LabPathways"), icon: FlaskConical },
+        ]
+      },
+      {
+        title: "Pediatric Endocrinology",
+        icon: Zap,
+        children: [
+          { title: "Endocrinology Hub", url: createPageUrl("PediatricEndocrinology"), icon: Zap },
+          { title: "DKA Protocol", url: createPageUrl("EmergencyHub"), icon: AlertTriangle },
         ]
       },
       {
@@ -323,6 +332,7 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
   const [workspace, setWorkspace] = useState(() => {
     try { return localStorage.getItem("clinicals_workspace") || "hub"; } catch { return "hub"; }
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleSwitch = (ws) => {
     setWorkspace(ws);
@@ -406,17 +416,15 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
           Sign Out
         </button>
         <button
-          onClick={() => {
-            if (window.confirm("Delete your account? This cannot be undone.")) {
-              toast.error("Contact support to complete account deletion.");
-            }
-          }}
+          onClick={() => setShowDeleteDialog(true)}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 rounded-lg transition-all font-medium"
         >
           <Trash2 className="w-3.5 h-3.5" />
           Delete Account
         </button>
       </div>
+
+      {showDeleteDialog && <DeleteAccountDialog onClose={() => setShowDeleteDialog(false)} />}
     </div>
   );
 }

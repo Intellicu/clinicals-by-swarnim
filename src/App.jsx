@@ -36,6 +36,7 @@ import ClinicalWorkspace from './pages/ClinicalWorkspace';
 import GeneralPediatricsHub from './pages/GeneralPediatricsHub';
 import ImagingViewer from './pages/ImagingViewer';
 import PathwayBuilder from './pages/PathwayBuilder';
+import PediatricEndocrinology from './pages/PediatricEndocrinology';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -116,6 +117,7 @@ const AuthenticatedApp = () => {
       <Route path="/GeneralPediatricsHub" element={<LayoutWrapper currentPageName="GeneralPediatricsHub"><GeneralPediatricsHub /></LayoutWrapper>} />
       <Route path="/ImagingViewer" element={<LayoutWrapper currentPageName="ImagingViewer"><ImagingViewer /></LayoutWrapper>} />
       <Route path="/PathwayBuilder" element={<LayoutWrapper currentPageName="PathwayBuilder"><PathwayBuilder /></LayoutWrapper>} />
+      <Route path="/PediatricEndocrinology" element={<LayoutWrapper currentPageName="PediatricEndocrinology"><PediatricEndocrinology /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

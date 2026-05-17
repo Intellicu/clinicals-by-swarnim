@@ -7,6 +7,7 @@ import {
   AlertTriangle, Activity, Zap, Droplet, Heart, Brain, Search,
   ChevronRight, Clock, Pill, ArrowLeft, CheckSquare, ListChecks
 } from "lucide-react";
+import VoiceDictation from "@/components/VoiceDictation";
 
 const PROTOCOLS = [
   {
@@ -517,6 +518,7 @@ export default function EmergencyHub() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("algorithm");
+  const [showDictation, setShowDictation] = useState(false);
 
   const protocol = selected ? PROTOCOLS.find(p => p.id === selected) : null;
   const filtered = PROTOCOLS.filter(p =>
@@ -529,13 +531,21 @@ export default function EmergencyHub() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6 rounded-2xl bg-gradient-to-r from-red-700 via-red-600 to-orange-600 p-6 text-white shadow-2xl">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="w-7 h-7 flex-shrink-0" />
-            <div>
-              <h1 className="text-lg font-bold">Emergency & ICU Hub</h1>
-              <p className="text-red-100 text-xs mt-0.5">Hyperkalemia · HTN Emergency · RPGN · aHUS · STEC-HUS · Anti-GBM · PRES · TLS · Dialysis</p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-7 h-7 flex-shrink-0" />
+              <div>
+                <h1 className="text-lg font-bold">Emergency & ICU Hub</h1>
+                <p className="text-red-100 text-xs mt-0.5">Hyperkalemia · HTN Emergency · RPGN · aHUS · STEC-HUS · Anti-GBM · PRES · TLS · Dialysis</p>
+              </div>
             </div>
+            <VoiceDictation compact onSoap={(soap) => console.log("SOAP:", soap)} />
           </div>
+          {showDictation && (
+            <div className="mt-3">
+              <VoiceDictation onSoap={(soap) => { console.log("SOAP:", soap); setShowDictation(false); }} />
+            </div>
+          )}
           <div className="flex flex-wrap gap-2 mt-4">
             {PROTOCOLS.map(p => (
               <button

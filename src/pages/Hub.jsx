@@ -14,7 +14,7 @@ import {
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
   RefreshCw, Shield, Info, BarChart2, Star, Clock,
   Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, Thermometer
 } from "lucide-react";
 import QuickPatientEntry from "../components/QuickPatientEntry";
 import { useOnlineStatus } from "../components/OfflineDataManager";
@@ -222,6 +222,21 @@ const KNOWLEDGE_SECTIONS = [
     ]
   },
   {
+    title: "Pediatric Endocrinology",
+    icon: Thermometer,
+    color: "border-orange-200 bg-orange-50",
+    iconColor: "text-orange-600",
+    items: [
+      { name: "Endocrinology Hub", page: "PediatricEndocrinology", icon: Thermometer },
+      { name: "DKA Management", page: "EmergencyHub", icon: AlertCircle },
+      { name: "Growth Hormone Deficiency", page: "PediatricEndocrinology", icon: Baby },
+      { name: "Thyroid Disorders", page: "PediatricEndocrinology", icon: Thermometer },
+      { name: "Adrenal Disorders (CAH)", page: "PediatricEndocrinology", icon: Zap },
+      { name: "Diabetes Mellitus Type 1/2", page: "PediatricEndocrinology", icon: Activity },
+      { name: "Pubertal Disorders", page: "PediatricEndocrinology", icon: Users },
+    ]
+  },
+  {
     title: "Research Platform",
     icon: Layers,
     color: "border-teal-200 bg-teal-50",
@@ -397,7 +412,7 @@ export default function Hub() {
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden pb-20">
-      <div className="w-full max-w-3xl mx-auto px-3 py-3 space-y-4">
+      <div className="w-full px-3 py-3 space-y-4 lg:max-w-3xl lg:mx-auto">
 
         {/* ── Hero strip ── */}
         <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 shadow">
@@ -585,6 +600,7 @@ export default function Hub() {
               { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
               { name: "Calculators", icon: Calculator, color: "bg-blue-600", page: "CalculatorsHub" },
               { name: "Pathway Builder", icon: GitBranch, color: "bg-violet-600", page: "PathwayBuilder" },
+              { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" },
             ].map(chip => {
               const ChipIcon = chip.icon;
               return (

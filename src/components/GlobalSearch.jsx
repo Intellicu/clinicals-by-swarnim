@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers } from "lucide-react";
+import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers, Mic, MicOff } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -177,10 +177,28 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const [groups, setGroups] = useState({});
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [focused, setFocused] = useState(0); // flat index across all results
+  const [focused, setFocused] = useState(0);
+  const [isListening, setIsListening] = useState(false);
   const navigate = useNavigate();
   const containerRef = useRef();
-  const flatResults = useRef([]); // mutable flat list for keyboard nav
+  const flatResults = useRef([]);
+  const recognitionRef = useRef(null);
+
+  const startVoiceSearch = useCallback(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) { alert("Voice search not supported in this browser"); return; }
+    if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return; }
+    const rec = new SpeechRecognition();
+    rec.lang = "en-IN";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e) => { setQuery(e.results[0][0].transcript); setIsListening(false); };
+    rec.onerror = () => setIsListening(false);
+    rec.onend = () => setIsListening(false);
+    recognitionRef.current = rec;
+    rec.start();
+    setIsListening(true);
+  }, [isListening]);
 
   // ── Debounce ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -408,16 +426,21 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
           onKeyDown={handleKeyDown}
           onFocus={() => debouncedQuery && setOpen(true)}
           placeholder={placeholder}
-          className="pl-9 pr-8 text-sm h-9"
+          className="pl-9 pr-16 text-sm h-9"
         />
-        {query && (
-          <button
-            onClick={() => { setQuery(""); setOpen(false); setGroups({}); flatResults.current = []; }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-          >
-            <X className="w-4 h-4" />
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {query && (
+            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); flatResults.current = []; }}
+              className="text-slate-400 hover:text-slate-600">
+              <X className="w-4 h-4" />
+            </button>
+          )}
+          <button onClick={startVoiceSearch}
+            className={`p-1 rounded-full transition-colors ${isListening ? "text-red-500 bg-red-50 animate-pulse" : "text-slate-400 hover:text-blue-500"}`}
+            title="Voice search">
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
-        )}
+        </div>
       </div>
 
       {open && debouncedQuery && (
