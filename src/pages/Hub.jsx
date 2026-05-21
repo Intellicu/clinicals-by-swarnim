@@ -14,8 +14,8 @@ import {
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
   RefreshCw, Shield, Info, BarChart2, Star, Clock,
   Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
-  ChevronDown, ChevronUp, Thermometer
-} from "lucide-react";
+  ChevronDown, ChevronUp, Thermometer } from
+"lucide-react";
 import QuickPatientEntry from "../components/QuickPatientEntry";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
@@ -26,336 +26,336 @@ import FrequencyQuickAccess from "../components/hub/FrequencyQuickAccess";
 
 // ── AI Analyser Tools ── (url = full path, or page for createPageUrl)
 const AI_TOOLS = [
-  { name: "Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub", tab: "labs", desc: "Interpret labs with AI" },
-  { name: "Biopsy AI", icon: Layers, color: "bg-violet-700", page: "ClinicalAIHub", tab: "biopsy", desc: "Renal biopsy patterns" },
-  { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer", desc: "Genetic report analysis" },
-  { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub", tab: "uroflow", desc: "Uroflowmetry analysis" },
-  { name: "Urine/UDS AI", icon: TestTube, color: "bg-teal-600", page: "ClinicalAIHub", tab: "uds", desc: "Urine & UDS analysis" },
-  { name: "Differential Dx", icon: Brain, color: "bg-indigo-600", page: "DifferentialEngine", desc: "AI differential diagnosis" },
-  { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-700", page: "AIPrescriber", desc: "Smart prescription builder" },
-  { name: "Case Analyzer", icon: BookOpen, color: "bg-emerald-700", page: "ClinicalAIHub", tab: "case", desc: "Full case AI analysis" },
-];
+{ name: "Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub", tab: "labs", desc: "Interpret labs with AI" },
+{ name: "Biopsy AI", icon: Layers, color: "bg-violet-700", page: "ClinicalAIHub", tab: "biopsy", desc: "Renal biopsy patterns" },
+{ name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer", desc: "Genetic report analysis" },
+{ name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub", tab: "uroflow", desc: "Uroflowmetry analysis" },
+{ name: "Urine/UDS AI", icon: TestTube, color: "bg-teal-600", page: "ClinicalAIHub", tab: "uds", desc: "Urine & UDS analysis" },
+{ name: "Differential Dx", icon: Brain, color: "bg-indigo-600", page: "DifferentialEngine", desc: "AI differential diagnosis" },
+{ name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-700", page: "AIPrescriber", desc: "Smart prescription builder" },
+{ name: "Case Analyzer", icon: BookOpen, color: "bg-emerald-700", page: "ClinicalAIHub", tab: "case", desc: "Full case AI analysis" }];
+
 
 // ── Quick Calc Tools ──
 const QUICK_CALCS = [
-  { name: "Schwartz GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR" },
-  { name: "BP Percentiles", icon: Heart, color: "bg-red-600", page: "BPPercentiles" },
-  { name: "AKI Stager", icon: AlertCircle, color: "bg-red-700", page: "AKIStager" },
-  { name: "FENa", icon: TestTube, color: "bg-indigo-600", page: "FENaCalculator" },
-  { name: "ABG", icon: Wind, color: "bg-rose-600", page: "ABGInterpreter" },
-  { name: "Anion Gap", icon: Calculator, color: "bg-red-600", page: "AnionGap" },
-  { name: "Sodium Corr.", icon: Droplet, color: "bg-blue-500", page: "SodiumCalculator" },
-  { name: "K+ Calc", icon: Zap, color: "bg-amber-600", page: "PotassiumCalculator" },
-  { name: "Fluids", icon: Waves, color: "bg-cyan-600", page: "FluidCalculator" },
-  { name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
-  { name: "All Calcs →", icon: Calculator, color: "bg-slate-700", page: "CalculatorsHub" },
-];
+{ name: "Schwartz GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR" },
+{ name: "BP Percentiles", icon: Heart, color: "bg-red-600", page: "BPPercentiles" },
+{ name: "AKI Stager", icon: AlertCircle, color: "bg-red-700", page: "AKIStager" },
+{ name: "FENa", icon: TestTube, color: "bg-indigo-600", page: "FENaCalculator" },
+{ name: "ABG", icon: Wind, color: "bg-rose-600", page: "ABGInterpreter" },
+{ name: "Anion Gap", icon: Calculator, color: "bg-red-600", page: "AnionGap" },
+{ name: "Sodium Corr.", icon: Droplet, color: "bg-blue-500", page: "SodiumCalculator" },
+{ name: "K+ Calc", icon: Zap, color: "bg-amber-600", page: "PotassiumCalculator" },
+{ name: "Fluids", icon: Waves, color: "bg-cyan-600", page: "FluidCalculator" },
+{ name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
+{ name: "All Calcs →", icon: Calculator, color: "bg-slate-700", page: "CalculatorsHub" }];
+
 
 // ── Knowledge sections ──
 const KNOWLEDGE_SECTIONS = [
-  {
-    title: "Glomerular Diseases",
-    icon: Microscope,
-    color: "border-blue-300 bg-blue-50",
-    iconColor: "text-blue-700",
-    items: [
-      { name: "GN & Glomerular Pathways", page: "GlomerularDiseases", icon: Microscope },
-      { name: "Nephrotic Syndrome", page: "ClinicalSupport", icon: Droplet },
-      { name: "SRNS & Biopsy Pathways", page: "ClinicalSupport", icon: Layers },
-      { name: "Lupus Nephritis", page: "ClinicalSupport", icon: Shield },
-      { name: "IgA & IgAV Nephropathy", page: "ClinicalSupport", icon: GitBranch },
-      { name: "ANCA Vasculitis", page: "ClinicalSupport", icon: Activity },
-      { name: "Membranous Nephropathy", page: "ClinicalSupport", icon: Microscope },
-    ]
-  },
-  {
-    title: "AKI & Emergency",
-    icon: AlertCircle,
-    color: "border-red-200 bg-red-50",
-    iconColor: "text-red-600",
-    items: [
-      { name: "Emergency Hub", page: "EmergencyHub", icon: AlertCircle },
-      { name: "AKI Management (KDIGO)", page: "AKIStager", icon: Zap },
-      { name: "HUS / TMA Protocols", page: "EmergencyHub", icon: AlertCircle },
-      { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
-      { name: "HTN Emergency", page: "EmergencyHub", icon: Heart },
-      { name: "RRT Initiation Triggers", page: "RRTAssistant", icon: Droplet },
-    ]
-  },
-  {
-    title: "CKD Management",
-    icon: TrendingUp,
-    color: "border-cyan-200 bg-cyan-50",
-    iconColor: "text-cyan-700",
-    items: [
-      { name: "CKD Staging (KDIGO)", page: "CKDStager", icon: TrendingUp },
-      { name: "CKD-MBD Protocols", page: "ClinicalSupport", icon: TestTube },
-      { name: "Anemia of CKD", page: "ClinicalSupport", icon: Activity },
-      { name: "Nutrition in CKD", page: "NutritionHub", icon: UtensilsCrossed },
-      { name: "Prediction Tools (ESRD)", page: "PredictionTools", icon: LineChart },
-    ]
-  },
-  {
-    title: "Tubular Disorders",
-    icon: Beaker,
-    color: "border-teal-200 bg-teal-50",
-    iconColor: "text-teal-700",
-    items: [
-      { name: "Tubular Disorder Lab", page: "UrologyNephrologyHub", icon: Beaker },
-      { name: "RTA Classifier", page: "RTAClassifier", icon: FlaskConical },
-      { name: "TRP & TmP/GFR", page: "TRPCalculator", icon: TestTube },
-      { name: "FEMg, FEUA Calculators", page: "FEMgCalculator", icon: Calculator },
-      { name: "Cystinuria & Rare Tubular", page: "RareDiseaseModule", icon: Dna },
-    ]
-  },
-  {
-    title: "Hypertension",
-    icon: Heart,
-    color: "border-rose-200 bg-rose-50",
-    iconColor: "text-rose-600",
-    items: [
-      { name: "BP Percentiles (AAP 2017)", page: "BPPercentiles", icon: Heart },
-      { name: "HTN Staging & Treatment", page: "ClinicalSupport", icon: Stethoscope },
-      { name: "HTN Emergency Protocol", page: "EmergencyHub", icon: AlertCircle },
-      { name: "Secondary HTN Workup", page: "ClinicalSupport", icon: GitBranch },
-      { name: "Antihypertensive Drugs", page: "DrugsDosing", icon: Pill },
-    ]
-  },
-  {
-    title: "Dialysis & RRT",
-    icon: Droplet,
-    color: "border-indigo-200 bg-indigo-50",
-    iconColor: "text-indigo-700",
-    items: [
-      { name: "RRT Assistant (HD/PD)", page: "RRTAssistant", icon: Droplet },
-      { name: "Kt/V Adequacy", page: "KtVCalculator", icon: Calculator },
-      { name: "PD Peritonitis Protocol", page: "EmergencyHub", icon: AlertCircle },
-      { name: "CRRT Prescriptions", page: "RRTAssistant", icon: Activity },
-      { name: "Dialysis Catheter Infection", page: "ClinicalSupport", icon: Shield },
-    ]
-  },
-  {
-    title: "Transplant",
-    icon: Shield,
-    color: "border-green-200 bg-green-50",
-    iconColor: "text-green-700",
-    items: [
-      { name: "Transplant Pathways", page: "ClinicalSupport", icon: Shield },
-      { name: "Rejection Protocols", page: "ClinicalSupport", icon: AlertCircle },
-      { name: "Post-Tx Monitoring", page: "ClinicalSupport", icon: Activity },
-      { name: "Immunosuppressants", page: "DrugsDosing", icon: Pill },
-    ]
-  },
-  {
-    title: "Nephrology & Urology",
-    icon: Droplet,
-    color: "border-blue-300 bg-blue-50",
-    iconColor: "text-blue-800",
-    items: [
-      { name: "CAKUT Master Center", page: "UrologyNephrologyHub", icon: Droplet },
-      { name: "Neurogenic Bladder", page: "UrologyNephrologyHub", icon: Brain },
-      { name: "Uroflow AI Analyzer", page: "UrologyNephrologyHub", icon: Activity },
-      { name: "UTI Master Module", page: "UrologyNephrologyHub", icon: Microscope },
-      { name: "VUR Pathways", page: "ClinicalSupport", icon: GitBranch },
-      { name: "Hydronephrosis Workup", page: "ClinicalSupport", icon: Waves },
-    ]
-  },
-  {
-    title: "Electrolyte Disorders",
-    icon: Zap,
-    color: "border-amber-200 bg-amber-50",
-    iconColor: "text-amber-700",
-    items: [
-      { name: "Hyponatremia / Hypernatremia", page: "SodiumCalculator", icon: Droplet },
-      { name: "Hypokalemia / Hyperkalemia", page: "PotassiumCalculator", icon: Zap },
-      { name: "Calcium & Phosphate", page: "ClinicalSupport", icon: TestTube },
-      { name: "Magnesium Disorders", page: "FEMgCalculator", icon: Beaker },
-      { name: "Acid-Base (ABG)", page: "ABGInterpreter", icon: Wind },
-    ]
-  },
-  {
-    title: "Genetics & Rare Disease",
-    icon: Dna,
-    color: "border-violet-200 bg-violet-50",
-    iconColor: "text-violet-700",
-    items: [
-      { name: "Rare Disease Module", page: "RareDiseaseModule", icon: Dna },
-      { name: "Genetic Report Analyzer", page: "GeneticReportAnalyzer", icon: Brain },
-      { name: "aHUS · Cystinosis · Fabry", page: "RareDiseaseModule", icon: FlaskConical },
-      { name: "NPRD & CoE Network", page: "RareDiseaseModule", icon: Shield },
-      { name: "AI Lab Rare Analyzers", page: "RareDiseaseModule", icon: Microscope },
-    ]
-  },
-  {
-    title: "Guidelines & Evidence",
-    icon: BookOpen,
-    color: "border-green-200 bg-green-50",
-    iconColor: "text-green-700",
-    items: [
-      { name: "Guidelines Library", page: "GuidelinesLibrary", icon: BookOpen },
-      { name: "Clinical OS (KDIGO/ISPN)", page: "ClinicalOS", icon: Brain },
-      { name: "Teaching Hub", page: "TeachingHub", icon: GraduationCap },
-      { name: "Case Library", page: "CaseLibrary", icon: Database },
-    ]
-  },
-  {
-    title: "Calculators Hub",
-    icon: Calculator,
-    color: "border-slate-200 bg-slate-50",
-    iconColor: "text-slate-700",
-    items: [
-      { name: "All Calculators →", page: "CalculatorsHub", icon: Calculator },
-      { name: "Schwartz GFR", page: "SchwartzGFR", icon: Activity },
-      { name: "ABG Interpreter", page: "ABGInterpreter", icon: Wind },
-      { name: "Drug Dosing Engine", page: "DrugsDosing", icon: Pill },
-    ]
-  },
-  {
-    title: "Pediatric Rheumatology",
-    icon: Heart,
-    color: "border-rose-200 bg-rose-50",
-    iconColor: "text-rose-600",
-    items: [
-      { name: "Rheumatology Hub", page: "PediatricRheumatology", icon: Stethoscope },
-      { name: "JIA, SLE, Vasculitis", page: "PediatricRheumatology", icon: Shield },
-      { name: "Scoring (JADAS, SLEDAI)", page: "CalculatorsHub", icon: BarChart2 },
-    ]
-  },
-  {
-    title: "Pediatric Endocrinology",
-    icon: Thermometer,
-    color: "border-orange-200 bg-orange-50",
-    iconColor: "text-orange-600",
-    items: [
-      { name: "Endocrinology Hub", page: "PediatricEndocrinology", icon: Thermometer },
-      { name: "DKA Management", page: "EmergencyHub", icon: AlertCircle },
-      { name: "Growth Hormone Deficiency", page: "PediatricEndocrinology", icon: Baby },
-      { name: "Thyroid Disorders", page: "PediatricEndocrinology", icon: Thermometer },
-      { name: "Adrenal Disorders (CAH)", page: "PediatricEndocrinology", icon: Zap },
-      { name: "Diabetes Mellitus Type 1/2", page: "PediatricEndocrinology", icon: Activity },
-      { name: "Pubertal Disorders", page: "PediatricEndocrinology", icon: Users },
-    ]
-  },
-  {
-    title: "Research Platform",
-    icon: Layers,
-    color: "border-teal-200 bg-teal-50",
-    iconColor: "text-teal-600",
-    items: [
-      { name: "Research Hub", page: "ResearchHub", icon: Layers },
-      { name: "Research OS", page: "ResearchOS", icon: Database },
-      { name: "Nutrition Hub", page: "NutritionHub", icon: UtensilsCrossed },
-      { name: "General Pediatrics", page: "PediatricsHub", icon: Baby },
-    ]
-  },
-  {
-    title: "General Pediatric Calculators",
-    icon: Calculator,
-    color: "border-green-200 bg-green-50",
-    iconColor: "text-green-700",
-    items: [
-      { name: "Maintenance Fluids (Holliday-Segar)", page: "FluidCalculator", icon: Waves },
-      { name: "Dehydration Correction", page: "FluidCalculator", icon: Droplet },
-      { name: "Corrected Sodium", page: "SodiumCalculator", icon: Droplet },
-      { name: "Corrected Calcium", page: "ClinicalSupport", icon: TestTube },
-      { name: "Anion Gap", page: "AnionGap", icon: Calculator },
-      { name: "Osmolar Gap", page: "OsmolarGap", icon: Calculator },
-      { name: "BP Percentiles (AAP)", page: "BPPercentiles", icon: Heart },
-      { name: "BMI Percentiles", page: "Anthropometry", icon: Baby },
-      { name: "Growth Percentiles", page: "Anthropometry", icon: Baby },
-      { name: "Glasgow Coma Scale", page: "CalculatorsHub", icon: Brain },
-      { name: "PEWS Score", page: "CalculatorsHub", icon: Activity },
-      { name: "Pediatric Sepsis Screening", page: "CalculatorsHub", icon: AlertCircle },
-      { name: "Drug Dose by Weight", page: "DrugsDosing", icon: Pill },
-      { name: "Resuscitation Drug Calc", page: "CalculatorsHub", icon: Zap },
-      { name: "Burns Fluid Calculator", page: "CalculatorsHub", icon: Waves },
-      { name: "Insulin Infusion Calc", page: "CalculatorsHub", icon: Activity },
-      { name: "DKA Corrected Sodium", page: "SodiumCalculator", icon: Droplet },
-      { name: "Neonatal Bilirubin", page: "CalculatorsHub", icon: Baby },
-      { name: "APGAR Reference", page: "CalculatorsHub", icon: Star },
-      { name: "Tanner Staging", page: "CalculatorsHub", icon: Users },
-    ]
-  },
-  {
-    title: "Pediatric Emergency Tools",
-    icon: AlertCircle,
-    color: "border-red-200 bg-red-50",
-    iconColor: "text-red-600",
-    items: [
-      { name: "Emergency Hub (All)", page: "EmergencyHub", icon: AlertCircle },
-      { name: "Sepsis & Septic Shock", page: "EmergencyHub", icon: Zap },
-      { name: "Status Epilepticus", page: "EmergencyHub", icon: Brain },
-      { name: "DKA Management", page: "EmergencyHub", icon: Activity },
-      { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
-      { name: "Hypertensive Emergency", page: "EmergencyHub", icon: Heart },
-      { name: "Anaphylaxis", page: "EmergencyHub", icon: AlertCircle },
-      { name: "Acute Severe Asthma", page: "EmergencyHub", icon: Wind },
-      { name: "Fluid Bolus Guidance", page: "FluidCalculator", icon: Droplet },
-      { name: "PICU Escalation Triggers", page: "EmergencyHub", icon: TrendingUp },
-      { name: "Intubation Quick Guide", page: "EmergencyHub", icon: Activity },
-      { name: "Toxicology Basics", page: "EmergencyHub", icon: Beaker },
-    ]
-  },
-  {
-    title: "General Pediatric Pathways",
-    icon: GitBranch,
-    color: "border-sky-200 bg-sky-50",
-    iconColor: "text-sky-700",
-    items: [
-      { name: "Fever Approach", page: "ClinicalApproaches", icon: Activity },
-      { name: "Failure to Thrive", page: "ClinicalApproaches", icon: Baby },
-      { name: "Developmental Delay", page: "ClinicalApproaches", icon: Brain },
-      { name: "Short Stature", page: "Anthropometry", icon: Baby },
-      { name: "Obesity & BMI", page: "Anthropometry", icon: Baby },
-      { name: "Anemia Approach", page: "ClinicalApproaches", icon: Droplet },
-      { name: "Neonatal Jaundice", page: "ClinicalApproaches", icon: Baby },
-      { name: "Dehydration", page: "FluidCalculator", icon: Waves },
-      { name: "Shock Approach", page: "EmergencyHub", icon: AlertCircle },
-      { name: "Seizures Pathway", page: "ClinicalApproaches", icon: Brain },
-      { name: "Poisoning Approach", page: "EmergencyHub", icon: Beaker },
-      { name: "Pediatric HTN Pathway", page: "BPPercentiles", icon: Heart },
-    ]
-  },
-  {
-    title: "Pediatric Procedures",
-    icon: ClipboardList,
-    color: "border-purple-200 bg-purple-50",
-    iconColor: "text-purple-700",
-    items: [
-      { name: "Lumbar Puncture Guide", page: "ClinicalApproaches", icon: Stethoscope },
-      { name: "Central Line Basics", page: "ClinicalApproaches", icon: Activity },
-      { name: "NG Tube Insertion", page: "ClinicalApproaches", icon: ClipboardList },
-      { name: "Urinary Catheterization", page: "ClinicalApproaches", icon: Droplet },
-      { name: "Intraosseous Access", page: "ClinicalApproaches", icon: Zap },
-      { name: "IV Access Pearls", page: "ClinicalApproaches", icon: Activity },
-      { name: "Airway Checklist", page: "EmergencyHub", icon: Wind },
-      { name: "Fluid Bolus Protocols", page: "FluidCalculator", icon: Waves },
-    ]
-  },
-  {
-    title: "Pediatric AI Analysers",
-    icon: Brain,
-    color: "border-violet-200 bg-violet-50",
-    iconColor: "text-violet-700",
-    items: [
-      { name: "CBC Analyzer", page: "ClinicalAIHub", icon: Microscope },
-      { name: "ABG Analyzer", page: "ABGInterpreter", icon: Wind },
-      { name: "DKA Analyzer", page: "ClinicalAIHub", icon: Activity },
-      { name: "Sepsis Risk Analyzer", page: "ClinicalAIHub", icon: AlertCircle },
-      { name: "Growth Failure Analyzer", page: "ClinicalAIHub", icon: Baby },
-      { name: "Nutrition Analyzer", page: "NutritionHub", icon: UtensilsCrossed },
-      { name: "Dehydration Analyzer", page: "ClinicalAIHub", icon: Droplet },
-      { name: "Lab Analyzer (Nephro)", page: "ClinicalAIHub", icon: FlaskConical },
-    ]
-  },
-];
+{
+  title: "Glomerular Diseases",
+  icon: Microscope,
+  color: "border-blue-300 bg-blue-50",
+  iconColor: "text-blue-700",
+  items: [
+  { name: "GN & Glomerular Pathways", page: "GlomerularDiseases", icon: Microscope },
+  { name: "Nephrotic Syndrome", page: "ClinicalSupport", icon: Droplet },
+  { name: "SRNS & Biopsy Pathways", page: "ClinicalSupport", icon: Layers },
+  { name: "Lupus Nephritis", page: "ClinicalSupport", icon: Shield },
+  { name: "IgA & IgAV Nephropathy", page: "ClinicalSupport", icon: GitBranch },
+  { name: "ANCA Vasculitis", page: "ClinicalSupport", icon: Activity },
+  { name: "Membranous Nephropathy", page: "ClinicalSupport", icon: Microscope }]
+
+},
+{
+  title: "AKI & Emergency",
+  icon: AlertCircle,
+  color: "border-red-200 bg-red-50",
+  iconColor: "text-red-600",
+  items: [
+  { name: "Emergency Hub", page: "EmergencyHub", icon: AlertCircle },
+  { name: "AKI Management (KDIGO)", page: "AKIStager", icon: Zap },
+  { name: "HUS / TMA Protocols", page: "EmergencyHub", icon: AlertCircle },
+  { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
+  { name: "HTN Emergency", page: "EmergencyHub", icon: Heart },
+  { name: "RRT Initiation Triggers", page: "RRTAssistant", icon: Droplet }]
+
+},
+{
+  title: "CKD Management",
+  icon: TrendingUp,
+  color: "border-cyan-200 bg-cyan-50",
+  iconColor: "text-cyan-700",
+  items: [
+  { name: "CKD Staging (KDIGO)", page: "CKDStager", icon: TrendingUp },
+  { name: "CKD-MBD Protocols", page: "ClinicalSupport", icon: TestTube },
+  { name: "Anemia of CKD", page: "ClinicalSupport", icon: Activity },
+  { name: "Nutrition in CKD", page: "NutritionHub", icon: UtensilsCrossed },
+  { name: "Prediction Tools (ESRD)", page: "PredictionTools", icon: LineChart }]
+
+},
+{
+  title: "Tubular Disorders",
+  icon: Beaker,
+  color: "border-teal-200 bg-teal-50",
+  iconColor: "text-teal-700",
+  items: [
+  { name: "Tubular Disorder Lab", page: "UrologyNephrologyHub", icon: Beaker },
+  { name: "RTA Classifier", page: "RTAClassifier", icon: FlaskConical },
+  { name: "TRP & TmP/GFR", page: "TRPCalculator", icon: TestTube },
+  { name: "FEMg, FEUA Calculators", page: "FEMgCalculator", icon: Calculator },
+  { name: "Cystinuria & Rare Tubular", page: "RareDiseaseModule", icon: Dna }]
+
+},
+{
+  title: "Hypertension",
+  icon: Heart,
+  color: "border-rose-200 bg-rose-50",
+  iconColor: "text-rose-600",
+  items: [
+  { name: "BP Percentiles (AAP 2017)", page: "BPPercentiles", icon: Heart },
+  { name: "HTN Staging & Treatment", page: "ClinicalSupport", icon: Stethoscope },
+  { name: "HTN Emergency Protocol", page: "EmergencyHub", icon: AlertCircle },
+  { name: "Secondary HTN Workup", page: "ClinicalSupport", icon: GitBranch },
+  { name: "Antihypertensive Drugs", page: "DrugsDosing", icon: Pill }]
+
+},
+{
+  title: "Dialysis & RRT",
+  icon: Droplet,
+  color: "border-indigo-200 bg-indigo-50",
+  iconColor: "text-indigo-700",
+  items: [
+  { name: "RRT Assistant (HD/PD)", page: "RRTAssistant", icon: Droplet },
+  { name: "Kt/V Adequacy", page: "KtVCalculator", icon: Calculator },
+  { name: "PD Peritonitis Protocol", page: "EmergencyHub", icon: AlertCircle },
+  { name: "CRRT Prescriptions", page: "RRTAssistant", icon: Activity },
+  { name: "Dialysis Catheter Infection", page: "ClinicalSupport", icon: Shield }]
+
+},
+{
+  title: "Transplant",
+  icon: Shield,
+  color: "border-green-200 bg-green-50",
+  iconColor: "text-green-700",
+  items: [
+  { name: "Transplant Pathways", page: "ClinicalSupport", icon: Shield },
+  { name: "Rejection Protocols", page: "ClinicalSupport", icon: AlertCircle },
+  { name: "Post-Tx Monitoring", page: "ClinicalSupport", icon: Activity },
+  { name: "Immunosuppressants", page: "DrugsDosing", icon: Pill }]
+
+},
+{
+  title: "Nephrology & Urology",
+  icon: Droplet,
+  color: "border-blue-300 bg-blue-50",
+  iconColor: "text-blue-800",
+  items: [
+  { name: "CAKUT Master Center", page: "UrologyNephrologyHub", icon: Droplet },
+  { name: "Neurogenic Bladder", page: "UrologyNephrologyHub", icon: Brain },
+  { name: "Uroflow AI Analyzer", page: "UrologyNephrologyHub", icon: Activity },
+  { name: "UTI Master Module", page: "UrologyNephrologyHub", icon: Microscope },
+  { name: "VUR Pathways", page: "ClinicalSupport", icon: GitBranch },
+  { name: "Hydronephrosis Workup", page: "ClinicalSupport", icon: Waves }]
+
+},
+{
+  title: "Electrolyte Disorders",
+  icon: Zap,
+  color: "border-amber-200 bg-amber-50",
+  iconColor: "text-amber-700",
+  items: [
+  { name: "Hyponatremia / Hypernatremia", page: "SodiumCalculator", icon: Droplet },
+  { name: "Hypokalemia / Hyperkalemia", page: "PotassiumCalculator", icon: Zap },
+  { name: "Calcium & Phosphate", page: "ClinicalSupport", icon: TestTube },
+  { name: "Magnesium Disorders", page: "FEMgCalculator", icon: Beaker },
+  { name: "Acid-Base (ABG)", page: "ABGInterpreter", icon: Wind }]
+
+},
+{
+  title: "Genetics & Rare Disease",
+  icon: Dna,
+  color: "border-violet-200 bg-violet-50",
+  iconColor: "text-violet-700",
+  items: [
+  { name: "Rare Disease Module", page: "RareDiseaseModule", icon: Dna },
+  { name: "Genetic Report Analyzer", page: "GeneticReportAnalyzer", icon: Brain },
+  { name: "aHUS · Cystinosis · Fabry", page: "RareDiseaseModule", icon: FlaskConical },
+  { name: "NPRD & CoE Network", page: "RareDiseaseModule", icon: Shield },
+  { name: "AI Lab Rare Analyzers", page: "RareDiseaseModule", icon: Microscope }]
+
+},
+{
+  title: "Guidelines & Evidence",
+  icon: BookOpen,
+  color: "border-green-200 bg-green-50",
+  iconColor: "text-green-700",
+  items: [
+  { name: "Guidelines Library", page: "GuidelinesLibrary", icon: BookOpen },
+  { name: "Clinical OS (KDIGO/ISPN)", page: "ClinicalOS", icon: Brain },
+  { name: "Teaching Hub", page: "TeachingHub", icon: GraduationCap },
+  { name: "Case Library", page: "CaseLibrary", icon: Database }]
+
+},
+{
+  title: "Calculators Hub",
+  icon: Calculator,
+  color: "border-slate-200 bg-slate-50",
+  iconColor: "text-slate-700",
+  items: [
+  { name: "All Calculators →", page: "CalculatorsHub", icon: Calculator },
+  { name: "Schwartz GFR", page: "SchwartzGFR", icon: Activity },
+  { name: "ABG Interpreter", page: "ABGInterpreter", icon: Wind },
+  { name: "Drug Dosing Engine", page: "DrugsDosing", icon: Pill }]
+
+},
+{
+  title: "Pediatric Rheumatology",
+  icon: Heart,
+  color: "border-rose-200 bg-rose-50",
+  iconColor: "text-rose-600",
+  items: [
+  { name: "Rheumatology Hub", page: "PediatricRheumatology", icon: Stethoscope },
+  { name: "JIA, SLE, Vasculitis", page: "PediatricRheumatology", icon: Shield },
+  { name: "Scoring (JADAS, SLEDAI)", page: "CalculatorsHub", icon: BarChart2 }]
+
+},
+{
+  title: "Pediatric Endocrinology",
+  icon: Thermometer,
+  color: "border-orange-200 bg-orange-50",
+  iconColor: "text-orange-600",
+  items: [
+  { name: "Endocrinology Hub", page: "PediatricEndocrinology", icon: Thermometer },
+  { name: "DKA Management", page: "EmergencyHub", icon: AlertCircle },
+  { name: "Growth Hormone Deficiency", page: "PediatricEndocrinology", icon: Baby },
+  { name: "Thyroid Disorders", page: "PediatricEndocrinology", icon: Thermometer },
+  { name: "Adrenal Disorders (CAH)", page: "PediatricEndocrinology", icon: Zap },
+  { name: "Diabetes Mellitus Type 1/2", page: "PediatricEndocrinology", icon: Activity },
+  { name: "Pubertal Disorders", page: "PediatricEndocrinology", icon: Users }]
+
+},
+{
+  title: "Research Platform",
+  icon: Layers,
+  color: "border-teal-200 bg-teal-50",
+  iconColor: "text-teal-600",
+  items: [
+  { name: "Research Hub", page: "ResearchHub", icon: Layers },
+  { name: "Research OS", page: "ResearchOS", icon: Database },
+  { name: "Nutrition Hub", page: "NutritionHub", icon: UtensilsCrossed },
+  { name: "General Pediatrics", page: "PediatricsHub", icon: Baby }]
+
+},
+{
+  title: "General Pediatric Calculators",
+  icon: Calculator,
+  color: "border-green-200 bg-green-50",
+  iconColor: "text-green-700",
+  items: [
+  { name: "Maintenance Fluids (Holliday-Segar)", page: "FluidCalculator", icon: Waves },
+  { name: "Dehydration Correction", page: "FluidCalculator", icon: Droplet },
+  { name: "Corrected Sodium", page: "SodiumCalculator", icon: Droplet },
+  { name: "Corrected Calcium", page: "ClinicalSupport", icon: TestTube },
+  { name: "Anion Gap", page: "AnionGap", icon: Calculator },
+  { name: "Osmolar Gap", page: "OsmolarGap", icon: Calculator },
+  { name: "BP Percentiles (AAP)", page: "BPPercentiles", icon: Heart },
+  { name: "BMI Percentiles", page: "Anthropometry", icon: Baby },
+  { name: "Growth Percentiles", page: "Anthropometry", icon: Baby },
+  { name: "Glasgow Coma Scale", page: "CalculatorsHub", icon: Brain },
+  { name: "PEWS Score", page: "CalculatorsHub", icon: Activity },
+  { name: "Pediatric Sepsis Screening", page: "CalculatorsHub", icon: AlertCircle },
+  { name: "Drug Dose by Weight", page: "DrugsDosing", icon: Pill },
+  { name: "Resuscitation Drug Calc", page: "CalculatorsHub", icon: Zap },
+  { name: "Burns Fluid Calculator", page: "CalculatorsHub", icon: Waves },
+  { name: "Insulin Infusion Calc", page: "CalculatorsHub", icon: Activity },
+  { name: "DKA Corrected Sodium", page: "SodiumCalculator", icon: Droplet },
+  { name: "Neonatal Bilirubin", page: "CalculatorsHub", icon: Baby },
+  { name: "APGAR Reference", page: "CalculatorsHub", icon: Star },
+  { name: "Tanner Staging", page: "CalculatorsHub", icon: Users }]
+
+},
+{
+  title: "Pediatric Emergency Tools",
+  icon: AlertCircle,
+  color: "border-red-200 bg-red-50",
+  iconColor: "text-red-600",
+  items: [
+  { name: "Emergency Hub (All)", page: "EmergencyHub", icon: AlertCircle },
+  { name: "Sepsis & Septic Shock", page: "EmergencyHub", icon: Zap },
+  { name: "Status Epilepticus", page: "EmergencyHub", icon: Brain },
+  { name: "DKA Management", page: "EmergencyHub", icon: Activity },
+  { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
+  { name: "Hypertensive Emergency", page: "EmergencyHub", icon: Heart },
+  { name: "Anaphylaxis", page: "EmergencyHub", icon: AlertCircle },
+  { name: "Acute Severe Asthma", page: "EmergencyHub", icon: Wind },
+  { name: "Fluid Bolus Guidance", page: "FluidCalculator", icon: Droplet },
+  { name: "PICU Escalation Triggers", page: "EmergencyHub", icon: TrendingUp },
+  { name: "Intubation Quick Guide", page: "EmergencyHub", icon: Activity },
+  { name: "Toxicology Basics", page: "EmergencyHub", icon: Beaker }]
+
+},
+{
+  title: "General Pediatric Pathways",
+  icon: GitBranch,
+  color: "border-sky-200 bg-sky-50",
+  iconColor: "text-sky-700",
+  items: [
+  { name: "Fever Approach", page: "ClinicalApproaches", icon: Activity },
+  { name: "Failure to Thrive", page: "ClinicalApproaches", icon: Baby },
+  { name: "Developmental Delay", page: "ClinicalApproaches", icon: Brain },
+  { name: "Short Stature", page: "Anthropometry", icon: Baby },
+  { name: "Obesity & BMI", page: "Anthropometry", icon: Baby },
+  { name: "Anemia Approach", page: "ClinicalApproaches", icon: Droplet },
+  { name: "Neonatal Jaundice", page: "ClinicalApproaches", icon: Baby },
+  { name: "Dehydration", page: "FluidCalculator", icon: Waves },
+  { name: "Shock Approach", page: "EmergencyHub", icon: AlertCircle },
+  { name: "Seizures Pathway", page: "ClinicalApproaches", icon: Brain },
+  { name: "Poisoning Approach", page: "EmergencyHub", icon: Beaker },
+  { name: "Pediatric HTN Pathway", page: "BPPercentiles", icon: Heart }]
+
+},
+{
+  title: "Pediatric Procedures",
+  icon: ClipboardList,
+  color: "border-purple-200 bg-purple-50",
+  iconColor: "text-purple-700",
+  items: [
+  { name: "Lumbar Puncture Guide", page: "ClinicalApproaches", icon: Stethoscope },
+  { name: "Central Line Basics", page: "ClinicalApproaches", icon: Activity },
+  { name: "NG Tube Insertion", page: "ClinicalApproaches", icon: ClipboardList },
+  { name: "Urinary Catheterization", page: "ClinicalApproaches", icon: Droplet },
+  { name: "Intraosseous Access", page: "ClinicalApproaches", icon: Zap },
+  { name: "IV Access Pearls", page: "ClinicalApproaches", icon: Activity },
+  { name: "Airway Checklist", page: "EmergencyHub", icon: Wind },
+  { name: "Fluid Bolus Protocols", page: "FluidCalculator", icon: Waves }]
+
+},
+{
+  title: "Pediatric AI Analysers",
+  icon: Brain,
+  color: "border-violet-200 bg-violet-50",
+  iconColor: "text-violet-700",
+  items: [
+  { name: "CBC Analyzer", page: "ClinicalAIHub", icon: Microscope },
+  { name: "ABG Analyzer", page: "ABGInterpreter", icon: Wind },
+  { name: "DKA Analyzer", page: "ClinicalAIHub", icon: Activity },
+  { name: "Sepsis Risk Analyzer", page: "ClinicalAIHub", icon: AlertCircle },
+  { name: "Growth Failure Analyzer", page: "ClinicalAIHub", icon: Baby },
+  { name: "Nutrition Analyzer", page: "NutritionHub", icon: UtensilsCrossed },
+  { name: "Dehydration Analyzer", page: "ClinicalAIHub", icon: Droplet },
+  { name: "Lab Analyzer (Nephro)", page: "ClinicalAIHub", icon: FlaskConical }]
+
+}];
+
 
 // ── OCR Scan cards ──
 const OCR_CARDS = [
-  { name: "Scan Lab Report", icon: Microscope, color: "bg-blue-600", desc: "Auto-extract lab values" },
-  { name: "Scan Prescription", icon: Pill, color: "bg-purple-600", desc: "Extract Rx details" },
-  { name: "Scan Urine Report", icon: TestTube, color: "bg-teal-600", desc: "Dipstick & microscopy" },
-];
+{ name: "Scan Lab Report", icon: Microscope, color: "bg-blue-600", desc: "Auto-extract lab values" },
+{ name: "Scan Prescription", icon: Pill, color: "bg-purple-600", desc: "Extract Rx details" },
+{ name: "Scan Urine Report", icon: TestTube, color: "bg-teal-600", desc: "Dipstick & microscopy" }];
+
 
 function CollapsibleSection({ title, icon: Icon, iconColor, children, defaultOpen = false, className = "" }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -363,8 +363,8 @@ function CollapsibleSection({ title, icon: Icon, iconColor, children, defaultOpe
     <div className={`bg-white ${className}`}>
       <button
         className="w-full flex items-center justify-between px-3 py-2.5 text-left focus:outline-none"
-        onClick={() => setOpen(o => !o)}
-      >
+        onClick={() => setOpen((o) => !o)}>
+        
         <div className="flex items-center gap-2">
           <Icon className={`w-4 h-4 ${iconColor}`} />
           <span className="text-sm font-bold text-slate-800">{title}</span>
@@ -372,8 +372,8 @@ function CollapsibleSection({ title, icon: Icon, iconColor, children, defaultOpe
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>
       {open && <div className="pb-2">{children}</div>}
-    </div>
-  );
+    </div>);
+
 }
 
 export default function Hub() {
@@ -393,14 +393,14 @@ export default function Hub() {
   const filteredSections = useMemo(() => {
     if (!sectionQuery.trim()) return KNOWLEDGE_SECTIONS;
     const q = sectionQuery.toLowerCase();
-    return KNOWLEDGE_SECTIONS
-      .map(section => ({
-        ...section,
-        items: section.items.filter(item => item.name.toLowerCase().includes(q))
-      }))
-      .filter(section =>
-        section.title.toLowerCase().includes(q) || section.items.length > 0
-      );
+    return KNOWLEDGE_SECTIONS.
+    map((section) => ({
+      ...section,
+      items: section.items.filter((item) => item.name.toLowerCase().includes(q))
+    })).
+    filter((section) =>
+    section.title.toLowerCase().includes(q) || section.items.length > 0
+    );
   }, [sectionQuery]);
 
   const visibleSections = showAllKnowledge ? filteredSections : filteredSections.slice(0, 6);
@@ -418,7 +418,7 @@ export default function Hub() {
         <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 shadow">
           <div>
             <h1 className="text-base font-bold text-white leading-tight">CliniCals Hub</h1>
-            <p className="text-blue-200 text-xs">Pediatric Nephrology Bedside Cockpit</p>
+            <p className="text-blue-200 text-xs">Pediatric Nephrology Bedside Assistant</p>
           </div>
           <div className="flex items-center gap-2">
             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
@@ -431,21 +431,21 @@ export default function Hub() {
                 <span>Workspace</span>
               </Button>
             </Link>
-            {isAdmin && (
-              <Link to={createPageUrl("ClinicDashboard")}>
+            {isAdmin &&
+            <Link to={createPageUrl("ClinicDashboard")}>
                 <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2">
                   <Users className="w-3 h-3" />
                 </Button>
               </Link>
-            )}
+            }
           </div>
         </div>
 
         {/* ── Search ── */}
         <GlobalSearch
           placeholder="Search calculators, pathways, drugs, AI tools…"
-          className="bg-white shadow-sm rounded-xl border border-slate-200"
-        />
+          className="bg-white shadow-sm rounded-xl border border-slate-200" />
+        
 
         {/* ── Quick Patient Entry ── */}
         <QuickPatientEntry />
@@ -492,20 +492,20 @@ export default function Hub() {
                         setOcrLoading(null);
                         e.target.value = '';
                       }
-                    }}
-                  />
+                    }} />
+                  
                   <label htmlFor={inputId} className="cursor-pointer block">
                     <div className={`${card.color} rounded-xl p-3 flex flex-col items-center gap-1.5 active:scale-95 transition-transform shadow-sm`}>
-                      {ocrLoading === card.name
-                        ? <RefreshCw className="w-5 h-5 text-white animate-spin" />
-                        : <Icon className="w-5 h-5 text-white" />
+                      {ocrLoading === card.name ?
+                      <RefreshCw className="w-5 h-5 text-white animate-spin" /> :
+                      <Icon className="w-5 h-5 text-white" />
                       }
                       <span className="text-white text-xs font-semibold text-center leading-tight">{card.name}</span>
                       <span className="text-white/70 text-xs text-center leading-tight hidden sm:block">{card.desc}</span>
                     </div>
                   </label>
-                </div>
-              );
+                </div>);
+
             })}
           </div>
         </div>
@@ -522,7 +522,7 @@ export default function Hub() {
             </Link>
           </div>
           <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-            {AI_TOOLS.map(tool => {
+            {AI_TOOLS.map((tool) => {
               const Icon = tool.icon;
               const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
               return (
@@ -533,8 +533,8 @@ export default function Hub() {
                     </div>
                     <span className="text-xs font-semibold text-slate-700 text-center leading-tight line-clamp-2">{tool.name}</span>
                   </div>
-                </Link>
-              );
+                </Link>);
+
             })}
           </div>
         </div>
@@ -551,7 +551,7 @@ export default function Hub() {
             </Link>
           </div>
           <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-            {QUICK_CALCS.map(calc => {
+            {QUICK_CALCS.map((calc) => {
               const Icon = calc.icon;
               return (
                 <Link key={calc.name} to={createPageUrl(calc.page)}>
@@ -561,8 +561,8 @@ export default function Hub() {
                     </div>
                     <span className="text-xs font-semibold text-slate-700 text-center leading-tight line-clamp-2">{calc.name}</span>
                   </div>
-                </Link>
-              );
+                </Link>);
+
             })}
           </div>
         </div>
@@ -589,19 +589,19 @@ export default function Hub() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {[
-              { name: "Pediatrics Hub", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
-              { name: "Clinical Pathways", icon: GitBranch, color: "bg-sky-700", page: "ClinicalSupport" },
-              { name: "Nephrology & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
-              { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
-              { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
-              { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
-              { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
-              { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
-              { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
-              { name: "Calculators", icon: Calculator, color: "bg-blue-600", page: "CalculatorsHub" },
-              { name: "Pathway Builder", icon: GitBranch, color: "bg-violet-600", page: "PathwayBuilder" },
-              { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" },
-            ].map(chip => {
+            { name: "Pediatrics Hub", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
+            { name: "Clinical Pathways", icon: GitBranch, color: "bg-sky-700", page: "ClinicalSupport" },
+            { name: "Nephrology & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
+            { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
+            { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
+            { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
+            { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
+            { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
+            { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
+            { name: "Calculators", icon: Calculator, color: "bg-blue-600", page: "CalculatorsHub" },
+            { name: "Pathway Builder", icon: GitBranch, color: "bg-violet-600", page: "PathwayBuilder" },
+            { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" }].
+            map((chip) => {
               const ChipIcon = chip.icon;
               return (
                 <Link key={chip.name} to={createPageUrl(chip.page)}>
@@ -609,8 +609,8 @@ export default function Hub() {
                     <ChipIcon className="w-4 h-4 flex-shrink-0" />
                     <span className="text-xs font-semibold leading-tight">{chip.name}</span>
                   </div>
-                </Link>
-              );
+                </Link>);
+
             })}
           </div>
         </div>
@@ -626,20 +626,20 @@ export default function Hub() {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
               <input
                 value={sectionQuery}
-                onChange={e => setSectionQuery(e.target.value)}
+                onChange={(e) => setSectionQuery(e.target.value)}
                 placeholder="Filter…"
-                className="w-full pl-7 pr-6 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
-              />
-              {sectionQuery && (
-                <button onClick={() => setSectionQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400">
+                className="w-full pl-7 pr-6 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              
+              {sectionQuery &&
+              <button onClick={() => setSectionQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400">
                   <X className="w-3 h-3" />
                 </button>
-              )}
+              }
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-px bg-slate-200 rounded-xl overflow-hidden border border-slate-200">
-            {visibleSections.map(section => {
+            {visibleSections.map((section) => {
               const SectionIcon = section.icon;
               return (
                 <CollapsibleSection
@@ -647,10 +647,10 @@ export default function Hub() {
                   title={section.title}
                   icon={SectionIcon}
                   iconColor={section.iconColor}
-                  className="bg-white px-3"
-                >
+                  className="bg-white px-3">
+                  
                   <div className="px-2 pb-1 space-y-0.5">
-                    {section.items.map(item => {
+                    {section.items.map((item) => {
                       const ItemIcon = item.icon;
                       return (
                         <Link key={item.name} to={createPageUrl(item.page)}>
@@ -659,23 +659,23 @@ export default function Hub() {
                             <span className="text-xs text-slate-600 group-hover:text-slate-900 flex-1">{item.name}</span>
                             <ChevronRight className="w-3 h-3 text-slate-300" />
                           </div>
-                        </Link>
-                      );
+                        </Link>);
+
                     })}
                   </div>
-                </CollapsibleSection>
-              );
+                </CollapsibleSection>);
+
             })}
           </div>
 
-          {filteredSections.length > 6 && (
-            <button
-              onClick={() => setShowAllKnowledge(v => !v)}
-              className="w-full mt-2 py-2 text-xs font-semibold text-blue-600 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 transition-colors"
-            >
+          {filteredSections.length > 6 &&
+          <button
+            onClick={() => setShowAllKnowledge((v) => !v)}
+            className="w-full mt-2 py-2 text-xs font-semibold text-blue-600 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 transition-colors">
+            
               {showAllKnowledge ? "Show Less ↑" : `Show All ${filteredSections.length} Sections ↓`}
             </button>
-          )}
+          }
         </div>
 
         {/* ── Disclaimer ── */}
@@ -686,6 +686,6 @@ export default function Hub() {
           </AlertDescription>
         </Alert>
       </div>
-    </div>
-  );
+    </div>);
+
 }
