@@ -75,7 +75,9 @@
   ],
   "rls": {
     "create": {
-      "created_by": "{{user.email}}"
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "read": {
       "$or": [
@@ -84,6 +86,16 @@
         },
         {
           "data.clinician_id": "{{user.email}}"
+        },
+        {
+          "data.workspace_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.workspaces_admin_of}}",
+                "{{user.data.workspaces_doctor_of}}"
+              ]
+            }
+          }
         },
         {
           "user_condition": {
@@ -101,6 +113,16 @@
           "data.clinician_id": "{{user.email}}"
         },
         {
+          "data.workspace_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.workspaces_admin_of}}",
+                "{{user.data.workspaces_doctor_of}}"
+              ]
+            }
+          }
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -114,6 +136,16 @@
         },
         {
           "data.clinician_id": "{{user.email}}"
+        },
+        {
+          "data.workspace_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.workspaces_admin_of}}",
+                "{{user.data.workspaces_doctor_of}}"
+              ]
+            }
+          }
         },
         {
           "user_condition": {
