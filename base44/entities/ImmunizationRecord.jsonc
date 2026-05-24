@@ -117,19 +117,9 @@
   ],
   "rls": {
     "create": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.given_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "read": {
       "$or": [
@@ -138,6 +128,15 @@
         },
         {
           "data.given_by": "{{user.email}}"
+        },
+        {
+          "data.patient_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.patients_managed}}"
+              ]
+            }
+          }
         },
         {
           "user_condition": {
