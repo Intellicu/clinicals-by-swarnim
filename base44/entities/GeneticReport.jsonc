@@ -193,10 +193,10 @@
     "read": {
       "$or": [
         {
-          "data.ordering_clinician": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
-          "data.reviewed_by": "{{user.email}}"
+          "data.ordering_clinician": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -208,10 +208,10 @@
     "update": {
       "$or": [
         {
-          "data.ordering_clinician": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
-          "data.reviewed_by": "{{user.email}}"
+          "data.ordering_clinician": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -223,10 +223,10 @@
     "delete": {
       "$or": [
         {
-          "data.ordering_clinician": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
-          "data.reviewed_by": "{{user.email}}"
+          "data.ordering_clinician": "{{user.email}}"
         },
         {
           "user_condition": {
