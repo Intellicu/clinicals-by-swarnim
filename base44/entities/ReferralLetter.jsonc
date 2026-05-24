@@ -79,9 +79,6 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.referring_doctor": "{{user.email}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
