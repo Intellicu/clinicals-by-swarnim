@@ -184,9 +184,6 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.ordering_clinician": "{{user.email}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
@@ -196,10 +193,10 @@
     "read": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "data.ordering_clinician": "{{user.email}}"
         },
         {
-          "data.ordering_clinician": "{{user.email}}"
+          "data.reviewed_by": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -211,10 +208,10 @@
     "update": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "data.ordering_clinician": "{{user.email}}"
         },
         {
-          "data.ordering_clinician": "{{user.email}}"
+          "data.reviewed_by": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -226,10 +223,10 @@
     "delete": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "data.ordering_clinician": "{{user.email}}"
         },
         {
-          "data.ordering_clinician": "{{user.email}}"
+          "data.reviewed_by": "{{user.email}}"
         },
         {
           "user_condition": {
