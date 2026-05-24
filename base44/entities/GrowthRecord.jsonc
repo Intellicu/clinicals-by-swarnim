@@ -125,9 +125,6 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.assessed_by": "{{user.email}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
