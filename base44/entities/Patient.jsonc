@@ -244,6 +244,16 @@
           "created_by": "{{user.email}}"
         },
         {
+          "data.workspace_id": {
+            "$in": {
+              "base44_entity": "Workspace",
+              "query": {
+                "data.members.email": "{{user.email}}"
+              }
+            }
+          }
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -256,6 +266,16 @@
           "created_by": "{{user.email}}"
         },
         {
+          "data.workspace_id": {
+            "$in": {
+              "base44_entity": "Workspace",
+              "query": {
+                "data.members.email": "{{user.email}}"
+              }
+            }
+          }
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -266,6 +286,16 @@
       "$or": [
         {
           "created_by": "{{user.email}}"
+        },
+        {
+          "data.workspace_id": {
+            "$in": {
+              "base44_entity": "Workspace",
+              "query": {
+                "data.members.email": "{{user.email}}"
+              }
+            }
+          }
         },
         {
           "user_condition": {
