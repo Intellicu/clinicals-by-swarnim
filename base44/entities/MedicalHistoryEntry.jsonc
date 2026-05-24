@@ -113,9 +113,6 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.doctor_name": "{{user.email}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
