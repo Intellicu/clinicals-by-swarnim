@@ -86,41 +86,42 @@
   ],
   "rls": {
     "create": {
-      "created_by": "{{user.email}}"
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.recipient_email": "{{user.email}}"
+        }
+      ]
     },
     "read": {
       "$or": [
         {
-          "data.recipient_email": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "data.recipient_email": "{{user.email}}"
         }
       ]
     },
     "update": {
       "$or": [
         {
-          "data.recipient_email": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "data.recipient_email": "{{user.email}}"
         }
       ]
     },
     "delete": {
       "$or": [
         {
-          "data.recipient_email": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
-          "user_condition": {
-            "role": "admin"
-          }
+          "data.recipient_email": "{{user.email}}"
         }
       ]
     }
