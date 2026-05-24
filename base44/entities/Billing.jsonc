@@ -74,12 +74,24 @@
   ],
   "rls": {
     "create": {
-      "created_by": "{{user.email}}"
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "read": {
       "$or": [
         {
           "created_by": "{{user.email}}"
+        },
+        {
+          "data.workspace_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.workspaces_admin_of}}",
+                "{{user.data.workspaces_doctor_of}}"
+              ]
+            }
+          }
         },
         {
           "user_condition": {
@@ -94,6 +106,16 @@
           "created_by": "{{user.email}}"
         },
         {
+          "data.workspace_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.workspaces_admin_of}}",
+                "{{user.data.workspaces_doctor_of}}"
+              ]
+            }
+          }
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -104,6 +126,16 @@
       "$or": [
         {
           "created_by": "{{user.email}}"
+        },
+        {
+          "data.workspace_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.workspaces_admin_of}}",
+                "{{user.data.workspaces_doctor_of}}"
+              ]
+            }
+          }
         },
         {
           "user_condition": {
