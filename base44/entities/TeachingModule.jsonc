@@ -18,7 +18,10 @@
         "Transplant",
         "General Nephrology",
         "Procedures",
-        "Pathology"
+        "Pathology",
+        "Metabolic & Genetic",
+        "Tubular Disorders",
+        "Congenital & CAKUT"
       ],
       "description": "Module category"
     },
@@ -35,15 +38,13 @@
       "type": "object",
       "properties": {
         "overview": {
-          "type": "string",
-          "description": "Module overview/introduction"
+          "type": "string"
         },
         "learning_objectives": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "description": "Learning objectives"
+          }
         },
         "topics": {
           "type": "array",
@@ -163,34 +164,35 @@
       }
     },
     "estimated_duration": {
-      "type": "string",
-      "description": "Estimated time to complete (e.g., '2 hours')"
+      "type": "string"
     },
     "created_by": {
-      "type": "string",
-      "description": "User who created module"
+      "type": "string"
     },
     "is_default": {
       "type": "boolean",
-      "description": "Default module (not deletable)",
       "default": false
     },
     "uploaded_files": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "URLs of uploaded teaching materials"
+      }
     }
   },
-  "required": [
-    "title",
-    "category",
-    "difficulty_level"
-  ],
+  "required": [],
   "rls": {
     "create": {
-      "created_by": "{{user.email}}"
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
     },
     "read": {
       "$or": [
