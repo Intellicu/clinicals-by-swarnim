@@ -220,6 +220,9 @@
     "read": {
       "$or": [
         {
+          "created_by": "{{user.email}}"
+        },
+        {
           "data.clinician_id": "{{user.email}}"
         },
         {
@@ -232,6 +235,9 @@
     "update": {
       "$or": [
         {
+          "created_by": "{{user.email}}"
+        },
+        {
           "data.clinician_id": "{{user.email}}"
         },
         {
@@ -243,6 +249,9 @@
     },
     "delete": {
       "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
         {
           "data.clinician_id": "{{user.email}}"
         },
