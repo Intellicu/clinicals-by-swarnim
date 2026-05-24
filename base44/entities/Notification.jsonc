@@ -86,31 +86,12 @@
   ],
   "rls": {
     "create": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.recipient_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "read": {
-      "$or": [
-        {
-          "data.recipient_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "data.recipient_email": "{{user.email}}"
     },
     "update": {
       "$or": [
