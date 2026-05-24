@@ -159,15 +159,15 @@
   ],
   "rls": {
     "create": {
-      "data.created_by": "{{user.email}}"
+      "created_by": "{{user.email}}"
     },
     "read": {
       "$or": [
         {
-          "data.is_public": true
+          "created_by": "{{user.email}}"
         },
         {
-          "data.created_by": "{{user.email}}"
+          "data.is_public": true
         },
         {
           "user_condition": {
@@ -179,7 +179,7 @@
     "update": {
       "$or": [
         {
-          "data.created_by": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -191,7 +191,7 @@
     "delete": {
       "$or": [
         {
-          "data.created_by": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
           "user_condition": {

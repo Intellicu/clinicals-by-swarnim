@@ -82,21 +82,12 @@
   ],
   "rls": {
     "create": {
-      "data.created_by": "{{user.email}}"
+      "created_by": "{{user.email}}"
     },
     "read": {
       "$or": [
         {
-          "data.created_by": "{{user.email}}"
-        },
-        {
-          "data.patient_id": {
-            "$in": {
-              "$concat": [
-                "{{user.data.patients_managed}}"
-              ]
-            }
-          }
+          "created_by": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -108,7 +99,7 @@
     "update": {
       "$or": [
         {
-          "data.created_by": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -120,7 +111,7 @@
     "delete": {
       "$or": [
         {
-          "data.created_by": "{{user.email}}"
+          "created_by": "{{user.email}}"
         },
         {
           "user_condition": {

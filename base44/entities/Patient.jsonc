@@ -236,49 +236,12 @@
   ],
   "rls": {
     "create": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.referring_doctor": "{{user.email}}"
-        },
-        {
-          "data.workspace_id": {
-            "$in": {
-              "$concat": [
-                "{{user.data.workspaces_admin_of}}",
-                "{{user.data.workspaces_doctor_of}}"
-              ]
-            }
-          }
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "created_by": "{{user.email}}"
     },
     "read": {
       "$or": [
         {
           "created_by": "{{user.email}}"
-        },
-        {
-          "data.referring_doctor": "{{user.email}}"
-        },
-        {
-          "data.workspace_id": {
-            "$in": {
-              "$concat": [
-                "{{user.data.workspaces_admin_of}}",
-                "{{user.data.workspaces_doctor_of}}",
-                "{{user.data.workspaces_nurse_of}}",
-                "{{user.data.workspaces_assistant_of}}"
-              ]
-            }
-          }
         },
         {
           "user_condition": {
@@ -293,19 +256,6 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.referring_doctor": "{{user.email}}"
-        },
-        {
-          "data.workspace_id": {
-            "$in": {
-              "$concat": [
-                "{{user.data.workspaces_admin_of}}",
-                "{{user.data.workspaces_doctor_of}}"
-              ]
-            }
-          }
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
@@ -316,15 +266,6 @@
       "$or": [
         {
           "created_by": "{{user.email}}"
-        },
-        {
-          "data.workspace_id": {
-            "$in": {
-              "$concat": [
-                "{{user.data.workspaces_admin_of}}"
-              ]
-            }
-          }
         },
         {
           "user_condition": {
