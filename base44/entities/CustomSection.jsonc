@@ -91,7 +91,7 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.created_by_admin": true
+          "data.is_public": true
         },
         {
           "user_condition": {
