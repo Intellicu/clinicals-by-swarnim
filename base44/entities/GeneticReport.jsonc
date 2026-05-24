@@ -179,19 +179,9 @@
   ],
   "rls": {
     "create": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.ordering_clinician": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "read": {
       "$or": [
@@ -200,6 +190,18 @@
         },
         {
           "data.ordering_clinician": "{{user.email}}"
+        },
+        {
+          "data.reviewed_by": "{{user.email}}"
+        },
+        {
+          "data.patient_id": {
+            "$in": {
+              "$concat": [
+                "{{user.data.patients_managed}}"
+              ]
+            }
+          }
         },
         {
           "user_condition": {
@@ -217,6 +219,9 @@
           "data.ordering_clinician": "{{user.email}}"
         },
         {
+          "data.reviewed_by": "{{user.email}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -230,6 +235,9 @@
         },
         {
           "data.ordering_clinician": "{{user.email}}"
+        },
+        {
+          "data.reviewed_by": "{{user.email}}"
         },
         {
           "user_condition": {
