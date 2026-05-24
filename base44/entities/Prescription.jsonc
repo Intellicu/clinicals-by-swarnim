@@ -143,6 +143,9 @@
     "read": {
       "$or": [
         {
+          "created_by": "{{user.email}}"
+        },
+        {
           "data.prescribed_by": "{{user.email}}"
         },
         {
@@ -155,6 +158,9 @@
     "update": {
       "$or": [
         {
+          "created_by": "{{user.email}}"
+        },
+        {
           "data.prescribed_by": "{{user.email}}"
         },
         {
@@ -166,6 +172,9 @@
     },
     "delete": {
       "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
         {
           "data.prescribed_by": "{{user.email}}"
         },
