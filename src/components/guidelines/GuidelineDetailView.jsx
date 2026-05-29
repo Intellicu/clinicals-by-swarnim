@@ -764,8 +764,11 @@ function DBDetailedView({ guideline }) {
               <div key={idx} className="border-l-4 border-purple-400 pl-4">
                 <h3 className="font-bold text-slate-900 mb-2">{section.heading}</h3>
                 {section.content && (
-                  <div className="prose prose-sm max-w-none text-slate-700 overflow-x-auto"
-                    dangerouslySetInnerHTML={{ __html: section.content }} />
+                  <div className="space-y-1 mt-1">
+                    {section.content.split('\n').filter(line => line.trim()).map((line, li) => (
+                      <p key={li} className="text-sm text-slate-700 leading-relaxed">{line.trim()}</p>
+                    ))}
+                  </div>
                 )}
                 {section.key_points?.length > 0 && (
                   <ul className="space-y-1.5 mt-2">

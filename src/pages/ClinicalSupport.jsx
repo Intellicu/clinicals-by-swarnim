@@ -1657,26 +1657,37 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
     const scenario = clinicalScenarios.find((s) => s.id === selectedScenario);
 
+    // If scenario not found in the list, show the PathwayRenderer with a fallback scenario object
+    const effectiveScenario = scenario || {
+      id: selectedScenario,
+      title: selectedScenario.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      description: "Clinical pathway",
+      category: "Clinical",
+      priority: "secondary",
+      icon: Stethoscope,
+      hasFullPathway: true,
+    };
+
     return (
       <div>
         <div className="mb-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-start gap-3">
               <div className={`w-14 h-14 rounded-xl flex items-center justify-center shadow-lg ${
-              scenario.priority === "danger" ? "bg-red-200" :
-              scenario.priority === "warning" ? "bg-amber-200" :
+              effectiveScenario.priority === "danger" ? "bg-red-200" :
+              effectiveScenario.priority === "warning" ? "bg-amber-200" :
               "bg-blue-200"}`
               }>
-                <scenario.icon className={`w-8 h-8 ${
-                scenario.priority === "danger" ? "text-red-700" :
-                scenario.priority === "warning" ? "text-amber-700" :
+                <effectiveScenario.icon className={`w-8 h-8 ${
+                effectiveScenario.priority === "danger" ? "text-red-700" :
+                effectiveScenario.priority === "warning" ? "text-amber-700" :
                 "text-blue-700"}`
                 } />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">{scenario.title}</h2>
-                <p className="text-slate-600">{scenario.description}</p>
-                <Badge variant="outline" className="mt-2">{scenario.category}</Badge>
+                <h2 className="text-2xl font-bold text-slate-900 mb-1">{effectiveScenario.title}</h2>
+                <p className="text-slate-600">{effectiveScenario.description}</p>
+                <Badge variant="outline" className="mt-2">{effectiveScenario.category}</Badge>
               </div>
             </div>
             <Button variant="outline" onClick={() => {
@@ -1694,7 +1705,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         {selectedScenario !== "nephrotic-syndrome" && selectedScenario !== "iga-nephropathy" && (
           <PathwayRenderer
             scenarioId={selectedScenario}
-            scenario={scenario}
+            scenario={effectiveScenario}
             onAIPrompt={handleAIPromptFromPathway}
             isAdmin={user?.role === 'admin'}
           />
