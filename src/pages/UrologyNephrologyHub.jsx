@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import {
   Stethoscope, Droplet, Brain, Activity, TestTube, BookOpen,
@@ -33,7 +33,7 @@ const SECTIONS = [
   { id: "cakut", label: "CAKUT & Urology", icon: Droplet, badge: "8+" },
   { id: "neuro_bbd", label: "NGB & BBD", icon: Brain, badge: "ICCS" },
   { id: "uti", label: "UTI & Antimicrobial", icon: Microscope, badge: "ISPN" },
-  { id: "tubular", label: "Tubular & Electrolytes", icon: TestTube, badge: "RTA" },
+  { id: "tubular", label: "Tubular & Electrolytes", icon: TestTube, badge: "RTA", externalLink: "/TubularDisordersHub" },
   { id: "dialysis", label: "Dialysis & ICU", icon: Activity, badge: "HD·PD·CRRT" },
   { id: "transplant", label: "Transplant", icon: Syringe, badge: "IS" },
   { id: "htn", label: "Hypertension", icon: Shield, badge: "AAP" },
@@ -44,6 +44,7 @@ const SECTIONS = [
 ];
 
 export default function UrologyNephrologyHub() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("nephrology");
   const [sectionHistory, setSectionHistory] = useState([]);
 
@@ -114,6 +115,11 @@ export default function UrologyNephrologyHub() {
           sections={SECTIONS}
           activeId={activeSection}
           onSelect={(id) => {
+            const section = SECTIONS.find(s => s.id === id);
+            if (section?.externalLink) {
+              navigate(section.externalLink);
+              return;
+            }
             if (id !== activeSection) {
               setSectionHistory(prev => [...prev, activeSection]);
             }

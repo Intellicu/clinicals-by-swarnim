@@ -101,7 +101,7 @@ const KNOWLEDGE_SECTIONS = [
   color: "border-teal-200 bg-teal-50",
   iconColor: "text-teal-700",
   items: [
-  { name: "Tubular Disorder Lab", page: "UrologyNephrologyHub", icon: Beaker },
+  { name: "Tubular Disorders Hub", page: "TubularDisordersHub", icon: Beaker },
   { name: "RTA Classifier", page: "RTAClassifier", icon: FlaskConical },
   { name: "TRP & TmP/GFR", page: "TRPCalculator", icon: TestTube },
   { name: "FEMg, FEUA Calculators", page: "FEMgCalculator", icon: Calculator },
@@ -592,6 +592,7 @@ export default function Hub() {
             { name: "Pediatrics Hub", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
             { name: "Clinical Pathways", icon: GitBranch, color: "bg-sky-700", page: "ClinicalSupport" },
             { name: "Nephrology & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
+            { name: "Tubular Disorders", icon: Beaker, color: "bg-teal-700", page: "TubularDisordersHub" },
             { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
             { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
             { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },

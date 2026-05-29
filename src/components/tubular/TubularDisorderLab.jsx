@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TestTube, ChevronDown, ChevronUp, ArrowRight, Brain, Loader2, AlertTriangle, Zap } from "lucide-react";
+import { TestTube, ChevronDown, ChevronUp, ArrowRight, Brain, Loader2, AlertTriangle, Zap, Plus, Pencil, Trash2, X, Check } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 
 // ─── Rich condition data ────────────────────────────────────────────────────
 const TUBULAR_CONDITIONS = [
@@ -654,15 +655,16 @@ JSON: { ag_classification, uag_interpretation, primary_diagnosis, differential: 
 }
 
 // ─── Condition Card ──────────────────────────────────────────────────────────
-function ConditionCard({ cond, isOpen, onToggle }) {
+function ConditionCard({ cond, isOpen, onToggle, isAdmin, onEdit, onDelete, isCustom }) {
   return (
-    <Card className={`border-slate-200 shadow-sm ${cond.emergency ? "border-l-4 border-l-red-500" : ""}`}>
+    <Card className={`border-slate-200 shadow-sm ${cond.emergency ? "border-l-4 border-l-red-500" : ""} ${isCustom ? "border-l-4 border-l-amber-400" : ""}`}>
       <CardContent className="p-0">
         <button className="w-full flex items-center justify-between p-3 text-left" onClick={onToggle}>
           <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
             {cond.emergency && <Zap className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />}
             <span className="font-semibold text-sm text-slate-800">{cond.name}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cond.color}`}>{cond.tag}</span>
+            {isCustom && <span className="text-xs text-amber-600 font-medium">Custom</span>}
           </div>
           {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />}
         </button>
@@ -685,6 +687,18 @@ function ConditionCard({ cond, isOpen, onToggle }) {
                 </div>
               </div>
             ))}
+            {isAdmin && (
+              <div className="flex gap-2 pt-1 flex-wrap">
+                <Button size="sm" variant="outline" className="text-xs border-amber-200 text-amber-700 hover:bg-amber-50 h-7" onClick={e => { e.stopPropagation(); onEdit(); }}>
+                  <Pencil className="w-3 h-3 mr-1" /> Edit
+                </Button>
+                {isCustom && (
+                  <Button size="sm" variant="outline" className="text-xs border-red-200 text-red-600 hover:bg-red-50 h-7" onClick={e => { e.stopPropagation(); onDelete(); }}>
+                    <Trash2 className="w-3 h-3 mr-1" /> Delete
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </CardContent>
@@ -692,14 +706,57 @@ function ConditionCard({ cond, isOpen, onToggle }) {
   );
 }
 
+const EMPTY_CONDITION = {
+  name: "", tag: "RTA", color: "bg-blue-100 text-blue-800", emergency: false, summary: "",
+  sections: [{ heading: "Key Points", points: [""] }]
+};
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 export default function TubularDisorderLab() {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [openIdx, setOpenIdx] = useState(null);
   const [showAI, setShowAI] = useState(false);
+  const [customConditions, setCustomConditions] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("custom_tubular") || "[]"); } catch { return []; }
+  });
+  const [editModal, setEditModal] = useState(null);
 
-  const filtered = TUBULAR_CONDITIONS.filter(c => {
+  const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60000 });
+  const isAdmin = user?.role === "admin";
+
+  const saveCustom = (updated) => {
+    setCustomConditions(updated);
+    localStorage.setItem("custom_tubular", JSON.stringify(updated));
+  };
+
+  const openAdd = () => setEditModal({ mode: "add", cond: { ...EMPTY_CONDITION, sections: [{ heading: "Key Points", points: [""] }] }, isCustom: true });
+  const openEdit = (cond, isCustom, customIdx) => setEditModal({ mode: "edit", cond: { ...cond, sections: cond.sections ? [...cond.sections.map(s => ({ ...s, points: [...s.points] }))] : [] }, isCustom, customIdx });
+
+  const handleSave = () => {
+    const c = editModal.cond;
+    if (!c.name.trim()) return;
+    if (editModal.mode === "add") {
+      saveCustom([...customConditions, c]);
+    } else if (editModal.isCustom && editModal.customIdx !== undefined) {
+      const updated = [...customConditions];
+      updated[editModal.customIdx] = c;
+      saveCustom(updated);
+    }
+    setEditModal(null);
+  };
+
+  const handleDelete = (customIdx) => {
+    saveCustom(customConditions.filter((_, i) => i !== customIdx));
+    setOpenIdx(null);
+  };
+
+  const allConditions = [
+    ...TUBULAR_CONDITIONS.map(c => ({ ...c, _isCustom: false })),
+    ...customConditions.map(c => ({ ...c, _isCustom: true }))
+  ];
+
+  const filtered = allConditions.filter(c => {
     const matchTag = filter === "All" || c.tag === filter;
     const q = search.toLowerCase();
     const matchSearch = !q || c.name.toLowerCase().includes(q) || c.tag.toLowerCase().includes(q) || c.summary?.toLowerCase().includes(q);
@@ -710,12 +767,19 @@ export default function TubularDisorderLab() {
     <div className="space-y-4">
       {/* Header */}
       <div className="rounded-xl bg-gradient-to-r from-teal-700 to-cyan-600 p-5 text-white">
-        <div className="flex items-center gap-3">
-          <TestTube className="w-7 h-7" />
-          <div>
-            <h2 className="text-xl font-bold">Tubular Disorders & Electrolytes</h2>
-            <p className="text-teal-100 text-sm">RTA · Fanconi · Channelopathies · NDI · Oxalate · Cystine · Phosphate Wasting · Acid-Base</p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <TestTube className="w-7 h-7" />
+            <div>
+              <h2 className="text-xl font-bold">Tubular Disorders & Electrolytes</h2>
+              <p className="text-teal-100 text-sm">RTA · Fanconi · Channelopathies · NDI · Oxalate · Cystine · Phosphate Wasting · Acid-Base</p>
+            </div>
           </div>
+          {isAdmin && (
+            <button onClick={openAdd} className="flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 text-white px-2.5 py-1.5 rounded-full border border-white/30 transition-colors flex-shrink-0">
+              <Plus className="w-3.5 h-3.5" /> Add
+            </button>
+          )}
         </div>
         <div className="flex flex-wrap gap-1.5 mt-3">
           {["KDIGO 2022","dRTA·pRTA·Type4","Bartter·Gitelman","Cystinosis","XLH·Burosumab","PH1·Lumasiran","Fellowship-grade"].map(t => (
@@ -759,20 +823,84 @@ export default function TubularDisorderLab() {
 
       {/* Cards */}
       <div className="space-y-2">
-        {filtered.map((cond, i) => (
-          <ConditionCard
-            key={cond.name}
-            cond={cond}
-            isOpen={openIdx === i}
-            onToggle={() => setOpenIdx(openIdx === i ? null : i)}
-          />
-        ))}
+        {filtered.map((cond, i) => {
+          const customIdx = cond._isCustom ? customConditions.findIndex(c => c.name === cond.name) : undefined;
+          return (
+            <ConditionCard
+              key={cond.name + i}
+              cond={cond}
+              isOpen={openIdx === i}
+              onToggle={() => setOpenIdx(openIdx === i ? null : i)}
+              isAdmin={isAdmin}
+              isCustom={cond._isCustom}
+              onEdit={() => openEdit(cond, cond._isCustom, customIdx)}
+              onDelete={() => handleDelete(customIdx)}
+            />
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
         <div className="text-center py-8 text-slate-400">
           <TestTube className="w-8 h-8 mx-auto mb-2 opacity-30" />
           <p className="text-sm">No conditions match your search</p>
+        </div>
+      )}
+
+      {/* Add / Edit Modal */}
+      {editModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-3 pb-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+              <h3 className="text-sm font-bold text-slate-800">{editModal.mode === "add" ? "Add New Condition" : "Edit Condition"}</h3>
+              <button onClick={() => setEditModal(null)} className="p-1 text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="p-4 space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Condition Name *</label>
+                <input value={editModal.cond.name} onChange={e => setEditModal(m => ({ ...m, cond: { ...m.cond, name: e.target.value } }))}
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-300" placeholder="e.g. Distal RTA (Type 1)" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">Tag</label>
+                  <select value={editModal.cond.tag} onChange={e => setEditModal(m => ({ ...m, cond: { ...m.cond, tag: e.target.value } }))}
+                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none">
+                    {["RTA","Fanconi/Genetic","Channelopathy","Concentration Defect","Phosphate Wasting","Oxalate Disorder","Amino Acid Defect","Magnesium Disorder","Acid-Base","Isolated Tubular Defect"].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2 pt-5">
+                  <input type="checkbox" id="emerg2" checked={!!editModal.cond.emergency} onChange={e => setEditModal(m => ({ ...m, cond: { ...m.cond, emergency: e.target.checked } }))} className="w-4 h-4" />
+                  <label htmlFor="emerg2" className="text-sm text-slate-600 font-medium">Emergency</label>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Summary</label>
+                <textarea value={editModal.cond.summary} onChange={e => setEditModal(m => ({ ...m, cond: { ...m.cond, summary: e.target.value } }))}
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-300 h-16 resize-none" placeholder="Brief description" />
+              </div>
+              {editModal.cond.sections?.map((sec, si) => (
+                <div key={si} className="border border-slate-200 rounded-lg p-3 space-y-2">
+                  <input value={sec.heading} onChange={e => {
+                    const s = [...editModal.cond.sections]; s[si] = { ...s[si], heading: e.target.value };
+                    setEditModal(m => ({ ...m, cond: { ...m.cond, sections: s } }));
+                  }} className="w-full px-2 py-1 text-xs font-bold border border-slate-200 rounded focus:outline-none" placeholder="Section heading" />
+                  <textarea value={sec.points.join("\n")} onChange={e => {
+                    const s = [...editModal.cond.sections]; s[si] = { ...s[si], points: e.target.value.split("\n") };
+                    setEditModal(m => ({ ...m, cond: { ...m.cond, sections: s } }));
+                  }} className="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:outline-none h-24 resize-none" placeholder="One point per line" />
+                </div>
+              ))}
+              <button onClick={() => setEditModal(m => ({ ...m, cond: { ...m.cond, sections: [...(m.cond.sections || []), { heading: "New Section", points: [""] }] } }))}
+                className="text-xs text-teal-600 hover:text-teal-800 font-medium">+ Add Section</button>
+              <div className="flex gap-2 pt-1">
+                <Button onClick={handleSave} size="sm" className="bg-teal-600 hover:bg-teal-700 flex-1">
+                  <Check className="w-3.5 h-3.5 mr-1" /> Save
+                </Button>
+                <Button onClick={() => setEditModal(null)} size="sm" variant="outline">Cancel</Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
