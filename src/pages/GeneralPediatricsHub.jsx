@@ -541,13 +541,16 @@ const COLOR_CLASSES = {
   purple: { bg: "bg-purple-50", border: "border-purple-200", header: "bg-purple-100", title: "text-purple-900" },
 };
 
-function NutritionGuidelineCard({ section }) {
-  const [open, setOpen] = useState(false);
+function NutritionGuidelineCard({ section, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
   const c = COLOR_CLASSES[section.color] || COLOR_CLASSES.blue;
   return (
     <div className={`rounded-xl border overflow-hidden ${c.border}`}>
       <button onClick={() => setOpen(o => !o)} className={`w-full flex items-center justify-between px-4 py-3 ${c.header} text-left`}>
-        <span className={`text-sm font-bold ${c.title}`}>{section.title}</span>
+        <div className="flex-1 min-w-0">
+          <span className={`text-sm font-bold ${c.title}`}>{section.title}</span>
+          {section.source && <span className="ml-2 text-xs text-slate-500 font-normal">— {section.source}</span>}
+        </div>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
       </button>
       {open && (
@@ -1062,29 +1065,7 @@ export default function GeneralPediatricsHub() {
               </div>
             ) : (
               filteredNutrition.map(section => (
-                <div key={section.title} className={`rounded-xl border overflow-hidden ${COLOR_CLASSES[section.color]?.border || "border-slate-200"}`}>
-                  <button onClick={() => {}} className={`w-full flex items-center justify-between px-4 py-3 ${COLOR_CLASSES[section.color]?.header || "bg-slate-100"} text-left`}
-                    onClick={(e) => {
-                      const card = e.currentTarget.parentElement;
-                      const body = card.querySelector('.nut-body');
-                      if (body) body.classList.toggle('hidden');
-                    }}>
-                    <div className="flex-1">
-                      <span className={`text-sm font-bold ${COLOR_CLASSES[section.color]?.title || "text-slate-900"}`}>{section.title}</span>
-                      {section.source && <span className="ml-2 text-xs opacity-60">— {section.source}</span>}
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
-                  </button>
-                  <div className={`nut-body ${COLOR_CLASSES[section.color]?.bg || "bg-white"} p-4 ${search ? "" : "hidden"}`}>
-                    <ul className="space-y-1.5">
-                      {section.content.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
-                          <span className="text-slate-400 font-bold shrink-0 mt-0.5">•</span>{item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                <NutritionGuidelineCard key={section.title} section={section} defaultOpen={!!search} />
               ))
             )}
 
