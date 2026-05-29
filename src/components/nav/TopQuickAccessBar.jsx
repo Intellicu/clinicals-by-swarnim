@@ -1,17 +1,17 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Sparkles, Pill, GitBranch, TrendingUp, FlaskConical, BookOpen, Dna, Droplet } from "lucide-react";
+import { Home, Sparkles, Pill, Bot, FlaskConical, BookOpen, Dna, Droplet, Baby } from "lucide-react";
 
 const NAV_ITEMS = [
-  { label: "Hub", icon: Home, page: "Hub", color: "bg-blue-600 text-white", activeCheck: ["/Hub", "/"] },
-  { label: "AI Prescriber", icon: Sparkles, page: "AIPrescriber", color: "bg-white text-slate-700", activeCheck: ["/AIPrescriber"] },
-  { label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", color: "bg-white text-slate-700", activeCheck: ["/DrugsDosing", "/DrugCalculator"] },
-  { label: "Nephrology & Urology", icon: Droplet, page: "UrologyNephrologyHub", color: "bg-white text-slate-700", activeCheck: ["/ClinicalSupport", "/UrologyNephrologyHub"] },
-  { label: "Rare Disease", icon: Dna, page: "RareDiseaseModule", color: "bg-white text-slate-700", activeCheck: ["/RareDiseaseModule"] },
-  { label: "Growth", icon: TrendingUp, page: "CalculatorsHub", color: "bg-white text-slate-700", activeCheck: ["/CalculatorsHub", "/BPPercentiles", "/SchwartzGFR", "/Anthropometry"] },
-  { label: "Research", icon: FlaskConical, page: "ResearchHub", color: "bg-white text-slate-700", activeCheck: ["/ResearchHub", "/ResearchOS"] },
-  { label: "Guidelines", icon: BookOpen, page: "Guidelines", color: "bg-white text-slate-700", activeCheck: ["/Guidelines"] },
+  { label: "Hub", icon: Home, page: "Hub", activeCheck: ["/Hub", "/"] },
+  { label: "Guidelines", icon: BookOpen, page: "GuidelinesLibrary", activeCheck: ["/GuidelinesLibrary", "/Guidelines"] },
+  { label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", activeCheck: ["/DrugsDosing", "/DrugCalculator"] },
+  { label: "Nephrology & Urology", icon: Droplet, page: "UrologyNephrologyHub", activeCheck: ["/ClinicalSupport", "/UrologyNephrologyHub"] },
+  { label: "Rare Disease", icon: Dna, page: "RareDiseaseModule", activeCheck: ["/RareDiseaseModule"] },
+  { label: "General Pediatrics", icon: Baby, page: "GeneralPediatricsHub", activeCheck: ["/GeneralPediatricsHub"] },
+  { label: "AI Agents", icon: Bot, path: "/AIAgentsHub", activeCheck: ["/AIAgentsHub"] },
+  { label: "AI Prescriber", icon: Sparkles, page: "AIPrescriber", activeCheck: ["/AIPrescriber"] },
 ];
 
 export default function TopQuickAccessBar() {
@@ -26,8 +26,9 @@ export default function TopQuickAccessBar() {
           const isActive = item.activeCheck.some(path =>
             path === "/" ? p === "/" || p === "/Hub" : p.startsWith(path)
           );
+          const href = item.path || createPageUrl(item.page);
           return (
-            <Link key={item.label} to={createPageUrl(item.page)}>
+            <Link key={item.label} to={href}>
               <button
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                   isActive

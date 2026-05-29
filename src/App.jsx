@@ -38,6 +38,7 @@ import ImagingViewer from './pages/ImagingViewer';
 import PathwayBuilder from './pages/PathwayBuilder';
 import PediatricEndocrinology from './pages/PediatricEndocrinology';
 import TubularDisordersHub from './pages/TubularDisordersHub';
+import AIAgentsHub from './pages/AIAgentsHub';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -120,6 +121,7 @@ const AuthenticatedApp = () => {
       <Route path="/PathwayBuilder" element={<LayoutWrapper currentPageName="PathwayBuilder"><PathwayBuilder /></LayoutWrapper>} />
       <Route path="/PediatricEndocrinology" element={<LayoutWrapper currentPageName="PediatricEndocrinology"><PediatricEndocrinology /></LayoutWrapper>} />
       <Route path="/TubularDisordersHub" element={<LayoutWrapper currentPageName="TubularDisordersHub"><TubularDisordersHub /></LayoutWrapper>} />
+      <Route path="/AIAgentsHub" element={<LayoutWrapper currentPageName="AIAgentsHub"><AIAgentsHub /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

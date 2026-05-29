@@ -22,20 +22,18 @@ import PediatricNutritionPathway from "../components/pathways/PediatricNutrition
 import VaccDrugChatbot from "../components/pediatrics/VaccDrugChatbot.jsx";
 import SimpleVaccinationSchedule from "../components/pediatrics/SimpleVaccinationSchedule.jsx";
 import NutritionIntakeTracker from "../components/pediatrics/NutritionIntakeTracker.jsx";
-import InteractiveGrowthChart from "../components/pediatrics/InteractiveGrowthChart.jsx";
 import DevQuotientTool from "../components/pediatrics/DevQuotientTool.jsx";
 import EndocrineSection from "../components/pediatrics/EndocrineSection.jsx";
 import PedsReferenceSection from "../components/pediatrics/PedsReferenceSection.jsx";
 import PedsAIAnalysers from "../components/pediatrics/PedsAIAnalysers.jsx";
 import IAPScreeningTools from "../components/pediatrics/IAPScreeningTools.jsx";
 
-// ── Tab config — Pathways FIRST ──────────────────────────────────────────────
+// ── Tab config ────────────────────────────────────────────────────────────────
 const TABS = [
   { id: "pathways", label: "Pathways", icon: Brain, color: "bg-teal-600" },
   { id: "screening", label: "Screening", icon: Search, color: "bg-green-700", badge: "IAP" },
   { id: "assistant", label: "AI Assistant", icon: MessageCircle, color: "bg-green-600", badge: "AI" },
   { id: "vaccination", label: "Vaccines", icon: Syringe, color: "bg-blue-600" },
-  { id: "pediatrics", label: "Growth", icon: TrendingUp, color: "bg-purple-600" },
   { id: "dev", label: "Development", icon: Baby, color: "bg-cyan-600", badge: "DQ" },
   { id: "nutrition", label: "Nutrition", icon: Apple, color: "bg-orange-600" },
   { id: "analysers", label: "AI Analysers", icon: Sparkles, color: "bg-violet-600", badge: "AI" },
@@ -488,9 +486,86 @@ Return JSON: name, full, badge, color (amber/teal/violet/blue/green/rose), overv
   );
 }
 
+// ── M-CHAT-R Screening Tool ───────────────────────────────────────────────────
+function MCHATTool() {
+  const CRITICAL_ITEMS = [
+    { id: 1, q: "Does your child respond to their name when called?" },
+    { id: 2, q: "Does your child point with finger to show interest (not to ask)?" },
+    { id: 3, q: "Does your child make eye contact with you?" },
+    { id: 4, q: "Does your child bring objects to show you?" },
+    { id: 5, q: "Does your child imitate or copy what you do?" },
+    { id: 6, q: "Does your child follow your gaze or pointing to look at something?" },
+  ];
+  const [answers, setAnswers] = useState({});
+  const totalNo = Object.values(answers).filter(v => v === false).length;
+  const answered = Object.keys(answers).length;
+
+  return (
+    <div className="bg-white rounded-xl border border-violet-200 overflow-hidden">
+      <div className="px-4 py-2.5 bg-violet-50 border-b border-violet-100">
+        <p className="text-sm font-bold text-violet-900">M-CHAT-R — 6 Critical Items (Autism Screen, 16-30 months)</p>
+      </div>
+      <div className="p-4 space-y-3">
+        {CRITICAL_ITEMS.map(item => (
+          <div key={item.id} className="flex items-start gap-3">
+            <span className="text-xs font-bold text-violet-600 w-5 shrink-0">{item.id}.</span>
+            <p className="text-xs text-slate-700 flex-1">{item.q}</p>
+            <div className="flex gap-1 shrink-0">
+              <button onClick={() => setAnswers(a => ({ ...a, [item.id]: true }))}
+                className={`px-2.5 py-1 text-xs rounded-full font-semibold border transition-colors ${answers[item.id] === true ? "bg-green-500 text-white border-green-500" : "bg-white text-slate-500 border-slate-300"}`}>Yes</button>
+              <button onClick={() => setAnswers(a => ({ ...a, [item.id]: false }))}
+                className={`px-2.5 py-1 text-xs rounded-full font-semibold border transition-colors ${answers[item.id] === false ? "bg-red-500 text-white border-red-500" : "bg-white text-slate-500 border-slate-300"}`}>No</button>
+            </div>
+          </div>
+        ))}
+        {answered > 0 && (
+          <div className={`rounded-lg p-3 text-xs font-semibold ${totalNo >= 2 ? "bg-red-50 text-red-800 border border-red-200" : totalNo === 1 ? "bg-amber-50 text-amber-800 border border-amber-200" : "bg-green-50 text-green-800 border border-green-200"}`}>
+            {totalNo === 0 && answered === 6 ? "✅ Low risk — routine surveillance" :
+             totalNo === 1 ? "⚠️ 1 critical fail — Follow-up interview recommended" :
+             `🔴 ${totalNo} critical fails — HIGH RISK — Refer to developmental paediatrician immediately`}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Nutrition Guideline Card ──────────────────────────────────────────────────
+const COLOR_CLASSES = {
+  green: { bg: "bg-green-50", border: "border-green-200", header: "bg-green-100", title: "text-green-900" },
+  amber: { bg: "bg-amber-50", border: "border-amber-200", header: "bg-amber-100", title: "text-amber-900" },
+  red: { bg: "bg-red-50", border: "border-red-200", header: "bg-red-100", title: "text-red-900" },
+  blue: { bg: "bg-blue-50", border: "border-blue-200", header: "bg-blue-100", title: "text-blue-900" },
+  purple: { bg: "bg-purple-50", border: "border-purple-200", header: "bg-purple-100", title: "text-purple-900" },
+};
+
+function NutritionGuidelineCard({ section }) {
+  const [open, setOpen] = useState(false);
+  const c = COLOR_CLASSES[section.color] || COLOR_CLASSES.blue;
+  return (
+    <div className={`rounded-xl border overflow-hidden ${c.border}`}>
+      <button onClick={() => setOpen(o => !o)} className={`w-full flex items-center justify-between px-4 py-3 ${c.header} text-left`}>
+        <span className={`text-sm font-bold ${c.title}`}>{section.title}</span>
+        {open ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
+      </button>
+      {open && (
+        <div className={`${c.bg} p-4`}>
+          <ul className="space-y-1.5">
+            {section.content.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                <span className="text-slate-400 font-bold shrink-0 mt-0.5">•</span>{item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 export default function GeneralPediatricsHub() {
-  const [activeTab, setActiveTab] = useState("pathways");
+  const [activeTab, setActiveTab] = useState("pathways"); // Default tab
   const [search, setSearch] = useState("");
   const [showGenerator, setShowGenerator] = useState(false);
   const [editingPathway, setEditingPathway] = useState(null);
@@ -688,44 +763,211 @@ export default function GeneralPediatricsHub() {
           </div>
         )}
 
-        {/* ── PEDIATRICS (was Growth) ── */}
-        {activeTab === "pediatrics" && (
-          <div>
-            <div className="flex items-center gap-2 mb-4 p-3 bg-purple-600 rounded-xl shadow">
-              <TrendingUp className="w-5 h-5 text-white shrink-0" />
-              <div>
-                <p className="font-bold text-white text-sm">WHO Growth Charts — Interactive</p>
-                <p className="text-purple-100 text-xs">Weight, Height, Head Circumference · Z-scores · Centile curves</p>
-              </div>
-            </div>
-            <InteractiveGrowthChart />
-          </div>
-        )}
-
         {/* ── DEVELOPMENT + DQ ── */}
         {activeTab === "dev" && (
           <div className="space-y-4">
             <div className="flex items-center gap-2 p-3 bg-cyan-600 rounded-xl shadow">
               <Baby className="w-5 h-5 text-white shrink-0" />
               <div>
-                <p className="font-bold text-white text-sm">Developmental Quotient (DQ) & Milestone Checker</p>
-                <p className="text-cyan-100 text-xs">Calculate DQ across 4 domains · Mark milestones · Identify delays</p>
+                <p className="font-bold text-white text-sm">Developmental Assessment — IAP/WHO</p>
+                <p className="text-cyan-100 text-xs">Milestone table · DQ calculator · M-CHAT · Hearing screen · GDD workup · RBSK referral</p>
               </div>
             </div>
+
+            {/* Milestone Table */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div className="px-4 py-2.5 bg-cyan-50 border-b border-cyan-100">
+                <p className="text-sm font-bold text-cyan-900">Developmental Milestones by Age (IAP 2015)</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100">
+                      <th className="text-left px-3 py-2 font-bold text-slate-700 min-w-[60px]">Age</th>
+                      <th className="text-left px-2 py-2 font-bold text-blue-700 min-w-[130px]">Gross Motor</th>
+                      <th className="text-left px-2 py-2 font-bold text-green-700 min-w-[130px]">Fine Motor</th>
+                      <th className="text-left px-2 py-2 font-bold text-purple-700 min-w-[130px]">Language</th>
+                      <th className="text-left px-2 py-2 font-bold text-orange-700 min-w-[130px]">Social-Adaptive</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { age: "2m", gm: "Holds head 45°, lifts chest", fm: "Follows past midline", lang: "Social smile, cooing", soc: "Recognises mother" },
+                      { age: "4m", gm: "Head steady, rolls front-back", fm: "Grasps rattle, hands to mouth", lang: "Laughs, babbles", soc: "Recognises familiar faces" },
+                      { age: "6m", gm: "Sits with support, rolls both ways", fm: "Transfers hand to hand, rakes", lang: "Monosyllables (da/ba)", soc: "Stranger anxiety begins" },
+                      { age: "9m", gm: "Sits unsupported, creeps/crawls", fm: "Pincer grasp (inferior)", lang: "Dada/mama non-specifically", soc: "Waves bye, plays peek-a-boo" },
+                      { age: "12m", gm: "Pulls to stand, walks with support", fm: "Fine pincer, releases voluntarily", lang: "1 word with meaning, jargon", soc: "Separation anxiety, gives objects" },
+                      { age: "15m", gm: "Walks alone, falls rarely", fm: "Scribbles, puts block in cup", lang: "3–5 words", soc: "Points to wants, uses spoon" },
+                      { age: "18m", gm: "Runs stiffly, climbs stairs holding", fm: "Tower of 3, turns pages", lang: "10+ words, names body parts", soc: "Parallel play, imitates housework" },
+                      { age: "24m", gm: "Runs well, jumps both feet", fm: "Tower of 6, circular scribble", lang: "2-word phrases, 50+ words", soc: "Parallel play, uses spoon/fork" },
+                      { age: "36m", gm: "Alternate feet upstairs, pedals tricycle", fm: "Tower 9, copies circle", lang: "3-word sentences, 200+ words", soc: "Group play, knows name/gender" },
+                      { age: "48m", gm: "Hops on 1 foot, skips", fm: "Copies cross/square", lang: "Questions (why/how), tells story", soc: "Cooperative play, follows rules" },
+                      { age: "60m", gm: "Skips, balances on 1 foot 10s", fm: "Copies triangle, ties shoelace", lang: "Fluent speech, reads letters", soc: "Competitive games, friendships" },
+                    ].map((row, i) => (
+                      <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                        <td className="px-3 py-1.5 font-bold text-slate-700">{row.age}</td>
+                        <td className="px-2 py-1.5 text-blue-800">{row.gm}</td>
+                        <td className="px-2 py-1.5 text-green-800">{row.fm}</td>
+                        <td className="px-2 py-1.5 text-purple-800">{row.lang}</td>
+                        <td className="px-2 py-1.5 text-orange-800">{row.soc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Red Flags */}
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-red-700 uppercase tracking-wide">⚠️ Red Flags by Domain</p>
+              {[
+                { domain: "Gross Motor Red Flags", color: "blue", items: ["No head control by 4m", "No sitting by 9m", "No walking by 18m", "Asymmetric movement at any age", "Regression of motor skills"] },
+                { domain: "Language Red Flags", color: "purple", items: ["No cooing by 3m", "No babbling by 9m", "No words by 18m", "No 2-word phrases by 24m", "Any language regression", "Cannot follow 2-step commands by 24m"] },
+                { domain: "Social-Adaptive Red Flags", color: "orange", items: ["No social smile by 3m", "No eye contact by 6m", "No joint attention by 12m (pointing, showing)", "No pretend play by 18m", "Persistent hand flapping, toe walking"] },
+              ].map(rf => (
+                <SectionCard key={rf.domain} title={rf.domain} items={rf.items} />
+              ))}
+            </div>
+
+            {/* M-CHAT-R */}
+            <MCHATTool />
+
+            {/* DQ Calculator */}
             <DevQuotientTool />
+
+            {/* GDD Workup Checklist */}
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <p className="text-sm font-bold text-slate-800 mb-3">📋 GDD Workup Checklist (DQ &lt;70 or ≥2 domains delayed)</p>
+              <div className="space-y-1">
+                {[
+                  "Thyroid function (T4, TSH) — exclude congenital hypothyroidism",
+                  "Karyotype / chromosomal microarray (CMA) — exclude trisomy, microdeletion",
+                  "Fragile X PCR (all boys, girls if family history)",
+                  "MRI brain — periventricular leukomalacia, corpus callosum anomalies, cortical dysplasia",
+                  "Metabolic screen: urine organic acids, plasma amino acids, ammonia, lactate",
+                  "TORCH titres if dysmorphic or microcephalic",
+                  "Hearing assessment (OAE + BERA) — hearing loss causes language delay",
+                  "Vision screening — refraction, ophthalmology",
+                  "EEG if seizure suspected",
+                  "Whole Exome Sequencing (WES) if above negative + strong family history",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                    <input type="checkbox" className="mt-0.5 rounded" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* RBSK referral */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="text-sm font-bold text-amber-900 mb-2">🏥 RBSK/DEIC Referral (India)</p>
+              <ol className="space-y-1">
+                {[
+                  "Screen using RBSK tools at Anganwadi / sub-centre level",
+                  "Children with any delay → refer to DEIC (District Early Intervention Centre)",
+                  "DEIC provides: multidisciplinary evaluation, therapy (PT/OT/SLT), hearing aids",
+                  "ADIP scheme: free assistive devices for children with disability",
+                  "Sarva Shiksha Abhiyan (SSA): integration into regular school",
+                  "Disability certificate: obtained via DEIC → enables government benefits",
+                ].map((s, i) => <li key={i} className="text-xs text-amber-800 flex gap-1.5"><span className="font-bold text-amber-600">{i+1}.</span>{s}</li>)}
+              </ol>
+            </div>
           </div>
         )}
 
         {/* ── NUTRITION ── */}
         {activeTab === "nutrition" && (
-          <div>
-            <div className="flex items-center gap-2 mb-4 p-3 bg-orange-600 rounded-xl shadow">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 p-3 bg-orange-600 rounded-xl shadow">
               <Apple className="w-5 h-5 text-white shrink-0" />
               <div>
-                <p className="font-bold text-white text-sm">Nutrition Intake Tracker</p>
-                <p className="text-orange-100 text-xs">Log food + fluids · Compare vs requirements · IAP/ICMR guidelines</p>
+                <p className="font-bold text-white text-sm">Nutrition — IAP/WHO/NIN Guidelines</p>
+                <p className="text-orange-100 text-xs">IYCF · SAM · MUAC · Growth Monitoring · Micronutrients</p>
               </div>
             </div>
+
+            {/* Nutrition guideline cards */}
+            {[
+              {
+                title: "Infant and Young Child Feeding (IYCF)",
+                color: "green",
+                content: [
+                  "Initiate breastfeeding within 1 hour of birth (colostrum = 'liquid gold')",
+                  "Exclusive breastfeeding for first 6 months — no water, no other feeds",
+                  "Complementary feeding from 6 months: home-cooked semi-solid foods",
+                  "Continue breastfeeding up to 2 years or beyond",
+                  "India-specific: khichdi, mashed dal-rice, suji kheer, mashed banana, curd-rice",
+                  "Energy density: ≥1 kcal/mL; protein: 10–15% total energy",
+                  "4-star diet: cereals + pulses + animal foods + fruits/vegetables daily",
+                  "Frequency: 2-3 meals/day at 6-8m; 3-4 meals + 1-2 snacks at 9-23m",
+                ]
+              },
+              {
+                title: "Malnutrition Classification + MUAC Guide",
+                color: "amber",
+                content: [
+                  "SAM: WHZ <-3SD OR MUAC <11.5cm OR bilateral pitting oedema",
+                  "MAM: WHZ -2 to -3SD OR MUAC 11.5–12.5cm",
+                  "Normal: WHZ >-2SD AND MUAC >12.5cm",
+                  "🔴 MUAC <11.5cm = SAM → facility-based management",
+                  "🟡 MUAC 11.5–12.5cm = MAM → community supplementary feeding",
+                  "🟢 MUAC >12.5cm = Normal",
+                  "Oedema grading: + foot/ankle | ++ lower limb | +++ generalised",
+                  "Kwashiorkor (oedema) = SAM regardless of weight-for-height",
+                ]
+              },
+              {
+                title: "SAM Management — NRC 10-Step Protocol (WHO/IAP)",
+                color: "red",
+                content: [
+                  "Step 1: Treat hypoglycaemia — glucose 10% 5mL/kg if unconscious",
+                  "Step 2: Treat hypothermia — skin-to-skin, warm environment, hat",
+                  "Step 3: Treat/prevent dehydration — ReSoMal 5mL/kg/30min if diarrhoea",
+                  "Step 4: Correct electrolytes — K+ (4 mmol/kg/d), Mg (0.6 mmol/kg/d)",
+                  "Step 5: Treat infections — amoxicillin (uncomplicated) / ampicillin+gentamicin (complicated)",
+                  "Step 6: Correct micronutrient deficiencies — Vitamin A, Zinc, Folate (NO iron Phase 1)",
+                  "Step 7: Start cautious feeding — F-75 formula (75 kcal/100mL), 100mL/kg/day",
+                  "Step 8: Rebuild wasted tissue — transition to F-100 or RUTF when stable",
+                  "Step 9: Provide stimulation — structured play, sensory stimulation",
+                  "Step 10: Prepare for follow-up — monthly weight; discharged when WHZ >-2 + eating well",
+                ]
+              },
+              {
+                title: "Growth Monitoring + FTT",
+                color: "blue",
+                content: [
+                  "Use WHO growth charts (0-5y) and IAP 2015 charts (5-18y)",
+                  "Mid-parental height (boys): (Father's ht + Mother's ht + 13) ÷ 2",
+                  "Mid-parental height (girls): (Father's ht + Mother's ht - 13) ÷ 2",
+                  "FTT: weight <3rd percentile OR crossing 2 major centile lines downward",
+                  "FTT workup: CBC, TFT, urine culture, coeliac screen, metabolic panel",
+                  "Measure every month <1y; every 3m (1-3y); every 6m (3-6y)",
+                  "Head circumference until 36 months — microcephaly if <2SD for age/sex",
+                ]
+              },
+              {
+                title: "Micronutrient Deficiencies",
+                color: "purple",
+                content: [
+                  "Vitamin D: 400 IU/day for all infants from birth to 1y; 600 IU/day thereafter",
+                  "IDA: Fe 3-6 mg/kg/day elemental iron for 3 months; WIFS school programme",
+                  "Iodine: use iodised salt; iodine deficiency = commonest preventable intellectual disability",
+                  "Zinc: 10mg/day <5y, 20mg/day 5-12y for 14d with acute diarrhoea",
+                  "Vitamin A: 100,000 IU at 6-11m, 200,000 IU every 6m (12m-5y) in India",
+                ]
+              },
+            ].map(section => (
+              <NutritionGuidelineCard key={section.title} section={section} />
+            ))}
+
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-slate-200" />
+              <span className="text-xs text-slate-400 font-semibold">FOOD INTAKE TRACKER</span>
+              <div className="flex-1 h-px bg-slate-200" />
+            </div>
+
             <NutritionIntakeTracker />
           </div>
         )}

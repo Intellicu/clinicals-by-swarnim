@@ -25,19 +25,35 @@ function resolveIcon(name) {
 export function TubularDisordersSection({ onNavigate }) {
   const [selectedGuideline, setSelectedGuideline] = useState(null);
   const [search, setSearch] = useState("");
+  const [subFilter, setSubFilter] = useState("All");
+
+  const SUB_FILTERS = ["All", "RTA", "Fanconi/Genetic", "Channelopathy", "Concentration Defect", "Phosphate Wasting", "Dent/Lowe"];
+  const SUB_FILTER_MAP = {
+    "RTA": ["rta", "renal tubular acidosis", "proximal rta", "distal rta"],
+    "Fanconi/Genetic": ["fanconi", "cystinosis", "lowe", "galactosaemia"],
+    "Channelopathy": ["bartter", "gitelman", "liddle", "gordon"],
+    "Concentration Defect": ["nephrogenic diabetes insipidus", "ndi", "concentration"],
+    "Phosphate Wasting": ["hypophosphatemic", "phosphate", "tmp", "trp", "xlh"],
+    "Dent/Lowe": ["dent", "lowe", "ocrl"],
+  };
 
   const { data: guidelines = [], isLoading } = useQuery({
-    queryKey: ["guidelines_tubular"],
+    queryKey: ["guidelines_tubular_v2"],
     queryFn: () => base44.entities.Guideline.filter(
-      { $or: [{ category: "Tubular Disorders" }, { category: "RTA" }] },
-      "-year", 50
+      { category: { $in: ["Tubular Disorders", "RTA"] } },
+      "-year", 200
     ),
     staleTime: 60000,
   });
 
-  const filtered = guidelines.filter(g =>
-    !search || g.title?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = guidelines.filter(g => {
+    const matchSearch = !search || g.title?.toLowerCase().includes(search.toLowerCase()) ||
+      g.keywords?.some(k => k.toLowerCase().includes(search.toLowerCase()));
+    if (!matchSearch) return false;
+    if (subFilter === "All") return true;
+    const terms = SUB_FILTER_MAP[subFilter] || [];
+    return terms.some(t => g.title?.toLowerCase().includes(t) || g.summary?.toLowerCase().includes(t));
+  });
 
   if (selectedGuideline) {
     return (
@@ -51,56 +67,99 @@ export function TubularDisordersSection({ onNavigate }) {
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-center gap-3 p-3 bg-cyan-50 border border-cyan-200 rounded-xl">
-        <TestTube className="w-6 h-6 text-cyan-700 flex-shrink-0" />
-        <div>
-          <h2 className="font-bold text-cyan-900 text-sm">Tubular Disorders and RTA</h2>
-          <p className="text-xs text-cyan-700">RTA Types 1/2/4 · Bartter · Gitelman · Fanconi · NDI · Dent Disease · Lowe · Hypophosphatemic Rickets</p>
+    <div className="space-y-4">
+      {/* Header banner */}
+      <div className="p-4 bg-gradient-to-r from-cyan-700 to-teal-700 text-white rounded-xl">
+        <div className="flex items-center gap-3 mb-1">
+          <TestTube className="w-6 h-6 flex-shrink-0" />
+          <h2 className="font-bold text-base">Tubular Disorders & RTA</h2>
+          <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">{guidelines.length} conditions</span>
         </div>
+        <p className="text-xs text-cyan-100 ml-9">RTA Types 1/2/4 · Bartter · Gitelman · Fanconi · NDI · Dent Disease · Lowe · Hypophosphatemic Rickets · Cystinosis</p>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search tubular guidelines…"
-          className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300"
-        />
+      {/* Sub-filter chips */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 px-4" style={{ scrollbarWidth: "none" }}>
+        {SUB_FILTERS.map(f => (
+          <button key={f} onClick={() => setSubFilter(f)}
+            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${subFilter === f ? "bg-cyan-600 text-white border-cyan-600" : "bg-white text-slate-600 border-slate-300 hover:border-cyan-400"}`}>
+            {f}
+          </button>
+        ))}
       </div>
 
-      {isLoading ? (
-        <div className="space-y-2">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />)}
+      <div className="px-4 space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search tubular guidelines…"
+            className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300" />
         </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-10 text-slate-400">
-          <TestTube className="w-8 h-8 mx-auto mb-2 opacity-30" />
-          <p className="text-sm">No tubular guidelines found</p>
+
+        <p className="text-xs text-slate-500">{filtered.length} condition{filtered.length !== 1 ? "s" : ""} found</p>
+
+        {isLoading ? (
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />)}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-10 text-slate-400">
+            <TestTube className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            <p className="text-sm">No tubular guidelines found for this filter</p>
+            <p className="text-xs mt-1">Try "All" or check the Guidelines Library to add records with category "Tubular Disorders" or "RTA"</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filtered.map(g => (
+              <TubularGuidelineCard key={g.id} guideline={g} onClick={() => setSelectedGuideline(g)} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TubularGuidelineCard({ guideline: g, onClick }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="bg-white border border-cyan-100 rounded-xl overflow-hidden hover:border-cyan-300 hover:shadow-sm transition-all">
+      <button onClick={() => setExpanded(e => !e)}
+        className="w-full text-left p-3.5">
+        <div className="flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 mb-1">
+              <Badge className="bg-cyan-100 text-cyan-800 border-cyan-300 text-xs border">{g.source || "ISPN"}</Badge>
+              {g.year && <span className="text-xs text-slate-400">{g.year}</span>}
+              <Badge variant="outline" className="text-xs">{g.category}</Badge>
+            </div>
+            <p className="text-sm font-semibold text-slate-800 leading-snug">{g.title}</p>
+            {g.summary && <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{g.summary}</p>}
+          </div>
+          <div className="flex flex-col gap-1 flex-shrink-0">
+            <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${expanded ? "rotate-90" : ""}`} />
+          </div>
         </div>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map(g => (
-            <button
-              key={g.id}
-              onClick={() => setSelectedGuideline(g)}
-              className="w-full text-left bg-white border border-cyan-100 rounded-xl p-3.5 hover:border-cyan-300 hover:shadow-sm transition-all active:scale-[0.99]"
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                    <Badge className="bg-cyan-100 text-cyan-800 border-cyan-300 text-xs border">{g.source}</Badge>
-                    {g.year && <span className="text-xs text-slate-400">{g.year}</span>}
-                    <Badge variant="outline" className="text-xs">{g.category}</Badge>
-                  </div>
-                  <p className="text-sm font-semibold text-slate-800 leading-snug">{g.title}</p>
-                  {g.summary && <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{g.summary}</p>}
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
-              </div>
-            </button>
+      </button>
+      {expanded && (
+        <div className="border-t border-cyan-100 p-3 space-y-2 bg-cyan-50/30">
+          {g.content?.sections?.map((s, i) => (
+            <div key={i} className="bg-white rounded-lg border border-cyan-100 p-3">
+              <p className="text-xs font-bold text-cyan-800 mb-1">{s.heading}</p>
+              {s.content && <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">{s.content}</p>}
+              {s.key_points?.length > 0 && (
+                <ul className="mt-1 space-y-0.5">
+                  {s.key_points.map((kp, j) => <li key={j} className="text-xs text-slate-600 flex gap-1.5"><span className="text-cyan-500">•</span>{kp}</li>)}
+                </ul>
+              )}
+            </div>
           ))}
+          {(!g.content?.sections || g.content.sections.length === 0) && g.key_recommendations?.length > 0 && (
+            <ul className="space-y-1">
+              {g.key_recommendations.map((r, i) => <li key={i} className="text-xs text-slate-700 flex gap-1.5"><span className="text-cyan-500 font-bold">{i+1}.</span>{r}</li>)}
+            </ul>
+          )}
+          <button onClick={onClick} className="text-xs text-cyan-700 font-semibold hover:underline">View Full Guideline →</button>
         </div>
       )}
     </div>
