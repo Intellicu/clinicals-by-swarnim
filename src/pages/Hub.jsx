@@ -1,8 +1,6 @@
 import React, { useState, useMemo } from "react";
 import EmergencyAccessDrawer from "../components/EmergencyAccessDrawer";
 import EmergencyProtocolDrawer from "../components/hub/EmergencyProtocolDrawer";
-import DataDrivenToolGroups from "../components/hub/DataDrivenToolGroups";
-import GuidelineLinkedPathways from "../components/hub/GuidelineLinkedPathways";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +24,7 @@ import ContextualSuggestions from "../components/hub/ContextualSuggestions";
 import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
 import FrequencyQuickAccess from "../components/hub/FrequencyQuickAccess";
+import HubDrugSearch from "../components/hub/HubDrugSearch";
 
 // ── AI Analyser Tools ── (url = full path, or page for createPageUrl)
 const AI_TOOLS = [
@@ -495,6 +494,9 @@ export default function Hub() {
         {/* ── Quick Patient Entry ── */}
         <QuickPatientEntry />
 
+        {/* ── Drug Dosing Calculator (inline) ── */}
+        <HubDrugSearch />
+
         {/* ── Auto Calculations ── */}
         <QuickCalculations />
 
@@ -729,12 +731,6 @@ export default function Hub() {
             </button>
           }
         </div>
-
-        {/* ── Data-driven tool groups (AI Analysers, Emergency Protocols, Procedures) ── */}
-        <DataDrivenToolGroups />
-
-        {/* ── General Pediatric Pathways (guideline-linked) ── */}
-        <GuidelineLinkedPathways />
 
         {/* ── Disclaimer ── */}
         <Alert className="bg-blue-50 border-blue-200">
