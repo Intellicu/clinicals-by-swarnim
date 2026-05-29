@@ -172,50 +172,44 @@ function ToolGroup({ title, categoryKey, iconColor, tools, loading, hardcodedNam
       {open && (
         <div className="px-3 pb-3">
           {loading ? (
-            <div className="flex gap-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex-shrink-0 w-[140px] h-20 bg-slate-100 rounded-xl animate-pulse" />
+            <div className="flex gap-1.5">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex-shrink-0 w-16 h-16 bg-slate-100 rounded-xl animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-              {tiles.map(({ name, tool }) => {
-                const isActive = !!tool;
-                const Icon = tool ? getIcon(tool.icon) : Activity;
-                const bgColor = isActive ? (CATEGORY_COLOR[categoryKey] || "bg-slate-600") : "bg-slate-300";
+            <div className="w-full overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+              <div className="flex gap-1.5 pb-1 min-w-max">
+                {tiles.map(({ name, tool }) => {
+                  const isActive = !!tool;
+                  const Icon = tool ? getIcon(tool.icon) : Activity;
+                  const bgColor = isActive ? (CATEGORY_COLOR[categoryKey] || "bg-slate-600") : "bg-slate-200";
 
-                if (isActive) {
+                  if (isActive) {
+                    return (
+                      <button
+                        key={name}
+                        onClick={() => setSelectedTool(tool)}
+                        className="flex-shrink-0 w-16 flex flex-col items-center gap-1 active:scale-95 transition-transform text-center min-h-[44px] justify-start pt-1"
+                      >
+                        <div className={`w-10 h-10 ${bgColor} rounded-xl flex items-center justify-center shadow-sm`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-[10px] font-semibold text-slate-700 leading-tight line-clamp-2 w-full">{tool.name}</span>
+                      </button>
+                    );
+                  }
+
                   return (
-                    <button
-                      key={name}
-                      onClick={() => setSelectedTool(tool)}
-                      className="flex-shrink-0 min-w-[140px] bg-white border border-slate-200 rounded-xl p-3 flex flex-col items-start gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm text-left"
-                    >
-                      <div className={`w-8 h-8 ${bgColor} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <Icon className="w-4 h-4 text-white" />
+                    <div key={name} className="flex-shrink-0 w-16 flex flex-col items-center gap-1 opacity-40 cursor-not-allowed text-center pt-1">
+                      <div className={`w-10 h-10 ${bgColor} rounded-xl flex items-center justify-center`}>
+                        <Activity className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-xs font-semibold text-slate-700 leading-tight line-clamp-2">{tool.name}</span>
-                      {tool.description && (
-                        <span className="text-xs text-slate-400 leading-tight line-clamp-1">{tool.description}</span>
-                      )}
-                    </button>
-                  );
-                }
-
-                // Coming soon tile
-                return (
-                  <div
-                    key={name}
-                    className="flex-shrink-0 min-w-[140px] bg-white border border-slate-100 rounded-xl p-3 flex flex-col items-start gap-1.5 opacity-50 cursor-not-allowed"
-                  >
-                    <div className="w-8 h-8 bg-slate-300 rounded-lg flex items-center justify-center">
-                      <Activity className="w-4 h-4 text-white" />
+                      <span className="text-[10px] font-medium text-slate-400 leading-tight line-clamp-2 w-full">{name}</span>
                     </div>
-                    <span className="text-xs font-semibold text-slate-500 leading-tight line-clamp-2">{name}</span>
-                    <Badge variant="outline" className="text-xs px-1.5 py-0 text-slate-400 border-slate-200">Coming soon</Badge>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

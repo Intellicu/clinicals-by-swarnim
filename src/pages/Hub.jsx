@@ -627,7 +627,7 @@ export default function Hub() {
           </Link>
         </div>
         <EmergencyAccessDrawer open={emergencyDrawerOpen} onClose={() => setEmergencyDrawerOpen(false)} />
-        <EmergencyProtocolDrawer open={emergencyProtocolOpen} onClose={() => setEmergencyProtocolOpen(false)} />
+        <EmergencyProtocolDrawer open={emergencyProtocolOpen} onClose={() => setEmergencyProtocolOpen(false)} weight={patientData.weight ? String(patientData.weight) : ""} />
 
         {/* ── Key Module Chips ── */}
         <div>

@@ -318,8 +318,8 @@ CliniCals by Swarnim | Verify all doses independently`;
 
         {/* Patient parameters strip */}
         <Card className="bg-white shadow-md mb-5 border border-purple-200">
-          <CardContent className="p-4">
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+          <CardContent className="p-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
               <div>
                 <Label className="text-xs font-semibold text-slate-600">Weight (kg)</Label>
                 <Input value={weight} onChange={e => setWeight(e.target.value)} placeholder="25" className="mt-1 text-sm h-9" />
@@ -352,16 +352,19 @@ CliniCals by Swarnim | Verify all doses independently`;
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-4 h-auto gap-1">
-            <TabsTrigger value="search" className="text-xs">🔍 Search</TabsTrigger>
-            <TabsTrigger value="calculator" className="text-xs">💊 Dose Calc</TabsTrigger>
-            <TabsTrigger value="interactions" className="text-xs">⚡ Interactions</TabsTrigger>
-            <TabsTrigger value="prescription" className="text-xs">📋 Rx {rxDrugs.length > 0 && `(${rxDrugs.length})`}</TabsTrigger>
-            <TabsTrigger value="steroids" className="text-xs">🔄 Steroids</TabsTrigger>
-            <TabsTrigger value="eculizumab" className="text-xs">🛡️ Eculizumab</TabsTrigger>
-            <TabsTrigger value="plasmapheresis" className="text-xs">💉 Plasmapheresis</TabsTrigger>
-            <TabsTrigger value="ckd-dosing" className="text-xs">🫘 CKD Dosing</TabsTrigger>
-          </TabsList>
+          {/* Mobile-first scrollable tab strip — never pushes page width */}
+          <div className="w-full overflow-x-auto mb-4" style={{ scrollbarWidth: "none" }}>
+            <TabsList className="flex w-max gap-1 h-auto p-1">
+              <TabsTrigger value="search" className="text-xs whitespace-nowrap min-h-[36px] px-3">🔍 Search</TabsTrigger>
+              <TabsTrigger value="calculator" className="text-xs whitespace-nowrap min-h-[36px] px-3">💊 Dose Calc</TabsTrigger>
+              <TabsTrigger value="interactions" className="text-xs whitespace-nowrap min-h-[36px] px-3">⚡ Interactions</TabsTrigger>
+              <TabsTrigger value="prescription" className="text-xs whitespace-nowrap min-h-[36px] px-3">📋 Rx {rxDrugs.length > 0 && `(${rxDrugs.length})`}</TabsTrigger>
+              <TabsTrigger value="steroids" className="text-xs whitespace-nowrap min-h-[36px] px-3">🔄 Steroids</TabsTrigger>
+              <TabsTrigger value="eculizumab" className="text-xs whitespace-nowrap min-h-[36px] px-3">🛡️ Eculizumab</TabsTrigger>
+              <TabsTrigger value="plasmapheresis" className="text-xs whitespace-nowrap min-h-[36px] px-3">💉 Plasmapheresis</TabsTrigger>
+              <TabsTrigger value="ckd-dosing" className="text-xs whitespace-nowrap min-h-[36px] px-3">🫘 CKD Dosing</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* ── SEARCH TAB ─────────────────────────────────────── */}
           <TabsContent value="search" className="space-y-4">
@@ -383,55 +386,107 @@ CliniCals by Swarnim | Verify all doses independently`;
 
             <div className="text-xs text-slate-500">{filtered.length} drug{filtered.length !== 1 ? "s" : ""} found</div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[65vh] overflow-y-auto pr-1">
+            {/* Inline dose result when a drug is tapped */}
+            {focusDrug && (() => {
+              const wt = parseFloat(weight);
+              const dose = calcDose(focusDrug, wt, bsa, effectiveEgfr);
+              const renalFlag = getRenalFlag(focusDrug, effectiveEgfr);
+              return (
+                <div className="bg-purple-50 border-2 border-purple-300 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-purple-900 text-base">{focusDrug.generic_name}</p>
+                      <p className="text-xs text-purple-600">{focusDrug.therapeutic_class}</p>
+                    </div>
+                    <div className="flex gap-2 items-center flex-shrink-0">
+                      <Button size="sm" onClick={() => addToRx(focusDrug)}
+                        className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-9 px-3">
+                        <Plus className="w-3 h-3 mr-1" /> Add Rx
+                      </Button>
+                      <button onClick={() => setFocusDrug(null)} className="text-slate-400 hover:text-slate-600">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {renalFlag && (
+                    <div className={`rounded-xl px-3 py-2 text-xs font-medium border ${renalFlag.level === "critical" ? "bg-red-50 border-red-300 text-red-800" : "bg-amber-50 border-amber-300 text-amber-800"}`}>
+                      ⚠️ {renalFlag.msg}
+                    </div>
+                  )}
+
+                  {dose && dose.type !== "TDM" ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { label: "Per Dose", value: dose.perDose, highlight: true },
+                        { label: "Daily Total", value: dose.daily },
+                        { label: "Frequency", value: dose.freq },
+                        { label: "Route", value: focusDrug.route || "PO" },
+                      ].map(({ label, value, highlight }) => (
+                        <div key={label} className={`rounded-xl p-3 text-center border ${highlight ? "bg-white border-purple-300" : "bg-white border-slate-200"}`}>
+                          <p className="text-xs text-slate-500">{label}</p>
+                          <p className={`font-bold mt-0.5 ${highlight ? "text-purple-800 text-base" : "text-slate-800 text-sm"}`}>{value || "—"}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : dose?.type === "TDM" ? (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs text-blue-800">
+                      <strong>TDM-guided dosing.</strong> {dose.note}
+                    </div>
+                  ) : null}
+
+                  {dose?.note && dose.type !== "TDM" && <p className="text-xs text-slate-500 bg-white rounded-lg px-2 py-1.5">{dose.note}</p>}
+                  {!weight && <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">Enter weight above for personalised dose calculation</p>}
+
+                  {focusDrug.renal_adjust && (
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-2 text-xs text-indigo-800">
+                      <strong>Renal adjustment:</strong> {focusDrug.renal_adjust}
+                      {focusDrug.hd_adjust && <p className="mt-0.5"><strong>HD:</strong> {focusDrug.hd_adjust}</p>}
+                      {focusDrug.pd_adjust && <p className="mt-0.5"><strong>PD:</strong> {focusDrug.pd_adjust}</p>}
+                    </div>
+                  )}
+                  {focusDrug.monitoring && (
+                    <div className="text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-3 py-2">
+                      <strong>Monitor:</strong> {focusDrug.monitoring}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-0.5">
               {filtered.map(drug => {
                 const isInRx = rxDrugs.find(d => d.id === drug.id);
                 const renalFlag = getRenalFlag(drug, effectiveEgfr);
+                const isSelected = focusDrug?.id === drug.id;
                 return (
-                  <Card key={drug.id}
-                    className={`bg-white border-2 transition-all cursor-pointer hover:shadow-md ${isInRx ? "border-purple-500 bg-purple-50" : "border-slate-200 hover:border-purple-300"}`}
-                    onClick={() => { setFocusDrug(drug); setActiveTab("calculator"); }}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm text-slate-900 leading-tight">{drug.generic_name}</p>
-                          <p className="text-xs text-slate-500 truncate">{drug.therapeutic_class}</p>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          {renalFlag && (
-                            <Badge className={`text-xs ${renalFlag.level === "critical" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
-                              {renalFlag.level === "critical" ? "🔴 Renal" : "⚠️ Adjust"}
-                            </Badge>
-                          )}
-                          {drug.dose_calculation_type === "TDM" && (
-                            <Badge className="bg-blue-100 text-blue-700 text-xs">TDM</Badge>
-                          )}
-                        </div>
-                      </div>
-                      {drug.brands_indian && (
-                        <p className="text-xs text-slate-400 truncate mb-2">{drug.brands_indian.split(",")[0].trim()}</p>
+                  <button
+                    key={drug.id}
+                    className={`w-full text-left flex items-center gap-3 px-3 py-3 rounded-xl border-2 transition-all active:scale-[0.99] min-h-[56px] ${isSelected ? "border-purple-400 bg-purple-50" : isInRx ? "border-green-300 bg-green-50" : "border-slate-200 bg-white hover:border-purple-300"}`}
+                    onClick={() => setFocusDrug(isSelected ? null : drug)}
+                  >
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected ? "bg-purple-600" : "bg-slate-100"}`}>
+                      <Pill className={`w-4 h-4 ${isSelected ? "text-white" : "text-slate-500"}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-slate-900 leading-tight">{drug.generic_name}</p>
+                      <p className="text-xs text-slate-400 truncate">{drug.therapeutic_class}{drug.brands_indian ? ` · ${drug.brands_indian.split(",")[0].trim()}` : ""}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      {renalFlag && (
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${renalFlag.level === "critical" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
+                          {renalFlag.level === "critical" ? "🔴" : "⚠️"}
+                        </span>
                       )}
-                      <div className="flex gap-1 flex-wrap mb-3">
-                        <Badge variant="outline" className="text-xs">{drug.category || "General"}</Badge>
-                        {drug.dose_weight_based?.includes("/m²") && <Badge className="bg-teal-100 text-teal-700 text-xs">mg/m²</Badge>}
-                        {drug.dose_weight_based?.includes("/kg") && <Badge className="bg-indigo-100 text-indigo-700 text-xs">mg/kg</Badge>}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={e => { e.stopPropagation(); setFocusDrug(drug); setActiveTab("calculator"); }}
-                          className="flex-1 text-xs h-7">Calculate</Button>
-                        <Button size="sm" onClick={e => { e.stopPropagation(); addToRx(drug); }}
-                          className={`flex-1 text-xs h-7 ${isInRx ? "bg-green-600 hover:bg-green-700" : "bg-purple-600 hover:bg-purple-700"} text-white`}>
-                          {isInRx ? <><CheckCircle className="w-3 h-3 mr-1" />Added</> : <><Plus className="w-3 h-3 mr-1" />Add Rx</>}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      {isInRx && <CheckCircle className="w-3.5 h-3.5 text-green-600" />}
+                    </div>
+                  </button>
                 );
               })}
               {filtered.length === 0 && (
-                <div className="col-span-full text-center py-16 text-slate-400">
+                <div className="text-center py-12 text-slate-400">
                   <Pill className="w-10 h-10 mx-auto mb-3 opacity-40" />
-                  <p>No drugs found. Try a different search or category filter.</p>
+                  <p className="text-sm">No drugs found. Try a different search or filter.</p>
                 </div>
               )}
             </div>

@@ -183,44 +183,41 @@ export default function GuidelineLinkedPathways() {
         {open && (
           <div className="px-3 pb-3">
             {isLoading ? (
-              <div className="flex gap-2">
-                {[1, 2, 3].map((i) => <div key={i} className="flex-shrink-0 w-[140px] h-20 bg-slate-100 rounded-xl animate-pulse" />)}
+              <div className="flex gap-1.5">
+                {[1,2,3,4].map((i) => <div key={i} className="w-16 h-16 bg-slate-100 rounded-xl animate-pulse flex-shrink-0" />)}
               </div>
             ) : (
-              <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-                {PATHWAY_TILES.map((tile) => {
-                  const matched = matchGuideline(tile, guidelines);
-                  const Icon = tile.icon;
+              <div className="w-full overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+                <div className="flex gap-1.5 pb-1 min-w-max">
+                  {PATHWAY_TILES.map((tile) => {
+                    const matched = matchGuideline(tile, guidelines);
+                    const Icon = tile.icon;
 
-                  if (matched) {
+                    if (matched) {
+                      return (
+                        <button
+                          key={tile.name}
+                          onClick={() => setSelectedGuideline(matched)}
+                          className="flex-shrink-0 w-16 flex flex-col items-center gap-1 active:scale-95 transition-transform text-center pt-1 min-h-[44px]"
+                        >
+                          <div className="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center shadow-sm">
+                            <Icon className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="text-[10px] font-semibold text-slate-700 leading-tight line-clamp-2 w-full">{tile.name}</span>
+                        </button>
+                      );
+                    }
+
                     return (
-                      <button
-                        key={tile.name}
-                        onClick={() => setSelectedGuideline(matched)}
-                        className="flex-shrink-0 min-w-[140px] bg-white border border-slate-200 rounded-xl p-3 flex flex-col items-start gap-1.5 active:scale-95 transition-transform hover:border-sky-300 hover:shadow-sm text-left"
-                      >
-                        <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-white" />
+                      <div key={tile.name} className="flex-shrink-0 w-16 flex flex-col items-center gap-1 opacity-40 cursor-not-allowed text-center pt-1">
+                        <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-slate-400" />
                         </div>
-                        <span className="text-xs font-semibold text-slate-700 leading-tight line-clamp-2">{tile.name}</span>
-                        <span className="text-xs text-sky-500 leading-tight">Guideline →</span>
-                      </button>
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={tile.name}
-                      className="flex-shrink-0 min-w-[140px] bg-white border border-slate-100 rounded-xl p-3 flex flex-col items-start gap-1.5 opacity-50 cursor-not-allowed"
-                    >
-                      <div className="w-8 h-8 bg-slate-300 rounded-lg flex items-center justify-center">
-                        <Icon className="w-4 h-4 text-white" />
+                        <span className="text-[10px] font-medium text-slate-400 leading-tight line-clamp-2 w-full">{tile.name}</span>
                       </div>
-                      <span className="text-xs font-semibold text-slate-500 leading-tight line-clamp-2">{tile.name}</span>
-                      <Badge variant="outline" className="text-xs px-1.5 py-0 text-slate-400 border-slate-200">Coming soon</Badge>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
