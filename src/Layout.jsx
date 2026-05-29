@@ -114,7 +114,10 @@ export default function Layout({ children, currentPageName }) {
         *, *::before, *::after { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         html, body {
           width: 100%; height: 100%;
-          overflow: auto; overscroll-behavior: none;
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-width: 100vw;
+          overscroll-behavior: none;
           -webkit-text-size-adjust: 100%;
           -webkit-font-smoothing: antialiased;
         }
@@ -142,7 +145,7 @@ export default function Layout({ children, currentPageName }) {
 
       <div
         className="min-h-screen flex w-full"
-        style={{ background: `linear-gradient(to bottom right, var(--bg-gradient-start), var(--bg-gradient-end))` }}
+        style={{ background: `linear-gradient(to bottom right, var(--bg-gradient-start), var(--bg-gradient-end))`, overflowX: "hidden", maxWidth: "100vw" }}
       >
         {/* ── Desktop Sidebar ── */}
         <aside
@@ -192,8 +195,8 @@ export default function Layout({ children, currentPageName }) {
 
         {/* ── Main Content ── */}
         <main
-          className="flex-1 flex flex-col lg:ml-80"
-          style={{ paddingBottom: "var(--tab-bar-height)" }}
+          className="flex-1 flex flex-col lg:ml-80 min-w-0"
+          style={{ paddingBottom: "var(--tab-bar-height)", overflowX: "hidden" }}
           aria-label="Main content"
         >
           {/* Header */}

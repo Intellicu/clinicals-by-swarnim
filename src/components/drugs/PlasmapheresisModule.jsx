@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, Calculator, Droplets, Activity, Activity as ActivityIcon } from "lucide-react";
+
+import { AlertTriangle, Calculator, Droplets, Activity } from "lucide-react";
 
 // Based on AJKD 2023 Core Curriculum + ASFA 8th Edition 2019
 
@@ -35,62 +35,184 @@ const ANTICOAGULATION_DATA = [
   { agent: "ACD-A + Heparin (paediatric)", method: "Both", dose: "500 mL ACD-A + 10,000 U heparin; ratio ≥26:1", monitor: "Ionised Ca²⁺, platelet count", note: "For small blood volumes; minimises citrate load" },
 ];
 
-function EPVCalculator({ weight, setWeight, hematocrit, setHematocrit }) {
+function EPVCalculator({ weight, setWeight, hematocrit, setHematocrit, targetPV, setTargetPV, fluidChoice, setFluidChoice }) {
   const wt = parseFloat(weight);
-  const hct = parseFloat(hematocrit) / 100;
-  const epv = (wt && hct) ? ((0.065 * wt) * (1 - hct)).toFixed(2) : null;
-  const vol1 = epv ? (parseFloat(epv) * 1.0).toFixed(0) : null;
-  const vol1_5 = epv ? (parseFloat(epv) * 1.5).toFixed(0) : null;
+  const hctRaw = parseFloat(hematocrit);
+  const hct = hctRaw / 100;
+  const target = parseFloat(targetPV) || 1.0;
 
-  // Paediatric: 60–75 mL/kg for aHUS
-  const pedsPEX = wt ? (wt * 65).toFixed(0) : null;
+  // Kaplan formula: EPV (L) = 0.07 × weight(kg) × (1 − Hct)
+  const epv_L = (wt && hct) ? 0.07 * wt * (1 - hct) : null;
+  const epv_mL = epv_L ? epv_L * 1000 : null;
+  const exchVol_mL = epv_mL ? epv_mL * target : null;
+
+  // Total blood volume: ~75 mL/kg child, 70 mL/kg adult
+  const tbv_mL = wt ? wt * 75 : null;
+  // Typical extracorporeal circuit volume ~100–250 mL
+  const circuitVol = 150; // mL, typical paeds circuit
+  const circuitPct = tbv_mL ? ((circuitVol / tbv_mL) * 100).toFixed(1) : null;
+  const needsBloodPrime = tbv_mL ? circuitVol > tbv_mL * 0.15 : false;
+
+  // Removal efficiency: 1-e^(-n) where n = PV exchanges
+  const removalPct = target ? ((1 - Math.exp(-target)) * 100).toFixed(0) : null;
+
+  const fluidLabel = fluidChoice === "ffp" ? "Fresh Frozen Plasma (FFP)" : fluidChoice === "mix" ? "80% Albumin + 20% FFP" : "5% Albumin";
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
-      <CardHeader className="py-3 px-4 border-b border-blue-100">
-        <CardTitle className="text-sm flex items-center gap-2">
-          <Calculator className="w-4 h-4 text-blue-600" /> Plasma Volume Calculator
-          <Badge className="bg-blue-100 text-blue-700 text-xs">EPV = (0.065 × wt) × (1 − Hct)</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-4 space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label className="text-xs font-semibold text-slate-600">Weight (kg)</Label>
-            <Input value={weight} onChange={e => setWeight(e.target.value)} placeholder="20" className="mt-1 h-9 text-sm" />
+    <div className="space-y-4">
+      {/* Inputs */}
+      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+        <CardHeader className="py-3 px-4 border-b border-blue-100">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Calculator className="w-4 h-4 text-blue-600" /> EPV Calculator (Kaplan Formula)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs font-semibold text-slate-600">Weight (kg)</Label>
+              <Input value={weight} onChange={e => setWeight(e.target.value)} placeholder="e.g. 25" className="mt-1 h-11" />
+            </div>
+            <div>
+              <Label className="text-xs font-semibold text-slate-600">Haematocrit (%)</Label>
+              <Input value={hematocrit} onChange={e => setHematocrit(e.target.value)} placeholder="e.g. 34" className="mt-1 h-11" />
+            </div>
           </div>
-          <div>
-            <Label className="text-xs font-semibold text-slate-600">Hematocrit (%)</Label>
-            <Input value={hematocrit} onChange={e => setHematocrit(e.target.value)} placeholder="34" className="mt-1 h-9 text-sm" />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs font-semibold text-slate-600">Target plasma volumes</Label>
+              <select
+                value={targetPV}
+                onChange={e => setTargetPV(e.target.value)}
+                className="mt-1 w-full h-11 border border-slate-200 rounded-md px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                <option value="1.0">1.0× PV (standard)</option>
+                <option value="1.25">1.25× PV</option>
+                <option value="1.5">1.5× PV (aHUS/intensive)</option>
+              </select>
+            </div>
+            <div>
+              <Label className="text-xs font-semibold text-slate-600">Replacement fluid</Label>
+              <select
+                value={fluidChoice}
+                onChange={e => setFluidChoice(e.target.value)}
+                className="mt-1 w-full h-11 border border-slate-200 rounded-md px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                <option value="albumin">5% Albumin (default)</option>
+                <option value="ffp">FFP (TTP / anti-FH aHUS / bleeding)</option>
+                <option value="mix">80:20 Albumin:FFP (mix)</option>
+              </select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Worked steps */}
+      {epv_L && (
+        <div className="space-y-3">
+          {/* Step 1 */}
+          <div className="rounded-xl border-l-4 border-blue-500 bg-white border border-slate-200 p-4">
+            <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-1">Step 1 — Estimated Plasma Volume (EPV)</p>
+            <p className="text-xs text-slate-500 mb-2 font-mono">EPV = 0.07 × weight × (1 − Hct)</p>
+            <p className="text-base font-mono font-bold text-slate-800">
+              = 0.07 × {wt} × (1 − {(hct).toFixed(2)}) = <span className="text-blue-700">{epv_L.toFixed(2)} L ({epv_mL.toFixed(0)} mL)</span>
+            </p>
+            <p className="text-xs text-slate-500 mt-2">
+              <strong>Why 0.07?</strong> Plasma volume is ~7% of body weight on average (Kaplan, Blood Purif 2012). Haematocrit correction accounts for the fraction occupied by red cells — only plasma is exchanged.
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div className="rounded-xl border-l-4 border-indigo-500 bg-white border border-slate-200 p-4">
+            <p className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1">Step 2 — Exchange Volume</p>
+            <p className="text-xs text-slate-500 mb-2 font-mono">Exchange = EPV × target ({target}×)</p>
+            <p className="text-base font-mono font-bold text-slate-800">
+              = {epv_mL.toFixed(0)} mL × {target} = <span className="text-indigo-700">{exchVol_mL.toFixed(0)} mL</span>
+            </p>
+            <p className="text-xs text-slate-500 mt-2">
+              <strong>Why 1–1.5×?</strong> Intravascular removal follows first-order kinetics: 1.0× PV removes ~63%, 1.25× removes ~71%, 1.5× removes ~78% of the target macromolecule. Beyond 1.5× adds little extra clearance with increased complications.
+            </p>
+            <div className="mt-2 flex gap-2 flex-wrap">
+              {[["1.0×", 63], ["1.25×", 71], ["1.5×", 78]].map(([lbl, pct]) => (
+                <div key={lbl} className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${parseFloat(lbl) === target ? "bg-indigo-100 border-indigo-300 text-indigo-800" : "bg-slate-50 border-slate-200 text-slate-600"}`}>
+                  {lbl} → ~{pct}% removal
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Step 3 — Circuit safety check */}
+          <div className={`rounded-xl border-l-4 ${needsBloodPrime ? "border-red-500 bg-red-50" : "border-green-500 bg-green-50"} border border-slate-200 p-4`}>
+            <p className={`text-xs font-bold uppercase tracking-wide mb-1 ${needsBloodPrime ? "text-red-700" : "text-green-700"}`}>Step 3 — Extracorporeal Volume Safety Check</p>
+            <p className="text-xs text-slate-500 mb-2 font-mono">TBV = 75 mL/kg × {wt} kg = {tbv_mL.toFixed(0)} mL | Circuit ≈ {circuitVol} mL ({circuitPct}% of TBV)</p>
+            {needsBloodPrime ? (
+              <>
+                <p className="text-sm font-bold text-red-700">⚠️ Circuit volume &gt;15% TBV — blood prime required</p>
+                <p className="text-xs text-red-800 mt-1">
+                  Prime the circuit with O-negative pRBC or 5% albumin before connecting. Without priming, acute haemodynamic instability (hypotension, shock) can occur in this child. Discuss with perfusionist/apheresis nurse.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-bold text-green-700">✓ Circuit volume &lt;15% TBV — safe to proceed without blood prime</p>
+                <p className="text-xs text-green-800 mt-1">Standard priming with saline acceptable. Monitor closely at circuit connection for vasovagal response.</p>
+              </>
+            )}
+          </div>
+
+          {/* Step 4 — Replacement fluid */}
+          <div className="rounded-xl border-l-4 border-teal-500 bg-white border border-slate-200 p-4">
+            <p className="text-xs font-bold text-teal-700 uppercase tracking-wide mb-1">Step 4 — Replacement Fluid</p>
+            <p className="text-sm font-bold text-slate-800">Selected: <span className="text-teal-700">{fluidLabel}</span></p>
+            <p className="text-xs text-slate-500 mt-1">Volume to prepare: <strong>{exchVol_mL.toFixed(0)} mL</strong></p>
+            {fluidChoice === "albumin" && (
+              <div className="mt-2 text-xs text-slate-600 space-y-1">
+                <p>✅ <strong>Why albumin (default)?</strong> No transfusion reactions, no infection risk, maintains oncotic pressure, long shelf life. Removes clotting factors — check coagulation 8–12h post-session.</p>
+                <p>⚠️ <strong>Citrate / calcium:</strong> Monitor ionised Ca²⁺ every 30 min. Give prophylactic IV calcium gluconate (50 mg/kg or 0.5 mL/kg 10% solution) if symptomatic paraesthesia/cramping.</p>
+              </div>
+            )}
+            {fluidChoice === "ffp" && (
+              <div className="mt-2 text-xs text-slate-600 space-y-1">
+                <p>✅ <strong>Why FFP?</strong> TTP requires ADAMTS13 replacement (only in FFP). Anti-FH aHUS benefits from complement regulatory factors in FFP. Essential if there is active bleeding or depletion coagulopathy.</p>
+                <p>⚠️ Pre-medicate with diphenhydramine + hydrocortisone (transfusion reaction risk). Citrate load is higher — calcium monitoring every 20–30 min; hypocalcaemia more common.</p>
+              </div>
+            )}
+            {fluidChoice === "mix" && (
+              <div className="mt-2 text-xs text-slate-600 space-y-1">
+                <p>Prepare: <strong>{(exchVol_mL * 0.8).toFixed(0)} mL 5% albumin</strong> + <strong>{(exchVol_mL * 0.2).toFixed(0)} mL FFP</strong></p>
+                <p>Balances oncotic pressure maintenance with partial coagulation factor replacement. Used when some FFP benefit is needed but full FFP volume is impractical.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Summary box */}
+          <div className="rounded-xl bg-slate-800 text-white p-4 grid grid-cols-2 gap-3">
+            <div className="text-center">
+              <p className="text-xs text-slate-400">Plasma Volume (EPV)</p>
+              <p className="text-xl font-bold text-blue-300">{epv_mL.toFixed(0)} mL</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-slate-400">Exchange Volume ({target}× PV)</p>
+              <p className="text-xl font-bold text-indigo-300">{exchVol_mL.toFixed(0)} mL</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-slate-400">Expected Removal</p>
+              <p className="text-xl font-bold text-green-300">~{removalPct}%</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-slate-400">Blood Prime Needed?</p>
+              <p className={`text-xl font-bold ${needsBloodPrime ? "text-red-300" : "text-green-300"}`}>{needsBloodPrime ? "YES" : "No"}</p>
+            </div>
           </div>
         </div>
+      )}
 
-        {epv && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { label: "EPV (Estimated Plasma Volume)", value: `${epv} L`, highlight: true },
-              { label: "1× Exchange Volume", value: `${vol1} mL` },
-              { label: "1.5× Exchange Volume", value: `${vol1_5} mL` },
-              { label: "Paeds aHUS (65 mL/kg)", value: `${pedsPEX} mL` },
-            ].map(({ label, value, highlight }) => (
-              <div key={label} className={`rounded-xl p-3 text-center border ${highlight ? "bg-blue-100 border-blue-300" : "bg-white border-slate-200"}`}>
-                <p className="text-xs text-slate-500 leading-tight mb-1">{label}</p>
-                <p className={`font-bold ${highlight ? "text-blue-800 text-lg" : "text-slate-800"}`}>{value}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <Alert className="bg-amber-50 border-amber-200">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-          <AlertDescription className="text-xs text-amber-800">
-            <strong>Key principle:</strong> One plasma volume exchange removes ~65–70% of intravascular target substance. 
-            1.4× EPV removes ~75%. Exchange &gt;1.5× EPV adds minimal extra clearance.
-            Extracorporeal volume should be &lt;15% of total blood volume.
-          </AlertDescription>
-        </Alert>
-      </CardContent>
-    </Card>
+      {!epv_L && (
+        <div className="rounded-xl bg-slate-50 border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
+          Enter weight and haematocrit above to see worked calculation steps
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -181,9 +303,12 @@ export default function PlasmapheresisModule() {
   const [activeSection, setActiveSection] = useState("calculator");
   const [weight, setWeight] = useState("");
   const [hematocrit, setHematocrit] = useState("34");
+  const [targetPV, setTargetPV] = useState("1.0");
+  const [fluidChoice, setFluidChoice] = useState("albumin");
 
   const sections = [
     { id: "calculator", label: "📐 EPV Calc" },
+    { id: "ahus", label: "🔴 aHUS PLEX" },
     { id: "indications", label: "📋 Indications" },
     { id: "ispn", label: "🧒 ISPN Paeds" },
     { id: "fluids", label: "💉 Fluids" },
@@ -213,17 +338,132 @@ export default function PlasmapheresisModule() {
         </CardContent>
       </Card>
 
-      {/* Section Nav */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-        {sections.map(s => (
-          <button key={s.id} onClick={() => setActiveSection(s.id)}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${activeSection === s.id ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
-            {s.label}
-          </button>
-        ))}
+      {/* Section Nav — scrollable, never pushes page width */}
+      <div className="w-full overflow-x-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+        <div className="flex gap-1.5 pb-1 min-w-max px-0.5">
+          {sections.map(s => (
+            <button key={s.id} onClick={() => setActiveSection(s.id)}
+              className={`flex-shrink-0 px-3 py-2 rounded-full text-xs font-semibold border transition-all min-h-[40px] ${activeSection === s.id ? "bg-teal-600 text-white border-teal-600" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+              {s.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {activeSection === "calculator" && <EPVCalculator weight={weight} setWeight={setWeight} hematocrit={hematocrit} setHematocrit={setHematocrit} />}
+      {activeSection === "calculator" && <EPVCalculator weight={weight} setWeight={setWeight} hematocrit={hematocrit} setHematocrit={setHematocrit} targetPV={targetPV} setTargetPV={setTargetPV} fluidChoice={fluidChoice} setFluidChoice={setFluidChoice} />}
+      {activeSection === "ahus" && (
+        <div className="space-y-4">
+          {/* Banner */}
+          <Card className="bg-gradient-to-r from-red-600 to-rose-700 text-white border-0">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-8 h-8 opacity-90 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-base">aHUS PLEX Protocol</h3>
+                  <p className="text-red-100 text-xs mt-0.5">ISPN / AIIMS 2025 Consensus — Anti-Factor H Antibody aHUS (Indian phenotype)</p>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {["Start within 24h", "Anti-FH Ab titre before first PLEX", "1.5× PV initially", "Daily × 5–7 then taper"].map(t => (
+                      <span key={t} className="bg-white/20 text-xs px-2 py-0.5 rounded-full font-medium">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Urgency */}
+          <Alert className="bg-red-50 border-red-200">
+            <AlertTriangle className="w-4 h-4 text-red-600" />
+            <AlertDescription className="text-xs text-red-800">
+              <strong>Time-critical:</strong> Initiate PLEX empirically within 24h of presentation — do NOT wait for complement genetics or anti-FH titre results. Send anti-FH antibody titre and complement C3/C4/CH50 <em>before the first session</em> but do not delay.
+            </AlertDescription>
+          </Alert>
+
+          {/* Step-by-step protocol */}
+          <Card className="bg-white border border-slate-200">
+            <CardHeader className="bg-slate-50 border-b py-3 px-4">
+              <CardTitle className="text-sm">Step-by-Step Protocol (ISPN/AIIMS 2025)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              {[
+                {
+                  step: "1", title: "Confirmation & Emergency Labs", color: "border-red-400",
+                  items: ["CBC, blood film (schistocytes), LDH, haptoglobin, DAT (direct Coombs)", "Serum creatinine, electrolytes, LFT", "Anti-FH antibody titre (ELISA/ALBIA) — send BEFORE first PLEX session", "C3, C4, CH50, factor H level", "Complement genetics panel (MLPA + Sanger) — non-urgent, can follow"]
+                },
+                {
+                  step: "2", title: "PLEX Prescription", color: "border-orange-400",
+                  items: ["Volume: 1.5× EPV per session (empirical intensive start)", "Replacement fluid: Fresh Frozen Plasma (FFP) — 60–75 mL/kg", "Frequency: Daily for first 5–7 sessions", "Access: Femoral or internal jugular CVC (double-lumen)", "Pre-medicate: IV hydrocortisone 2 mg/kg + diphenhydramine 1 mg/kg (FFP reaction prophylaxis)"]
+                },
+                {
+                  step: "3", title: "Monitoring During PLEX", color: "border-amber-400",
+                  items: ["Ionised Ca²⁺ every 30 min — citrate from FFP causes hypocalcaemia", "BP, HR, SpO2 every 15 min", "Watch for: chills, urticaria, hypotension, perioral tingling (citrate)", "IV calcium gluconate (0.5 mL/kg 10% solution) if ionised Ca < 1.0 mmol/L or symptomatic"]
+                },
+                {
+                  step: "4", title: "Taper & Maintenance", color: "border-blue-400",
+                  items: ["After 5–7 daily sessions: assess LDH, platelet trend, creatinine", "If improving: alternate-day PLEX for 2 weeks, then twice-weekly for 4–6 weeks", "Taper guided by anti-FH Ab titre (target < 1:32) + platelet normalisation", "Continue until Ab titre negative for ≥2 consecutive checks or eculizumab initiated"]
+                },
+                {
+                  step: "5", title: "Immunosuppression (Antibody-Positive Disease)", color: "border-violet-400",
+                  items: ["Start prednisolone 2 mg/kg/day (max 60 mg) at diagnosis — reduces Ab production", "If incomplete response or high titre: add mycophenolate mofetil (MMF) 600 mg/m²/day", "Rituximab 375 mg/m² × 2–4 doses for refractory antibody-positive aHUS", "Monitor Ig levels (hypogammaglobulinaemia risk with rituximab); withhold if IgG < 4 g/L"]
+                },
+                {
+                  step: "6", title: "Eculizumab — When to Prioritise", color: "border-green-400",
+                  items: ["Preferred if: genetic complement mutation (non-antibody type), unavailability of PLEX facilities, PLEX-refractory disease", "Bridge therapy: if eculizumab unavailable, FFP infusion 10–20 mL/kg every 48h supplements complement factors", "Vaccination against meningococcus, pneumococcus, H. influenzae mandatory ≥2 weeks before eculizumab start (or use prophylactic penicillin if urgent)", "Transition: can switch from PLEX to eculizumab after Ab titre negative if preferred"]
+                },
+              ].map(({ step, title, color, items }) => (
+                <div key={step} className={`border-l-4 ${color} bg-slate-50 rounded-r-xl p-3`}>
+                  <p className="text-xs font-bold text-slate-800 mb-1.5">Step {step}: {title}</p>
+                  <ul className="space-y-1">
+                    {items.map((item, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700">
+                        <span className="text-slate-400 mt-0.5 flex-shrink-0">•</span>{item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Endpoint / Stop criteria */}
+          <Card className="bg-white border border-slate-200">
+            <CardHeader className="bg-slate-50 border-b py-3 px-4">
+              <CardTitle className="text-sm">Endpoints & Discontinuation Criteria</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { label: "Haematological remission", val: "Platelets >150×10³/μL for ≥2 days + LDH normalising" },
+                  { label: "Renal endpoint", val: "Creatinine improving or stable; no new oliguria" },
+                  { label: "Antibody endpoint", val: "Anti-FH Ab titre <1:32 on ≥2 consecutive checks" },
+                  { label: "Stop PLEX", val: "All 3 above + eculizumab initiated, OR no response after 10–14 sessions" },
+                ].map((e, i) => (
+                  <div key={i} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                    <p className="text-xs font-bold text-slate-700">{e.label}</p>
+                    <p className="text-xs text-slate-600 mt-0.5">{e.val}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* FFP infusion fallback */}
+          <Alert className="bg-blue-50 border-blue-200">
+            <Activity className="w-4 h-4 text-blue-600" />
+            <AlertDescription className="text-xs text-blue-800">
+              <strong>FFP Infusion Fallback (PLEX unavailable):</strong> FFP 10–20 mL/kg every 24–48h supplies complement regulatory factors. Less effective than PLEX (no pathological Ab removal) but can maintain partial disease control. Monitor for volume overload; use diuretics if needed.
+            </AlertDescription>
+          </Alert>
+
+          <Alert className="bg-slate-50 border-slate-200">
+            <AlertTriangle className="w-3.5 h-3.5 text-slate-500" />
+            <AlertDescription className="text-xs text-slate-600">
+              <strong>References:</strong> ISPN/AIIMS aHUS Working Group 2025 | Sinha A et al. Indian J Pediatr 2024 | Bagga A et al. ISPN Consensus 2022 | Fremeaux-Bacchi V et al. JASN 2021 | KDIGO aHUS Controversies Conference 2017. For educational use only.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       {activeSection === "indications" && <IndicationsTable />}
 
       {activeSection === "ispn" && (
@@ -245,7 +485,8 @@ export default function PlasmapheresisModule() {
 
             <div className="rounded-xl border border-slate-200 overflow-hidden">
               <div className="bg-teal-700 px-4 py-2 text-white text-xs font-bold">Key Paediatric Indications (ISPN 2019 Consensus)</div>
-              <table className="w-full text-xs border-collapse">
+              <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse" style={{ minWidth: 480 }}>
                 <thead><tr className="bg-slate-100">
                   <th className="text-left px-3 py-2 font-bold">Indication</th>
                   <th className="text-center px-2 py-2 font-bold">Evidence</th>
@@ -269,6 +510,7 @@ export default function PlasmapheresisModule() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-3">
