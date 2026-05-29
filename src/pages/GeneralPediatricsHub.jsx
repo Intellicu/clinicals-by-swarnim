@@ -667,7 +667,7 @@ export default function GeneralPediatricsHub() {
               className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-lg min-w-[62px] transition-all text-xs font-semibold shadow-sm border
                   ${isActive ? `${tab.color} text-white border-transparent` : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
                 <Icon className="w-4 h-4" />
-                <span className="text-[10px] font-bold whitespace-nowrap hidden">{tab.label}</span>
+                
                 {tab.badge &&
                 <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">{tab.badge}</span>
                 }
