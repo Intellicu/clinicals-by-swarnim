@@ -206,6 +206,38 @@ const DEFAULT_PATHWAYS = [
     ]
   },
   {
+    id: "bbs", name: "Bardet-Biedl", full: "Bardet-Biedl Syndrome (BBS)", gene: "BBS1 (most common), BBS10, BBS12, + 22 BBS genes", color: "teal",
+    overview: "Autosomal recessive ciliopathy — multisystem disorder affecting multiple organs including kidney, eye, CNS, and endocrine system. Classic pentad: rod-cone dystrophy (night blindness), obesity, polydactyly, renal anomalies, intellectual disability. Variable expressivity even within families. One of the most common syndromic ciliopathies.",
+    genetics: "Highly genetically heterogeneous — 24 BBS genes identified. BBS1 (M390R mutation): ~20% of cases in European populations. BBS10 and BBS12: common. All encode components of the BBSome protein complex (cilia formation/trafficking). Triallelic inheritance described. Phenotype does not predict genotype reliably — gene panel/WES essential.",
+    red_flags: ["Night blindness or visual field loss in child — rod-cone dystrophy from age 6-10", "Post-axial polydactyly (extra digit on ulnar/fibular side) — may be subtle or surgically corrected", "Truncal obesity from early childhood", "Renal anomalies: horseshoe kidney, cysts, dysplasia, CKD", "Intellectual disability or learning difficulties", "Hypogonadism + obesity in adolescent male", "Anosmia (absent sense of smell)"],
+    diagnostic: ["Ophthalmology: ERG (rod-cone dystrophy — abnormal early even before visual symptoms)", "Renal ultrasound: dysplasia, cysts, horseshoe kidney, collecting system anomalies", "BBS gene panel (24 genes) or whole exome sequencing", "Developmental assessment + IQ testing", "HbA1c, fasting glucose, lipids (metabolic syndrome)", "Audiometry (sensorineural hearing loss in some BBS)", "Cardiac echo (congenital heart disease in ~5%)", "Endocrinology: LH, FSH, testosterone (hypogonadism)"],
+    monitoring: "Annual ophthalmology + ERG (vision aids when needed). Renal function every 6 months. BP monitoring. Annual metabolic screen (glucose, lipids, HbA1c). Growth and pubertal development. Annual neurodevelopmental review. Renal ultrasound every 12-24 months.",
+    ckd: "Renal involvement in 50-80%: structural anomalies (calyceal cysts, renal tubular dysfunction) or CKD. Treat as per CKD stage. Hypertension: ACEi/ARB for proteinuria. No disease-modifying therapy for renal BBS. Obesity management: diet, exercise, structured programmes. GLP-1 agonists for obesity-related complications (emerging evidence).",
+    transplant: "Renal transplant for ESRD: good outcomes. BBS does not recur in transplanted kidney. Pre-transplant cardiac evaluation essential. Obesity management important for post-transplant outcomes. Intellectual disability assessment for post-transplant adherence planning.",
+    family_screening: "AR: 25% recurrence risk. BBS gene panel for parents and siblings. Significant interfamilial variability even with same mutation. Genetic counselling: variable expressivity — siblings may have mild or severe manifestations.",
+    references: ["Forsythe E. Front Pediatr 2018", "Marion V. Orphanet J Rare Dis 2012", "BBS Foundation Guidelines 2023", "Marshall JD. Orphanet J 2023"],
+    further_reading: [
+      { title: "Bardet-Biedl Syndrome — Orphanet Reviews 2023", url: "https://www.ojrd.com/articles/10.1186/s13023-023-02624-2", source: "OJRD", year: "2023" },
+      { title: "BBS Foundation", url: "https://www.bbsfoundation.org", source: "BBS Foundation", year: "2024" },
+    ]
+  },
+  {
+    id: "lowe", name: "Lowe Syndrome", full: "Lowe Syndrome (Oculocerebrorenal Syndrome)", gene: "OCRL (Xq26.1) — X-linked", color: "orange",
+    overview: "X-linked multisystem disorder affecting eye, brain, and kidney (oculocerebrorenal syndrome — OCRL). Caused by deficiency of OCRL1 phosphatase enzyme involved in vesicular trafficking. Classic triad: congenital cataracts, intellectual disability/hypotonia, and renal Fanconi syndrome. Almost exclusively affects males; females are carriers with lens opacities.",
+    genetics: "X-linked. OCRL gene (Xq26.1) — >200 mutations. No clear genotype-phenotype correlation. Females (carriers): punctate/subcapsular lens opacities (slit lamp) — most are unaffected. Rare affected females (Turner syndrome or skewed X-inactivation). De novo mutations in ~30%.",
+    red_flags: ["Congenital cataracts in male neonate — bilateral", "Neonatal hypotonia (floppy baby) + cataracts", "Fanconi syndrome: aminoaciduria, phosphaturia, glucosuria with normoglycaemia, bicarbonaturia", "Rickets refractory to standard vitamin D therapy (hypophosphataemic rickets)", "Intellectual disability + behaviour problems (stereotypies, emotional dysregulation)", "Glaucoma developing after cataract surgery in infant", "Elevated creatinine kinase in infant (myopathic features)"],
+    diagnostic: ["Ophthalmology: slit lamp (bilateral dense cataracts at birth), IOP (glaucoma)", "Urine Fanconi panel: aminoaciduria, phosphaturia, glucosuria, bicarbonaturia, uricosuria", "OCRL enzyme activity (leucocytes or fibroblasts) — markedly reduced", "OCRL gene sequencing", "Renal function: creatinine, electrolytes", "Phosphate, calcium, PTH, ALP (rickets assessment)", "Brain MRI: periventricular leukoencephalopathy, ventriculomegaly", "Developmental assessment: IQ, behaviour, autistic features"],
+    monitoring: "Ophthalmology 3-6 monthly (cataract, glaucoma, aphakic glasses). Renal function quarterly. Electrolyte replacement adequacy: pH, phosphate, potassium monthly. ALP + X-ray hands/wrists 6-monthly (rickets). Developmental review annually. Behaviour assessment (stereotypies, aggression). Blood pressure monitoring.",
+    ckd: "Renal Fanconi syndrome: replace all wasted solutes — bicarbonate (NaHCO3 1-4 mEq/kg/day), phosphate supplements (1-3 g/day), potassium supplementation, carnitine. Calcitriol 0.025-0.05 mcg/kg/day for rickets. Progress to CKD in majority by adulthood (40% by age 30). ACEi when proteinuria develops. No disease-modifying therapy available yet.",
+    transplant: "Renal transplant for ESRD: possible and beneficial. OCRL enzyme defect persists in transplanted kidney but renal function restored. Extrarenal disease (cataracts, intellectual disability) continues post-transplant. Pre-transplant: intellectual capacity and adherence assessment essential.",
+    family_screening: "X-linked: obligate carrier females (mothers of affected males). Slit lamp examination of female relatives (lens opacities in carriers). OCRL gene sequencing for definitive carrier status. Prenatal diagnosis: OCRL sequencing from CVS. Preimplantation genetic testing available.",
+    references: ["Bockenhauer D. Ped Nephrol 2020", "Shrimpton AE. Am J Med Genet 2009", "Lowe Syndrome Association Guidelines 2023"],
+    further_reading: [
+      { title: "Lowe Syndrome — Comprehensive Review Ped Nephrol 2020", url: "https://link.springer.com/article/10.1007/s00467-019-04310-1", source: "Pediatric Nephrology", year: "2020" },
+      { title: "Lowe Syndrome Association", url: "https://www.lowesyndrome.org", source: "LSA", year: "2024" },
+    ]
+  },
+  {
     id: "alport", name: "Alport Syndrome", full: "Alport Syndrome", gene: "COL4A5 (X-linked), COL4A3/COL4A4 (AR/AD)", color: "indigo",
     overview: "Hereditary progressive nephritis caused by mutations in type IV collagen genes (COL4A3, COL4A4, COL4A5). Type IV collagen forms the structural scaffold of the glomerular basement membrane (GBM), cochlear basement membrane, and lens. Alport syndrome is the second most common genetic cause of ESRD in children after ARPKD.\n\nClinical spectrum: (1) Males with X-linked COL4A5 mutations — haematuria in infancy, proteinuria in childhood, ESRD typically by 3rd decade. (2) Females with X-linked (heterozygous) — haematuria common, CKD and ESRD risk 10–30% by age 40 due to X-inactivation. (3) AR Alport (COL4A3/A4 biallelic) — severe, similar to X-linked males. (4) AD Alport (monoallelic COL4A3/A4) — milder, often presenting as 'thin basement membrane nephropathy'.\n\nEarly ACEi intervention is the cornerstone of treatment — dramatically improves renal survival.",
     genetics: "X-linked (COL4A5): ~80% of cases. Males: severe progressive disease, ESRD by 25–30 years without ACEi. Females: variable, range from isolated haematuria to ESRD. AR (COL4A3/COL4A4): ~15%. Homozygous or compound heterozygous — severity = X-linked males. Parental consanguinity raises AR risk. AD (COL4A3/COL4A4 monoallelic): ~5%. Milder, often misclassified as TBMN (thin basement membrane nephropathy). ACEi still beneficial. Genotype-phenotype: truncating/splice-site COL4A5 > missense for severity. Exon 21-deletion: severe (juvenile ESRD). Multi-gene panels (COL4A3+A4+A5) essential — inheritance determines family cascade risk.",
@@ -522,7 +554,7 @@ export default function RareDiseasePathways({ isAdmin }) {
   return (
     <Tabs defaultValue="ahus">
       <div className="overflow-x-auto pb-1 mb-3">
-        <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1 min-w-full md:grid md:grid-cols-7">
+        <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1 min-w-full md:grid md:grid-cols-9">
           {DEFAULT_PATHWAYS.map(p => (
             <TabsTrigger key={p.id} value={p.id} className="px-2 py-2 text-xs rounded-lg whitespace-nowrap data-[state=active]:bg-violet-600 data-[state=active]:text-white">
               {p.name}

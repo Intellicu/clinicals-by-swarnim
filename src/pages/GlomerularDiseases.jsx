@@ -5,6 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import GlomerularDiseasesPathway from "../components/pathways/GlomerularDiseasesPathway";
 
 export default function GlomerularDiseases() {
+  // Support deep-linking to a tab via ?tab=ns-detail etc.
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get("tab") || "diseases";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6">
       <div className="max-w-5xl mx-auto space-y-5">
@@ -17,7 +21,7 @@ export default function GlomerularDiseases() {
             <p className="text-sm text-slate-600">NS · GN · RPGN · Lupus Nephritis · IgAN · C3G · Vasculitis · TMA · Biopsy · Immunosuppression</p>
           </div>
         </div>
-        <GlomerularDiseasesPathway />
+        <GlomerularDiseasesPathway initialTab={initialTab} />
       </div>
     </div>
   );

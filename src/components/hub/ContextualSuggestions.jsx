@@ -16,7 +16,7 @@ const SUGGESTIONS = [
 
 // Fixed pinned protocols — always visible in suggestions
 const PINNED_PROTOCOLS = [
-  { id: "ns_protocol", label: "Nephrotic Protocol", icon: Droplet, color: "bg-indigo-600", page: "ClinicalSupport", pinned: true },
+  { id: "ns_protocol", label: "Nephrotic Protocol", icon: Droplet, color: "bg-indigo-600", page: "GlomerularDiseases", params: "?tab=ns-detail", pinned: true },
   { id: "aki_protocol", label: "AKI Protocol", icon: AlertTriangle, color: "bg-red-600", page: "AKIStager", pinned: true },
   { id: "drugs_dosing", label: "Drug Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing", pinned: true },
 ];
@@ -81,7 +81,7 @@ export default function ContextualSuggestions({ patientData }) {
       {activeTab === "smart" && (
         <>
           {/* Always-pinned Nephrotic Protocol */}
-          <Link to={createPageUrl("ClinicalSupport")} className="block mb-2">
+          <Link to={createPageUrl("GlomerularDiseases") + "?tab=ns-detail"} className="block mb-2">
             <div className="flex items-center gap-2 bg-indigo-600 rounded-xl px-3 py-2.5 active:scale-95 transition-all">
               <Droplet className="w-4 h-4 text-white flex-shrink-0" />
               <div className="min-w-0">
@@ -121,7 +121,7 @@ export default function ContextualSuggestions({ patientData }) {
           {PINNED_PROTOCOLS.map(p => {
             const Icon = p.icon;
             return (
-              <Link key={p.id} to={createPageUrl(p.page)}>
+              <Link key={p.id} to={createPageUrl(p.page) + (p.params || "")}>
                 <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2.5 hover:border-indigo-300 active:scale-95 transition-all">
                   <div className={`w-8 h-8 ${p.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
                     <Icon className="w-4 h-4 text-white" />

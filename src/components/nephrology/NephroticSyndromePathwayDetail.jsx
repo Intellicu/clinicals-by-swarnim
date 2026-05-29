@@ -358,6 +358,33 @@ function SteroidToxicityMonitor() {
         </AlertDescription>
       </Alert>
 
+      {/* General steroid usage instructions */}
+      <Card className="bg-blue-50 border-blue-200 border-2">
+        <CardContent className="p-4 text-xs">
+          <p className="font-bold text-blue-900 mb-2">📋 General Steroid Usage Instructions (for families)</p>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="space-y-1.5 text-blue-800">
+              <p className="font-semibold text-blue-900">✅ How to take:</p>
+              <p>• <strong>Always take WITH food</strong> (meal or milk) — reduces stomach irritation</p>
+              <p>• Take in the <strong>morning</strong> (single daily dose) — mimics natural cortisol rhythm, reduces insomnia</p>
+              <p>• <strong>Do NOT crush or chew</strong> enteric-coated tablets — swallow whole</p>
+              <p>• Plain prednisolone tablets CAN be dissolved in water if child cannot swallow</p>
+              <p>• Measure liquid preparations carefully with a syringe (not spoon)</p>
+              <p>• Take at the <strong>same time each day</strong> — consistent blood levels</p>
+            </div>
+            <div className="space-y-1.5 text-blue-800">
+              <p className="font-semibold text-blue-900">⚠️ Critical rules:</p>
+              <p>• <strong>NEVER stop suddenly</strong> — risk of adrenal crisis (dizziness, vomiting, collapse)</p>
+              <p>• <strong>Sick day rule</strong>: double the dose if fever/illness/surgery — do NOT skip</p>
+              <p>• If vomiting and cannot keep tablets down — go to hospital for IV hydrocortisone</p>
+              <p>• Carry a <strong>steroid alert card</strong> with you at all times</p>
+              <p>• <strong>No live vaccines</strong> while on steroids (chickenpox vaccine, MMR)</p>
+              <p>• <strong>Avoid contact</strong> with chickenpox/shingles patients — inform doctor immediately</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {TOXICITIES.map(({ system, effects, monitoring, threshold }) => (
         <Card key={system} className="bg-white border border-slate-200">
           <CardContent className="p-4">
@@ -558,6 +585,28 @@ function SteroidSparingDrugs() {
           Indian first-line: <strong>Levamisole</strong> (cheap, effective). Escalate to MMF → CNI → Rituximab as needed.
         </AlertDescription>
       </Alert>
+
+      {/* General steroid-sparing usage tips */}
+      <Card className="bg-indigo-50 border-indigo-200">
+        <CardContent className="p-3 text-xs">
+          <p className="font-bold text-indigo-900 mb-2">📋 General Instructions for Steroid-Sparing Agents</p>
+          <div className="grid md:grid-cols-2 gap-2 text-indigo-800">
+            <div className="space-y-1">
+              <p>• <strong>MMF/Myfortic:</strong> Take with food; Myfortic (enteric-coated) — <strong>do NOT crush</strong>; avoid antacids 2h before/after</p>
+              <p>• <strong>Cyclosporine:</strong> Take consistently with/without food; <strong>avoid grapefruit</strong> (increases levels); use same brand always</p>
+              <p>• <strong>Tacrolimus:</strong> Take on empty stomach (1h before meals); consistent timing; <strong>avoid grapefruit</strong></p>
+              <p>• <strong>Levamisole:</strong> Can be taken with food; alternate-day schedule must be maintained strictly</p>
+            </div>
+            <div className="space-y-1">
+              <p>• <strong>All immunosuppressants:</strong> Avoid contact with sick/infected people; wear masks in crowded places</p>
+              <p>• <strong>No live vaccines</strong> while on immunosuppression (chickenpox, MMR, oral polio)</p>
+              <p>• Store medications at room temperature away from sunlight and moisture</p>
+              <p>• Never share medicines; <strong>never stop without doctor advice</strong> — sudden stop risks relapse</p>
+              <p>• Report fever, mouth ulcers, unusual bruising immediately — signs of bone marrow suppression</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Quick comparison table */}
       <Card className="bg-white border border-slate-200">

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   AlertTriangle, Activity, Zap, Droplet, Heart, Brain, Search,
-  ChevronRight, Clock, Pill, ArrowLeft, CheckSquare, ListChecks
+  ChevronRight, Clock, Pill, ArrowLeft, CheckSquare, ListChecks, Wind
 } from "lucide-react";
 import VoiceDictation from "@/components/VoiceDictation";
 
@@ -476,6 +476,43 @@ const PROTOCOLS = [
     ]
   },
   {
+    id: "asthma-exacerbation",
+    title: "Acute Asthma Exacerbation",
+    icon: Wind,
+    color: "bg-sky-700",
+    severity: "EMERGENCY",
+    summary: "Acute bronchospasm — assess severity, give oxygen + bronchodilators, escalate if no response. Weight optional for dose calc.",
+    icu_triggers: ["SpO2 <92% despite O2", "Silent chest on auscultation", "Pulsus paradoxus >20 mmHg", "Unable to speak in sentences", "Altered consciousness / exhaustion", "PaCO2 normal or rising (respiratory fatigue — near-fatal)"],
+    algorithm: [
+      { step: "1", action: "Assess severity: Mild (SpO2 >95%, speaks sentences, PEFR >70%), Moderate (SpO2 92–95%, speaks phrases, PEFR 40–70%), Severe (SpO2 <92%, speaks words, PEFR <40%), Life-threatening (silent chest, cyanosis, exhaustion)", time: "0 min", color: "bg-slate-600" },
+      { step: "2", action: "High-flow O2 by mask — target SpO2 94–98% (children). If SpO2 <92%: non-rebreather mask 10–15 L/min", time: "0 min", color: "bg-sky-600" },
+      { step: "3", action: "Salbutamol nebulization: 2.5 mg (<20 kg) or 5 mg (>20 kg). If no weight available: use age — <5y: 2.5 mg, >5y: 5 mg. Repeat every 20 min × 3 in first hour (continuous nebulization for severe)", time: "0–5 min", color: "bg-red-600" },
+      { step: "4", action: "Ipratropium bromide nebulization: 250 mcg (<20 kg) or 500 mcg (>20 kg). Give with EVERY Salbutamol dose in FIRST HOUR ONLY. Shown to reduce hospitalization in severe exacerbations", time: "0–5 min", color: "bg-orange-600" },
+      { step: "5", action: "Systemic steroids: Prednisolone PO 1–2 mg/kg (max 40mg) OR IV Hydrocortisone 4 mg/kg (max 200mg) if vomiting. Give within 1 hour — reduces admission. Continue 3–5 days", time: "5–10 min", color: "bg-amber-600" },
+      { step: "6", action: "SEVERE/LIFE-THREATENING: IV Magnesium sulphate (MgSO4) 0.1–0.2 mL/kg of 50% MgSO4 (= 50–75 mg/kg) IV over 20 min. Max 2g. Strong evidence for severe exacerbations (RR reduction 32%)", time: "15–20 min if severe", color: "bg-purple-600" },
+      { step: "7", action: "No response after 3 nebulizations: IV Salbutamol 5–10 mcg/kg bolus over 10 min, then infusion 0.1–5 mcg/kg/min. OR IV Aminophylline 5 mg/kg loading over 30 min (if not on theophylline), then 0.9 mg/kg/hr (neonates: 0.2 mg/kg/hr)", time: "30–60 min", color: "bg-red-700" },
+      { step: "8", action: "HELIOX 70:30 (helium:oxygen): if refractory and available — reduces airway resistance. BiPAP/NIV as bridge to intubation. Intubation last resort (high risk in acute asthma)", time: "If refractory", color: "bg-blue-700" },
+    ],
+    drugs: [
+      { name: "Salbutamol (Nebulized)", dose: "<20 kg: 2.5 mg | >20 kg: 5 mg (no weight: <5y→2.5mg, >5y→5mg)", route: "Nebulization q20 min ×3, then q1–4h", duration: "q20 min first hour, then assess", purpose: "First-line bronchodilator — beta-2 agonist" },
+      { name: "Ipratropium Bromide (Nebulized)", dose: "<20 kg: 250 mcg | >20 kg: 500 mcg", route: "With salbutamol — first hour only", duration: "First 3 doses only (anticholinergic)", purpose: "Additive bronchodilation — reduces admission rate" },
+      { name: "Prednisolone PO", dose: "1–2 mg/kg/day (max 40mg)", route: "PO (with food)", duration: "3–5 days, no taper needed for short courses", purpose: "Systemic anti-inflammatory — give within 1h of arrival" },
+      { name: "Hydrocortisone IV", dose: "4 mg/kg/dose (max 200mg)", route: "IV over 5 min", duration: "q6h until able to take PO steroids", purpose: "If vomiting or unable to take PO" },
+      { name: "Magnesium Sulphate IV", dose: "50 mg/kg (= 0.1–0.2 mL/kg of 50% MgSO4, max 2g)", route: "IV over 20 min", duration: "Single dose for severe/life-threatening", purpose: "Adjunct bronchodilation — significant evidence for severe cases" },
+      { name: "Salbutamol IV (if no response)", dose: "5–10 mcg/kg bolus over 10 min, then 0.1–5 mcg/kg/min infusion", route: "IV via infusion pump", duration: "Titrate to response", purpose: "Refractory asthma not responding to nebulized therapy" },
+    ],
+    monitoring: ["SpO2 continuous (target 94–98%)", "RR and work of breathing every 15 min", "PEFR (if able to cooperate — >6y)", "Heart rate (tachycardia from salbutamol — normal side effect)", "Blood gas: if not improving or fatigue suspected", "Blood glucose (steroids can cause hyperglycemia)"],
+    pitfalls: [
+      "Normal or rising PaCO2 in severe asthma = DANGER — indicates respiratory muscle fatigue (usually CO2 falls in mild-moderate asthma due to hyperventilation)",
+      "Sedation/opioids contraindicated — can suppress respiratory drive critically",
+      "Ipratropium: FIRST HOUR ONLY — not proven beneficial after initial phase",
+      "Aminophylline: risk of arrhythmias — ECG monitoring mandatory; do NOT give if already on theophylline without checking levels",
+      "IV Salbutamol causes hypokalaemia — monitor potassium and supplement",
+      "MgSO4 check: give slowly over 20 min — rapid infusion causes hypotension and flushing",
+      "Weight-based dosing: use age-based estimates confidently if weight unavailable — do NOT delay treatment to obtain weight"
+    ]
+  },
+  {
     id: "hypernatremia",
     title: "Hypernatremic Dehydration",
     icon: Droplet,
@@ -666,9 +703,12 @@ export default function EmergencyHub() {
 
                     {activeTab === "drugs" && (
                       <div>
-                        <h3 className="font-bold text-lg text-slate-900 mb-4 flex items-center gap-2">
+                        <h3 className="font-bold text-lg text-slate-900 mb-2 flex items-center gap-2">
                           <Pill className="w-5 h-5 text-red-600" /> Emergency Drugs
                         </h3>
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4 text-xs text-amber-800">
+                          <strong>⚖️ Weight-based dosing:</strong> If weight is unavailable, use age-based estimates or Broselow tape. Do NOT delay treatment to obtain weight. In emergencies, estimate: 1–12 months ≈ age(mo)+9 kg; 1–5y ≈ (age×2)+8 kg; 6–12y ≈ age×3 kg.
+                        </div>
                         <div className="space-y-3">
                           {protocol.drugs.map((drug, i) => (
                             <div key={i} className="bg-red-50 border border-red-200 rounded-xl p-4">

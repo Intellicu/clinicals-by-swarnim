@@ -657,7 +657,7 @@ const categoryColors = {
   Genetic: "bg-teal-100 text-teal-700"
 };
 
-export default function GlomerularDiseasesPathway() {
+export default function GlomerularDiseasesPathway({ initialTab = "diseases" }) {
   const [expanded, setExpanded] = useState({});
   const [activeTab, setActiveTab] = useState({});
   const [aiUpdates, setAiUpdates] = useState({});
@@ -668,7 +668,7 @@ export default function GlomerularDiseasesPathway() {
     try {return JSON.parse(localStorage.getItem("glom_custom") || "[]");} catch {return [];}
   });
   const [filterCategory, setFilterCategory] = useState("All");
-  const [mainTab, setMainTab] = useState("diseases");
+  const [mainTab, setMainTab] = useState(initialTab);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const isAdmin = user?.role === "admin";

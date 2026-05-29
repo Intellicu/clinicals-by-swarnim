@@ -104,7 +104,7 @@ export default function AdminPathwayGenerator({ onCreated, specialty = '' }) {
         prompt,
         add_context_from_internet: form.ai_mode === 'web',
         file_urls: uploadedUrl ? [uploadedUrl] : undefined,
-        model: 'claude_sonnet_4_6',
+        model: form.ai_mode === 'web' ? 'gemini_3_1_pro' : 'claude_sonnet_4_6',
         response_json_schema: {
           type: "object",
           properties: {
