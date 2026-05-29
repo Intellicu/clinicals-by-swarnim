@@ -622,6 +622,159 @@ export default function GeneralPediatricsHub() {
     p.badge?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Nutrition guidelines data (searchable)
+  const NUTRITION_GUIDELINES = [
+    {
+      title: "Infant and Young Child Feeding (IYCF)",
+      color: "green",
+      source: "WHO/IAP/UNICEF 2023",
+      tags: ["breastfeeding", "complementary feeding", "IYCF", "infant", "6 months"],
+      content: [
+        "Initiate breastfeeding within 1 hour of birth (colostrum = 'liquid gold')",
+        "Exclusive breastfeeding for first 6 months — no water, no other feeds",
+        "Complementary feeding from 6 months: home-cooked semi-solid foods",
+        "Continue breastfeeding up to 2 years or beyond",
+        "India-specific: khichdi, mashed dal-rice, suji kheer, mashed banana, curd-rice",
+        "Energy density: ≥1 kcal/mL; protein: 10–15% total energy",
+        "4-star diet: cereals + pulses + animal foods + fruits/vegetables daily",
+        "Frequency: 2-3 meals/day at 6-8m; 3-4 meals + 1-2 snacks at 9-23m",
+        "Avoid: honey (<1y), cow's milk as main drink (<1y), added salt/sugar (<2y), processed foods",
+      ]
+    },
+    {
+      title: "Malnutrition Classification + MUAC Guide",
+      color: "amber",
+      source: "WHO 2022 / CMAM",
+      tags: ["SAM", "MAM", "MUAC", "malnutrition", "oedema", "wasting", "kwashiorkor", "marasmus"],
+      content: [
+        "SAM: WHZ <-3SD OR MUAC <11.5cm OR bilateral pitting oedema",
+        "MAM: WHZ -2 to -3SD OR MUAC 11.5–12.5cm",
+        "Normal: WHZ >-2SD AND MUAC >12.5cm",
+        "🔴 MUAC <11.5cm = SAM → facility-based management (F-MAS)",
+        "🟡 MUAC 11.5–12.5cm = MAM → community supplementary feeding",
+        "🟢 MUAC >12.5cm = Normal; <6 months: MUAC <11cm = SAM",
+        "Oedema grading: + foot/ankle | ++ lower limb | +++ generalised (anasarca)",
+        "Kwashiorkor (oedema) = SAM regardless of weight-for-height",
+        "Marasmic-kwashiorkor = worst prognosis; combined wasting + oedema",
+      ]
+    },
+    {
+      title: "SAM Management — NRC 10-Step Protocol (WHO/IAP)",
+      color: "red",
+      source: "WHO 2013 / IAP 2023",
+      tags: ["SAM", "NRC", "F-75", "F-100", "RUTF", "NRC", "NRC protocol", "stabilisation"],
+      content: [
+        "Step 1: Treat hypoglycaemia — glucose 10% 5mL/kg if unconscious",
+        "Step 2: Treat hypothermia — skin-to-skin, warm environment, hat",
+        "Step 3: Treat/prevent dehydration — ReSoMal 5mL/kg/30min if diarrhoea",
+        "Step 4: Correct electrolytes — K+ (4 mmol/kg/d), Mg (0.6 mmol/kg/d); NO added Na",
+        "Step 5: Treat infections — amoxicillin (uncomplicated) / ampicillin+gentamicin (complicated)",
+        "Step 6: Correct micronutrient deficiencies — Vitamin A, Zinc, Folate; NO iron in Phase 1",
+        "Step 7: Start cautious feeding — F-75 formula (75 kcal/100mL), 100mL/kg/day q3h",
+        "Step 8: Rebuild wasted tissue — transition to F-100 or RUTF when stable (no oedema, infection resolving)",
+        "Step 9: Provide stimulation — structured play, sensory stimulation daily",
+        "Step 10: Follow-up — monthly weight; discharge: WHZ >-2 + MUAC >12.5 + eating well",
+        "RUTF (Plumpy'Nut): 200 kcal/sachet; 200 kcal/kg/day; never dilute with water",
+        "Iron: start ONLY in rehabilitation phase; premature iron → oxidative stress",
+      ]
+    },
+    {
+      title: "Growth Monitoring & Failure to Thrive",
+      color: "blue",
+      source: "IAP 2015 / WHO",
+      tags: ["FTT", "failure to thrive", "growth", "weight", "height", "centile", "short stature"],
+      content: [
+        "Use WHO growth charts (0-5y) and IAP 2015 charts (5-18y)",
+        "Mid-parental height (boys): (Father's ht + Mother's ht + 13) ÷ 2 (±8.5cm)",
+        "Mid-parental height (girls): (Father's ht + Mother's ht - 13) ÷ 2 (±8.5cm)",
+        "FTT: weight <3rd percentile OR crossing 2 major centile lines downward",
+        "FTT workup: CBC, TFT, urine culture, coeliac screen (anti-TTG), metabolic panel",
+        "Measure every month <1y; every 3m (1-3y); every 6m (3-6y)",
+        "Head circumference until 36 months — microcephaly if <2SD for age/sex",
+        "Weight velocity: term infant doubles birth weight by 4-5m; triples by 12m",
+        "Expected weight gain: 25-30g/day (0-3m), 15-20g/day (3-6m), 10-15g/day (6-12m)",
+        "BMI for age: overweight >+1SD; obese >+2SD (WHO/IAP cutoffs)",
+      ]
+    },
+    {
+      title: "Micronutrient Deficiencies — IAP/ICMR",
+      color: "purple",
+      source: "IAP 2022 / ICMR 2020",
+      tags: ["vitamin D", "iron", "IDA", "anaemia", "zinc", "vitamin A", "iodine", "folate", "micronutrient"],
+      content: [
+        "Vitamin D: 400 IU/day birth–12m; 600 IU/day >12m; treat deficiency with 60,000 IU/week × 6-8w",
+        "Iron Deficiency Anaemia: Fe 3-6 mg/kg/day elemental iron × 3 months",
+        "WIFS (Weekly Iron & Folic acid Supplementation): 45mg Fe + 400µg FA, school children",
+        "Iodine: use iodised salt; deficiency = commonest preventable intellectual disability",
+        "Zinc supplementation: 10mg/day <5y, 20mg/day 5-12y for 14 days with acute diarrhoea",
+        "Vitamin A: 100,000 IU at 6-11m; 200,000 IU every 6m (12m–5y); VAD → corneal ulcer",
+        "Vitamin K: 1mg IM at birth; prevents VKDB (Vitamin K Deficiency Bleeding)",
+        "Folate: 400µg/day periconceptional; deficiency → neural tube defects",
+        "Calcium: 500mg/day (1-3y), 800mg/day (4-8y), 1300mg/day (adolescents)",
+      ]
+    },
+    {
+      title: "Obesity & Metabolic Syndrome in Children",
+      color: "amber",
+      source: "IAP 2015 / IDF 2007",
+      tags: ["obesity", "BMI", "metabolic syndrome", "overweight", "NAFLD", "dyslipidaemia"],
+      content: [
+        "Overweight: BMI 85th–95th percentile for age/sex; Obese: BMI >95th percentile",
+        "Abdominal obesity: waist circumference >90th percentile or >80cm (girls)/90cm (boys) in adolescents",
+        "Metabolic syndrome criteria (IDF paediatric 2007): obesity + ≥2 of: TG↑, HDL↓, BP↑, glucose↑",
+        "Investigations: fasting lipid profile, glucose, insulin, LFT (NAFLD), uric acid",
+        "Management: lifestyle modification (Diet + 60 min/day moderate activity)",
+        "Caloric restriction: 500 kcal deficit/day; avoid ultra-processed foods",
+        "Screen for NAFLD: ALT/AST if BMI >95th; USS if elevated enzymes",
+        "Metformin: consider if HbA1c >5.7% or impaired fasting glucose; not first-line",
+        "Target: 5-10% weight reduction over 6 months; monitor every 3 months",
+      ]
+    },
+    {
+      title: "Nutrition in Chronic Disease (Renal/CKD/CHD)",
+      color: "blue",
+      source: "KDOQI 2020 / IAP",
+      tags: ["CKD nutrition", "renal diet", "CHD nutrition", "chronic disease", "KDOQI"],
+      content: [
+        "CKD nutrition: protein 100-140% DRI for healthy children (not restricted in early CKD)",
+        "Energy: 100% EER; supplement if growth faltering (NG tube feeds if needed)",
+        "Phosphorus: restrict in CKD stage 3b+; avoid phosphate additives in processed foods",
+        "Potassium: restrict in CKD 4-5 if hyperkalaeamic; avoid high-K fruits/vegetables",
+        "Sodium: 2-3g/day restriction in CKD with hypertension or oedema",
+        "CHD: high-calorie feeds (24-30 kcal/oz formula) for failure to thrive",
+        "IBD: exclusive enteral nutrition (EEN) for 6-8 weeks = first-line induction in Crohn's",
+        "Celiac: strict gluten-free diet; monitor growth and bone density annually",
+        "Nutritional screening: PG-SGA or STAMP tool on every hospital admission",
+      ]
+    },
+    {
+      title: "Neonatal Nutrition — IAP/NNF",
+      color: "green",
+      source: "NNF 2022 / IAP Neonatology",
+      tags: ["neonatal", "TPN", "preterm", "LBW", "breast milk", "neonatal nutrition", "TPN", "PN"],
+      content: [
+        "Term newborn: initiate feeds within 1h of birth; demand feeding 8-12 times/day",
+        "Preterm (<34w): begin trophic feeds (10-20 mL/kg/day) within 24h of birth",
+        "Advance feeds: 20-30 mL/kg/day in preterm if tolerating well",
+        "Parenteral nutrition if: NEC risk, surgical abdomen, <26w prematurity, VLBW",
+        "PN: glucose 4-8 mg/kg/min; amino acids start 2-3g/kg/day → target 3-4g/kg/day",
+        "Intralipid: 1g/kg/day → increase by 1g/kg/day to 3g/kg/day; check TG <200 mg/dL",
+        "Breast milk fortification: HMF added when on full enteral feeds in preterm (<34w)",
+        "Target growth: 15-20g/kg/day weight gain in preterm; head circumference growth",
+        "Discharge: LBW formula or breast milk + iron supplementation from 2-4 weeks of age",
+      ]
+    },
+  ];
+
+  // Search across nutrition guidelines
+  const filteredNutrition = NUTRITION_GUIDELINES.filter(g =>
+    !search.trim() ||
+    g.title.toLowerCase().includes(search.toLowerCase()) ||
+    g.source?.toLowerCase().includes(search.toLowerCase()) ||
+    g.tags?.some(t => t.toLowerCase().includes(search.toLowerCase())) ||
+    g.content.some(c => c.toLowerCase().includes(search.toLowerCase()))
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       {/* Header */}
@@ -884,84 +1037,56 @@ export default function GeneralPediatricsHub() {
             <div className="flex items-center gap-2 p-3 bg-orange-600 rounded-xl shadow">
               <Apple className="w-5 h-5 text-white shrink-0" />
               <div>
-                <p className="font-bold text-white text-sm">Nutrition — IAP/WHO/NIN Guidelines</p>
-                <p className="text-orange-100 text-xs">IYCF · SAM · MUAC · Growth Monitoring · Micronutrients</p>
+                <p className="font-bold text-white text-sm">Nutrition Guidelines — IAP/WHO/NIN/ICMR</p>
+                <p className="text-orange-100 text-xs">IYCF · SAM · MUAC · Growth · Micronutrients · Obesity · Neonatal · CKD Nutrition</p>
               </div>
             </div>
 
+            {/* Search box for nutrition */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Search nutrition guidelines (e.g. MUAC, SAM, vitamin D, IYCF, obesity…)"
+                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-orange-300" />
+            </div>
+
+            {search && (
+              <p className="text-xs text-slate-500">{filteredNutrition.length} guideline(s) match "{search}"</p>
+            )}
+
             {/* Nutrition guideline cards */}
-            {[
-              {
-                title: "Infant and Young Child Feeding (IYCF)",
-                color: "green",
-                content: [
-                  "Initiate breastfeeding within 1 hour of birth (colostrum = 'liquid gold')",
-                  "Exclusive breastfeeding for first 6 months — no water, no other feeds",
-                  "Complementary feeding from 6 months: home-cooked semi-solid foods",
-                  "Continue breastfeeding up to 2 years or beyond",
-                  "India-specific: khichdi, mashed dal-rice, suji kheer, mashed banana, curd-rice",
-                  "Energy density: ≥1 kcal/mL; protein: 10–15% total energy",
-                  "4-star diet: cereals + pulses + animal foods + fruits/vegetables daily",
-                  "Frequency: 2-3 meals/day at 6-8m; 3-4 meals + 1-2 snacks at 9-23m",
-                ]
-              },
-              {
-                title: "Malnutrition Classification + MUAC Guide",
-                color: "amber",
-                content: [
-                  "SAM: WHZ <-3SD OR MUAC <11.5cm OR bilateral pitting oedema",
-                  "MAM: WHZ -2 to -3SD OR MUAC 11.5–12.5cm",
-                  "Normal: WHZ >-2SD AND MUAC >12.5cm",
-                  "🔴 MUAC <11.5cm = SAM → facility-based management",
-                  "🟡 MUAC 11.5–12.5cm = MAM → community supplementary feeding",
-                  "🟢 MUAC >12.5cm = Normal",
-                  "Oedema grading: + foot/ankle | ++ lower limb | +++ generalised",
-                  "Kwashiorkor (oedema) = SAM regardless of weight-for-height",
-                ]
-              },
-              {
-                title: "SAM Management — NRC 10-Step Protocol (WHO/IAP)",
-                color: "red",
-                content: [
-                  "Step 1: Treat hypoglycaemia — glucose 10% 5mL/kg if unconscious",
-                  "Step 2: Treat hypothermia — skin-to-skin, warm environment, hat",
-                  "Step 3: Treat/prevent dehydration — ReSoMal 5mL/kg/30min if diarrhoea",
-                  "Step 4: Correct electrolytes — K+ (4 mmol/kg/d), Mg (0.6 mmol/kg/d)",
-                  "Step 5: Treat infections — amoxicillin (uncomplicated) / ampicillin+gentamicin (complicated)",
-                  "Step 6: Correct micronutrient deficiencies — Vitamin A, Zinc, Folate (NO iron Phase 1)",
-                  "Step 7: Start cautious feeding — F-75 formula (75 kcal/100mL), 100mL/kg/day",
-                  "Step 8: Rebuild wasted tissue — transition to F-100 or RUTF when stable",
-                  "Step 9: Provide stimulation — structured play, sensory stimulation",
-                  "Step 10: Prepare for follow-up — monthly weight; discharged when WHZ >-2 + eating well",
-                ]
-              },
-              {
-                title: "Growth Monitoring + FTT",
-                color: "blue",
-                content: [
-                  "Use WHO growth charts (0-5y) and IAP 2015 charts (5-18y)",
-                  "Mid-parental height (boys): (Father's ht + Mother's ht + 13) ÷ 2",
-                  "Mid-parental height (girls): (Father's ht + Mother's ht - 13) ÷ 2",
-                  "FTT: weight <3rd percentile OR crossing 2 major centile lines downward",
-                  "FTT workup: CBC, TFT, urine culture, coeliac screen, metabolic panel",
-                  "Measure every month <1y; every 3m (1-3y); every 6m (3-6y)",
-                  "Head circumference until 36 months — microcephaly if <2SD for age/sex",
-                ]
-              },
-              {
-                title: "Micronutrient Deficiencies",
-                color: "purple",
-                content: [
-                  "Vitamin D: 400 IU/day for all infants from birth to 1y; 600 IU/day thereafter",
-                  "IDA: Fe 3-6 mg/kg/day elemental iron for 3 months; WIFS school programme",
-                  "Iodine: use iodised salt; iodine deficiency = commonest preventable intellectual disability",
-                  "Zinc: 10mg/day <5y, 20mg/day 5-12y for 14d with acute diarrhoea",
-                  "Vitamin A: 100,000 IU at 6-11m, 200,000 IU every 6m (12m-5y) in India",
-                ]
-              },
-            ].map(section => (
-              <NutritionGuidelineCard key={section.title} section={section} />
-            ))}
+            {filteredNutrition.length === 0 ? (
+              <div className="text-center py-10 text-slate-400">
+                <Apple className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No nutrition guidelines match your search</p>
+              </div>
+            ) : (
+              filteredNutrition.map(section => (
+                <div key={section.title} className={`rounded-xl border overflow-hidden ${COLOR_CLASSES[section.color]?.border || "border-slate-200"}`}>
+                  <button onClick={() => {}} className={`w-full flex items-center justify-between px-4 py-3 ${COLOR_CLASSES[section.color]?.header || "bg-slate-100"} text-left`}
+                    onClick={(e) => {
+                      const card = e.currentTarget.parentElement;
+                      const body = card.querySelector('.nut-body');
+                      if (body) body.classList.toggle('hidden');
+                    }}>
+                    <div className="flex-1">
+                      <span className={`text-sm font-bold ${COLOR_CLASSES[section.color]?.title || "text-slate-900"}`}>{section.title}</span>
+                      {section.source && <span className="ml-2 text-xs opacity-60">— {section.source}</span>}
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                  </button>
+                  <div className={`nut-body ${COLOR_CLASSES[section.color]?.bg || "bg-white"} p-4 ${search ? "" : "hidden"}`}>
+                    <ul className="space-y-1.5">
+                      {section.content.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                          <span className="text-slate-400 font-bold shrink-0 mt-0.5">•</span>{item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))
+            )}
 
             {/* Divider */}
             <div className="flex items-center gap-3">

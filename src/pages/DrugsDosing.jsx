@@ -20,6 +20,7 @@ import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
+import PlasmapheresisCalculator from "../components/drugs/PlasmapheresisCalculator";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
 import StickyToolNav from "../components/StickyToolNav";
@@ -809,7 +810,7 @@ CliniCals by Swarnim | Verify all doses independently`;
 
           {/* ── PLASMAPHERESIS TAB ────────────────────────── */}
           <TabsContent value="plasmapheresis">
-            <PlasmapheresisModule />
+            <PlasmapheresisCalculator />
           </TabsContent>
 
           {/* ── CKD DOSING TAB ────────────────────────────── */}
