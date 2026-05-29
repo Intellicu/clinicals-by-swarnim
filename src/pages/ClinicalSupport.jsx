@@ -59,6 +59,8 @@ import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer
 import GlomerularDiseasesPathway from '../components/pathways/GlomerularDiseasesPathway';
 import PathwayRenderer from '../components/pathways/PathwayRenderer';
 import { TubularDisordersSection, ClinicalAIAgentsSection, RareDiseaseScreeningSection } from '../components/hub/HubSpecialtySections';
+import { PathwayModal, AIPathwayGenerator, PathwayCard, QuickAccessDashboard } from '../components/hub/ClinicalPathwayManager';
+import { Star, Plus, Sparkles } from 'lucide-react';
 
 
 // Symptom templates based on chief complaints
@@ -1404,6 +1406,57 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
 
   const [scenarioSearch, setScenarioSearch] = useState("");
+  const [scenarioFilter, setScenarioFilter] = useState("all"); // "all" | "favorites" | "reviewed"
+  const [favScenarioIds, setFavScenarioIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pathway_favs") || "[]"); } catch { return []; }
+  });
+  const [reviewedScenarioIds, setReviewedScenarioIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pathway_reviewed") || "[]"); } catch { return []; }
+  });
+  const [showAddPathwayModal, setShowAddPathwayModal] = useState(false);
+  const [editingCustomPathway, setEditingCustomPathway] = useState(null);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [customPathways, setCustomPathways] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("custom_nephro_pathways") || "[]"); } catch { return []; }
+  });
+
+  const toggleFavScenario = (id) => {
+    setFavScenarioIds(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
+      try { localStorage.setItem("pathway_favs", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+
+  const toggleReviewedScenario = (id) => {
+    setReviewedScenarioIds(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
+      try { localStorage.setItem("pathway_reviewed", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+
+  const handleCustomPathwaySave = (p) => {
+    setCustomPathways(prev => {
+      const exists = prev.find(x => x.id === p.id);
+      const next = exists ? prev.map(x => x.id === p.id ? p : x) : [...prev, p];
+      try { localStorage.setItem("custom_nephro_pathways", JSON.stringify(next)); } catch {}
+      return next;
+    });
+    setShowAddPathwayModal(false);
+    setEditingCustomPathway(null);
+    toast.success("Pathway saved!");
+  };
+
+  const handleDeleteCustomPathway = (id) => {
+    if (!confirm("Delete this custom pathway?")) return;
+    setCustomPathways(prev => {
+      const next = prev.filter(x => x.id !== id);
+      try { localStorage.setItem("custom_nephro_pathways", JSON.stringify(next)); } catch {}
+      return next;
+    });
+    toast.success("Pathway deleted");
+  };
 
   const CATEGORY_ORDER = ["Metabolic & Genetic", "Tubular Disorders", "Hypertension", "Nephrotic Syndrome", "Acute Kidney Disease", "CKD", "Glomerular Disease", "Electrolytes", "Fluids & Electrolytes", "Transplant", "Infection", "Peritoneal Dialysis", "Hemodialysis", "Developmental Kidney", "Urinary Tract", "Lower Urinary Tract"];
 
@@ -1439,83 +1492,143 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
     "Lower Urinary Tract": "bg-emerald-600",
   };
 
-  const renderScenarioList = () =>
-  <div className="space-y-6">
-      {Object.keys(groupedScenarios).length === 0 && (
-        <p className="text-center text-slate-400 py-8">No scenarios match your search</p>
+  const renderScenarioList = () => {
+    let allFilteredScenarios = filteredScenarios;
+    if (scenarioFilter === "favorites") allFilteredScenarios = filteredScenarios.filter(s => favScenarioIds.includes(s.id));
+    if (scenarioFilter === "reviewed") allFilteredScenarios = filteredScenarios.filter(s => reviewedScenarioIds.includes(s.id));
+
+    const groupedFiltered = CATEGORY_ORDER.reduce((acc, cat) => {
+      const items = allFilteredScenarios.filter(s => s.category === cat);
+      if (items.length > 0) acc[cat] = items;
+      return acc;
+    }, {});
+
+    return (
+    <div className="space-y-5">
+      {/* Quick Access Dashboard */}
+      {scenarioFilter === "all" && (favScenarioIds.length > 0 || reviewedScenarioIds.length > 0) && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-3">
+          {favScenarioIds.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Star className="w-3.5 h-3.5 text-amber-500" fill="currentColor" />
+                <span className="text-xs font-bold text-amber-700">My Saved Pathways</span>
+              </div>
+              <div className="flex gap-1.5 flex-wrap">
+                {clinicalScenarios.filter(s => favScenarioIds.includes(s.id)).map(s => (
+                  <button key={s.id} onClick={() => { setSelectedScenario(s.id); setActiveTab("pathways"); }}
+                    className="px-2.5 py-1 text-xs font-semibold bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 text-amber-800">
+                    ★ {s.title.slice(0, 30)}…
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {reviewedScenarioIds.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                <span className="text-xs font-bold text-green-700">Recently Reviewed</span>
+              </div>
+              <div className="flex gap-1.5 flex-wrap">
+                {clinicalScenarios.filter(s => reviewedScenarioIds.includes(s.id)).map(s => (
+                  <button key={s.id} onClick={() => { setSelectedScenario(s.id); setActiveTab("pathways"); }}
+                    className="px-2.5 py-1 text-xs font-semibold bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 text-green-800">
+                    ✓ {s.title.slice(0, 30)}…
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       )}
-      {Object.entries(groupedScenarios).map(([group, scenarios]) =>
-    <div key={group}>
-          <h3 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+
+      {/* Custom Pathways */}
+      {customPathways.length > 0 && scenarioFilter === "all" && (
+        <div>
+          <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <Plus className="w-3.5 h-3.5" /> My Custom Pathways ({customPathways.length})
+          </h3>
+          <div className="space-y-2">
+            {customPathways.map(p => (
+              <PathwayCard key={p.id} pathway={p}
+                isFav={favScenarioIds.includes(p.id)}
+                isReviewed={reviewedScenarioIds.includes(p.id)}
+                onToggleFav={toggleFavScenario}
+                onToggleReviewed={toggleReviewedScenario}
+                onEdit={setEditingCustomPathway}
+                onDelete={handleDeleteCustomPathway}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {Object.keys(groupedFiltered).length === 0 && (
+        <p className="text-center text-slate-400 py-8">No scenarios match your filter</p>
+      )}
+      {Object.entries(groupedFiltered).map(([group, scenarios]) => (
+        <div key={group}>
+          <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
             <Badge className={CATEGORY_COLORS[group] || "bg-slate-600"}>
               {group}
             </Badge>
             <span className="text-slate-500 text-xs">({scenarios.length})</span>
           </h3>
-          <div className="space-y-3">
-      {scenarios.map((scenario) => {
-          const ScenarioIcon = scenario.icon;
-          const priorityColors = {
-            danger: "bg-red-50 border-red-300 hover:bg-red-100 hover:shadow-lg", // Added hover effects
-            warning: "bg-amber-50 border-amber-300 hover:bg-amber-100 hover:shadow-lg",
-            secondary: "bg-blue-50 border-blue-300 hover:bg-blue-100 hover:shadow-lg"
-          };
-          const priorityBadges = {
-            danger: "bg-red-500 text-white", // Solid color badges
-            warning: "bg-amber-500 text-white",
-            secondary: "bg-blue-500 text-white"
-          };
-
-          return (
-            <Card
-              key={scenario.id}
-              className={`${priorityColors[scenario.priority]} border-2 cursor-pointer transition-all`} // Removed hover:shadow-lg from here as it's in priorityColors
-              onClick={() => {
-                setSelectedScenario(scenario.id);
-                setActiveTab("pathways");
-              }}>
-              
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3 flex-1">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${ // Increased size, added shadow
-                    scenario.priority === "danger" ? "bg-red-200" :
-                    scenario.priority === "warning" ? "bg-amber-200" :
-                    "bg-blue-200"}`
-                    }>
-                    <ScenarioIcon className={`w-7 h-7 ${
-                     scenario.priority === "danger" ? "text-red-700" :
-                     scenario.priority === "warning" ? "text-amber-700" :
-                     "text-blue-700"}`
-                     } />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-slate-900 mb-1 text-lg">{scenario.title}</h3> {/* Increased font size */}
-                    <p className="text-sm text-slate-600 mb-2">{scenario.description}</p>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">{scenario.category}</Badge>
-                      <Badge className={`${priorityBadges[scenario.priority]} text-xs px-2 py-1`}> {/* Styled badge */}
-                        {scenario.priority.toUpperCase()} {/* Uppercase priority */}
-                      </Badge>
-                      {scenario.hasFullPathway && // New badge for full pathway
-                        <Badge className="bg-green-500 text-white text-xs">
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
-                          Full Pathway
-                        </Badge>
-                        }
+          <div className="space-y-2">
+            {scenarios.map((scenario) => {
+              const ScenarioIcon = scenario.icon;
+              const isFav = favScenarioIds.includes(scenario.id);
+              const isReviewed = reviewedScenarioIds.includes(scenario.id);
+              const priorityColors = {
+                danger: "bg-red-50 border-red-200 hover:border-red-400",
+                warning: "bg-amber-50 border-amber-200 hover:border-amber-400",
+                secondary: "bg-blue-50 border-blue-200 hover:border-blue-400"
+              };
+              return (
+                <Card key={scenario.id} className={`${priorityColors[scenario.priority]} border-2 transition-all`}>
+                  <CardContent className="p-3">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow flex-shrink-0 cursor-pointer
+                        ${scenario.priority === "danger" ? "bg-red-200" : scenario.priority === "warning" ? "bg-amber-200" : "bg-blue-200"}`}
+                        onClick={() => { setSelectedScenario(scenario.id); setActiveTab("pathways"); }}>
+                        <ScenarioIcon className={`w-5 h-5 ${scenario.priority === "danger" ? "text-red-700" : scenario.priority === "warning" ? "text-amber-700" : "text-blue-700"}`} />
+                      </div>
+                      <div className="flex-1 min-w-0 cursor-pointer" onClick={() => { setSelectedScenario(scenario.id); setActiveTab("pathways"); }}>
+                        <h3 className="font-bold text-slate-900 text-sm leading-snug">{scenario.title}</h3>
+                        <p className="text-xs text-slate-600 mt-0.5 leading-relaxed line-clamp-2">{scenario.description}</p>
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          <Badge variant="outline" className="text-xs">{scenario.category}</Badge>
+                          {scenario.hasFullPathway && <Badge className="bg-green-100 text-green-700 text-xs border border-green-300">Full Pathway</Badge>}
+                          {isFav && <Badge className="bg-amber-100 text-amber-700 text-xs border border-amber-300">★ Saved</Badge>}
+                          {isReviewed && <Badge className="bg-green-100 text-green-700 text-xs border border-green-300">✓ Reviewed</Badge>}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1 flex-shrink-0">
+                        <button onClick={() => toggleFavScenario(scenario.id)} title={isFav ? "Unsave" : "Save"}
+                          className={`p-1.5 rounded-lg border text-xs transition-all ${isFav ? "bg-amber-100 border-amber-300 text-amber-600" : "bg-white border-slate-200 text-slate-300 hover:text-amber-400"}`}>
+                          <Star className="w-3.5 h-3.5" fill={isFav ? "currentColor" : "none"} />
+                        </button>
+                        <button onClick={() => toggleReviewedScenario(scenario.id)} title={isReviewed ? "Mark unreviewed" : "Mark reviewed"}
+                          className={`p-1.5 rounded-lg border text-xs transition-all ${isReviewed ? "bg-green-100 border-green-300 text-green-600" : "bg-white border-slate-200 text-slate-300 hover:text-green-400"}`}>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => { setSelectedScenario(scenario.id); setActiveTab("pathways"); }}
+                          className="p-1.5 rounded-lg border bg-white border-slate-200 text-slate-400 hover:text-blue-500 transition-all">
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <ChevronRight className="w-6 h-6 text-slate-400" /> {/* Increased icon size */}
-              </div>
-            </CardContent>
-          </Card>);
-
-        })}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
-          </div>
-    )}
-          </div>;
+        </div>
+      ))}
+    </div>
+  );
+};
 
 
   const renderNephroticSyndromePathway = () =>

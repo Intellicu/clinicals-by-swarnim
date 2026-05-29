@@ -9,6 +9,7 @@ import {
   Smartphone, BookOpenCheck, Activity
 } from "lucide-react";
 import ReferencesPanel from "./ReferencesPanel";
+import AlgorithmFlowchart from "./AlgorithmFlowchart";
 
 // ═══════════════════════════════════════════════════════════════
 // SHARED HELPERS
@@ -659,6 +660,10 @@ function DBQuickView({ guideline }) {
           <p className="text-sm text-blue-900 leading-relaxed">{guideline.scope_and_population}</p>
         </div>
       )}
+      {/* Algorithm flowchart — shown above key recommendations */}
+      {guideline.algorithm?.nodes?.length > 0 && (
+        <AlgorithmFlowchart algorithm={guideline.algorithm} />
+      )}
       {guideline.key_recommendations?.filter(r => r?.trim()).length > 0 && (
         <AccSection title="Management Steps" icon={Target} color="green" defaultOpen>
           <ol className="space-y-1.5">
@@ -785,6 +790,11 @@ function DBDetailedView({ guideline }) {
                 <p className="text-sm text-slate-800 leading-relaxed">{guideline.scope_and_population}</p>
               </CardContent>
             </Card>
+          )}
+
+          {/* Algorithm flowchart — above key recommendations */}
+          {guideline.algorithm?.nodes?.length > 0 && (
+            <AlgorithmFlowchart algorithm={guideline.algorithm} />
           )}
 
           {/* Key Recommendations — numbered quick-reference at top */}
