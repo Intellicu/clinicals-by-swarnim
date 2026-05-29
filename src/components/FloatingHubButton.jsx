@@ -53,7 +53,7 @@ export default function FloatingHubButton() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-20 lg:bottom-14 right-20 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        <div className="fixed bottom-36 lg:bottom-24 right-4 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-700 to-violet-700 px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -106,14 +106,14 @@ export default function FloatingHubButton() {
         </div>
       )}
 
-      {/* FAB button — positioned left of AI Assistant button */}
+      {/* FAB button — stacked above the AI Assistant button */}
       <button
         onClick={() => setOpen(v => !v)}
-        className={`fixed bottom-20 lg:bottom-6 right-20 z-50 flex items-center gap-2 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95 ${open ? "bg-slate-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
+        className={`fixed bottom-[88px] lg:bottom-[72px] right-4 z-50 flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95 ${open ? "bg-slate-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
         title="AI Analysers"
       >
-        {open ? <X className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-        <span className="hidden sm:inline">{open ? "Close" : "AI Tools"}</span>
+        {open ? <X className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
+        <span>{open ? "Close" : "AI Tools"}</span>
       </button>
     </>
   );

@@ -208,13 +208,13 @@ Always cite sources. Include formulas where relevant. Flag off-label use.${docCo
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-20 lg:bottom-6 right-4 z-50 flex flex-col gap-2 items-end">
+      <div className="fixed bottom-20 lg:bottom-6 right-4 z-50">
         <Button
           onClick={() => navigate('/AIAgentsHub')}
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-xl p-0 hover:scale-105 transition-transform"
+          className="w-12 h-12 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-xl p-0 hover:scale-105 transition-transform"
           title="AI Agents Hub"
         >
-          <Bot className="w-6 h-6 text-white" />
+          <Bot className="w-5 h-5 text-white" />
         </Button>
       </div>
     );
