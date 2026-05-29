@@ -14,7 +14,7 @@ import {
   ArrowLeft, Baby, Syringe, Scale, TrendingUp, MessageCircle, Apple,
   Brain, Activity, ChevronDown, ChevronUp, Plus, Trash2, Loader2,
   Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X, Star,
-  Info, BookOpen, TestTube, Microscope, Zap, Wind, Shield
+  Info, BookOpen, TestTube, Microscope, Zap, Wind, Shield, Dna
 } from "lucide-react";
 import { toast } from "sonner";
 import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
@@ -27,6 +27,7 @@ import EndocrineSection from "../components/pediatrics/EndocrineSection.jsx";
 import PedsReferenceSection from "../components/pediatrics/PedsReferenceSection.jsx";
 import PedsAIAnalysers from "../components/pediatrics/PedsAIAnalysers.jsx";
 import IAPScreeningTools from "../components/pediatrics/IAPScreeningTools.jsx";
+import DysmorphologyScreeningTool from "../components/tools/DysmorphologyScreeningTool.jsx";
 
 // ── Tab config ────────────────────────────────────────────────────────────────
 const TABS = [
@@ -38,6 +39,7 @@ const TABS = [
   { id: "nutrition", label: "Nutrition", icon: Apple, color: "bg-orange-600" },
   { id: "analysers", label: "AI Analysers", icon: Sparkles, color: "bg-violet-600", badge: "AI" },
   { id: "endocrine", label: "Endocrine", icon: Zap, color: "bg-amber-600" },
+  { id: "dysmorphology", label: "Dysmorphology", icon: Dna, color: "bg-indigo-700", badge: "NEW" },
   { id: "references", label: "References", icon: BookOpen, color: "bg-indigo-600" },
 ];
 
@@ -997,6 +999,20 @@ export default function GeneralPediatricsHub() {
               </div>
             </div>
             <EndocrineSection />
+          </div>
+        )}
+
+        {/* ── DYSMORPHOLOGY ── */}
+        {activeTab === "dysmorphology" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-indigo-700 rounded-xl shadow">
+              <Dna className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">Dysmorphology Screening Tool</p>
+                <p className="text-indigo-100 text-xs">Search syndromes by features · AI syndrome matcher · 12+ genetic syndromes</p>
+              </div>
+            </div>
+            <DysmorphologyScreeningTool />
           </div>
         )}
 

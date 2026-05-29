@@ -19,6 +19,7 @@ import {
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
+import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
 import StickyToolNav from "../components/StickyToolNav";
@@ -350,13 +351,14 @@ CliniCals by Swarnim | Verify all doses independently`;
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 mb-4 h-auto gap-1">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-4 h-auto gap-1">
             <TabsTrigger value="search" className="text-xs">🔍 Search</TabsTrigger>
             <TabsTrigger value="calculator" className="text-xs">💊 Dose Calc</TabsTrigger>
             <TabsTrigger value="interactions" className="text-xs">⚡ Interactions</TabsTrigger>
             <TabsTrigger value="prescription" className="text-xs">📋 Rx {rxDrugs.length > 0 && `(${rxDrugs.length})`}</TabsTrigger>
             <TabsTrigger value="steroids" className="text-xs">🔄 Steroids</TabsTrigger>
             <TabsTrigger value="eculizumab" className="text-xs">🛡️ Eculizumab</TabsTrigger>
+            <TabsTrigger value="plasmapheresis" className="text-xs">💉 Plasmapheresis</TabsTrigger>
             <TabsTrigger value="ckd-dosing" className="text-xs">🫘 CKD Dosing</TabsTrigger>
           </TabsList>
 
@@ -803,6 +805,11 @@ CliniCals by Swarnim | Verify all doses independently`;
           {/* ── ECULIZUMAB TAB ────────────────────────────── */}
           <TabsContent value="eculizumab">
             <EculizumabGuidance />
+          </TabsContent>
+
+          {/* ── PLASMAPHERESIS TAB ────────────────────────── */}
+          <TabsContent value="plasmapheresis">
+            <PlasmapheresisModule />
           </TabsContent>
 
           {/* ── CKD DOSING TAB ────────────────────────────── */}

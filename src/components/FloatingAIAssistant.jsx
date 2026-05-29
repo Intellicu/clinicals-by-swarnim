@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +35,7 @@ const SIZES = {
 };
 
 export default function FloatingAIAssistant() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -206,10 +208,15 @@ Always cite sources. Include formulas where relevant. Flag off-label use.${docCo
 
   if (!isOpen) {
     return (
-      <Button onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 lg:bottom-6 right-4 w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 shadow-xl z-50 p-0">
-        <Bot className="w-6 h-6 text-white" />
-      </Button>
+      <div className="fixed bottom-20 lg:bottom-6 right-4 z-50 flex flex-col gap-2 items-end">
+        <Button
+          onClick={() => navigate('/AIAgentsHub')}
+          className="w-14 h-14 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-xl p-0 hover:scale-105 transition-transform"
+          title="AI Agents Hub"
+        >
+          <Bot className="w-6 h-6 text-white" />
+        </Button>
+      </div>
     );
   }
 
