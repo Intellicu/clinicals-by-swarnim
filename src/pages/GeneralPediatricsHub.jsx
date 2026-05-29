@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -577,6 +577,11 @@ function NutritionGuidelineCard({ section, defaultOpen = false }) {
 export default function GeneralPediatricsHub() {
   const [activeTab, setActiveTab] = useState("pathways"); // Default tab
   const [search, setSearch] = useState("");
+
+  // Scroll to top on tab change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeTab]);
   const [showGenerator, setShowGenerator] = useState(false);
   const [editingPathway, setEditingPathway] = useState(null);
   const [addingNew, setAddingNew] = useState(false);

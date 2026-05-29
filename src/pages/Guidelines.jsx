@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -155,13 +155,19 @@ function GuidelineModal({ guideline, allGuidelines, onClose }) {
   const cat = CAT_COLORS[guideline.category] || "bg-slate-100 text-slate-700";
   const [activeTab, setActiveTab] = useState("content");
   const audit = auditGuideline(guideline);
+  const scrollRef = React.useRef(null);
+
+  // Scroll content to top when guideline changes
+  React.useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [guideline?.id]);
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-50 bg-black/50 flex items-start sm:items-center justify-center p-0 sm:p-4 pt-4 sm:pt-0"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full sm:max-w-2xl max-h-[93vh] sm:max-h-[88vh] bg-white rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+      <div className="w-full sm:max-w-2xl max-h-[95vh] sm:max-h-[90vh] bg-white rounded-2xl flex flex-col overflow-hidden shadow-2xl mt-auto sm:mt-0">
         {/* Header */}
         <div className="flex items-start gap-3 p-3.5 border-b border-slate-200 bg-white sticky top-0 z-10">
           <div className="flex-1 min-w-0">
@@ -199,7 +205,7 @@ function GuidelineModal({ guideline, allGuidelines, onClose }) {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto p-3" ref={scrollRef}>
           {activeTab === "content" && <GuidelineDetailView guideline={guideline} defaultMode="quick" />}
           {activeTab === "evidence" && (
             <div className="space-y-3 py-1">

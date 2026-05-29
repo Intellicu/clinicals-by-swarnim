@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ContextualActionsPanel from "@/components/clinicalOS/ContextualActionsPanel";
 import AIEnhancePanel from "@/components/clinicalOS/AIEnhancePanel";
 import AdminGovernanceQueue from "@/components/clinicalOS/AdminGovernanceQueue";
@@ -67,6 +67,11 @@ export default function GuidelineDetail() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [enhancing, setEnhancing] = useState(false);
   const [detailViewMode, setDetailViewMode] = useState("detailed"); // "quick" | "detailed"
+
+  // Scroll to top when page loads or view mode changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [guidelineId, detailViewMode]);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],

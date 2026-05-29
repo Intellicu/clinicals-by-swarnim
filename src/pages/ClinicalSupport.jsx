@@ -745,6 +745,11 @@ export default function ClinicalSupport() {
     if (scenario) setSelectedScenario(scenario);
   }, [location.search]);
 
+  // Scroll to top on tab change and scenario selection
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeTab, selectedScenario]);
+
   // Diagnostic AI state
   const [diagnosticStep, setDiagnosticStep] = useState(1);
   const [patientAge, setPatientAge] = useState("");
