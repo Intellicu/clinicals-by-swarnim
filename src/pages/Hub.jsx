@@ -237,6 +237,42 @@ const KNOWLEDGE_SECTIONS = [
 
 },
 {
+  title: "Pediatric Gastroenterology",
+  icon: Activity,
+  color: "border-orange-200 bg-orange-50",
+  iconColor: "text-orange-700",
+  items: [
+  { name: "Gastroenterology Hub (IAP)", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "GERD — Diagnosis & Management", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "IBD — Crohn's Disease", page: "GeneralPediatricsHub", icon: AlertCircle },
+  { name: "IBD — Ulcerative Colitis", page: "GeneralPediatricsHub", icon: AlertCircle },
+  { name: "Coeliac Disease (IAP criteria)", page: "GeneralPediatricsHub", icon: Beaker },
+  { name: "Acute Diarrhoea & ORS", page: "GeneralPediatricsHub", icon: Droplet },
+  { name: "Neonatal Cholestasis / Alagille", page: "GeneralPediatricsHub", icon: Baby },
+  { name: "Neonatal Enterocolitis (NEC)", page: "GeneralPediatricsHub", icon: Baby },
+  { name: "GI Bleed Approach", page: "GeneralPediatricsHub", icon: AlertCircle },
+  { name: "Liver Disease — Paediatric", page: "GeneralPediatricsHub", icon: Activity }]
+
+},
+{
+  title: "Pediatric Haematology",
+  icon: FlaskConical,
+  color: "border-red-200 bg-red-50",
+  iconColor: "text-red-700",
+  items: [
+  { name: "Haematology Hub (IAP)", page: "GeneralPediatricsHub", icon: FlaskConical },
+  { name: "Iron Deficiency Anaemia (IDA)", page: "GeneralPediatricsHub", icon: Droplet },
+  { name: "Thalassaemia — Diagnosis & Tx", page: "GeneralPediatricsHub", icon: Beaker },
+  { name: "ITP — Immune Thrombocytopenia", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "Haemophilia A & B", page: "GeneralPediatricsHub", icon: AlertCircle },
+  { name: "Sickle Cell Disease (SCD)", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "HLH — Haemophagocytic Syndrome", page: "GeneralPediatricsHub", icon: AlertCircle },
+  { name: "CBC Interpretation Guide", page: "ClinicalAIHub", icon: Microscope },
+  { name: "Bone Marrow Failure (AA)", page: "GeneralPediatricsHub", icon: Zap },
+  { name: "Transfusion Medicine Basics", page: "GeneralPediatricsHub", icon: Droplet }]
+
+},
+{
   title: "Research Platform",
   icon: Layers,
   color: "border-teal-200 bg-teal-50",

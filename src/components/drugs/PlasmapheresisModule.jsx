@@ -7,12 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Calculator, Droplets, Activity } from "lucide-react";
 
-// Based on AJKD 2023 Core Curriculum + Bagga ISPN 2019 HUS Guidelines
+// Based on AJKD 2023 Core Curriculum + ASFA 8th Edition 2019
 
 const INDICATIONS = [
   { disease: "TTP (TMA, TTP)", category: "I", grade: "1A", freq: "Daily", fluid: "Frozen plasma", duration: "Until platelets >150×10³/μL + LDH normal ×2-3 days" },
   { disease: "Anti-GBM Disease (Goodpasture)", category: "I", grade: "1B/1C", freq: "Daily", fluid: "Albumin (FFP if DAH)", duration: "10–20 days until organ injury resolves" },
-  { disease: "aHUS — Anti-FH antibody", category: "I", grade: "2C", freq: "Daily until remission, taper 4–6w", fluid: "Frozen plasma 60–75 mL/kg", duration: "5–7 sessions, taper (see Bagga protocol)" },
+  { disease: "aHUS — Anti-FH antibody", category: "I", grade: "2C", freq: "Daily until remission, taper 4–6w", fluid: "Frozen plasma 60–75 mL/kg", duration: "5–7 sessions, then taper per clinical response" },
   { disease: "CAPS (Catastrophic APS)", category: "I", grade: "2C", freq: "Daily/alternate days", fluid: "Frozen plasma/albumin", duration: "3–5 sessions minimum" },
   { disease: "Guillain-Barré Syndrome", category: "I", grade: "1A", freq: "Daily/alternate", fluid: "Albumin", duration: "5 sessions" },
   { disease: "FSGS post-transplant recurrence", category: "I", grade: "1B", freq: "Daily × 3, then 6 in 2 weeks", fluid: "Albumin", duration: "Per response" },
@@ -199,15 +199,15 @@ export default function PlasmapheresisModule() {
             <Droplets className="w-9 h-9 opacity-90" />
             <div>
               <h2 className="font-bold text-lg">Plasmapheresis / TPE Module</h2>
-              <p className="text-teal-100 text-sm">Therapeutic Plasma Exchange — ASFA 2019 · AJKD Core Curriculum 2023 · Bagga/ISPN 2019</p>
+              <p className="text-teal-100 text-sm">Therapeutic Plasma Exchange — ASFA 2019 · AJKD Core Curriculum 2023</p>
             </div>
           </div>
           <div className="flex gap-2 flex-wrap mt-3">
             <Badge className="bg-white/20 text-xs">EPV Calculator</Badge>
-            <Badge className="bg-white/20 text-xs">ASFA Indications</Badge>
-            <Badge className="bg-white/20 text-xs">aHUS/Anti-FH Protocol</Badge>
-            <Badge className="bg-white/20 text-xs">TTP Protocol</Badge>
-            <Badge className="bg-white/20 text-xs">Anti-GBM Protocol</Badge>
+            <Badge className="bg-white/20 text-xs">ASFA Category I/II Indications</Badge>
+            <Badge className="bg-white/20 text-xs">Replacement Fluid Guide</Badge>
+            <Badge className="bg-white/20 text-xs">Anticoagulation</Badge>
+            <Badge className="bg-white/20 text-xs">Complications</Badge>
           </div>
         </CardContent>
       </Card>
@@ -284,7 +284,7 @@ export default function PlasmapheresisModule() {
       <Alert className="bg-blue-50 border-blue-200">
         <AlertTriangle className="w-4 h-4 text-blue-600" />
         <AlertDescription className="text-xs text-blue-800">
-          <strong>References:</strong> Padmanabhan A et al. ASFA 8th Special Issue, J Clin Apher 2019 | Cervantes CE et al. AJKD Core Curriculum 81(4):475-492, 2023 | Szczepiorkowski ZM & Winters JL. Transfusion 2019. For informational/educational use only. Always verify with current institutional protocols.
+          <strong>References:</strong> Padmanabhan A et al. ASFA 8th Special Issue, J Clin Apher 2019 | Cervantes CE et al. AJKD Core Curriculum 81(4):475-492, 2023 | Szczepiorkowski ZM & Winters JL. Transfusion 2019 | Schwartz J et al. J Clin Apher 2023. For educational use only. Verify doses and protocols with current institutional guidelines.
         </AlertDescription>
       </Alert>
     </div>
