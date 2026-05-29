@@ -5,7 +5,7 @@ import { Home, Sparkles, Pill, Bot, FlaskConical, BookOpen, Dna, Droplet, Baby }
 
 const NAV_ITEMS = [
   { label: "Hub", icon: Home, page: "Hub", activeCheck: ["/Hub", "/"] },
-  { label: "Guidelines", icon: BookOpen, page: "GuidelinesLibrary", activeCheck: ["/GuidelinesLibrary", "/Guidelines"] },
+  { label: "Guidelines", icon: BookOpen, page: "Guidelines", activeCheck: ["/GuidelinesLibrary", "/Guidelines"] },
   { label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", activeCheck: ["/DrugsDosing", "/DrugCalculator"] },
   { label: "Nephrology & Urology", icon: Droplet, page: "UrologyNephrologyHub", activeCheck: ["/ClinicalSupport", "/UrologyNephrologyHub"] },
   { label: "Rare Disease", icon: Dna, page: "RareDiseaseModule", activeCheck: ["/RareDiseaseModule"] },
