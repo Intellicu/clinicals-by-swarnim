@@ -319,7 +319,7 @@ export default function Guidelines() {
   const queryClient = useQueryClient();
   const { data: dbGuidelines = [], isLoading } = useQuery({
     queryKey: ["guidelines"],
-    queryFn: () => base44.entities.Guideline.list("-year", 200),
+    queryFn: () => base44.entities.Guideline.list("-year", 1000),
     initialData: [],
   });
 
