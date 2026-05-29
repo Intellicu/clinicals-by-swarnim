@@ -68,22 +68,36 @@ export default function AdminPathwayGenerator({ onCreated, specialty = '' }) {
     const typeLabel = CONTENT_TYPES.find(t => t.value === form.content_type)?.label || 'content';
     try {
       const prompt = form.ai_mode === 'upload' && uploadedUrl
-        ? `Extract and structure the clinical content from the attached document into a well-formatted ${typeLabel} for: "${topic}". ${specialty ? `Context: ${specialty} pediatric practice.` : ''} ${form.additional_context}
+        ? `You are a senior pediatric nephrologist creating a comprehensive clinical reference document.
+          Extract and structure ALL clinical content from the attached document into a detailed ${typeLabel} for: "${topic}".
+          ${specialty ? `Context: ${specialty} pediatric practice.` : ''}
+          ${form.additional_context}
           
-          Structure the output as JSON with these fields:
-          - title: string
-          - summary: string (2-3 sentence overview)
-          - sections: array of { heading: string, content: string, key_points: string[] }
-          - clinical_pearls: string[]
-          - references_note: string`
-        : `Generate a comprehensive, evidence-based ${typeLabel} for: "${topic}". ${specialty ? `Context: Indian ${specialty} pediatric practice.` : 'Context: Indian pediatric nephrology practice.'} ${form.additional_context}
+          Be COMPREHENSIVE and DETAILED — include ALL dosing, monitoring protocols, definitions, decision points.
+          Structure the output as JSON:
+          - title: string (descriptive title)
+          - summary: string (3-5 sentence clinical overview with key facts)
+          - sections: array of { heading: string, content: string (detailed paragraph), key_points: string[] (at least 5-8 bullet points each) }
+          - clinical_pearls: string[] (at least 8-10 practical tips)
+          - references_note: string (list key guidelines with year)`
+        : `You are a senior pediatric nephrologist. Generate a COMPREHENSIVE, detailed, evidence-based ${typeLabel} for: "${topic}".
+          ${specialty ? `Context: Indian ${specialty} pediatric practice.` : 'Context: Indian pediatric nephrology practice.'}
+          ${form.additional_context}
           
-          Include current evidence, Indian-specific considerations, and practical clinical guidance.
-          Structure as JSON with:
+          IMPORTANT: Be thorough and detailed. Include:
+          - Exact drug doses (mg/kg or mg/m²), max doses, frequency, duration
+          - Monitoring protocols (what to check, how often)
+          - Definition criteria
+          - Decision algorithms (when to escalate, when to change treatment)
+          - Indian-specific considerations (cost, availability, TB screening, local guidelines)
+          - Side effects and their management
+          - Current evidence (cite key trials and guideline years)
+          
+          Structure as JSON — make each section DETAILED (not just superficial headings):
           - title: string
-          - summary: string (2-3 sentence overview)  
-          - sections: array of { heading: string, content: string, key_points: string[] }
-          - clinical_pearls: string[]
+          - summary: string (4-6 sentences with key clinical facts and guideline basis)
+          - sections: array of { heading: string, content: string (detailed 3-6 sentence paragraph with clinical specifics), key_points: string[] (6-10 specific, actionable bullet points with doses/thresholds) }
+          - clinical_pearls: string[] (10-12 practical tips, Indian context, common pitfalls)
           - references_note: string`;
 
       const result = await base44.integrations.Core.InvokeLLM({
@@ -122,21 +136,21 @@ export default function AdminPathwayGenerator({ onCreated, specialty = '' }) {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (publish = false) => {
     setSaving(true);
     try {
       await base44.entities.CustomSection.create({
         title: preview.title || form.title,
         name: preview.title || form.title,
         section_type: form.content_type,
-        status: 'draft',
+        status: publish ? 'published' : 'draft',
         created_by_admin: true,
         generation_topic: form.topic,
         source_document_url: uploadedUrl,
         content: preview,
         specialty_id: specialty || undefined,
       });
-      toast.success('Section saved as draft — review in Admin Content Manager');
+      toast.success(publish ? '✅ Pathway published and added to library!' : 'Saved as draft — review in Admin Content Manager');
       if (onCreated) onCreated();
       setOpen(false);
       setStep('form');
@@ -313,18 +327,28 @@ export default function AdminPathwayGenerator({ onCreated, specialty = '' }) {
                 )}
               </div>
 
-              <div className="flex gap-2 justify-end pt-2 border-t">
+              <div className="flex gap-2 justify-end pt-2 border-t flex-wrap">
                 <Button variant="outline" size="sm" onClick={() => setStep('form')}>
                   <Edit3 className="w-3 h-3 mr-1" /> Regenerate
                 </Button>
                 <Button
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={handleSave}
+                  variant="outline"
+                  className="border-slate-400 text-slate-700"
+                  onClick={() => handleSave(false)}
                   disabled={saving}
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
-                  {saving ? 'Saving...' : 'Save as Draft'}
+                  Save as Draft
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => handleSave(true)}
+                  disabled={saving}
+                >
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
+                  {saving ? 'Publishing...' : 'Approve & Publish'}
                 </Button>
               </div>
             </div>

@@ -56,37 +56,43 @@ const DecisionNode = ({ question, yes, no }) =>
 const DEFAULT_CONDITIONS = [
 {
   id: "mcd",
-  name: "Minimal Change Disease (MCD)",
-  variants: ["Idiopathic MCD", "Secondary MCD (NSAID, malignancy)"],
-  guideline: "KDIGO 2021 Glomerular Diseases",
+  name: "Minimal Change Disease / NS — Childhood (ISPN 2022)",
+  variants: ["Steroid-Sensitive NS (SSNS)", "FRNS", "SDNS", "SRNS", "Secondary MCD (NSAID, lymphoma)"],
+  guideline: "ISPN 2022 + IPNA 2021 + IAP India Guidelines",
   urgency: "high",
-  tags: ["KDIGO", "Steroid-Sensitive", "Nephrotic"],
+  tags: ["ISPN 2022", "IPNA", "IAP", "Steroid-Sensitive", "Nephrotic", "BSA-based"],
   category: "Nephrotic",
-  pathology: "Light microscopy normal; EM shows diffuse podocyte foot process effacement (>75%)",
-  genetics: "Usually not genetic; rare: PODXL, CD2AP variants",
+  pathology: "Light microscopy normal (or mild mesangial hypercellularity); EM shows diffuse podocyte foot process effacement (>75%). Podocytopathy — not a fixed structural lesion.",
+  genetics: "Usually not genetic in typical childhood NS. Rare: PODXL, CD2AP, PLCE1 variants in atypical/SRNS cases.",
   flowchart: [
-  "Confirm Nephrotic Syndrome: edema + proteinuria >3.5g/day + albumin <3g/dL",
-  "Rule out secondary causes: NSAID, lithium, lymphoma (Hodgkin's especially)",
-  "Biopsy: usually not required in children (first episode) — empirical steroids",
-  "Prednisone 60 mg/m² or 2 mg/kg/day (max 60 mg) × 4-6 weeks → taper",
-  "Complete remission in >90% children within 4-6 weeks"],
+  "Confirm Nephrotic Syndrome: edema + UPCR ≥2 mg/mg (or 24h protein >40 mg/m²/h) + albumin <2.5 g/dL",
+  "ISPN: empirical steroids without biopsy if typical first episode (age 1-12y, no atypical features)",
+  "MANDATORY before steroids: TB screen (Mantoux/IGRA) + varicella serology + HBsAg — India",
+  "Prednisolone 60 mg/m²/day (max 60 mg) × 6 weeks DAILY, then 40 mg/m²/alt-day × 6 weeks, then taper",
+  "ISPN key change vs ISKDC: 6+6 weeks (BSA-based) vs 4+4 weeks (weight-based) — ↓ relapse rate",
+  "Assess response at week 4: remission = 3 consecutive negative dipsticks"],
 
   decisionNodes: [
-  { q: "Steroid-sensitive (remission <4wks)?", yes: "Taper steroids, monitor for relapse", no: "Biopsy + consider CNI (Tacrolimus/CSA)" },
-  { q: "Frequently relapsing (≥2 relapses/6mo)?", yes: "Steroid-sparing: MMF, Levamisole, CNI, Rituximab", no: "Treat each relapse with steroids" }],
+  { q: "Remission by week 4-6 of daily prednisolone?", yes: "SSNS: proceed to consolidation (alt-day) + taper. 85-90% of children.", no: "SRNS: biopsy mandatory. Genetic panel. Consider CNI (Tacrolimus/CSA)." },
+  { q: "Frequently relapsing (FRNS: ≥2 relapses/6mo) OR Steroid-dependent (SDNS)?", yes: "Steroid-sparing: ISPN first-line = Levamisole 2.5 mg/kg alt-day. MMF/CNI/RTX for severe cases.", no: "IRNS: treat each relapse with standard course. No steroid-sparing needed." }],
 
   keyPoints: [
-  "Children: empirical steroids without biopsy (first episode)",
-  "Adults: biopsy recommended before treatment",
-  "Standard steroids: Prednisolone 60 mg/m² for 4-6 weeks, then taper over 4-6 weeks",
-  "Steroid-sensitive NS responds in >90% children — excellent prognosis",
-  "Frequently relapsing: cyclophosphamide (2 mg/kg × 8-12 wks) induces sustained remission",
-  "Rituximab: highly effective for steroid-dependent/frequently relapsing (anti-B-cell)",
-  "MMF: useful steroid-sparing agent for mild frequently-relapsing",
-  "Levamisole 2.5 mg/kg alternate days: cheap, effective immunomodulator (IAP endorsed)",
-  "Vaccinations: pneumococcal, varicella BEFORE immunosuppression"],
+  "ISPN 2022: 60 mg/m²/day × 6 weeks + 40 mg/m²/alt-day × 6 weeks (LONGER than ISKDC — ↓ relapse)",
+  "BSA-based dosing (ISPN) preferred over weight-based (ISKDC) — more accurate",
+  "TB screen (Mantoux + IGRA) MANDATORY before steroids in India — disseminated TB risk",
+  "Varicella serology + pneumococcal vaccination before immunosuppression",
+  "FRNS/SDNS — ISPN India 1st-line steroid-sparing: Levamisole 2.5 mg/kg alt-day × 12-24 months",
+  "MMF (mycophenolate mofetil) 300-600 mg/m²/dose BID — 2nd line for FRNS/SDNS",
+  "CNI (Tacrolimus 0.1-0.15 mg/kg/day or Cyclosporine 3-5 mg/kg/day) — SDNS/SRNS",
+  "Rituximab 375 mg/m²/dose IV — for CNI-dependent SDNS; 60-70% steroid-free remission",
+  "SRNS: genetic panel (NPHS1, NPHS2, WT1, ACTN4, TRPC6) + kidney biopsy mandatory",
+  "Cyclophosphamide 2-3 mg/kg/day × 8-12 weeks: single course for FRNS with steroid toxicity (cumulative limit 168-200 mg/kg)",
+  "Nutritional support + calcium/Vit D + growth monitoring — mandatory for all on chronic steroids"],
 
-  refs: [{ title: "KDIGO 2021 Glomerular Disease Guideline", url: "https://kdigo.org/guidelines/gd/" }]
+  refs: [
+  { title: "ISPN 2022 Pediatric Nephrotic Syndrome Guidelines", url: "https://ispneph.com/" },
+  { title: "IPNA Clinical Practice Recommendations 2021", url: "https://www.ipna.info/" },
+  { title: "IAP India NS Guidelines", url: "https://iapindia.org/" }]
 },
 {
   id: "fsgs",
@@ -732,6 +738,7 @@ export default function GlomerularDiseasesPathway() {
         { id: "monitoring", label: "📊 Monitoring" },
         { id: "evidence", label: "📡 Evidence" },
         { id: "steroids", label: "⚗️ Steroids" },
+        { id: "sparing", label: "💊 Sparing Drugs" },
         { id: "decision", label: "🧠 Decision" },
         { id: "ns-detail", label: "🩺 NS Protocol" }].
         map((t) =>
@@ -747,6 +754,7 @@ export default function GlomerularDiseasesPathway() {
       {mainTab === "monitoring" && <GNMonitoring />}
       {mainTab === "evidence" && <GNEvidence isAdmin={isAdmin} />}
       {mainTab === "steroids" && <SteroidEquivalentEngine />}
+      {mainTab === "sparing" && <NephroticSyndromePathwayDetail defaultTab="sparing" />}
       {mainTab === "decision" && <GlomerularDecisionEngine />}
       {mainTab === "ns-detail" && <NephroticSyndromePathwayDetail />}
 
