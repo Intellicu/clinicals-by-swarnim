@@ -14,8 +14,8 @@ import {
   ArrowLeft, Baby, Syringe, Scale, TrendingUp, MessageCircle, Apple,
   Brain, Activity, ChevronDown, ChevronUp, Plus, Trash2, Loader2,
   Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X, Star,
-  Info, BookOpen, TestTube, Microscope, Zap, Wind, Shield, Dna
-} from "lucide-react";
+  Info, BookOpen, TestTube, Microscope, Zap, Wind, Shield, Dna } from
+"lucide-react";
 import { toast } from "sonner";
 import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
 import PediatricNutritionPathway from "../components/pathways/PediatricNutritionPathway.jsx";
@@ -31,202 +31,202 @@ import DysmorphologyScreeningTool from "../components/tools/DysmorphologyScreeni
 
 // ── Tab config ────────────────────────────────────────────────────────────────
 const TABS = [
-  { id: "pathways", label: "Pathways", icon: Brain, color: "bg-teal-600" },
-  { id: "screening", label: "Screening", icon: Search, color: "bg-green-700", badge: "IAP" },
-  { id: "assistant", label: "AI Assistant", icon: MessageCircle, color: "bg-green-600", badge: "AI" },
-  { id: "vaccination", label: "Vaccines", icon: Syringe, color: "bg-blue-600" },
-  { id: "dev", label: "Development", icon: Baby, color: "bg-cyan-600", badge: "DQ" },
-  { id: "nutrition", label: "Nutrition", icon: Apple, color: "bg-orange-600" },
-  { id: "analysers", label: "AI Analysers", icon: Sparkles, color: "bg-violet-600", badge: "AI" },
-  { id: "endocrine", label: "Endocrine", icon: Zap, color: "bg-amber-600" },
-  { id: "dysmorphology", label: "Dysmorphology", icon: Dna, color: "bg-indigo-700", badge: "NEW" },
-  { id: "references", label: "References", icon: BookOpen, color: "bg-indigo-600" },
-];
+{ id: "pathways", label: "Pathways", icon: Brain, color: "bg-teal-600" },
+{ id: "screening", label: "Screening", icon: Search, color: "bg-green-700", badge: "IAP" },
+{ id: "assistant", label: "AI Assistant", icon: MessageCircle, color: "bg-green-600", badge: "AI" },
+{ id: "vaccination", label: "Vaccines", icon: Syringe, color: "bg-blue-600" },
+{ id: "dev", label: "Development", icon: Baby, color: "bg-cyan-600", badge: "DQ" },
+{ id: "nutrition", label: "Nutrition", icon: Apple, color: "bg-orange-600" },
+{ id: "analysers", label: "AI Analysers", icon: Sparkles, color: "bg-violet-600", badge: "AI" },
+{ id: "endocrine", label: "Endocrine", icon: Zap, color: "bg-amber-600" },
+{ id: "dysmorphology", label: "Dysmorphology", icon: Dna, color: "bg-indigo-700", badge: "NEW" },
+{ id: "references", label: "References", icon: BookOpen, color: "bg-indigo-600" }];
+
 
 // ── Built-in clinical pathways ──────────────────────────────────────────────
 const INITIAL_PATHWAYS = [
-  {
-    id: "sam",
-    name: "SAM Management",
-    full: "Severe Acute Malnutrition (SAM) — WHO/IAP Protocol",
-    color: "amber",
-    badge: "Nutrition Emergency",
-    overview: "SAM in children <5 years: weight-for-height Z-score <-3SD or MUAC <11.5 cm or bilateral pitting oedema. Affects ~14 million children in India. Leading cause of under-5 mortality. Facility-based management (F-MAS) for complicated SAM; community-based CMAM with RUTF for uncomplicated.",
-    criteria: [
-      "MUAC <11.5 cm (severe), 11.5–12.5 cm (moderate)",
-      "Weight-for-height Z-score (WHZ) < -3 SD (severe)",
-      "Bilateral pitting oedema (any degree = SAM regardless of weight)",
-      "Kwashiorkor: oedema + skin changes + hair changes",
-      "Marasmus: severe wasting, wizened appearance, preserves mentation",
-      "Marasmic-kwashiorkor: mixed form — worst prognosis",
-    ],
-    danger_signs: [
-      "Shock: cold extremities, weak/absent radial pulse, drowsy/unconscious",
-      "Severe respiratory distress",
-      "Lower respiratory tract infection",
-      "Severe dehydration (estimate: child with diarrhoea only)",
-      "Severe anaemia (Hb <4 g/dL or 4-6 with respiratory distress)",
-      "Hypoglycaemia (blood glucose <3 mmol/L or 54 mg/dL)",
-      "Hypothermia (axillary temp <35.5°C or rectal <36°C)",
-      "Visual changes (xerophthalmia, corneal ulcer) → Vitamin A deficiency",
-    ],
-    management: [
-      "PHASE 1 (Stabilisation): F-75 formula (75 kcal/100mL); NO F-100 in early phase",
-      "F-75 ml = 130 mL/kg/day for oedema; 100 mL/kg/day for marasmus",
-      "Glucose 10% IV (5mL/kg) if hypoglycaemic AND unconscious",
-      "Hypothermia: skin-to-skin, warm room, hat, no IV fluids unless shocked",
-      "SHOCK: ReSoMal or half-normal saline + 5% glucose: 15 mL/kg over 1h; reassess",
-      "ANTIBIOTICS: ALL SAM → amoxicillin (uncomplicated) OR ampicillin + gentamicin (complicated)",
-      "TRANSITION (Day 2-7): Switch to F-100 when: oedema reducing, eating, no infection",
-      "REHABILITATION (Phase 2): F-100 or RUTF; 150-220 kcal/kg/day; weekly weight gain >10-15 g/kg/day",
-      "RUTF (Plumpy'Nut): 200 kcal/sachet; 200 kcal/kg/day; do NOT mix with water",
-      "Micronutrients: Vitamin A D3 E K, zinc, folate, Fe (ONLY in rehabilitation phase)",
-      "Iron: start ONLY when weight gaining; premature iron worsens oxidative stress",
-      "DISCHARGE: WHZ > -2 SD; MUAC > 12.5 cm; no oedema; eating well",
-    ],
-    monitoring: [
-      "Weight DAILY (morning, naked, same time)",
-      "Blood glucose: every 30 min if hypoglycaemic until stable",
-      "Temperature: every 6 hours",
-      "Pulse rate + respiratory rate: every 30 min if shocked",
-      "Fluid balance: input/output charting",
-      "Oedema grading: + (foot/ankle), ++ (lower limb+), +++ (generalised)",
-      "Weekly: height/length, MUAC, appetite test (RUTF)",
-    ],
-    references: ["WHO SAM Protocol 2013", "IAP SAM Guidelines 2023", "NIN India 2020"],
-  },
-  {
-    id: "autism",
-    name: "Autism Screening (M-CHAT)",
-    full: "Autism Spectrum Disorder (ASD) — Screening & Early Intervention Pathway",
-    color: "violet",
-    badge: "Neurodevelopmental",
-    overview: "ASD prevalence: ~1 in 100 children globally; 1 in 66 in India (INCLEN 2017). Early detection (before age 2-3) and intensive early intervention dramatically improves outcomes. Universal screening at 18 and 24 months is recommended.",
-    criteria: [
-      "Core features: persistent deficits in social communication + interaction",
-      "Restricted/repetitive behaviours, interests, or activities (RRBs)",
-      "DSM-5 specifiers: with/without intellectual impairment, language impairment",
-      "ASD levels 1-3: Level 1 (requiring support) → Level 3 (very substantial support)",
-      "Screening: M-CHAT-R/F at 16, 18, 24 months all children",
-    ],
-    danger_signs: [
-      "No back-and-forth sharing of sounds/smiles/facial expressions by 9 months",
-      "No babbling by 12 months",
-      "No pointing/showing/reaching/waving by 12 months",
-      "No words by 16 months",
-      "No meaningful 2-word phrases (not echolalia) by 24 months",
-      "Any loss of speech or social skills at any age",
-      "No response to own name by 12 months",
-    ],
-    management: [
-      "M-CHAT-R/F scoring: 0-2 low risk; 3-7 medium risk (follow-up interview); 8+ high risk (refer immediately)",
-      "ADOS-2: Gold standard diagnostic tool (specialist referral)",
-      "AIIMS ISAA: Indian Scale for Assessment of Autism — validated for Indian context",
-      "EARLY INTERVENTION (<3 years): ABA, Early Intensive Behavioural Intervention (EIBI)",
-      "Speech and Language Therapy: begin as early as diagnosis",
-      "Occupational Therapy: sensory processing, ADL skills",
-      "INDIA RESOURCES: National Trust, ASHA workers, Anganwadi referral",
-      "CO-MORBIDITIES: ADHD (50-70%), epilepsy (25-30%), sleep disorders",
-      "MEDICATIONS: risperidone/aripiprazole for irritability (ONLY if needed); melatonin for sleep",
-    ],
-    monitoring: [
-      "M-CHAT-R/F: 16, 18, 24 months routine; 30 months if any concern",
-      "CARS-2 annually: track severity",
-      "Adaptive behaviour: Vineland Adaptive Behaviour Scales — baseline and annually",
-      "Language assessment: annually by speech therapist",
-      "Epilepsy: EEG if any suspicion of seizures",
-      "GI symptoms (50% ASD): dietary history, constipation/diarrhoea diary",
-    ],
-    references: ["DSM-5 ASD Criteria 2013", "IAP Autism Guidelines 2022", "INCLEN India ASD 2017"],
-  },
-  {
-    id: "fever",
-    name: "Fever Management",
-    full: "Approach to Fever in Children — IAP/WHO Protocol",
-    color: "rose",
-    badge: "Common Emergency",
-    overview: "Fever (temp >38°C axillary) is the most common pediatric complaint. Key is to identify the source, rule out serious bacterial infection (SBI), and manage appropriately. Avoid antibiotics unless clear bacterial source. Fever itself is not harmful; manage discomfort.",
-    criteria: [
-      "Fever >38°C axillary, >38.5°C rectal",
-      "Neonates <28 days: any fever = admit and full sepsis workup",
-      "Infants 28-90 days: low-threshold sepsis screen",
-      "Age-appropriate: assess for source (URTI, UTI, LRTI, gastroenteritis)",
-      "Fever >5 days: consider Kawasaki, typhoid, JIA, occult bacteraemia",
-      "Fever + petechiae: meningococcaemia until proven otherwise",
-    ],
-    danger_signs: [
-      "Infant <3 months with fever ≥38°C",
-      "Fever >5 days without source",
-      "Fever + rash (especially non-blanching/petechiae)",
-      "Lethargy, poor perfusion, CRT >3s",
-      "Severe headache + neck stiffness (meningitis)",
-      "Respiratory distress with fever",
-      "Febrile seizure — first episode or prolonged (>5 min)",
-    ],
-    management: [
-      "Antipyretics: Paracetamol 15 mg/kg/dose q4-6h (max 5 doses/24h) OR Ibuprofen 10 mg/kg/dose q6-8h (>3 months)",
-      "Do NOT combine routinely; can alternate if inadequate response",
-      "Avoid aspirin in viral illness (Reye syndrome risk)",
-      "Hydration: encourage oral fluids; tepid sponging for comfort",
-      "Febrile seizure: airway, position, lorazepam 0.05-0.1 mg/kg IV if >5 min",
-      "Antibiotics ONLY if: SBI confirmed, severely unwell, infant <3 months",
-      "UTI: confirm with urine culture; treat with appropriate antibiotic",
-      "Malaria endemic area: malaria RDT/smear if fever >3 days",
-    ],
-    monitoring: [
-      "Temperature every 4-6 hours",
-      "Hydration status (urine output, fontanelle, skin turgor)",
-      "Rash surveillance — check at each visit",
-      "Response to antipyretics",
-      "Daily clinical review if fever persists >48h without source",
-      "CBC, CRP, blood culture if high risk or not responding",
-    ],
-    references: ["WHO IMCI 2024", "IAP Fever Guidelines 2022", "AAP Fever Guidelines 2021"],
-  },
-  {
-    id: "diarrhoea",
-    name: "Acute Diarrhoea & ORS",
-    full: "Acute Diarrhoea & Dehydration Management — WHO/IAPSMCON",
-    color: "blue",
-    badge: "GI Emergency",
-    overview: "Diarrhoea: ≥3 loose/watery stools in 24h. Leading cause of under-5 mortality globally. Dehydration is the main killer. Oral rehydration therapy (ORT) is the cornerstone of management. Antibiotics are rarely needed. Zinc supplementation reduces duration and severity.",
-    criteria: [
-      "Acute: <14 days; Persistent: 14-30 days; Chronic: >30 days",
-      "Dehydration: No (0%) → Some (1-9%) → Severe (≥10%)",
-      "Some dehydration: sunken eyes, dry mouth, restless, thirsty, CRT 2-3s",
-      "Severe dehydration: very sunken eyes, no tears, lethargic, unable to drink",
-      "Bloody diarrhoea (dysentery): Shigella most common → treat with antibiotics",
-      "Cholera suspected: profuse rice-water stools, adults, IV fluids urgently",
-    ],
-    danger_signs: [
-      "Severe dehydration: lethargic, sunken fontanelle, no urine >8h",
-      "Unable to drink or keep fluids down",
-      "Fever >39°C with diarrhoea in infant <3 months",
-      "Bloody diarrhoea + high fever",
-      "Marked abdominal distension",
-      "Seizures with diarrhoea (hyponatraemia/hypernatraemia)",
-    ],
-    management: [
-      "ORS Plan A (No dehydration): 50-100 mL ORS after each loose stool; continue breastfeeding",
-      "ORS Plan B (Some dehydration): 75 mL/kg ORS over 4 hours; reassess",
-      "IV Plan C (Severe): Ringer's lactate 100 mL/kg: 30 mL/kg over 30min (infant) or 1h, then 70 mL/kg over 2.5h",
-      "WHO ORS: Na 75, Cl 65, K 20, citrate 10, glucose 75 mEq/L, osmolarity 245",
-      "Zinc: 10 mg/day (<6m) or 20 mg/day (≥6m) for 14 days — reduces duration by 25%",
-      "Feed: continue breastfeeding; do NOT restrict food; BRAT diet NOT recommended",
-      "Antibiotics: ONLY for dysentery (azithromycin 12 mg/kg/day × 3d) or cholera",
-      "Ondansetron: 0.15 mg/kg (max 4mg) if vomiting prevents ORS",
-    ],
-    monitoring: [
-      "Hydration assessment every 1-2h during ORT",
-      "Stool frequency and character",
-      "Urine output (target >1 mL/kg/hr)",
-      "Weight before and after ORT",
-      "Electrolytes: Na, K if severe or prolonged",
-      "Blood glucose if altered consciousness",
-    ],
-    references: ["WHO IMCI 2024", "IAPSMCON Diarrhoea Guidelines 2020", "AAP Diarrhoea 2022"],
-  },
-];
+{
+  id: "sam",
+  name: "SAM Management",
+  full: "Severe Acute Malnutrition (SAM) — WHO/IAP Protocol",
+  color: "amber",
+  badge: "Nutrition Emergency",
+  overview: "SAM in children <5 years: weight-for-height Z-score <-3SD or MUAC <11.5 cm or bilateral pitting oedema. Affects ~14 million children in India. Leading cause of under-5 mortality. Facility-based management (F-MAS) for complicated SAM; community-based CMAM with RUTF for uncomplicated.",
+  criteria: [
+  "MUAC <11.5 cm (severe), 11.5–12.5 cm (moderate)",
+  "Weight-for-height Z-score (WHZ) < -3 SD (severe)",
+  "Bilateral pitting oedema (any degree = SAM regardless of weight)",
+  "Kwashiorkor: oedema + skin changes + hair changes",
+  "Marasmus: severe wasting, wizened appearance, preserves mentation",
+  "Marasmic-kwashiorkor: mixed form — worst prognosis"],
+
+  danger_signs: [
+  "Shock: cold extremities, weak/absent radial pulse, drowsy/unconscious",
+  "Severe respiratory distress",
+  "Lower respiratory tract infection",
+  "Severe dehydration (estimate: child with diarrhoea only)",
+  "Severe anaemia (Hb <4 g/dL or 4-6 with respiratory distress)",
+  "Hypoglycaemia (blood glucose <3 mmol/L or 54 mg/dL)",
+  "Hypothermia (axillary temp <35.5°C or rectal <36°C)",
+  "Visual changes (xerophthalmia, corneal ulcer) → Vitamin A deficiency"],
+
+  management: [
+  "PHASE 1 (Stabilisation): F-75 formula (75 kcal/100mL); NO F-100 in early phase",
+  "F-75 ml = 130 mL/kg/day for oedema; 100 mL/kg/day for marasmus",
+  "Glucose 10% IV (5mL/kg) if hypoglycaemic AND unconscious",
+  "Hypothermia: skin-to-skin, warm room, hat, no IV fluids unless shocked",
+  "SHOCK: ReSoMal or half-normal saline + 5% glucose: 15 mL/kg over 1h; reassess",
+  "ANTIBIOTICS: ALL SAM → amoxicillin (uncomplicated) OR ampicillin + gentamicin (complicated)",
+  "TRANSITION (Day 2-7): Switch to F-100 when: oedema reducing, eating, no infection",
+  "REHABILITATION (Phase 2): F-100 or RUTF; 150-220 kcal/kg/day; weekly weight gain >10-15 g/kg/day",
+  "RUTF (Plumpy'Nut): 200 kcal/sachet; 200 kcal/kg/day; do NOT mix with water",
+  "Micronutrients: Vitamin A D3 E K, zinc, folate, Fe (ONLY in rehabilitation phase)",
+  "Iron: start ONLY when weight gaining; premature iron worsens oxidative stress",
+  "DISCHARGE: WHZ > -2 SD; MUAC > 12.5 cm; no oedema; eating well"],
+
+  monitoring: [
+  "Weight DAILY (morning, naked, same time)",
+  "Blood glucose: every 30 min if hypoglycaemic until stable",
+  "Temperature: every 6 hours",
+  "Pulse rate + respiratory rate: every 30 min if shocked",
+  "Fluid balance: input/output charting",
+  "Oedema grading: + (foot/ankle), ++ (lower limb+), +++ (generalised)",
+  "Weekly: height/length, MUAC, appetite test (RUTF)"],
+
+  references: ["WHO SAM Protocol 2013", "IAP SAM Guidelines 2023", "NIN India 2020"]
+},
+{
+  id: "autism",
+  name: "Autism Screening (M-CHAT)",
+  full: "Autism Spectrum Disorder (ASD) — Screening & Early Intervention Pathway",
+  color: "violet",
+  badge: "Neurodevelopmental",
+  overview: "ASD prevalence: ~1 in 100 children globally; 1 in 66 in India (INCLEN 2017). Early detection (before age 2-3) and intensive early intervention dramatically improves outcomes. Universal screening at 18 and 24 months is recommended.",
+  criteria: [
+  "Core features: persistent deficits in social communication + interaction",
+  "Restricted/repetitive behaviours, interests, or activities (RRBs)",
+  "DSM-5 specifiers: with/without intellectual impairment, language impairment",
+  "ASD levels 1-3: Level 1 (requiring support) → Level 3 (very substantial support)",
+  "Screening: M-CHAT-R/F at 16, 18, 24 months all children"],
+
+  danger_signs: [
+  "No back-and-forth sharing of sounds/smiles/facial expressions by 9 months",
+  "No babbling by 12 months",
+  "No pointing/showing/reaching/waving by 12 months",
+  "No words by 16 months",
+  "No meaningful 2-word phrases (not echolalia) by 24 months",
+  "Any loss of speech or social skills at any age",
+  "No response to own name by 12 months"],
+
+  management: [
+  "M-CHAT-R/F scoring: 0-2 low risk; 3-7 medium risk (follow-up interview); 8+ high risk (refer immediately)",
+  "ADOS-2: Gold standard diagnostic tool (specialist referral)",
+  "AIIMS ISAA: Indian Scale for Assessment of Autism — validated for Indian context",
+  "EARLY INTERVENTION (<3 years): ABA, Early Intensive Behavioural Intervention (EIBI)",
+  "Speech and Language Therapy: begin as early as diagnosis",
+  "Occupational Therapy: sensory processing, ADL skills",
+  "INDIA RESOURCES: National Trust, ASHA workers, Anganwadi referral",
+  "CO-MORBIDITIES: ADHD (50-70%), epilepsy (25-30%), sleep disorders",
+  "MEDICATIONS: risperidone/aripiprazole for irritability (ONLY if needed); melatonin for sleep"],
+
+  monitoring: [
+  "M-CHAT-R/F: 16, 18, 24 months routine; 30 months if any concern",
+  "CARS-2 annually: track severity",
+  "Adaptive behaviour: Vineland Adaptive Behaviour Scales — baseline and annually",
+  "Language assessment: annually by speech therapist",
+  "Epilepsy: EEG if any suspicion of seizures",
+  "GI symptoms (50% ASD): dietary history, constipation/diarrhoea diary"],
+
+  references: ["DSM-5 ASD Criteria 2013", "IAP Autism Guidelines 2022", "INCLEN India ASD 2017"]
+},
+{
+  id: "fever",
+  name: "Fever Management",
+  full: "Approach to Fever in Children — IAP/WHO Protocol",
+  color: "rose",
+  badge: "Common Emergency",
+  overview: "Fever (temp >38°C axillary) is the most common pediatric complaint. Key is to identify the source, rule out serious bacterial infection (SBI), and manage appropriately. Avoid antibiotics unless clear bacterial source. Fever itself is not harmful; manage discomfort.",
+  criteria: [
+  "Fever >38°C axillary, >38.5°C rectal",
+  "Neonates <28 days: any fever = admit and full sepsis workup",
+  "Infants 28-90 days: low-threshold sepsis screen",
+  "Age-appropriate: assess for source (URTI, UTI, LRTI, gastroenteritis)",
+  "Fever >5 days: consider Kawasaki, typhoid, JIA, occult bacteraemia",
+  "Fever + petechiae: meningococcaemia until proven otherwise"],
+
+  danger_signs: [
+  "Infant <3 months with fever ≥38°C",
+  "Fever >5 days without source",
+  "Fever + rash (especially non-blanching/petechiae)",
+  "Lethargy, poor perfusion, CRT >3s",
+  "Severe headache + neck stiffness (meningitis)",
+  "Respiratory distress with fever",
+  "Febrile seizure — first episode or prolonged (>5 min)"],
+
+  management: [
+  "Antipyretics: Paracetamol 15 mg/kg/dose q4-6h (max 5 doses/24h) OR Ibuprofen 10 mg/kg/dose q6-8h (>3 months)",
+  "Do NOT combine routinely; can alternate if inadequate response",
+  "Avoid aspirin in viral illness (Reye syndrome risk)",
+  "Hydration: encourage oral fluids; tepid sponging for comfort",
+  "Febrile seizure: airway, position, lorazepam 0.05-0.1 mg/kg IV if >5 min",
+  "Antibiotics ONLY if: SBI confirmed, severely unwell, infant <3 months",
+  "UTI: confirm with urine culture; treat with appropriate antibiotic",
+  "Malaria endemic area: malaria RDT/smear if fever >3 days"],
+
+  monitoring: [
+  "Temperature every 4-6 hours",
+  "Hydration status (urine output, fontanelle, skin turgor)",
+  "Rash surveillance — check at each visit",
+  "Response to antipyretics",
+  "Daily clinical review if fever persists >48h without source",
+  "CBC, CRP, blood culture if high risk or not responding"],
+
+  references: ["WHO IMCI 2024", "IAP Fever Guidelines 2022", "AAP Fever Guidelines 2021"]
+},
+{
+  id: "diarrhoea",
+  name: "Acute Diarrhoea & ORS",
+  full: "Acute Diarrhoea & Dehydration Management — WHO/IAPSMCON",
+  color: "blue",
+  badge: "GI Emergency",
+  overview: "Diarrhoea: ≥3 loose/watery stools in 24h. Leading cause of under-5 mortality globally. Dehydration is the main killer. Oral rehydration therapy (ORT) is the cornerstone of management. Antibiotics are rarely needed. Zinc supplementation reduces duration and severity.",
+  criteria: [
+  "Acute: <14 days; Persistent: 14-30 days; Chronic: >30 days",
+  "Dehydration: No (0%) → Some (1-9%) → Severe (≥10%)",
+  "Some dehydration: sunken eyes, dry mouth, restless, thirsty, CRT 2-3s",
+  "Severe dehydration: very sunken eyes, no tears, lethargic, unable to drink",
+  "Bloody diarrhoea (dysentery): Shigella most common → treat with antibiotics",
+  "Cholera suspected: profuse rice-water stools, adults, IV fluids urgently"],
+
+  danger_signs: [
+  "Severe dehydration: lethargic, sunken fontanelle, no urine >8h",
+  "Unable to drink or keep fluids down",
+  "Fever >39°C with diarrhoea in infant <3 months",
+  "Bloody diarrhoea + high fever",
+  "Marked abdominal distension",
+  "Seizures with diarrhoea (hyponatraemia/hypernatraemia)"],
+
+  management: [
+  "ORS Plan A (No dehydration): 50-100 mL ORS after each loose stool; continue breastfeeding",
+  "ORS Plan B (Some dehydration): 75 mL/kg ORS over 4 hours; reassess",
+  "IV Plan C (Severe): Ringer's lactate 100 mL/kg: 30 mL/kg over 30min (infant) or 1h, then 70 mL/kg over 2.5h",
+  "WHO ORS: Na 75, Cl 65, K 20, citrate 10, glucose 75 mEq/L, osmolarity 245",
+  "Zinc: 10 mg/day (<6m) or 20 mg/day (≥6m) for 14 days — reduces duration by 25%",
+  "Feed: continue breastfeeding; do NOT restrict food; BRAT diet NOT recommended",
+  "Antibiotics: ONLY for dysentery (azithromycin 12 mg/kg/day × 3d) or cholera",
+  "Ondansetron: 0.15 mg/kg (max 4mg) if vomiting prevents ORS"],
+
+  monitoring: [
+  "Hydration assessment every 1-2h during ORT",
+  "Stool frequency and character",
+  "Urine output (target >1 mL/kg/hr)",
+  "Weight before and after ORT",
+  "Electrolytes: Na, K if severe or prolonged",
+  "Blood glucose if altered consciousness"],
+
+  references: ["WHO IMCI 2024", "IAPSMCON Diarrhoea Guidelines 2020", "AAP Diarrhoea 2022"]
+}];
+
 
 const COLOR_MAP = {
   amber: { badge: "bg-amber-100 text-amber-800", header: "bg-amber-50 border-amber-200" },
@@ -234,7 +234,7 @@ const COLOR_MAP = {
   violet: { badge: "bg-violet-100 text-violet-800", header: "bg-violet-50 border-violet-200" },
   blue: { badge: "bg-blue-100 text-blue-800", header: "bg-blue-50 border-blue-200" },
   green: { badge: "bg-green-100 text-green-800", header: "bg-green-50 border-green-200" },
-  rose: { badge: "bg-rose-100 text-rose-800", header: "bg-rose-50 border-rose-200" },
+  rose: { badge: "bg-rose-100 text-rose-800", header: "bg-rose-50 border-rose-200" }
 };
 
 // ── Collapsible section ──────────────────────────────────────────────────────
@@ -243,27 +243,27 @@ function SectionCard({ title, items, isList = true }) {
   return (
     <div className="border border-slate-200 rounded-lg overflow-hidden">
       <button onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-left">
+      className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-left">
         <span className="font-semibold text-sm text-slate-800">{title}</span>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>
-      {open && (
-        <div className="p-3 bg-white">
-          {isList ? (
-            <ul className="space-y-1.5">
-              {items.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
+      {open &&
+      <div className="p-3 bg-white">
+          {isList ?
+        <ul className="space-y-1.5">
+              {items.map((item, i) =>
+          <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
                   <span className="text-indigo-400 font-bold min-w-[18px] mt-0.5">{i + 1}.</span>{item}
                 </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs text-slate-700 leading-relaxed">{items}</p>
           )}
+            </ul> :
+
+        <p className="text-xs text-slate-700 leading-relaxed">{items}</p>
+        }
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
 
 // ── Edit/Add/Delete Pathway Modal ─────────────────────────────────────────────
@@ -279,11 +279,11 @@ function PathwayModal({ pathway, onSave, onClose }) {
     danger_signs: Array.isArray(pathway.danger_signs) ? pathway.danger_signs.join('\n') : "",
     management: Array.isArray(pathway.management) ? pathway.management.join('\n') : "",
     monitoring: Array.isArray(pathway.monitoring) ? pathway.monitoring.join('\n') : "",
-    references: Array.isArray(pathway.references) ? pathway.references.join('\n') : "",
+    references: Array.isArray(pathway.references) ? pathway.references.join('\n') : ""
   });
 
   const handleSave = () => {
-    if (!data.name.trim() || !data.full.trim()) { toast.error("Name and full title required"); return; }
+    if (!data.name.trim() || !data.full.trim()) {toast.error("Name and full title required");return;}
     onSave({
       ...pathway,
       id: pathway.id || `custom_${Date.now()}`,
@@ -292,11 +292,11 @@ function PathwayModal({ pathway, onSave, onClose }) {
       badge: data.badge,
       color: data.color,
       overview: data.overview,
-      criteria: data.criteria.split('\n').filter(s => s.trim()),
-      danger_signs: data.danger_signs.split('\n').filter(s => s.trim()),
-      management: data.management.split('\n').filter(s => s.trim()),
-      monitoring: data.monitoring.split('\n').filter(s => s.trim()),
-      references: data.references.split('\n').filter(s => s.trim()),
+      criteria: data.criteria.split('\n').filter((s) => s.trim()),
+      danger_signs: data.danger_signs.split('\n').filter((s) => s.trim()),
+      management: data.management.split('\n').filter((s) => s.trim()),
+      monitoring: data.monitoring.split('\n').filter((s) => s.trim()),
+      references: data.references.split('\n').filter((s) => s.trim())
     });
   };
 
@@ -316,45 +316,45 @@ function PathwayModal({ pathway, onSave, onClose }) {
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label className="text-xs font-semibold text-slate-600">Short Name *</Label>
-              <Input value={data.name} onChange={e => setData(d => ({ ...d, name: e.target.value }))}
-                placeholder="e.g. Kawasaki Disease" className="mt-1 h-8 text-sm" />
+              <Input value={data.name} onChange={(e) => setData((d) => ({ ...d, name: e.target.value }))}
+              placeholder="e.g. Kawasaki Disease" className="mt-1 h-8 text-sm" />
             </div>
             <div>
               <Label className="text-xs font-semibold text-slate-600">Badge Label</Label>
-              <Input value={data.badge} onChange={e => setData(d => ({ ...d, badge: e.target.value }))}
-                placeholder="e.g. Vasculitis" className="mt-1 h-8 text-sm" />
+              <Input value={data.badge} onChange={(e) => setData((d) => ({ ...d, badge: e.target.value }))}
+              placeholder="e.g. Vasculitis" className="mt-1 h-8 text-sm" />
             </div>
           </div>
           <div>
             <Label className="text-xs font-semibold text-slate-600">Full Title *</Label>
-            <Input value={data.full} onChange={e => setData(d => ({ ...d, full: e.target.value }))}
-              className="mt-1 h-8 text-sm" />
+            <Input value={data.full} onChange={(e) => setData((d) => ({ ...d, full: e.target.value }))}
+            className="mt-1 h-8 text-sm" />
           </div>
           <div>
             <Label className="text-xs font-semibold text-slate-600">Color Theme</Label>
             <div className="flex gap-2 mt-1">
-              {COLORS.map(c => (
-                <button key={c} onClick={() => setData(d => ({ ...d, color: c }))}
-                  className={`w-7 h-7 rounded-full border-2 transition-all ${data.color === c ? "border-slate-800 scale-110" : "border-transparent opacity-60"} ${
-                    c === "amber" ? "bg-amber-400" : c === "blue" ? "bg-blue-500" : c === "teal" ? "bg-teal-500" :
-                    c === "violet" ? "bg-violet-500" : c === "green" ? "bg-green-500" : "bg-rose-500"}`} />
-              ))}
+              {COLORS.map((c) =>
+              <button key={c} onClick={() => setData((d) => ({ ...d, color: c }))}
+              className={`w-7 h-7 rounded-full border-2 transition-all ${data.color === c ? "border-slate-800 scale-110" : "border-transparent opacity-60"} ${
+              c === "amber" ? "bg-amber-400" : c === "blue" ? "bg-blue-500" : c === "teal" ? "bg-teal-500" :
+              c === "violet" ? "bg-violet-500" : c === "green" ? "bg-green-500" : "bg-rose-500"}`} />
+              )}
             </div>
           </div>
           {[
-            { label: "Overview", key: "overview", rows: 3, placeholder: "Brief overview paragraph..." },
-            { label: "Criteria / Diagnostic Features (one per line)", key: "criteria", rows: 4, placeholder: "Criterion 1\nCriterion 2..." },
-            { label: "Danger Signs / Red Flags (one per line)", key: "danger_signs", rows: 4, placeholder: "Red flag 1\nRed flag 2..." },
-            { label: "Management Steps (one per line)", key: "management", rows: 6, placeholder: "Step 1\nStep 2..." },
-            { label: "Monitoring (one per line)", key: "monitoring", rows: 4, placeholder: "Monitor 1\nMonitor 2..." },
-            { label: "References (one per line)", key: "references", rows: 2, placeholder: "WHO Guidelines 2023\nIAP 2022..." },
-          ].map(f => (
-            <div key={f.key}>
+          { label: "Overview", key: "overview", rows: 3, placeholder: "Brief overview paragraph..." },
+          { label: "Criteria / Diagnostic Features (one per line)", key: "criteria", rows: 4, placeholder: "Criterion 1\nCriterion 2..." },
+          { label: "Danger Signs / Red Flags (one per line)", key: "danger_signs", rows: 4, placeholder: "Red flag 1\nRed flag 2..." },
+          { label: "Management Steps (one per line)", key: "management", rows: 6, placeholder: "Step 1\nStep 2..." },
+          { label: "Monitoring (one per line)", key: "monitoring", rows: 4, placeholder: "Monitor 1\nMonitor 2..." },
+          { label: "References (one per line)", key: "references", rows: 2, placeholder: "WHO Guidelines 2023\nIAP 2022..." }].
+          map((f) =>
+          <div key={f.key}>
               <Label className="text-xs font-semibold text-slate-600">{f.label}</Label>
-              <Textarea value={data[f.key]} onChange={e => setData(d => ({ ...d, [f.key]: e.target.value }))}
-                rows={f.rows} placeholder={f.placeholder} className="mt-1 text-xs resize-y" />
+              <Textarea value={data[f.key]} onChange={(e) => setData((d) => ({ ...d, [f.key]: e.target.value }))}
+            rows={f.rows} placeholder={f.placeholder} className="mt-1 text-xs resize-y" />
             </div>
-          ))}
+          )}
           <div className="flex gap-2 pt-2">
             <Button onClick={handleSave} size="sm" className="bg-blue-600 hover:bg-blue-700 flex-1">
               <Check className="w-3.5 h-3.5 mr-1" /> {isNew ? "Add Pathway" : "Save Changes"}
@@ -363,8 +363,8 @@ function PathwayModal({ pathway, onSave, onClose }) {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 // ── Pathway display card ─────────────────────────────────────────────────────
@@ -380,11 +380,11 @@ function PathwayCard({ pathway, onEdit, onDelete }) {
           </div>
           <div className="flex gap-1.5 flex-shrink-0">
             <Button size="sm" variant="outline" onClick={() => onEdit(pathway)}
-              className="h-7 text-xs border-blue-200 text-blue-700 hover:bg-blue-50 px-2">
+            className="h-7 text-xs border-blue-200 text-blue-700 hover:bg-blue-50 px-2">
               <Pencil className="w-3 h-3" />
             </Button>
             <Button size="sm" variant="outline" onClick={() => onDelete(pathway.id)}
-              className="h-7 text-xs border-red-200 text-red-600 hover:bg-red-50 px-2">
+            className="h-7 text-xs border-red-200 text-red-600 hover:bg-red-50 px-2">
               <Trash2 className="w-3 h-3" />
             </Button>
           </div>
@@ -396,17 +396,17 @@ function PathwayCard({ pathway, onEdit, onDelete }) {
         {pathway.danger_signs?.length > 0 && <SectionCard title="🚨 Danger Signs / Red Flags" items={pathway.danger_signs} />}
         {pathway.management?.length > 0 && <SectionCard title="🩺 Management Protocol" items={pathway.management} />}
         {pathway.monitoring?.length > 0 && <SectionCard title="📊 Monitoring" items={pathway.monitoring} />}
-        {pathway.references?.length > 0 && (
-          <div className="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+        {pathway.references?.length > 0 &&
+        <div className="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
             <p className="text-xs font-semibold text-slate-600 mb-1">References</p>
             <div className="flex flex-wrap gap-1">
               {pathway.references.map((r, i) => <Badge key={i} variant="outline" className="text-xs">{r}</Badge>)}
             </div>
           </div>
-        )}
+        }
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 }
 
 // ── AI Pathway Generator ─────────────────────────────────────────────────────
@@ -417,7 +417,7 @@ function AIPathwayGenerator({ onGenerated }) {
   const [loading, setLoading] = useState(false);
 
   const generate = async () => {
-    if (!topic.trim() && !file) { toast.error("Enter a topic or upload a document"); return; }
+    if (!topic.trim() && !file) {toast.error("Enter a topic or upload a document");return;}
     setLoading(true);
     toast.info("AI generating pathway — 30-60 seconds…");
     try {
@@ -441,12 +441,12 @@ Return JSON: name, full, badge, color (amber/teal/violet/blue/green/rose), overv
             danger_signs: { type: "array", items: { type: "string" } },
             management: { type: "array", items: { type: "string" } },
             monitoring: { type: "array", items: { type: "string" } },
-            references: { type: "array", items: { type: "string" } },
+            references: { type: "array", items: { type: "string" } }
           }
         }
       });
       onGenerated({ ...res, id: `ai_${Date.now()}` });
-      setTopic(""); setFile(null);
+      setTopic("");setFile(null);
     } catch (e) {
       toast.error("Generation failed: " + (e.message || "unknown error"));
     }
@@ -461,45 +461,45 @@ Return JSON: name, full, badge, color (amber/teal/violet/blue/green/rose), overv
         <Badge className="bg-violet-100 text-violet-700 text-xs">Uses AI Credits</Badge>
       </div>
       <div className="flex gap-2">
-        {["web", "file"].map(m => (
-          <button key={m} onClick={() => setMode(m)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold border transition-colors ${mode === m ? "bg-violet-600 text-white border-violet-600" : "bg-white text-slate-600 border-slate-200 hover:bg-violet-50"}`}>
+        {["web", "file"].map((m) =>
+        <button key={m} onClick={() => setMode(m)}
+        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold border transition-colors ${mode === m ? "bg-violet-600 text-white border-violet-600" : "bg-white text-slate-600 border-slate-200 hover:bg-violet-50"}`}>
             {m === "web" ? <><Globe className="w-3.5 h-3.5" />Web Search</> : <><Upload className="w-3.5 h-3.5" />Upload Doc</>}
           </button>
-        ))}
+        )}
       </div>
-      <Input value={topic} onChange={e => setTopic(e.target.value)}
-        placeholder="e.g. Kawasaki Disease, Neonatal Sepsis, Febrile Seizures…"
-        className="h-9 text-sm bg-white" />
-      {mode === "file" && (
-        <div>
+      <Input value={topic} onChange={(e) => setTopic(e.target.value)}
+      placeholder="e.g. Kawasaki Disease, Neonatal Sepsis, Febrile Seizures…"
+      className="h-9 text-sm bg-white" />
+      {mode === "file" &&
+      <div>
           <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" id="pathway-doc-upload" className="hidden"
-            onChange={e => setFile(e.target.files?.[0] || null)} />
+        onChange={(e) => setFile(e.target.files?.[0] || null)} />
           <label htmlFor="pathway-doc-upload"
-            className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-violet-300 text-violet-700 rounded-lg bg-white hover:bg-violet-50">
+        className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-violet-300 text-violet-700 rounded-lg bg-white hover:bg-violet-50">
             <Upload className="w-3.5 h-3.5" />{file ? file.name : "Choose file"}
           </label>
         </div>
-      )}
+      }
       <Button onClick={generate} disabled={loading} className="w-full bg-violet-600 hover:bg-violet-700 text-white h-9 text-sm">
         {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating…</> : <><Sparkles className="w-4 h-4 mr-2" />Generate with AI</>}
       </Button>
-    </div>
-  );
+    </div>);
+
 }
 
 // ── M-CHAT-R Screening Tool ───────────────────────────────────────────────────
 function MCHATTool() {
   const CRITICAL_ITEMS = [
-    { id: 1, q: "Does your child respond to their name when called?" },
-    { id: 2, q: "Does your child point with finger to show interest (not to ask)?" },
-    { id: 3, q: "Does your child make eye contact with you?" },
-    { id: 4, q: "Does your child bring objects to show you?" },
-    { id: 5, q: "Does your child imitate or copy what you do?" },
-    { id: 6, q: "Does your child follow your gaze or pointing to look at something?" },
-  ];
+  { id: 1, q: "Does your child respond to their name when called?" },
+  { id: 2, q: "Does your child point with finger to show interest (not to ask)?" },
+  { id: 3, q: "Does your child make eye contact with you?" },
+  { id: 4, q: "Does your child bring objects to show you?" },
+  { id: 5, q: "Does your child imitate or copy what you do?" },
+  { id: 6, q: "Does your child follow your gaze or pointing to look at something?" }];
+
   const [answers, setAnswers] = useState({});
-  const totalNo = Object.values(answers).filter(v => v === false).length;
+  const totalNo = Object.values(answers).filter((v) => v === false).length;
   const answered = Object.keys(answers).length;
 
   return (
@@ -508,28 +508,28 @@ function MCHATTool() {
         <p className="text-sm font-bold text-violet-900">M-CHAT-R — 6 Critical Items (Autism Screen, 16-30 months)</p>
       </div>
       <div className="p-4 space-y-3">
-        {CRITICAL_ITEMS.map(item => (
-          <div key={item.id} className="flex items-start gap-3">
+        {CRITICAL_ITEMS.map((item) =>
+        <div key={item.id} className="flex items-start gap-3">
             <span className="text-xs font-bold text-violet-600 w-5 shrink-0">{item.id}.</span>
             <p className="text-xs text-slate-700 flex-1">{item.q}</p>
             <div className="flex gap-1 shrink-0">
-              <button onClick={() => setAnswers(a => ({ ...a, [item.id]: true }))}
-                className={`px-2.5 py-1 text-xs rounded-full font-semibold border transition-colors ${answers[item.id] === true ? "bg-green-500 text-white border-green-500" : "bg-white text-slate-500 border-slate-300"}`}>Yes</button>
-              <button onClick={() => setAnswers(a => ({ ...a, [item.id]: false }))}
-                className={`px-2.5 py-1 text-xs rounded-full font-semibold border transition-colors ${answers[item.id] === false ? "bg-red-500 text-white border-red-500" : "bg-white text-slate-500 border-slate-300"}`}>No</button>
+              <button onClick={() => setAnswers((a) => ({ ...a, [item.id]: true }))}
+            className={`px-2.5 py-1 text-xs rounded-full font-semibold border transition-colors ${answers[item.id] === true ? "bg-green-500 text-white border-green-500" : "bg-white text-slate-500 border-slate-300"}`}>Yes</button>
+              <button onClick={() => setAnswers((a) => ({ ...a, [item.id]: false }))}
+            className={`px-2.5 py-1 text-xs rounded-full font-semibold border transition-colors ${answers[item.id] === false ? "bg-red-500 text-white border-red-500" : "bg-white text-slate-500 border-slate-300"}`}>No</button>
             </div>
           </div>
-        ))}
-        {answered > 0 && (
-          <div className={`rounded-lg p-3 text-xs font-semibold ${totalNo >= 2 ? "bg-red-50 text-red-800 border border-red-200" : totalNo === 1 ? "bg-amber-50 text-amber-800 border border-amber-200" : "bg-green-50 text-green-800 border border-green-200"}`}>
-            {totalNo === 0 && answered === 6 ? "✅ Low risk — routine surveillance" :
-             totalNo === 1 ? "⚠️ 1 critical fail — Follow-up interview recommended" :
-             `🔴 ${totalNo} critical fails — HIGH RISK — Refer to developmental paediatrician immediately`}
-          </div>
         )}
+        {answered > 0 &&
+        <div className={`rounded-lg p-3 text-xs font-semibold ${totalNo >= 2 ? "bg-red-50 text-red-800 border border-red-200" : totalNo === 1 ? "bg-amber-50 text-amber-800 border border-amber-200" : "bg-green-50 text-green-800 border border-green-200"}`}>
+            {totalNo === 0 && answered === 6 ? "✅ Low risk — routine surveillance" :
+          totalNo === 1 ? "⚠️ 1 critical fail — Follow-up interview recommended" :
+          `🔴 ${totalNo} critical fails — HIGH RISK — Refer to developmental paediatrician immediately`}
+          </div>
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 // ── Nutrition Guideline Card ──────────────────────────────────────────────────
@@ -538,7 +538,7 @@ const COLOR_CLASSES = {
   amber: { bg: "bg-amber-50", border: "border-amber-200", header: "bg-amber-100", title: "text-amber-900" },
   red: { bg: "bg-red-50", border: "border-red-200", header: "bg-red-100", title: "text-red-900" },
   blue: { bg: "bg-blue-50", border: "border-blue-200", header: "bg-blue-100", title: "text-blue-900" },
-  purple: { bg: "bg-purple-50", border: "border-purple-200", header: "bg-purple-100", title: "text-purple-900" },
+  purple: { bg: "bg-purple-50", border: "border-purple-200", header: "bg-purple-100", title: "text-purple-900" }
 };
 
 function NutritionGuidelineCard({ section }) {
@@ -546,23 +546,23 @@ function NutritionGuidelineCard({ section }) {
   const c = COLOR_CLASSES[section.color] || COLOR_CLASSES.blue;
   return (
     <div className={`rounded-xl border overflow-hidden ${c.border}`}>
-      <button onClick={() => setOpen(o => !o)} className={`w-full flex items-center justify-between px-4 py-3 ${c.header} text-left`}>
+      <button onClick={() => setOpen((o) => !o)} className={`w-full flex items-center justify-between px-4 py-3 ${c.header} text-left`}>
         <span className={`text-sm font-bold ${c.title}`}>{section.title}</span>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
       </button>
-      {open && (
-        <div className={`${c.bg} p-4`}>
+      {open &&
+      <div className={`${c.bg} p-4`}>
           <ul className="space-y-1.5">
-            {section.content.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
+            {section.content.map((item, i) =>
+          <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
                 <span className="text-slate-400 font-bold shrink-0 mt-0.5">•</span>{item}
               </li>
-            ))}
+          )}
           </ul>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -578,7 +578,7 @@ export default function GeneralPediatricsHub() {
     try {
       const saved = localStorage.getItem("peds_pathways_v2");
       return saved ? JSON.parse(saved) : INITIAL_PATHWAYS;
-    } catch { return INITIAL_PATHWAYS; }
+    } catch {return INITIAL_PATHWAYS;}
   });
 
   const savePathways = (updated) => {
@@ -587,10 +587,10 @@ export default function GeneralPediatricsHub() {
   };
 
   const handleSave = (updated) => {
-    const exists = pathways.find(p => p.id === updated.id);
-    const newList = exists
-      ? pathways.map(p => p.id === updated.id ? updated : p)
-      : [...pathways, updated];
+    const exists = pathways.find((p) => p.id === updated.id);
+    const newList = exists ?
+    pathways.map((p) => p.id === updated.id ? updated : p) :
+    [...pathways, updated];
     savePathways(newList);
     setEditingPathway(null);
     setAddingNew(false);
@@ -599,7 +599,7 @@ export default function GeneralPediatricsHub() {
 
   const handleDelete = (id) => {
     if (!confirm("Delete this pathway?")) return;
-    savePathways(pathways.filter(p => p.id !== id));
+    savePathways(pathways.filter((p) => p.id !== id));
     toast.success("Pathway deleted");
   };
 
@@ -615,11 +615,11 @@ export default function GeneralPediatricsHub() {
     toast.success("Pathways reset to defaults");
   };
 
-  const filtered = pathways.filter(p =>
-    !search.trim() ||
-    p.name?.toLowerCase().includes(search.toLowerCase()) ||
-    p.full?.toLowerCase().includes(search.toLowerCase()) ||
-    p.badge?.toLowerCase().includes(search.toLowerCase())
+  const filtered = pathways.filter((p) =>
+  !search.trim() ||
+  p.name?.toLowerCase().includes(search.toLowerCase()) ||
+  p.full?.toLowerCase().includes(search.toLowerCase()) ||
+  p.badge?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -641,18 +641,18 @@ export default function GeneralPediatricsHub() {
               <p className="text-xs text-slate-500 hidden sm:block">IAP · WHO · Growth · Vaccines · SAM · ASD · Endocrine · AI</p>
             </div>
           </div>
-          {activeTab === "pathways" && (
-            <div className="flex gap-1.5">
-              <Button size="sm" onClick={() => { setAddingNew(true); setShowGenerator(false); }}
-                className="bg-green-600 hover:bg-green-700 text-white text-xs h-8 gap-1 flex-shrink-0">
+          {activeTab === "pathways" &&
+          <div className="flex gap-1.5">
+              <Button size="sm" onClick={() => {setAddingNew(true);setShowGenerator(false);}}
+            className="bg-green-600 hover:bg-green-700 text-white text-xs h-8 gap-1 flex-shrink-0">
                 <Plus className="w-3.5 h-3.5" />Add
               </Button>
-              <Button size="sm" onClick={() => setShowGenerator(v => !v)}
-                className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1 flex-shrink-0">
+              <Button size="sm" onClick={() => setShowGenerator((v) => !v)}
+            className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1 flex-shrink-0">
                 <Sparkles className="w-3.5 h-3.5" />AI
               </Button>
             </div>
-          )}
+          }
         </div>
       </div>
 
@@ -664,15 +664,15 @@ export default function GeneralPediatricsHub() {
             const isActive = activeTab === tab.id;
             return (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-lg min-w-[62px] transition-all text-xs font-semibold shadow-sm border
+              className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2 rounded-lg min-w-[62px] transition-all text-xs font-semibold shadow-sm border
                   ${isActive ? `${tab.color} text-white border-transparent` : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
                 <Icon className="w-4 h-4" />
-                <span className="text-[10px] font-bold whitespace-nowrap">{tab.label}</span>
-                {tab.badge && (
-                  <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">{tab.badge}</span>
-                )}
-              </button>
-            );
+                <span className="text-[10px] font-bold whitespace-nowrap hidden">{tab.label}</span>
+                {tab.badge &&
+                <span className="absolute -top-1 -right-1 text-[9px] bg-yellow-400 text-yellow-900 px-1 rounded-full font-black leading-tight">{tab.badge}</span>
+                }
+              </button>);
+
           })}
         </div>
       </div>
@@ -681,13 +681,13 @@ export default function GeneralPediatricsHub() {
       <div className="max-w-5xl mx-auto p-4">
 
         {/* ── PATHWAYS (first tab) ── */}
-        {activeTab === "pathways" && (
-          <div className="space-y-3">
+        {activeTab === "pathways" &&
+        <div className="space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search pathways…"
-                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search pathways…"
+            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
             </div>
 
             {showGenerator && <AIPathwayGenerator onGenerated={handleAIGenerated} />}
@@ -699,18 +699,18 @@ export default function GeneralPediatricsHub() {
               </button>
             </div>
 
-            {filtered.map(p => (
-              <PathwayCard key={p.id} pathway={p} onEdit={setEditingPathway} onDelete={handleDelete} />
-            ))}
+            {filtered.map((p) =>
+          <PathwayCard key={p.id} pathway={p} onEdit={setEditingPathway} onDelete={handleDelete} />
+          )}
 
-            {filtered.length === 0 && (
-              <div className="text-center py-10">
+            {filtered.length === 0 &&
+          <div className="text-center py-10">
                 <p className="text-slate-400 text-sm mb-3">No pathways match your search</p>
                 <Button size="sm" onClick={() => setAddingNew(true)} className="bg-green-600 text-white">
                   <Plus className="w-4 h-4 mr-1" /> Add New Pathway
                 </Button>
               </div>
-            )}
+          }
 
             <Alert className="bg-blue-50 border-blue-200">
               <Info className="w-4 h-4 text-blue-600" />
@@ -719,11 +719,11 @@ export default function GeneralPediatricsHub() {
               </AlertDescription>
             </Alert>
           </div>
-        )}
+        }
 
         {/* ── SCREENING (IAP) ── */}
-        {activeTab === "screening" && (
-          <div>
+        {activeTab === "screening" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-green-700 rounded-xl shadow">
               <Search className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -733,11 +733,11 @@ export default function GeneralPediatricsHub() {
             </div>
             <IAPScreeningTools />
           </div>
-        )}
+        }
 
         {/* ── AI ASSISTANT ── */}
-        {activeTab === "assistant" && (
-          <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-green-200">
+        {activeTab === "assistant" &&
+        <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-green-200">
             <div className="bg-green-600 px-4 py-3 flex items-center justify-between">
               <div>
                 <p className="font-bold text-white text-sm flex items-center gap-2">
@@ -749,11 +749,11 @@ export default function GeneralPediatricsHub() {
             </div>
             <VaccDrugChatbot />
           </div>
-        )}
+        }
 
         {/* ── VACCINATION ── */}
-        {activeTab === "vaccination" && (
-          <div>
+        {activeTab === "vaccination" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-blue-600 rounded-xl shadow">
               <Syringe className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -763,11 +763,11 @@ export default function GeneralPediatricsHub() {
             </div>
             <SimpleVaccinationSchedule />
           </div>
-        )}
+        }
 
         {/* ── DEVELOPMENT + DQ ── */}
-        {activeTab === "dev" && (
-          <div className="space-y-4">
+        {activeTab === "dev" &&
+        <div className="space-y-4">
             <div className="flex items-center gap-2 p-3 bg-cyan-600 rounded-xl shadow">
               <Baby className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -794,26 +794,26 @@ export default function GeneralPediatricsHub() {
                   </thead>
                   <tbody>
                     {[
-                      { age: "2m", gm: "Holds head 45°, lifts chest", fm: "Follows past midline", lang: "Social smile, cooing", soc: "Recognises mother" },
-                      { age: "4m", gm: "Head steady, rolls front-back", fm: "Grasps rattle, hands to mouth", lang: "Laughs, babbles", soc: "Recognises familiar faces" },
-                      { age: "6m", gm: "Sits with support, rolls both ways", fm: "Transfers hand to hand, rakes", lang: "Monosyllables (da/ba)", soc: "Stranger anxiety begins" },
-                      { age: "9m", gm: "Sits unsupported, creeps/crawls", fm: "Pincer grasp (inferior)", lang: "Dada/mama non-specifically", soc: "Waves bye, plays peek-a-boo" },
-                      { age: "12m", gm: "Pulls to stand, walks with support", fm: "Fine pincer, releases voluntarily", lang: "1 word with meaning, jargon", soc: "Separation anxiety, gives objects" },
-                      { age: "15m", gm: "Walks alone, falls rarely", fm: "Scribbles, puts block in cup", lang: "3–5 words", soc: "Points to wants, uses spoon" },
-                      { age: "18m", gm: "Runs stiffly, climbs stairs holding", fm: "Tower of 3, turns pages", lang: "10+ words, names body parts", soc: "Parallel play, imitates housework" },
-                      { age: "24m", gm: "Runs well, jumps both feet", fm: "Tower of 6, circular scribble", lang: "2-word phrases, 50+ words", soc: "Parallel play, uses spoon/fork" },
-                      { age: "36m", gm: "Alternate feet upstairs, pedals tricycle", fm: "Tower 9, copies circle", lang: "3-word sentences, 200+ words", soc: "Group play, knows name/gender" },
-                      { age: "48m", gm: "Hops on 1 foot, skips", fm: "Copies cross/square", lang: "Questions (why/how), tells story", soc: "Cooperative play, follows rules" },
-                      { age: "60m", gm: "Skips, balances on 1 foot 10s", fm: "Copies triangle, ties shoelace", lang: "Fluent speech, reads letters", soc: "Competitive games, friendships" },
-                    ].map((row, i) => (
-                      <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                  { age: "2m", gm: "Holds head 45°, lifts chest", fm: "Follows past midline", lang: "Social smile, cooing", soc: "Recognises mother" },
+                  { age: "4m", gm: "Head steady, rolls front-back", fm: "Grasps rattle, hands to mouth", lang: "Laughs, babbles", soc: "Recognises familiar faces" },
+                  { age: "6m", gm: "Sits with support, rolls both ways", fm: "Transfers hand to hand, rakes", lang: "Monosyllables (da/ba)", soc: "Stranger anxiety begins" },
+                  { age: "9m", gm: "Sits unsupported, creeps/crawls", fm: "Pincer grasp (inferior)", lang: "Dada/mama non-specifically", soc: "Waves bye, plays peek-a-boo" },
+                  { age: "12m", gm: "Pulls to stand, walks with support", fm: "Fine pincer, releases voluntarily", lang: "1 word with meaning, jargon", soc: "Separation anxiety, gives objects" },
+                  { age: "15m", gm: "Walks alone, falls rarely", fm: "Scribbles, puts block in cup", lang: "3–5 words", soc: "Points to wants, uses spoon" },
+                  { age: "18m", gm: "Runs stiffly, climbs stairs holding", fm: "Tower of 3, turns pages", lang: "10+ words, names body parts", soc: "Parallel play, imitates housework" },
+                  { age: "24m", gm: "Runs well, jumps both feet", fm: "Tower of 6, circular scribble", lang: "2-word phrases, 50+ words", soc: "Parallel play, uses spoon/fork" },
+                  { age: "36m", gm: "Alternate feet upstairs, pedals tricycle", fm: "Tower 9, copies circle", lang: "3-word sentences, 200+ words", soc: "Group play, knows name/gender" },
+                  { age: "48m", gm: "Hops on 1 foot, skips", fm: "Copies cross/square", lang: "Questions (why/how), tells story", soc: "Cooperative play, follows rules" },
+                  { age: "60m", gm: "Skips, balances on 1 foot 10s", fm: "Copies triangle, ties shoelace", lang: "Fluent speech, reads letters", soc: "Competitive games, friendships" }].
+                  map((row, i) =>
+                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
                         <td className="px-3 py-1.5 font-bold text-slate-700">{row.age}</td>
                         <td className="px-2 py-1.5 text-blue-800">{row.gm}</td>
                         <td className="px-2 py-1.5 text-green-800">{row.fm}</td>
                         <td className="px-2 py-1.5 text-purple-800">{row.lang}</td>
                         <td className="px-2 py-1.5 text-orange-800">{row.soc}</td>
                       </tr>
-                    ))}
+                  )}
                   </tbody>
                 </table>
               </div>
@@ -823,12 +823,12 @@ export default function GeneralPediatricsHub() {
             <div className="space-y-2">
               <p className="text-xs font-bold text-red-700 uppercase tracking-wide">⚠️ Red Flags by Domain</p>
               {[
-                { domain: "Gross Motor Red Flags", color: "blue", items: ["No head control by 4m", "No sitting by 9m", "No walking by 18m", "Asymmetric movement at any age", "Regression of motor skills"] },
-                { domain: "Language Red Flags", color: "purple", items: ["No cooing by 3m", "No babbling by 9m", "No words by 18m", "No 2-word phrases by 24m", "Any language regression", "Cannot follow 2-step commands by 24m"] },
-                { domain: "Social-Adaptive Red Flags", color: "orange", items: ["No social smile by 3m", "No eye contact by 6m", "No joint attention by 12m (pointing, showing)", "No pretend play by 18m", "Persistent hand flapping, toe walking"] },
-              ].map(rf => (
-                <SectionCard key={rf.domain} title={rf.domain} items={rf.items} />
-              ))}
+            { domain: "Gross Motor Red Flags", color: "blue", items: ["No head control by 4m", "No sitting by 9m", "No walking by 18m", "Asymmetric movement at any age", "Regression of motor skills"] },
+            { domain: "Language Red Flags", color: "purple", items: ["No cooing by 3m", "No babbling by 9m", "No words by 18m", "No 2-word phrases by 24m", "Any language regression", "Cannot follow 2-step commands by 24m"] },
+            { domain: "Social-Adaptive Red Flags", color: "orange", items: ["No social smile by 3m", "No eye contact by 6m", "No joint attention by 12m (pointing, showing)", "No pretend play by 18m", "Persistent hand flapping, toe walking"] }].
+            map((rf) =>
+            <SectionCard key={rf.domain} title={rf.domain} items={rf.items} />
+            )}
             </div>
 
             {/* M-CHAT-R */}
@@ -842,22 +842,22 @@ export default function GeneralPediatricsHub() {
               <p className="text-sm font-bold text-slate-800 mb-3">📋 GDD Workup Checklist (DQ &lt;70 or ≥2 domains delayed)</p>
               <div className="space-y-1">
                 {[
-                  "Thyroid function (T4, TSH) — exclude congenital hypothyroidism",
-                  "Karyotype / chromosomal microarray (CMA) — exclude trisomy, microdeletion",
-                  "Fragile X PCR (all boys, girls if family history)",
-                  "MRI brain — periventricular leukomalacia, corpus callosum anomalies, cortical dysplasia",
-                  "Metabolic screen: urine organic acids, plasma amino acids, ammonia, lactate",
-                  "TORCH titres if dysmorphic or microcephalic",
-                  "Hearing assessment (OAE + BERA) — hearing loss causes language delay",
-                  "Vision screening — refraction, ophthalmology",
-                  "EEG if seizure suspected",
-                  "Whole Exome Sequencing (WES) if above negative + strong family history",
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
+              "Thyroid function (T4, TSH) — exclude congenital hypothyroidism",
+              "Karyotype / chromosomal microarray (CMA) — exclude trisomy, microdeletion",
+              "Fragile X PCR (all boys, girls if family history)",
+              "MRI brain — periventricular leukomalacia, corpus callosum anomalies, cortical dysplasia",
+              "Metabolic screen: urine organic acids, plasma amino acids, ammonia, lactate",
+              "TORCH titres if dysmorphic or microcephalic",
+              "Hearing assessment (OAE + BERA) — hearing loss causes language delay",
+              "Vision screening — refraction, ophthalmology",
+              "EEG if seizure suspected",
+              "Whole Exome Sequencing (WES) if above negative + strong family history"].
+              map((item, i) =>
+              <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
                     <input type="checkbox" className="mt-0.5 rounded" />
                     <span>{item}</span>
                   </div>
-                ))}
+              )}
               </div>
             </div>
 
@@ -866,21 +866,21 @@ export default function GeneralPediatricsHub() {
               <p className="text-sm font-bold text-amber-900 mb-2">🏥 RBSK/DEIC Referral (India)</p>
               <ol className="space-y-1">
                 {[
-                  "Screen using RBSK tools at Anganwadi / sub-centre level",
-                  "Children with any delay → refer to DEIC (District Early Intervention Centre)",
-                  "DEIC provides: multidisciplinary evaluation, therapy (PT/OT/SLT), hearing aids",
-                  "ADIP scheme: free assistive devices for children with disability",
-                  "Sarva Shiksha Abhiyan (SSA): integration into regular school",
-                  "Disability certificate: obtained via DEIC → enables government benefits",
-                ].map((s, i) => <li key={i} className="text-xs text-amber-800 flex gap-1.5"><span className="font-bold text-amber-600">{i+1}.</span>{s}</li>)}
+              "Screen using RBSK tools at Anganwadi / sub-centre level",
+              "Children with any delay → refer to DEIC (District Early Intervention Centre)",
+              "DEIC provides: multidisciplinary evaluation, therapy (PT/OT/SLT), hearing aids",
+              "ADIP scheme: free assistive devices for children with disability",
+              "Sarva Shiksha Abhiyan (SSA): integration into regular school",
+              "Disability certificate: obtained via DEIC → enables government benefits"].
+              map((s, i) => <li key={i} className="text-xs text-amber-800 flex gap-1.5"><span className="font-bold text-amber-600">{i + 1}.</span>{s}</li>)}
               </ol>
             </div>
           </div>
-        )}
+        }
 
         {/* ── NUTRITION ── */}
-        {activeTab === "nutrition" && (
-          <div className="space-y-4">
+        {activeTab === "nutrition" &&
+        <div className="space-y-4">
             <div className="flex items-center gap-2 p-3 bg-orange-600 rounded-xl shadow">
               <Apple className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -891,77 +891,77 @@ export default function GeneralPediatricsHub() {
 
             {/* Nutrition guideline cards */}
             {[
-              {
-                title: "Infant and Young Child Feeding (IYCF)",
-                color: "green",
-                content: [
-                  "Initiate breastfeeding within 1 hour of birth (colostrum = 'liquid gold')",
-                  "Exclusive breastfeeding for first 6 months — no water, no other feeds",
-                  "Complementary feeding from 6 months: home-cooked semi-solid foods",
-                  "Continue breastfeeding up to 2 years or beyond",
-                  "India-specific: khichdi, mashed dal-rice, suji kheer, mashed banana, curd-rice",
-                  "Energy density: ≥1 kcal/mL; protein: 10–15% total energy",
-                  "4-star diet: cereals + pulses + animal foods + fruits/vegetables daily",
-                  "Frequency: 2-3 meals/day at 6-8m; 3-4 meals + 1-2 snacks at 9-23m",
-                ]
-              },
-              {
-                title: "Malnutrition Classification + MUAC Guide",
-                color: "amber",
-                content: [
-                  "SAM: WHZ <-3SD OR MUAC <11.5cm OR bilateral pitting oedema",
-                  "MAM: WHZ -2 to -3SD OR MUAC 11.5–12.5cm",
-                  "Normal: WHZ >-2SD AND MUAC >12.5cm",
-                  "🔴 MUAC <11.5cm = SAM → facility-based management",
-                  "🟡 MUAC 11.5–12.5cm = MAM → community supplementary feeding",
-                  "🟢 MUAC >12.5cm = Normal",
-                  "Oedema grading: + foot/ankle | ++ lower limb | +++ generalised",
-                  "Kwashiorkor (oedema) = SAM regardless of weight-for-height",
-                ]
-              },
-              {
-                title: "SAM Management — NRC 10-Step Protocol (WHO/IAP)",
-                color: "red",
-                content: [
-                  "Step 1: Treat hypoglycaemia — glucose 10% 5mL/kg if unconscious",
-                  "Step 2: Treat hypothermia — skin-to-skin, warm environment, hat",
-                  "Step 3: Treat/prevent dehydration — ReSoMal 5mL/kg/30min if diarrhoea",
-                  "Step 4: Correct electrolytes — K+ (4 mmol/kg/d), Mg (0.6 mmol/kg/d)",
-                  "Step 5: Treat infections — amoxicillin (uncomplicated) / ampicillin+gentamicin (complicated)",
-                  "Step 6: Correct micronutrient deficiencies — Vitamin A, Zinc, Folate (NO iron Phase 1)",
-                  "Step 7: Start cautious feeding — F-75 formula (75 kcal/100mL), 100mL/kg/day",
-                  "Step 8: Rebuild wasted tissue — transition to F-100 or RUTF when stable",
-                  "Step 9: Provide stimulation — structured play, sensory stimulation",
-                  "Step 10: Prepare for follow-up — monthly weight; discharged when WHZ >-2 + eating well",
-                ]
-              },
-              {
-                title: "Growth Monitoring + FTT",
-                color: "blue",
-                content: [
-                  "Use WHO growth charts (0-5y) and IAP 2015 charts (5-18y)",
-                  "Mid-parental height (boys): (Father's ht + Mother's ht + 13) ÷ 2",
-                  "Mid-parental height (girls): (Father's ht + Mother's ht - 13) ÷ 2",
-                  "FTT: weight <3rd percentile OR crossing 2 major centile lines downward",
-                  "FTT workup: CBC, TFT, urine culture, coeliac screen, metabolic panel",
-                  "Measure every month <1y; every 3m (1-3y); every 6m (3-6y)",
-                  "Head circumference until 36 months — microcephaly if <2SD for age/sex",
-                ]
-              },
-              {
-                title: "Micronutrient Deficiencies",
-                color: "purple",
-                content: [
-                  "Vitamin D: 400 IU/day for all infants from birth to 1y; 600 IU/day thereafter",
-                  "IDA: Fe 3-6 mg/kg/day elemental iron for 3 months; WIFS school programme",
-                  "Iodine: use iodised salt; iodine deficiency = commonest preventable intellectual disability",
-                  "Zinc: 10mg/day <5y, 20mg/day 5-12y for 14d with acute diarrhoea",
-                  "Vitamin A: 100,000 IU at 6-11m, 200,000 IU every 6m (12m-5y) in India",
-                ]
-              },
-            ].map(section => (
-              <NutritionGuidelineCard key={section.title} section={section} />
-            ))}
+          {
+            title: "Infant and Young Child Feeding (IYCF)",
+            color: "green",
+            content: [
+            "Initiate breastfeeding within 1 hour of birth (colostrum = 'liquid gold')",
+            "Exclusive breastfeeding for first 6 months — no water, no other feeds",
+            "Complementary feeding from 6 months: home-cooked semi-solid foods",
+            "Continue breastfeeding up to 2 years or beyond",
+            "India-specific: khichdi, mashed dal-rice, suji kheer, mashed banana, curd-rice",
+            "Energy density: ≥1 kcal/mL; protein: 10–15% total energy",
+            "4-star diet: cereals + pulses + animal foods + fruits/vegetables daily",
+            "Frequency: 2-3 meals/day at 6-8m; 3-4 meals + 1-2 snacks at 9-23m"]
+
+          },
+          {
+            title: "Malnutrition Classification + MUAC Guide",
+            color: "amber",
+            content: [
+            "SAM: WHZ <-3SD OR MUAC <11.5cm OR bilateral pitting oedema",
+            "MAM: WHZ -2 to -3SD OR MUAC 11.5–12.5cm",
+            "Normal: WHZ >-2SD AND MUAC >12.5cm",
+            "🔴 MUAC <11.5cm = SAM → facility-based management",
+            "🟡 MUAC 11.5–12.5cm = MAM → community supplementary feeding",
+            "🟢 MUAC >12.5cm = Normal",
+            "Oedema grading: + foot/ankle | ++ lower limb | +++ generalised",
+            "Kwashiorkor (oedema) = SAM regardless of weight-for-height"]
+
+          },
+          {
+            title: "SAM Management — NRC 10-Step Protocol (WHO/IAP)",
+            color: "red",
+            content: [
+            "Step 1: Treat hypoglycaemia — glucose 10% 5mL/kg if unconscious",
+            "Step 2: Treat hypothermia — skin-to-skin, warm environment, hat",
+            "Step 3: Treat/prevent dehydration — ReSoMal 5mL/kg/30min if diarrhoea",
+            "Step 4: Correct electrolytes — K+ (4 mmol/kg/d), Mg (0.6 mmol/kg/d)",
+            "Step 5: Treat infections — amoxicillin (uncomplicated) / ampicillin+gentamicin (complicated)",
+            "Step 6: Correct micronutrient deficiencies — Vitamin A, Zinc, Folate (NO iron Phase 1)",
+            "Step 7: Start cautious feeding — F-75 formula (75 kcal/100mL), 100mL/kg/day",
+            "Step 8: Rebuild wasted tissue — transition to F-100 or RUTF when stable",
+            "Step 9: Provide stimulation — structured play, sensory stimulation",
+            "Step 10: Prepare for follow-up — monthly weight; discharged when WHZ >-2 + eating well"]
+
+          },
+          {
+            title: "Growth Monitoring + FTT",
+            color: "blue",
+            content: [
+            "Use WHO growth charts (0-5y) and IAP 2015 charts (5-18y)",
+            "Mid-parental height (boys): (Father's ht + Mother's ht + 13) ÷ 2",
+            "Mid-parental height (girls): (Father's ht + Mother's ht - 13) ÷ 2",
+            "FTT: weight <3rd percentile OR crossing 2 major centile lines downward",
+            "FTT workup: CBC, TFT, urine culture, coeliac screen, metabolic panel",
+            "Measure every month <1y; every 3m (1-3y); every 6m (3-6y)",
+            "Head circumference until 36 months — microcephaly if <2SD for age/sex"]
+
+          },
+          {
+            title: "Micronutrient Deficiencies",
+            color: "purple",
+            content: [
+            "Vitamin D: 400 IU/day for all infants from birth to 1y; 600 IU/day thereafter",
+            "IDA: Fe 3-6 mg/kg/day elemental iron for 3 months; WIFS school programme",
+            "Iodine: use iodised salt; iodine deficiency = commonest preventable intellectual disability",
+            "Zinc: 10mg/day <5y, 20mg/day 5-12y for 14d with acute diarrhoea",
+            "Vitamin A: 100,000 IU at 6-11m, 200,000 IU every 6m (12m-5y) in India"]
+
+          }].
+          map((section) =>
+          <NutritionGuidelineCard key={section.title} section={section} />
+          )}
 
             {/* Divider */}
             <div className="flex items-center gap-3">
@@ -972,11 +972,11 @@ export default function GeneralPediatricsHub() {
 
             <NutritionIntakeTracker />
           </div>
-        )}
+        }
 
         {/* ── AI ANALYSERS ── */}
-        {activeTab === "analysers" && (
-          <div>
+        {activeTab === "analysers" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-violet-600 rounded-xl shadow">
               <Sparkles className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -986,11 +986,11 @@ export default function GeneralPediatricsHub() {
             </div>
             <PedsAIAnalysers />
           </div>
-        )}
+        }
 
         {/* ── ENDOCRINE ── */}
-        {activeTab === "endocrine" && (
-          <div>
+        {activeTab === "endocrine" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-amber-600 rounded-xl shadow">
               <Zap className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -1000,11 +1000,11 @@ export default function GeneralPediatricsHub() {
             </div>
             <EndocrineSection />
           </div>
-        )}
+        }
 
         {/* ── DYSMORPHOLOGY ── */}
-        {activeTab === "dysmorphology" && (
-          <div>
+        {activeTab === "dysmorphology" &&
+        <div>
             <div className="flex items-center gap-2 mb-4 p-3 bg-indigo-700 rounded-xl shadow">
               <Dna className="w-5 h-5 text-white shrink-0" />
               <div>
@@ -1014,20 +1014,20 @@ export default function GeneralPediatricsHub() {
             </div>
             <DysmorphologyScreeningTool />
           </div>
-        )}
+        }
 
         {/* ── REFERENCES ── */}
         {activeTab === "references" && <PedsReferenceSection />}
       </div>
 
       {/* Edit/Add modal */}
-      {(editingPathway || addingNew) && (
-        <PathwayModal
-          pathway={addingNew ? {} : editingPathway}
-          onSave={handleSave}
-          onClose={() => { setEditingPathway(null); setAddingNew(false); }}
-        />
-      )}
-    </div>
-  );
+      {(editingPathway || addingNew) &&
+      <PathwayModal
+        pathway={addingNew ? {} : editingPathway}
+        onSave={handleSave}
+        onClose={() => {setEditingPathway(null);setAddingNew(false);}} />
+
+      }
+    </div>);
+
 }
