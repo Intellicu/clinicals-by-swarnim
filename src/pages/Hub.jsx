@@ -557,34 +557,6 @@ export default function Hub() {
           </div>
         </div>
 
-        {/* ── AI Analysers Hub ── */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Brain className="w-4 h-4 text-violet-600" />
-              <h2 className="text-sm font-bold text-slate-700">AI Analysers</h2>
-            </div>
-            <Link to={createPageUrl("ClinicalAIHub")}>
-              <span className="text-xs text-blue-600 font-semibold">All AI →</span>
-            </Link>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            {AI_TOOLS.map((tool) => {
-              const Icon = tool.icon;
-              const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
-              return (
-                <Link key={tool.name} to={href} className="flex-shrink-0">
-                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm w-20">
-                    <div className={`w-9 h-9 ${tool.color} rounded-xl flex items-center justify-center shadow-sm`}>
-                      <Icon className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-xs font-semibold text-slate-700 text-center leading-tight line-clamp-2">{tool.name}</span>
-                  </div>
-                </Link>);
-            })}
-          </div>
-        </div>
-
         {/* ── Quick Calculators ── */}
         <div>
           <div className="flex items-center justify-between mb-2">
