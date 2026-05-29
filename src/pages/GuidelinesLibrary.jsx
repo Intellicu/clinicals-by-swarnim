@@ -5,27 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Search, BookOpen, ArrowLeft, ChevronRight, Calendar, Globe,
-  GitBranch, Baby
-} from "lucide-react";
+import { Search, BookOpen, ArrowLeft, ChevronRight, Calendar, Globe, Baby, Filter, GitBranch } from "lucide-react";
 import AdminEditButton from "../components/admin/AdminEditButton";
-import AlgorithmFlowchart from "../components/guidelines/AlgorithmFlowchart";
+import GuidelineDetailView from "../components/guidelines/GuidelineDetailView";
 
-// ─── Source filter chips ──────────────────────────────────────────────────────
-const SOURCES = ["All", "IAP", "WHO", "AAP", "ISPN", "KDIGO", "IPNA", "ERKNet", "EAU/ESPU", "EULAR/ACR", "KDOQI", "ISPD", "ESPN"];
+const SOURCES = ["All", "ISPN", "KDIGO", "IPNA", "ERKNet", "EAU/ESPU", "EULAR/ACR", "KDOQI", "ISPD", "IAP", "AAP", "ESPN", "WHO"];
 
-// ─── Category tabs ────────────────────────────────────────────────────────────
-const CATEGORY_TABS = [
-  { id: "all",         label: "All",                filter: null },
-  { id: "gen_peds",   label: "General Pediatrics",  filter: "General Pediatrics" },
-  { id: "nephrology", label: "Nephrology",           filter: ["AKI", "CKD", "Nephrotic Syndrome", "Dialysis", "Transplant", "Glomerular Diseases", "Tubular Disorders", "Electrolytes", "Acid-Base", "RTA", "Stones", "Hypertension"] },
-  { id: "rheumatology",label: "Rheumatology",        filter: ["Rheumatology"] },
-  { id: "endocrine",  label: "Endocrinology",        filter: ["Endocrinology"] },
-  { id: "rare",       label: "Rare Disease",         filter: "Rare Disease" },
-  { id: "infection",  label: "Infection",            filter: "Infection" },
-  { id: "nutrition",  label: "Nutrition & Growth",   filter: "Nutrition & Growth" },
+const LIBRARY_TABS = [
+  { id: "all", label: "All Guidelines" },
+  { id: "general-peds", label: "General Pediatrics (IAP)" },
+  { id: "nephrology", label: "Nephrology" },
 ];
+
+const GENERAL_PEDS_CATEGORIES = ["General Pediatrics", "Neonatology", "Immunisation", "Nutrition & Growth", "Developmental Pediatrics", "Adolescent Health", "Gastroenterology", "Respiratory", "Neurology", "Infection", "Endocrinology"];
+const NEPHROLOGY_CATEGORIES = ["AKI", "CKD", "Nephrotic Syndrome", "Hypertension", "Glomerular Diseases", "Tubular Disorders", "Dialysis", "Transplant", "Electrolytes", "Acid-Base", "Stones", "Rare Disease"];
 
 const SOURCE_COLORS = {
   ISPN: "bg-green-100 text-green-800 border-green-300",
@@ -42,11 +35,9 @@ const SOURCE_COLORS = {
   WHO: "bg-emerald-100 text-emerald-800 border-emerald-300",
 };
 
-// ─── GuidelineDetail — detail view with algorithm flowchart ──────────────────
 function GuidelineDetail({ guideline, onBack }) {
   const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60000 });
   const isAdmin = user?.role === "admin";
-  const hasAlgo = guideline.algorithm && guideline.algorithm.nodes?.length > 0;
 
   return (
     <div className="space-y-4">
@@ -54,22 +45,18 @@ function GuidelineDetail({ guideline, onBack }) {
         <ArrowLeft className="w-4 h-4" /> Back
       </Button>
 
-      {/* Header banner */}
-      <div className={`rounded-xl p-4 ${guideline.source === "ISPN" ? "bg-green-700" : guideline.source === "IAP" ? "bg-amber-700" : "bg-blue-700"} text-white`}>
+      <div className={`rounded-xl p-4 ${guideline.source === "ISPN" ? "bg-green-700" : "bg-blue-700"} text-white`}>
         <div className="flex flex-wrap gap-2 mb-2">
           <Badge className="bg-white/25 text-white text-xs border-0">{guideline.source}</Badge>
-          {guideline.source === "ISPN" && <Badge className="bg-green-400/30 text-white text-xs border border-green-300/50">Primary — India</Badge>}
-          {guideline.source === "IAP" && <Badge className="bg-amber-400/30 text-white text-xs border border-amber-300/50">IAP — India</Badge>}
+          {guideline.source === "ISPN" && (
+            <Badge className="bg-green-400/30 text-white text-xs border border-green-300/50">Primary — India</Badge>
+          )}
           {guideline.year && <Badge className="bg-white/20 text-white text-xs border-0">{guideline.year}</Badge>}
           {guideline.region && <Badge className="bg-white/20 text-white text-xs border-0 flex items-center gap-1"><Globe className="w-3 h-3" />{guideline.region}</Badge>}
-          {hasAlgo && <Badge className="bg-white/20 text-white text-xs border-0 flex items-center gap-1"><GitBranch className="w-3 h-3" />Has Algorithm</Badge>}
         </div>
         <h1 className="text-lg font-bold leading-snug">{guideline.title}</h1>
         {guideline.organization && <p className="text-sm text-white/80 mt-1">{guideline.organization}</p>}
       </div>
-
-      {/* Algorithm ABOVE key recommendations */}
-      {hasAlgo && <AlgorithmFlowchart algorithm={guideline.algorithm} />}
 
       {guideline.scope_and_population && (
         <Card>
@@ -141,41 +128,24 @@ function GuidelineDetail({ guideline, onBack }) {
   );
 }
 
-// ─── Guideline card in list ───────────────────────────────────────────────────
-function GuidelineCard({ g, onSelect }) {
-  const hasAlgo = g.algorithm && g.algorithm.nodes?.length > 0;
+function GuidelineCard({ g, onClick }) {
   return (
-    <button
-      onClick={() => onSelect(g.id)}
-      className="w-full text-left bg-white rounded-xl border border-slate-200 p-3.5 hover:border-blue-300 hover:shadow-sm transition-all active:scale-[0.99]"
-    >
+    <button onClick={onClick}
+      className="w-full text-left bg-white rounded-xl border border-slate-200 p-3.5 hover:border-blue-300 hover:shadow-sm transition-all active:scale-[0.99]">
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${SOURCE_COLORS[g.source] || "bg-slate-100 text-slate-700 border-slate-300"}`}>
               {g.source}
             </span>
-            {g.source === "ISPN" && (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-300">Primary — India</span>
+            {g.source === "IAP" && (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-300">IAP STG</span>
             )}
-            {g.year && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
-                <Calendar className="w-3 h-3" />{g.year}
-              </span>
-            )}
-            {hasAlgo && (
-              <span className="text-xs text-blue-600 flex items-center gap-1 font-semibold">
-                <GitBranch className="w-3 h-3" />Algorithm
-              </span>
-            )}
+            {g.year && <span className="text-xs text-slate-500 flex items-center gap-1"><Calendar className="w-3 h-3" />{g.year}</span>}
+            {g.category && <Badge variant="outline" className="text-xs">{g.category}</Badge>}
           </div>
           <p className="text-sm font-semibold text-slate-800 leading-snug">{g.title}</p>
-          {g.summary && (
-            <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">{g.summary}</p>
-          )}
-          {g.category && (
-            <span className="text-xs text-slate-400 mt-0.5 inline-block">{g.category}</span>
-          )}
+          {g.summary && <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{g.summary}</p>}
         </div>
         <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
       </div>
@@ -183,220 +153,147 @@ function GuidelineCard({ g, onSelect }) {
   );
 }
 
-// ─── General Pediatrics tab with algorithm-first card view ───────────────────
-function GenPedsTab({ guidelines, onSelect }) {
-  const items = useMemo(() => guidelines.filter(g => g.category === "General Pediatrics"), [guidelines]);
-
-  if (items.length === 0) return (
-    <div className="text-center py-16 text-slate-400">
-      <Baby className="w-10 h-10 mx-auto mb-3 opacity-30" />
-      <p className="text-sm">No General Pediatrics guidelines found</p>
-      <p className="text-xs mt-1 text-slate-300">Add guidelines with category = "General Pediatrics" to see them here</p>
-    </div>
-  );
-
-  return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-      {items.map(g => {
-        const hasAlgo = g.algorithm && g.algorithm.nodes?.length > 0;
-        return (
-          <div key={g.id} className="bg-white rounded-xl border border-slate-200 p-4 hover:border-teal-300 hover:shadow-md transition-all flex flex-col gap-3">
-            <div>
-              <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${SOURCE_COLORS[g.source] || "bg-slate-100 text-slate-700 border-slate-300"}`}>
-                  {g.source}
-                </span>
-                {g.year && (
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />{g.year}
-                  </span>
-                )}
-                {hasAlgo && (
-                  <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs flex items-center gap-1">
-                    <GitBranch className="w-2.5 h-2.5" />Algorithm
-                  </Badge>
-                )}
-              </div>
-              <h3 className="text-sm font-bold text-slate-800 leading-snug mb-1">{g.title}</h3>
-              {g.summary && (
-                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{g.summary}</p>
-              )}
-            </div>
-
-            {/* Inline mini algorithm preview for cards with algorithm */}
-            {hasAlgo && (
-              <AlgorithmFlowchart algorithm={g.algorithm} compact />
-            )}
-
-            <Button
-              size="sm"
-              onClick={() => onSelect(g.id)}
-              className="bg-teal-600 hover:bg-teal-700 text-white h-8 text-xs mt-auto"
-            >
-              View Full Guideline <ChevronRight className="w-3 h-3 ml-1" />
-            </Button>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── Main page ────────────────────────────────────────────────────────────────
 export default function GuidelinesLibrary() {
   const [search, setSearch] = useState("");
   const [activeSource, setActiveSource] = useState("All");
-  const [activeTab, setActiveTab] = useState("all");
+  const [libraryTab, setLibraryTab] = useState("all");
   const [selected, setSelected] = useState(null);
+  const [detailMode, setDetailMode] = useState(false);
 
-  // ── Fetch ALL guidelines at once (200 limit), show full skeleton until ready ──
   const { data: guidelines = [], isLoading } = useQuery({
-    queryKey: ["guidelines_library_v2"],
+    queryKey: ["guidelines_library"],
     queryFn: () => base44.entities.Guideline.list("-year", 200),
-    staleTime: 120000,
   });
 
-  // ── Client-side filtering ──────────────────────────────────────────────────
   const filtered = useMemo(() => {
-    const tab = CATEGORY_TABS.find(t => t.id === activeTab);
     return guidelines.filter(g => {
-      // Tab filter
-      if (tab?.filter) {
-        if (Array.isArray(tab.filter)) {
-          if (!tab.filter.includes(g.category)) return false;
-        } else {
-          if (g.category !== tab.filter) return false;
-        }
-      }
-      // Source filter
-      if (activeSource !== "All" && g.source !== activeSource) return false;
-      // Search filter
+      const matchSource = activeSource === "All" || g.source === activeSource;
       const q = search.toLowerCase();
-      if (q) {
-        return (
-          g.title?.toLowerCase().includes(q) ||
-          g.category?.toLowerCase().includes(q) ||
-          g.summary?.toLowerCase().includes(q) ||
-          g.source?.toLowerCase().includes(q)
-        );
-      }
-      return true;
+      const matchSearch = !q ||
+        g.title?.toLowerCase().includes(q) ||
+        g.category?.toLowerCase().includes(q) ||
+        g.summary?.toLowerCase().includes(q) ||
+        g.source?.toLowerCase().includes(q);
+      const matchTab = libraryTab === "all" ||
+        (libraryTab === "general-peds" && GENERAL_PEDS_CATEGORIES.includes(g.category)) ||
+        (libraryTab === "nephrology" && NEPHROLOGY_CATEGORIES.includes(g.category));
+      return matchSource && matchSearch && matchTab;
     });
-  }, [guidelines, activeTab, activeSource, search]);
+  }, [guidelines, activeSource, search, libraryTab]);
 
   const selected_guideline = selected ? guidelines.find(g => g.id === selected) : null;
 
-  const LoadingSkeleton = () => (
-    <div className="space-y-3">
-      {[...Array(10)].map((_, i) => (
-        <div key={i} className="bg-white rounded-xl h-20 animate-pulse border border-slate-200" />
-      ))}
-    </div>
-  );
+  const handleSelectGuideline = (g) => {
+    setSelected(g.id);
+    setDetailMode(true);
+  };
+
+  const handleBack = () => {
+    setSelected(null);
+    setDetailMode(false);
+  };
+
+  // Group general peds by category
+  const generalPedsGrouped = useMemo(() => {
+    if (libraryTab !== "general-peds") return {};
+    return GENERAL_PEDS_CATEGORIES.reduce((acc, cat) => {
+      const items = filtered.filter(g => g.category === cat);
+      if (items.length > 0) acc[cat] = items;
+      return acc;
+    }, {});
+  }, [filtered, libraryTab]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 overflow-x-hidden">
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white px-4 py-5">
         <div className="flex items-center gap-3 mb-4">
-          {selected_guideline && (
-            <button onClick={() => setSelected(null)} className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-          )}
           <BookOpen className="w-6 h-6 flex-shrink-0" />
-          <h1 className="text-lg font-bold">
-            {selected_guideline ? selected_guideline.title : "Clinical Guidelines"}
-          </h1>
-          {!selected_guideline && (
-            <Badge className="bg-white/20 text-white border-0 text-xs ml-auto">
-              {isLoading ? "Loading…" : `${guidelines.length} guidelines`}
-            </Badge>
-          )}
+          <h1 className="text-lg font-bold">Clinical Guidelines</h1>
+          <Badge className="bg-white/25 text-white border-0 text-xs ml-auto">{guidelines.length} guidelines</Badge>
         </div>
-        {!selected_guideline && (
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search guidelines, categories, sources…"
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/20 text-white placeholder-white/60 text-sm focus:outline-none focus:bg-white/30 border border-white/20"
-            />
-          </div>
-        )}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search guidelines…"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/20 text-white placeholder-white/60 text-sm focus:outline-none focus:bg-white/30 border border-white/20"
+          />
+        </div>
       </div>
 
-      {/* ── Category tabs ── */}
-      {!selected_guideline && (
-        <div className="bg-white border-b border-slate-200 px-3 pt-2">
-          <div className="flex gap-1 overflow-x-auto pb-0" style={{ scrollbarWidth: "none" }}>
-            {CATEGORY_TABS.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 px-3 py-2 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-blue-600 text-blue-700"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                {tab.id === "gen_peds" && <Baby className="w-3 h-3 inline mr-1" />}
-                {tab.label}
-              </button>
-            ))}
-          </div>
+      {/* Library tabs */}
+      <div className="bg-white border-b border-slate-200 px-3 py-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {LIBRARY_TABS.map(tab => (
+            <button key={tab.id} onClick={() => setLibraryTab(tab.id)}
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${libraryTab === tab.id ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"}`}>
+              {tab.id === "general-peds" && <Baby className="w-3 h-3" />}
+              {tab.label}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* ── Source filter chips ── */}
-      {!selected_guideline && activeTab !== "gen_peds" && (
-        <div className="bg-white border-b border-slate-200 px-3 py-2">
-          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            {SOURCES.map(src => (
-              <button
-                key={src}
-                onClick={() => setActiveSource(src)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
-                  activeSource === src
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-slate-600 border-slate-300 hover:border-blue-400"
-                }`}
-              >
-                {src}
-              </button>
-            ))}
-          </div>
+      {/* Source filter chips */}
+      <div className="bg-slate-50 border-b border-slate-200 px-3 py-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {SOURCES.map(src => (
+            <button key={src} onClick={() => setActiveSource(src)}
+              className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${activeSource === src ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-300"}`}>
+              {src}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* ── Content ── */}
-      <div className="px-4 py-4">
-        {selected_guideline ? (
-          <GuidelineDetail guideline={selected_guideline} onBack={() => setSelected(null)} />
-        ) : isLoading ? (
-          <LoadingSkeleton />
-        ) : activeTab === "gen_peds" ? (
-          /* General Pediatrics grid view */
-          <GenPedsTab guidelines={guidelines} onSelect={setSelected} />
+      <div className="p-4">
+        {selected_guideline && detailMode ? (
+          <div className="space-y-4">
+            <Button variant="outline" size="sm" onClick={handleBack} className="gap-1.5">
+              <ArrowLeft className="w-4 h-4" /> Back to Guidelines
+            </Button>
+            <GuidelineDetailView guideline={selected_guideline} defaultMode="detailed" />
+          </div>
         ) : (
-          /* All other tabs — standard list */
           <>
-            <p className="text-xs text-slate-500 mb-3">
-              {filtered.length} guideline{filtered.length !== 1 ? "s" : ""}
-              {activeSource !== "All" ? ` · ${activeSource}` : ""}
-            </p>
+            <p className="text-xs text-slate-500 mb-3">{filtered.length} guideline{filtered.length !== 1 ? "s" : ""}</p>
 
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              <div className="space-y-3">
+                {[...Array(6)].map((_, i) => <div key={i} className="bg-white rounded-xl h-20 animate-pulse border border-slate-200" />)}
+              </div>
+            ) : libraryTab === "general-peds" ? (
+              <div className="space-y-5">
+                {Object.entries(generalPedsGrouped).map(([cat, items]) => (
+                  <div key={cat}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Baby className="w-4 h-4 text-amber-600" />
+                      <h3 className="text-sm font-bold text-slate-800">{cat}</h3>
+                      <Badge className="bg-amber-100 text-amber-700 text-xs border-0">{items.length}</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      {items.map(g => <GuidelineCard key={g.id} g={g} onClick={() => handleSelectGuideline(g)} />)}
+                    </div>
+                  </div>
+                ))}
+                {Object.keys(generalPedsGrouped).length === 0 && (
+                  <div className="text-center py-12 text-slate-400">
+                    <Baby className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No General Pediatrics guidelines yet</p>
+                    <p className="text-xs mt-1">Add guidelines with category "General Pediatrics" or "Immunisation"</p>
+                  </div>
+                )}
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-12 text-slate-400">
                 <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-30" />
                 <p className="text-sm">No guidelines found</p>
               </div>
             ) : (
               <div className="space-y-2.5">
-                {filtered.map(g => (
-                  <GuidelineCard key={g.id} g={g} onSelect={setSelected} />
-                ))}
+                {filtered.map(g => <GuidelineCard key={g.id} g={g} onClick={() => handleSelectGuideline(g)} />)}
               </div>
             )}
           </>

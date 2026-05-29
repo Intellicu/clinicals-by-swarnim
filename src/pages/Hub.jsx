@@ -249,10 +249,29 @@ const KNOWLEDGE_SECTIONS = [
 
 },
 {
-  title: "General Pediatric Calculators",
-  icon: Calculator,
+  title: "General Pediatrics (IAP)",
+  icon: Baby,
   color: "border-green-200 bg-green-50",
   iconColor: "text-green-700",
+  items: [
+  { name: "General Pediatrics Hub", page: "GeneralPediatricsHub", icon: Baby },
+  { name: "IAP Screening Tools", page: "GeneralPediatricsHub", icon: Shield },
+  { name: "M-CHAT (Autism Screening)", page: "GeneralPediatricsHub", icon: Brain },
+  { name: "Newborn Screening (NBS)", page: "GeneralPediatricsHub", icon: Baby },
+  { name: "Growth Monitoring (WHO/IAP)", page: "GeneralPediatricsHub", icon: TrendingUp },
+  { name: "IAP Vaccination 2023", page: "GeneralPediatricsHub", icon: Shield },
+  { name: "Fever Approach (IAP)", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "Acute Diarrhoea & ORS", page: "GeneralPediatricsHub", icon: Droplet },
+  { name: "SAM Management (WHO/IAP)", page: "GeneralPediatricsHub", icon: Baby },
+  { name: "BP Screening (AAP 2017)", page: "BPPercentiles", icon: Heart },
+  { name: "TB Screening (NTEP India)", page: "GeneralPediatricsHub", icon: Wind },
+  { name: "Anaemia & IDA (WIFS)", page: "GeneralPediatricsHub", icon: Activity }]
+},
+{
+  title: "General Pediatric Calculators",
+  icon: Calculator,
+  color: "border-teal-200 bg-teal-50",
+  iconColor: "text-teal-700",
   items: [
   { name: "Maintenance Fluids (Holliday-Segar)", page: "FluidCalculator", icon: Waves },
   { name: "Dehydration Correction", page: "FluidCalculator", icon: Droplet },

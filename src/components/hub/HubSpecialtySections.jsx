@@ -9,6 +9,7 @@ import {
   FlaskConical, ChevronRight, ArrowLeft, BookOpen, Filter, Star, AlertTriangle, ExternalLink
 } from "lucide-react";
 import GuidelineDetailView from "../guidelines/GuidelineDetailView";
+import ConsolidatedAIHub from "./ConsolidatedAIHub";
 
 // ─── Icon map for CustomTool icons ───────────────────────────
 const ICON_MAP = {
@@ -107,69 +108,10 @@ export function TubularDisordersSection({ onNavigate }) {
 }
 
 // ─── Clinical AI Agents Hub Section ──────────────────────────
-const AI_AGENT_TOOL_IDS = [
-  "69da8d6ff7a5b0b5f5ffd618",
-  "6a18de5a7b492cc13541c2ff",
-  "6a18de82d78ca287ca28400c",
-  "6a18deb5e408969f53f975aa",
-  "6a18deea0030b96f4acce726",
-  "69da8d6ff7a5b0b5f5ffd619",
-  "69da8d6ff7a5b0b5f5ffd61a",
-];
-
 export function ClinicalAIAgentsSection({ onLaunchTool }) {
-  const { data: tools = [], isLoading } = useQuery({
-    queryKey: ["ai_agent_tools"],
-    queryFn: async () => {
-      const allTools = await base44.entities.CustomTool.list("-created_date", 50);
-      return allTools.filter(t => AI_AGENT_TOOL_IDS.includes(t.id));
-    },
-    staleTime: 120000,
-  });
-
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-center gap-3 p-3 bg-violet-50 border border-violet-200 rounded-xl">
-        <Bot className="w-6 h-6 text-violet-700 flex-shrink-0" />
-        <div>
-          <h2 className="font-bold text-violet-900 text-sm">Clinical AI Agents Hub</h2>
-          <p className="text-xs text-violet-700">All AI-powered clinical decision support tools in one place</p>
-        </div>
-      </div>
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[...Array(6)].map((_, i) => <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />)}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {tools.map(tool => {
-            const Icon = resolveIcon(tool.icon);
-            return (
-              <Card key={tool.id} className="border border-violet-100 hover:border-violet-300 hover:shadow-sm transition-all">
-                <CardContent className="p-3 flex items-start gap-3">
-                  <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-slate-800 leading-snug">{tool.name}</p>
-                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed line-clamp-2">
-                      {tool.description?.slice(0, 100)}{tool.description?.length > 100 ? "…" : ""}
-                    </p>
-                    <Button
-                      size="sm"
-                      className="mt-2 h-7 px-3 text-xs bg-violet-600 hover:bg-violet-700 text-white"
-                      onClick={() => onLaunchTool && onLaunchTool(tool)}
-                    >
-                      <Zap className="w-3 h-3 mr-1" /> Launch
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+    <div className="p-4">
+      <ConsolidatedAIHub />
     </div>
   );
 }

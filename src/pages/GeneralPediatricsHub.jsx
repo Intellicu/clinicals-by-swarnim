@@ -14,7 +14,7 @@ import {
   ArrowLeft, Baby, Syringe, Scale, TrendingUp, MessageCircle, Apple,
   Brain, Activity, ChevronDown, ChevronUp, Plus, Trash2, Loader2,
   Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X, Star,
-  Info, BookOpen, TestTube, Microscope, Zap, Wind
+  Info, BookOpen, TestTube, Microscope, Zap, Wind, Shield
 } from "lucide-react";
 import { toast } from "sonner";
 import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
@@ -27,13 +27,15 @@ import DevQuotientTool from "../components/pediatrics/DevQuotientTool.jsx";
 import EndocrineSection from "../components/pediatrics/EndocrineSection.jsx";
 import PedsReferenceSection from "../components/pediatrics/PedsReferenceSection.jsx";
 import PedsAIAnalysers from "../components/pediatrics/PedsAIAnalysers.jsx";
+import IAPScreeningTools from "../components/pediatrics/IAPScreeningTools.jsx";
 
 // ── Tab config — Pathways FIRST ──────────────────────────────────────────────
 const TABS = [
   { id: "pathways", label: "Pathways", icon: Brain, color: "bg-teal-600" },
+  { id: "screening", label: "Screening", icon: Search, color: "bg-green-700", badge: "IAP" },
   { id: "assistant", label: "AI Assistant", icon: MessageCircle, color: "bg-green-600", badge: "AI" },
   { id: "vaccination", label: "Vaccines", icon: Syringe, color: "bg-blue-600" },
-  { id: "pediatrics", label: "Pediatrics", icon: TrendingUp, color: "bg-purple-600" },
+  { id: "pediatrics", label: "Growth", icon: TrendingUp, color: "bg-purple-600" },
   { id: "dev", label: "Development", icon: Baby, color: "bg-cyan-600", badge: "DQ" },
   { id: "nutrition", label: "Nutrition", icon: Apple, color: "bg-orange-600" },
   { id: "analysers", label: "AI Analysers", icon: Sparkles, color: "bg-violet-600", badge: "AI" },
@@ -639,6 +641,20 @@ export default function GeneralPediatricsHub() {
                 Based on WHO, IAP, AAP, CDC guidelines. All users can add/edit/delete pathways.
               </AlertDescription>
             </Alert>
+          </div>
+        )}
+
+        {/* ── SCREENING (IAP) ── */}
+        {activeTab === "screening" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-green-700 rounded-xl shadow">
+              <Search className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">IAP Screening Tools & Algorithms</p>
+                <p className="text-green-100 text-xs">M-CHAT · NBS · Growth · Anaemia · BP · TB · Vision & Hearing · CHD · Obesity</p>
+              </div>
+            </div>
+            <IAPScreeningTools />
           </div>
         )}
 
