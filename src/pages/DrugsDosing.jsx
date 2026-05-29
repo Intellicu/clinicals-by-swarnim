@@ -810,7 +810,7 @@ CliniCals by Swarnim | Verify all doses independently`;
 
           {/* ── PLASMAPHERESIS TAB ────────────────────────── */}
           <TabsContent value="plasmapheresis">
-            <PlasmapheresisCalculator />
+            <PlasmapheresisModule />
           </TabsContent>
 
           {/* ── CKD DOSING TAB ────────────────────────────── */}

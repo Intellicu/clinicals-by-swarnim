@@ -265,7 +265,11 @@ const KNOWLEDGE_SECTIONS = [
   { name: "SAM Management (WHO/IAP)", page: "GeneralPediatricsHub", icon: Baby },
   { name: "BP Screening (AAP 2017)", page: "BPPercentiles", icon: Heart },
   { name: "TB Screening (NTEP India)", page: "GeneralPediatricsHub", icon: Wind },
-  { name: "Anaemia & IDA (WIFS)", page: "GeneralPediatricsHub", icon: Activity }]
+  { name: "Anaemia & IDA (WIFS)", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "Gastroenterology (IBD/GERD/Coeliac)", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "Haematology (IDA/Thal/ITP/SCD/HLH)", page: "GeneralPediatricsHub", icon: Activity },
+  { name: "Developmental Milestones (IAP/WHO)", page: "GeneralPediatricsHub", icon: Brain },
+  { name: "Dysmorphology & Syndrome Screening", page: "GeneralPediatricsHub", icon: Dna }]
 },
 {
   title: "General Pediatric Calculators",
@@ -620,7 +624,9 @@ export default function Hub() {
             { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
             { name: "Calculators", icon: Calculator, color: "bg-blue-600", page: "CalculatorsHub" },
             { name: "Pathway Builder", icon: GitBranch, color: "bg-violet-600", page: "PathwayBuilder" },
-            { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" }].
+            { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" },
+            { name: "Gastroenterology", icon: Activity, color: "bg-orange-600", page: "GeneralPediatricsHub" },
+            { name: "Haematology", icon: Beaker, color: "bg-red-700", page: "GeneralPediatricsHub" }].
             map((chip) => {
               const ChipIcon = chip.icon;
               return (

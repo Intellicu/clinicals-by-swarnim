@@ -133,54 +133,6 @@ function IndicationsTable() {
   );
 }
 
-function BaggaProtocol() {
-  return (
-    <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-200">
-      <CardHeader className="border-b border-teal-100 py-3 px-4">
-        <CardTitle className="text-sm text-teal-900">🇮🇳 Bagga/ISPN Protocol — aHUS / Anti-FH HUS (India 2019)</CardTitle>
-        <p className="text-xs text-teal-700">Pediatric Nephrology (Bagga et al, 2019) — specific to resource-limited settings</p>
-      </CardHeader>
-      <CardContent className="p-4 space-y-3">
-        <div className="bg-white rounded-lg p-3 border border-teal-100 space-y-2">
-          <p className="text-xs font-bold text-teal-800">PEX Schedule (Table 3):</p>
-          <ul className="space-y-1 text-xs text-slate-700">
-            <li>• <strong>Days 1–5 (or until remission):</strong> Daily PEX — 1.5× plasma volume (60–75 mL/kg FFP)</li>
-            <li>• <strong>Alternate days × 2 weeks:</strong> 40 mL/kg per session</li>
-            <li>• <strong>Twice weekly × 2–3 weeks</strong></li>
-            <li>• <strong>Anti-FH positive:</strong> Stop after 4–6 weeks; add immunosuppression</li>
-            <li>• <strong>Anti-FH negative:</strong> Switch to plasma infusions (FFP 10–20 mL/kg q7–10 days)</li>
-          </ul>
-        </div>
-        <div className="bg-white rounded-lg p-3 border border-teal-100 space-y-2">
-          <p className="text-xs font-bold text-teal-800">Immunosuppression (Anti-FH positive):</p>
-          <ul className="space-y-1 text-xs text-slate-700">
-            <li>• <strong>Prednisolone:</strong> 1 mg/kg/day × 4 weeks → alternate days × 4 weeks → taper by 0.2–0.3 mg/kg alternate days over 10–12 months</li>
-            <li>• <strong>IV Cyclophosphamide:</strong> 500 mg/m² q4 weeks × 3–5 doses (preferred over rituximab, cost)</li>
-            <li>• <strong>OR IV Rituximab:</strong> 500 mg/m² × 2 doses, day 1 and 7</li>
-            <li>• <strong>Maintenance:</strong> MMF 500–750 mg/m²/day OR Azathioprine 1–2 mg/kg/day × 18–24 months</li>
-          </ul>
-        </div>
-        <div className="bg-white rounded-lg p-3 border border-teal-100">
-          <p className="text-xs font-bold text-teal-800">Hematological Remission Definition:</p>
-          <ul className="space-y-1 text-xs text-slate-700 mt-1">
-            <li>• Platelets &gt;100,000/μL + schistocytes &lt;2% + LDH &lt;ULN on 2 consecutive days</li>
-          </ul>
-          <p className="text-xs font-bold text-teal-800 mt-2">Indications for Eculizumab (despite PEX):</p>
-          <ul className="space-y-1 text-xs text-slate-700 mt-1">
-            <li>• No remission after 7–10 daily PEX sessions</li>
-            <li>• Life-threatening features (seizures, cardiac dysfunction)</li>
-            <li>• Complications of PEX or vascular access</li>
-            <li>• Inherited complement defect (CFH, CFI, C3, CFB mutations)</li>
-          </ul>
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-          <p className="text-xs font-bold text-amber-800">Premedication for each PEX session:</p>
-          <p className="text-xs text-amber-700 mt-1">IV Pheniramine (antihistamine) + IV Hydrocortisone before each session. Maintain ionised Ca²⁺ &gt;1 mMol/L and K⁺ 3.5–5 mEq/L throughout.</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function ComplicationsTable() {
   const complications = [
@@ -233,7 +185,6 @@ export default function PlasmapheresisModule() {
   const sections = [
     { id: "calculator", label: "📐 EPV Calc" },
     { id: "indications", label: "📋 Indications" },
-    { id: "bagga", label: "🇮🇳 ISPN/Bagga" },
     { id: "fluids", label: "💉 Fluids" },
     { id: "anticoag", label: "🔬 Anticoag" },
     { id: "complications", label: "⚠️ Complications" },
@@ -273,7 +224,6 @@ export default function PlasmapheresisModule() {
 
       {activeSection === "calculator" && <EPVCalculator weight={weight} setWeight={setWeight} hematocrit={hematocrit} setHematocrit={setHematocrit} />}
       {activeSection === "indications" && <IndicationsTable />}
-      {activeSection === "bagga" && <BaggaProtocol />}
 
       {activeSection === "fluids" && (
         <Card className="bg-white border border-slate-200">
@@ -334,7 +284,7 @@ export default function PlasmapheresisModule() {
       <Alert className="bg-blue-50 border-blue-200">
         <AlertTriangle className="w-4 h-4 text-blue-600" />
         <AlertDescription className="text-xs text-blue-800">
-          <strong>References:</strong> Cervantes CE et al. AJKD 81(4):475-492, 2023 | Bagga A et al. Pediatr Nephrol 2019 (ISPN HUS Guidelines) | Padmanabhan A et al. ASFA 8th Special Issue, J Clin Apher 2019. For informational/educational use only.
+          <strong>References:</strong> Padmanabhan A et al. ASFA 8th Special Issue, J Clin Apher 2019 | Cervantes CE et al. AJKD Core Curriculum 81(4):475-492, 2023 | Szczepiorkowski ZM & Winters JL. Transfusion 2019. For informational/educational use only. Always verify with current institutional protocols.
         </AlertDescription>
       </Alert>
     </div>

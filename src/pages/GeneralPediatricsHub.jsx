@@ -14,7 +14,7 @@ import {
   ArrowLeft, Baby, Syringe, Scale, TrendingUp, MessageCircle, Apple,
   Brain, Activity, ChevronDown, ChevronUp, Plus, Trash2, Loader2,
   Upload, Sparkles, Search, Globe, FileText, Pencil, Check, X, Star,
-  Info, BookOpen, TestTube, Microscope, Zap, Wind, Shield, Dna
+  Info, BookOpen, TestTube, Microscope, Zap, Wind, Shield, Dna, Droplet
 } from "lucide-react";
 import { toast } from "sonner";
 import GrowthMonitoringPathway from "../components/pathways/GrowthMonitoringPathway.jsx";
@@ -28,6 +28,9 @@ import PedsReferenceSection from "../components/pediatrics/PedsReferenceSection.
 import PedsAIAnalysers from "../components/pediatrics/PedsAIAnalysers.jsx";
 import IAPScreeningTools from "../components/pediatrics/IAPScreeningTools.jsx";
 import DysmorphologyScreeningTool from "../components/tools/DysmorphologyScreeningTool.jsx";
+import GastroenterologySection from "../components/pediatrics/GastroenterologySection.jsx";
+import HaematologySection from "../components/pediatrics/HaematologySection.jsx";
+import DevMilestoneTable from "../components/pediatrics/DevMilestoneTable.jsx";
 
 // ── Tab config ────────────────────────────────────────────────────────────────
 const TABS = [
@@ -40,6 +43,8 @@ const TABS = [
   { id: "analysers", label: "AI Analysers", icon: Sparkles, color: "bg-violet-600", badge: "AI" },
   { id: "endocrine", label: "Endocrine", icon: Zap, color: "bg-amber-600" },
   { id: "dysmorphology", label: "Dysmorphology", icon: Dna, color: "bg-indigo-700", badge: "NEW" },
+  { id: "gastro", label: "Gastro", icon: Activity, color: "bg-orange-600" },
+  { id: "haematology", label: "Haematology", icon: Droplet, color: "bg-red-700" },
   { id: "references", label: "References", icon: BookOpen, color: "bg-indigo-600" },
 ];
 
@@ -932,48 +937,8 @@ export default function GeneralPediatricsHub() {
               </div>
             </div>
 
-            {/* Milestone Table */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-              <div className="px-4 py-2.5 bg-cyan-50 border-b border-cyan-100">
-                <p className="text-sm font-bold text-cyan-900">Developmental Milestones by Age (IAP 2015)</p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="text-left px-3 py-2 font-bold text-slate-700 min-w-[60px]">Age</th>
-                      <th className="text-left px-2 py-2 font-bold text-blue-700 min-w-[130px]">Gross Motor</th>
-                      <th className="text-left px-2 py-2 font-bold text-green-700 min-w-[130px]">Fine Motor</th>
-                      <th className="text-left px-2 py-2 font-bold text-purple-700 min-w-[130px]">Language</th>
-                      <th className="text-left px-2 py-2 font-bold text-orange-700 min-w-[130px]">Social-Adaptive</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { age: "2m", gm: "Holds head 45°, lifts chest", fm: "Follows past midline", lang: "Social smile, cooing", soc: "Recognises mother" },
-                      { age: "4m", gm: "Head steady, rolls front-back", fm: "Grasps rattle, hands to mouth", lang: "Laughs, babbles", soc: "Recognises familiar faces" },
-                      { age: "6m", gm: "Sits with support, rolls both ways", fm: "Transfers hand to hand, rakes", lang: "Monosyllables (da/ba)", soc: "Stranger anxiety begins" },
-                      { age: "9m", gm: "Sits unsupported, creeps/crawls", fm: "Pincer grasp (inferior)", lang: "Dada/mama non-specifically", soc: "Waves bye, plays peek-a-boo" },
-                      { age: "12m", gm: "Pulls to stand, walks with support", fm: "Fine pincer, releases voluntarily", lang: "1 word with meaning, jargon", soc: "Separation anxiety, gives objects" },
-                      { age: "15m", gm: "Walks alone, falls rarely", fm: "Scribbles, puts block in cup", lang: "3–5 words", soc: "Points to wants, uses spoon" },
-                      { age: "18m", gm: "Runs stiffly, climbs stairs holding", fm: "Tower of 3, turns pages", lang: "10+ words, names body parts", soc: "Parallel play, imitates housework" },
-                      { age: "24m", gm: "Runs well, jumps both feet", fm: "Tower of 6, circular scribble", lang: "2-word phrases, 50+ words", soc: "Parallel play, uses spoon/fork" },
-                      { age: "36m", gm: "Alternate feet upstairs, pedals tricycle", fm: "Tower 9, copies circle", lang: "3-word sentences, 200+ words", soc: "Group play, knows name/gender" },
-                      { age: "48m", gm: "Hops on 1 foot, skips", fm: "Copies cross/square", lang: "Questions (why/how), tells story", soc: "Cooperative play, follows rules" },
-                      { age: "60m", gm: "Skips, balances on 1 foot 10s", fm: "Copies triangle, ties shoelace", lang: "Fluent speech, reads letters", soc: "Competitive games, friendships" },
-                    ].map((row, i) => (
-                      <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                        <td className="px-3 py-1.5 font-bold text-slate-700">{row.age}</td>
-                        <td className="px-2 py-1.5 text-blue-800">{row.gm}</td>
-                        <td className="px-2 py-1.5 text-green-800">{row.fm}</td>
-                        <td className="px-2 py-1.5 text-purple-800">{row.lang}</td>
-                        <td className="px-2 py-1.5 text-orange-800">{row.soc}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            {/* Milestone Table — Enhanced with filter */}
+            <DevMilestoneTable />
 
             {/* Red Flags */}
             <div className="space-y-2">
@@ -1202,6 +1167,34 @@ export default function GeneralPediatricsHub() {
               </div>
             </div>
             <DysmorphologyScreeningTool />
+          </div>
+        )}
+
+        {/* ── GASTRO ── */}
+        {activeTab === "gastro" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-orange-600 rounded-xl shadow">
+              <Activity className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">Pediatric Gastroenterology</p>
+                <p className="text-orange-100 text-xs">GERD · IBD · Coeliac · NEC · Cholestasis · GI Bleed — ESPGHAN/IAP</p>
+              </div>
+            </div>
+            <GastroenterologySection />
+          </div>
+        )}
+
+        {/* ── HAEMATOLOGY ── */}
+        {activeTab === "haematology" && (
+          <div>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-red-700 rounded-xl shadow">
+              <Droplet className="w-5 h-5 text-white shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">Pediatric Haematology</p>
+                <p className="text-red-100 text-xs">IDA · Thalassaemia · ITP · Haemophilia · Sickle Cell · HLH — ASH/IAP/WFH</p>
+              </div>
+            </div>
+            <HaematologySection />
           </div>
         )}
 
