@@ -697,118 +697,180 @@ function DBQuickView({ guideline }) {
   );
 }
 
-function DBDetailedView({ guideline }) {
+function ContentSectionRenderer({ section, idx }) {
+  // Render a single content.sections[] entry with full prose + bullets
+  const lines = (section.content || "").split('\n').filter(l => l.trim());
   return (
-    <div className="space-y-4 w-full overflow-hidden">
-      {guideline.scope_and_population && (
-        <Card className="border-2 border-blue-200">
-          <CardHeader className="bg-blue-50 border-b border-blue-200 py-3 px-4">
-            <CardTitle className="text-base font-bold text-blue-800 flex items-center gap-2">
-              <Zap className="w-4 h-4" /> Clinical Summary
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <p className="text-base text-slate-800 leading-relaxed">{guideline.scope_and_population}</p>
-          </CardContent>
-        </Card>
+    <div id={`section-${idx}`} className="border-l-4 border-purple-300 pl-4 pb-2">
+      <h3 className="font-bold text-slate-900 text-base mb-2 leading-snug">{section.heading}</h3>
+      {lines.length > 0 && (
+        <div className="space-y-1.5 mb-3">
+          {lines.map((line, li) => {
+            const isBullet = line.trim().startsWith("- ") || line.trim().startsWith("• ") || line.trim().startsWith("* ");
+            const text = isBullet ? line.trim().replace(/^[-•*]\s+/, "") : line.trim();
+            if (isBullet) {
+              return (
+                <div key={li} className="flex items-start gap-2">
+                  <span className="text-purple-400 flex-shrink-0 mt-1 text-xs">●</span>
+                  <p className="text-sm text-slate-700 leading-relaxed">{text}</p>
+                </div>
+              );
+            }
+            return <p key={li} className="text-sm text-slate-700 leading-relaxed">{text}</p>;
+          })}
+        </div>
       )}
-
-      {guideline.key_recommendations?.filter(r => r?.trim()).length > 0 && (
-        <Card className="border-2 border-green-200">
-          <CardHeader className="bg-green-50 border-b border-green-200 py-3 px-4">
-            <CardTitle className="text-base font-bold text-green-800 flex items-center gap-2">
-              <Target className="w-4 h-4" /> Management Algorithm
-              <Badge className="bg-green-600 text-white text-xs ml-auto">{guideline.key_recommendations.filter(r => r?.trim()).length} Steps</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <ol className="space-y-3">
-              {guideline.key_recommendations.filter(r => r?.trim()).map((rec, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div className="w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">{i + 1}</div>
-                  <p className="text-sm text-slate-800 leading-relaxed pt-0.5">{rec}</p>
-                </li>
-              ))}
-            </ol>
-          </CardContent>
-        </Card>
-      )}
-
-      {guideline.practice_pearls?.filter(p => p?.trim()).length > 0 && (
-        <Card className="border-2 border-amber-200">
-          <CardHeader className="bg-amber-50 border-b border-amber-200 py-3 px-4">
-            <CardTitle className="text-base font-bold text-amber-800 flex items-center gap-2">
-              <Lightbulb className="w-4 h-4" /> Clinical Practice Pearls
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <ul className="space-y-3">
-              {guideline.practice_pearls.filter(p => p?.trim()).map((pearl, i) => (
-                <li key={i} className="text-sm text-amber-900 flex items-start gap-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                  <span className="text-amber-500 font-bold text-lg flex-shrink-0 leading-none">★</span>
-                  <span className="leading-relaxed">{pearl}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-
-      {guideline.content?.sections?.length > 0 && (
-        <Card className="border-2 border-purple-200">
-          <CardHeader className="bg-purple-50 border-b border-purple-200 py-3 px-4">
-            <CardTitle className="text-base font-bold text-purple-800">Detailed Content</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 space-y-4">
-            {guideline.content.sections.map((section, idx) => (
-              <div key={idx} className="border-l-4 border-purple-400 pl-4">
-                <h3 className="font-bold text-slate-900 mb-2">{section.heading}</h3>
-                {section.content && (
-                  <div className="space-y-1 mt-1">
-                    {section.content.split('\n').filter(line => line.trim()).map((line, li) => (
-                      <p key={li} className="text-sm text-slate-700 leading-relaxed">{line.trim()}</p>
-                    ))}
-                  </div>
-                )}
-                {section.key_points?.length > 0 && (
-                  <ul className="space-y-1.5 mt-2">
-                    {section.key_points.map((point, pidx) => (
-                      <li key={pidx} className="text-sm text-slate-700 flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
-                        <span className="leading-relaxed">{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+      {section.key_points?.filter(p => p?.trim()).length > 0 && (
+        <div className="bg-purple-50 border border-purple-100 rounded-lg p-3 mt-2">
+          <p className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-2">Key Points</p>
+          <ul className="space-y-1.5">
+            {section.key_points.filter(p => p?.trim()).map((point, pidx) => (
+              <li key={pidx} className="text-sm text-slate-700 flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{point}</span>
+              </li>
             ))}
-          </CardContent>
-        </Card>
+          </ul>
+        </div>
       )}
+    </div>
+  );
+}
 
-      {guideline.summary && (
-        <Card className="border-2 border-slate-200">
-          <CardHeader className="bg-slate-50 border-b border-slate-200 py-3 px-4">
-            <CardTitle className="text-base font-bold text-slate-700">Complete Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-700 leading-relaxed">{guideline.summary}</p>
-          </CardContent>
-        </Card>
-      )}
+function DBDetailedView({ guideline }) {
+  const sections = guideline.content?.sections || [];
+  const recs = guideline.key_recommendations?.filter(r => r?.trim()) || [];
 
-      <EvidenceFooter guideline={guideline} detailed />
+  return (
+    <div className="w-full overflow-hidden">
+      {/* Layout: TOC sidebar + main content on lg screens */}
+      <div className="flex gap-4 items-start">
+        {/* TOC sidebar — only shown when there are named sections */}
+        {sections.length > 0 && (
+          <aside className="hidden lg:block w-52 flex-shrink-0 sticky top-20 self-start">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-1">
+                <BookOpen className="w-3 h-3" /> Contents
+              </p>
+              <nav className="space-y-1">
+                {recs.length > 0 && (
+                  <a href="#quick-rec" className="block text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded px-2 py-1 transition-colors leading-snug">
+                    Quick Recommendations
+                  </a>
+                )}
+                {sections.map((s, idx) => (
+                  <a
+                    key={idx}
+                    href={`#section-${idx}`}
+                    className="block text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded px-2 py-1 transition-colors leading-snug"
+                  >
+                    {s.heading}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </aside>
+        )}
 
-      <Card className="border-2 border-indigo-200 shadow-sm overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-200 py-3 px-4">
-          <CardTitle className="text-base font-bold text-indigo-800 flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-indigo-600" /> References & Citations
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <ReferencesPanel guideline={guideline} />
-        </CardContent>
-      </Card>
+        {/* Main content */}
+        <div className="flex-1 min-w-0 space-y-4">
+          {guideline.scope_and_population && (
+            <Card className="border-2 border-blue-200">
+              <CardHeader className="bg-blue-50 border-b border-blue-200 py-3 px-4">
+                <CardTitle className="text-base font-bold text-blue-800 flex items-center gap-2">
+                  <Zap className="w-4 h-4" /> Clinical Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-800 leading-relaxed">{guideline.scope_and_population}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Key Recommendations — numbered quick-reference at top */}
+          {recs.length > 0 && (
+            <Card id="quick-rec" className="border-2 border-green-200">
+              <CardHeader className="bg-green-50 border-b border-green-200 py-3 px-4">
+                <CardTitle className="text-base font-bold text-green-800 flex items-center gap-2">
+                  <Target className="w-4 h-4" /> Key Recommendations
+                  <Badge className="bg-green-600 text-white text-xs ml-auto">{recs.length}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <ol className="space-y-2.5">
+                  {recs.map((rec, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">{i + 1}</div>
+                      <p className="text-sm text-slate-800 leading-relaxed">{rec}</p>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Full content sections with TOC anchors */}
+          {sections.length > 0 && (
+            <Card className="border-2 border-purple-200">
+              <CardHeader className="bg-purple-50 border-b border-purple-200 py-3 px-4">
+                <CardTitle className="text-base font-bold text-purple-800 flex items-center gap-2">
+                  <BookOpenCheck className="w-4 h-4 text-purple-600" /> Full Clinical Content
+                  <Badge className="bg-purple-600 text-white text-xs ml-auto">{sections.length} sections</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-5">
+                {sections.map((section, idx) => (
+                  <ContentSectionRenderer key={idx} section={section} idx={idx} />
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {guideline.practice_pearls?.filter(p => p?.trim()).length > 0 && (
+            <Card className="border-2 border-amber-200">
+              <CardHeader className="bg-amber-50 border-b border-amber-200 py-3 px-4">
+                <CardTitle className="text-base font-bold text-amber-800 flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4" /> Clinical Practice Pearls
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <ul className="space-y-3">
+                  {guideline.practice_pearls.filter(p => p?.trim()).map((pearl, i) => (
+                    <li key={i} className="text-sm text-amber-900 flex items-start gap-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                      <span className="text-amber-500 font-bold text-lg flex-shrink-0 leading-none">★</span>
+                      <span className="leading-relaxed">{pearl}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
+          {guideline.summary && (
+            <Card className="border-2 border-slate-200">
+              <CardHeader className="bg-slate-50 border-b border-slate-200 py-3 px-4">
+                <CardTitle className="text-base font-bold text-slate-700">Complete Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <p className="text-sm text-slate-700 leading-relaxed">{guideline.summary}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          <EvidenceFooter guideline={guideline} detailed />
+
+          <Card className="border-2 border-indigo-200 shadow-sm overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-indigo-200 py-3 px-4">
+              <CardTitle className="text-base font-bold text-indigo-800 flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-indigo-600" /> References & Citations
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <ReferencesPanel guideline={guideline} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

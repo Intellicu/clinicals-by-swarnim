@@ -58,6 +58,7 @@ import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
 import GlomerularDiseasesPathway from '../components/pathways/GlomerularDiseasesPathway';
 import PathwayRenderer from '../components/pathways/PathwayRenderer';
+import { TubularDisordersSection, ClinicalAIAgentsSection, RareDiseaseScreeningSection } from '../components/hub/HubSpecialtySections';
 
 
 // Symptom templates based on chief complaints
@@ -1733,28 +1734,34 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-green-100 text-muted-foreground p-1 rounded-xl items-center justify-center grid w-full grid-cols-5 h-auto gap-1">
-            <TabsTrigger value="diagnostic" className="mx-1 my-1 px-2 py-1 text-xs font-medium rounded-2xl justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 sm:text-sm">
-              <Brain className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">AI Diagnostic</span><span className="sm:hidden">Dx Agent</span>
-            </TabsTrigger>
-            <TabsTrigger value="glomerular" className="px-3 py-1 text-xs font-medium rounded-xl justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 sm:text-sm">
-              <Microscope className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Glomerular Diseases</span><span className="sm:hidden">GN</span>
-            </TabsTrigger>
-            <TabsTrigger value="ai-agents" className="px-3 py-1 text-xs font-medium rounded-xl justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 sm:text-sm">
-              <Microscope className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Clinical AI</span><span className="sm:hidden">AI</span>
-            </TabsTrigger>
-            <TabsTrigger value="scenarios" className="flex items-center gap-1 text-xs sm:text-sm">
-              <Clipboard className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Scenarios ({clinicalScenarios.length})</span><span className="sm:hidden">Cases</span>
-            </TabsTrigger>
-            <TabsTrigger value="pathways" className="px-3 py-1 text-xs font-medium rounded-xl justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 sm:text-sm">
-              <GitBranch className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Pathways</span><span className="sm:hidden">Path</span>
-            </TabsTrigger>
+          <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            <TabsList className="bg-green-100 text-muted-foreground p-1 rounded-xl items-center justify-start inline-flex h-auto gap-1 min-w-max">
+              <TabsTrigger value="diagnostic" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
+                <Brain className="w-3 h-3" /><span>Dx Agent</span>
+              </TabsTrigger>
+              <TabsTrigger value="glomerular" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
+                <Microscope className="w-3 h-3" /><span>GN Pathways</span>
+              </TabsTrigger>
+              <TabsTrigger value="tubular" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 text-cyan-700">
+                <Beaker className="w-3 h-3" /><span>Tubular & RTA</span>
+              </TabsTrigger>
+              <TabsTrigger value="ai-hub" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 text-violet-700">
+                <Brain className="w-3 h-3" /><span>AI Agents Hub</span>
+              </TabsTrigger>
+              <TabsTrigger value="rare-disease" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 text-rose-700">
+                <Search className="w-3 h-3" /><span>Rare Disease</span>
+              </TabsTrigger>
+              <TabsTrigger value="ai-agents" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
+                <Microscope className="w-3 h-3" /><span>Clinical AI</span>
+              </TabsTrigger>
+              <TabsTrigger value="scenarios" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
+                <Clipboard className="w-3 h-3" /><span>Scenarios</span>
+              </TabsTrigger>
+              <TabsTrigger value="pathways" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
+                <GitBranch className="w-3 h-3" /><span>Pathways</span>
+              </TabsTrigger>
             </TabsList>
+          </div>
 
           <TabsContent value="diagnostic">
             {renderDiagnosticAgent()}
@@ -1762,6 +1769,21 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
           <TabsContent value="glomerular">
             <GlomerularDiseasesPathway />
+          </TabsContent>
+
+          <TabsContent value="tubular">
+            <TubularDisordersSection />
+          </TabsContent>
+
+          <TabsContent value="ai-hub">
+            <ClinicalAIAgentsSection onLaunchTool={(tool) => {
+              // Navigate to ClinicalAIHub or relevant page
+              window.location.href = '/ClinicalAIHub';
+            }} />
+          </TabsContent>
+
+          <TabsContent value="rare-disease">
+            <RareDiseaseScreeningSection />
           </TabsContent>
 
           <TabsContent value="ai-agents">
