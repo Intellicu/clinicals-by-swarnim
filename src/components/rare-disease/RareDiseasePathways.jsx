@@ -9,7 +9,96 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, BookOpen, Pencil, Check, X, Plus, Trash2, RefreshCw, ExternalLink, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, BookOpen, Pencil, Check, X, Plus, Trash2, RefreshCw, ExternalLink, Loader2, GitBranch } from "lucide-react";
+
+// ── Diagnostic Algorithms ─────────────────────────────────────────────────
+const PATHWAY_ALGORITHMS = {
+  ahus: [
+    { type: "start", text: "TMA presentation: Microangiopathic haemolytic anaemia (MAHA) + thrombocytopenia + AKI" },
+    { type: "decision", text: "Step 1 — Exclude TTP: ADAMTS13 activity >10%? If <10% → TTP (FFP/eculizumab for TMA not indicated)" },
+    { type: "action", text: "Step 2 — Exclude STEC-HUS: Stool culture + Shiga toxin PCR. STEC+ + diarrhoeal prodrome → STEC-HUS (supportive only)" },
+    { type: "action", text: "Step 3 — Complement workup: C3↓ with C4 normal (alternative pathway). sC5b-9 elevated. Anti-CFH antibodies (ELISA)." },
+    { type: "action", text: "Step 4 — Genetic panel: CFH, CFI, CD46, C3, CFB, THBD, DGKE + CFHR1/3 deletion (MLPA)" },
+    { type: "decision", text: "Anti-CFH antibodies positive? → Plasma exchange daily (60–75 mL/kg FFP) + Rituximab/Cyclophosphamide + Steroids" },
+    { type: "outcome", text: "STEC-negative + ADAMTS13 normal + Anti-CFH negative = aHUS → Eculizumab URGENTLY (within 24h if life-threatening). Meningococcal vaccination first if possible." },
+  ],
+  cystinosis: [
+    { type: "start", text: "Infant 6–18 months: FTT + polyuria + photophobia + Fanconi syndrome features" },
+    { type: "action", text: "Urine Fanconi panel: glycosuria (BG normal), aminoaciduria, phosphaturia, bicarbonaturia, K+ wasting" },
+    { type: "action", text: "Slit-lamp exam: cystine crystals (pathognomonic from age 1 year). Renal USS: medullary nephrocalcinosis." },
+    { type: "decision", text: "Leucocyte cystine level: >3.0 nmol/mg = diagnostic (normal <0.2). Genetic: CTNS sequencing + 57kb deletion (MLPA)" },
+    { type: "action", text: "Organ workup: TFT (hypothyroidism), blood glucose (pancreatic), swallowing assessment (>10y), pulmonary function (>15y)" },
+    { type: "outcome", text: "Start cysteamine immediately (10→50 mg/kg/day in 4 doses). Target leucocyte cystine <1.0 nmol/mg. Cysteamine eye drops. Electrolyte + phosphate + calcitriol replacement." },
+  ],
+  fabry: [
+    { type: "start", text: "Young male: acral pain + angiokeratomas + corneal verticillata OR unexplained LVH/stroke/CKD" },
+    { type: "action", text: "Enzyme assay: alpha-galactosidase A (plasma/leucocytes) — markedly low in males; may be normal in females" },
+    { type: "decision", text: "If female or uncertain: GLA gene sequencing (mandatory — enzyme assay unreliable in heterozygous females)" },
+    { type: "action", text: "Urine Gb3 + lyso-Gb3 (sensitive biomarkers, useful in females). Renal biopsy: Zebra bodies on EM." },
+    { type: "action", text: "Organ staging: ECHO + cardiac MRI (LGE), brain MRI, ophthalmology, audiometry, eGFR + urine ACR, nerve conduction" },
+    { type: "outcome", text: "Check migalastat amenability table. If amenable → Migalastat (oral). If not → ERT (agalsidase alfa/beta). ACEi/ARB for proteinuria. Pain: carbamazepine/gabapentin." },
+  ],
+  arpkd: [
+    { type: "start", text: "Prenatal: enlarged echogenic kidneys ± oligohydramnios. Neonatal: Potter sequence, respiratory failure, hypertension" },
+    { type: "action", text: "Renal USS: bilaterally enlarged kidneys with increased echogenicity, radially-arranged dilated collecting ducts. Liver USS: periportal fibrosis." },
+    { type: "decision", text: "Genetic: PKHD1 sequencing (>800 mutations). Two truncating mutations → severe neonatal. Confirm to exclude ADPKD (different prognosis/treatment)" },
+    { type: "action", text: "Liver assessment: LFT, GGT, portal vein Doppler. Oesophageal varices surveillance from age 2–3y. Assess splenomegaly." },
+    { type: "outcome", text: "BP control: ACEi. Respiratory support if needed. ESRD → RRT. Combined liver-kidney transplant if ESRD + significant portal hypertension. Annual renal function, LFT, growth monitoring." },
+  ],
+  nphp: [
+    { type: "start", text: "Adolescent: insidious polyuria + growth failure + progressive CKD. Small-normal echogenic kidneys (not large!)" },
+    { type: "action", text: "Urine concentration test: dilute urine. Renal USS: ± corticomedullary cysts, increased echogenicity, small kidneys (unlike PKD)." },
+    { type: "decision", text: "Extra-renal features? → Retinitis pigmentosa + NPHP = Senior-Løken. Cerebellar vermis hypoplasia (molar tooth MRI) = Joubert. Situs inversus + bronchiectasis = Bardet-Biedl." },
+    { type: "action", text: "Brain MRI (molar tooth sign). Ophthalmology + ERG. Array CGH (NPHP1 deletion — 20%). NPHP gene panel or WES if array negative." },
+    { type: "outcome", text: "No disease-modifying therapy. Salt + water supplementation (salt wasting). ESRD median age 13y. Excellent transplant outcomes — no recurrence." },
+  ],
+  ph1: [
+    { type: "start", text: "CaOx kidney stones <5 years OR dense bilateral nephrocalcinosis OR unexplained paediatric CKD" },
+    { type: "action", text: "24h urine oxalate >1 mmol/1.73m²/day (normal <0.5). Spot oxalate:Cr >0.1 mmol/mmol. Plasma oxalate if eGFR <30." },
+    { type: "decision", text: "Urine glycolate elevated → PH1 (AGXT). Urine L-glycerate → PH2 (GRHPR). 2-oxoglutarate → PH3 (HOGA1). Genetic testing MANDATORY before treatment." },
+    { type: "action", text: "Pyridoxine trial (PH1 G170R mutation): 5–10 mg/kg/day × 3 months. If 24h oxalate falls >30%: responder → continue." },
+    { type: "outcome", text: "PH1 first-line: Lumasiran (siRNA, FDA 2020) — reduces oxalate >80%. High fluids + K+ citrate for all. If eGFR <30: intensive HD + liver transplant (curative). PH2/3: supportive only." },
+  ],
+  alport: [
+    { type: "start", text: "Persistent microscopic haematuria in child (especially male) ± family history of haematuria/CKD" },
+    { type: "action", text: "Audiometry (SNHL, bilateral high-frequency from age 8–10). Ophthalmology: anterior lenticonus (pathognomonic)." },
+    { type: "decision", text: "Renal biopsy IF: proteinuria >0.5 g/day OR eGFR declining. LM + IF (type IV α3/α4/α5 chain) + EM (GBM lamellation = basket-weave)" },
+    { type: "action", text: "Genetic: COL4A3+A4+A5 3-gene panel (NGS). Skin biopsy: type IV α5 chain absent in X-linked males. Family cascade: screen 1st-degree relatives." },
+    { type: "decision", text: "ACR >30 mg/mmol or proteinuria? → START ACEi NOW (do not wait for hypertension or significant CKD)" },
+    { type: "outcome", text: "ACEi (ramipril/enalapril) — delays ESRD 5–10 years. Titrate to maximum tolerated. Add ARB if insufficient. ESRD → transplant (excellent outcomes, rare risk of anti-GBM post-transplant)." },
+  ],
+};
+
+function PathwayAlgorithmDisplay({ pathwayId }) {
+  const steps = PATHWAY_ALGORITHMS[pathwayId] || [];
+  if (!steps.length) return null;
+
+  const typeColors = {
+    start: "bg-blue-700 text-white",
+    decision: "bg-amber-500 text-white",
+    action: "bg-slate-600 text-white",
+    outcome: "bg-green-600 text-white",
+  };
+  const typeLabel = { start: "ASSESS", decision: "DECIDE", action: "STEP", outcome: "ACTION" };
+
+  return (
+    <div className="space-y-2 mt-3">
+      <p className="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
+        <GitBranch className="w-3.5 h-3.5 text-indigo-500" /> Diagnostic &amp; Management Algorithm
+      </p>
+      {steps.map((s, i) => (
+        <div key={i} className="flex items-start gap-2">
+          <div className={`flex-shrink-0 text-xs font-bold px-2 py-1.5 rounded-lg min-w-[64px] text-center leading-tight ${typeColors[s.type] || "bg-slate-500 text-white"}`}>
+            {i + 1}<br /><span className="text-[9px] opacity-80">{typeLabel[s.type]}</span>
+          </div>
+          <div className={`flex-1 rounded-lg px-3 py-2 text-xs leading-relaxed border ${s.type === "outcome" ? "bg-green-50 border-green-200 text-green-900 font-medium" : s.type === "decision" ? "bg-amber-50 border-amber-200 text-amber-900" : "bg-slate-50 border-slate-200 text-slate-800"}`}>
+            {s.text}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const DEFAULT_PATHWAYS = [
   {
@@ -307,7 +396,7 @@ function PathwayDetail({ pathway, dbRecord, isAdmin, onSave }) {
     { title: "Overview", key: "overview", isList: false },
     { title: "Genetics", key: "genetics", isList: false },
     { title: "🚩 Red Flags", key: "red_flags", isList: true },
-    { title: "Diagnostic Algorithm", key: "diagnostic", isList: true },
+    { title: "Diagnostic Checklist", key: "diagnostic", isList: true },
     { title: "Monitoring Protocol", key: "monitoring", isList: false },
     { title: "CKD Progression & Treatment", key: "ckd", isList: false },
     { title: "Transplant Considerations", key: "transplant", isList: false },
@@ -320,6 +409,10 @@ function PathwayDetail({ pathway, dbRecord, isAdmin, onSave }) {
         <span className="text-xs font-bold text-slate-500 uppercase">Genes: </span>
         <code className="text-xs font-mono">{data.gene}</code>
       </div>
+
+      {/* Algorithm always shown at top */}
+      <PathwayAlgorithmDisplay pathwayId={pathway.id} />
+
       {sections.map(s => (
         isAdmin ? (
           <EditableSection key={s.key} title={s.title} value={data[s.key]} fieldKey={s.key} isList={s.isList} onSave={saveField} />

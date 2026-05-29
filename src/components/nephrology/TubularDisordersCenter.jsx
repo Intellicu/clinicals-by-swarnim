@@ -2,7 +2,128 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ChevronDown, ChevronUp, FlaskConical, Dna, AlertTriangle } from "lucide-react";
+import { ChevronDown, ChevronUp, FlaskConical, Dna, AlertTriangle, GitBranch } from "lucide-react";
+
+// ── Diagnostic Algorithm per condition ─────────────────────────────────────
+const ALGORITHMS = {
+  bartter: [
+    { step: 1, type: "start", text: "Child with polyuria + hypokalemia + metabolic alkalosis", color: "bg-blue-600" },
+    { step: 2, type: "decision", text: "Check BP — Normal or Low?", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "Yes → Check urine Cl: >20 mEq/L (renal Cl wasting) OR <20 (GI loss/vomiting)?", color: "bg-slate-600" },
+    { step: 4, type: "action", text: "Renal loss → Check urine Ca/Cr: HIGH (>0.6) = Bartter | LOW (<0.15) = Gitelman", color: "bg-teal-600" },
+    { step: 5, type: "action", text: "Bartter confirmed: Check for nephrocalcinosis on USS (Type I/II). Send genetic panel: SLC12A1, KCNJ1, CLCNKB, BSND, CASR", color: "bg-violet-600" },
+    { step: 6, type: "outcome", text: "Treat: KCl + Indomethacin 1–3 mg/kg/day + Spironolactone. Monitor K+, Mg2+, renal USS.", color: "bg-green-600" },
+  ],
+  gitelman: [
+    { step: 1, type: "start", text: "Adolescent/adult with muscle cramps + hypokalemia + hypomagnesaemia + metabolic alkalosis + normal/low BP", color: "bg-blue-600" },
+    { step: 2, type: "action", text: "Urine Ca/Cr: LOW (<0.15) — hypocalciuria is the KEY differentiator from Bartter", color: "bg-teal-600" },
+    { step: 3, type: "action", text: "Urine Mg elevated (renal Mg wasting). Plasma renin ↑ + aldosterone ↑ (secondary hyperaldosteronism)", color: "bg-amber-500" },
+    { step: 4, type: "action", text: "Check for chondrocalcinosis (X-rays: Mg-pyrophosphate crystals). No nephrocalcinosis (unlike Bartter).", color: "bg-slate-600" },
+    { step: 5, type: "action", text: "Genetic testing: SLC12A3 (NCC gene) — usually compound heterozygous", color: "bg-violet-600" },
+    { step: 6, type: "outcome", text: "Treat: KCl (large doses, 80–100 mEq/day) + Mg citrate 10–15 mg/kg/day + Spironolactone/Amiloride ± ACEi", color: "bg-green-600" },
+  ],
+  drta: [
+    { step: 1, type: "start", text: "NAGMA + hypokalemia + nephrocalcinosis on USS", color: "bg-blue-600" },
+    { step: 2, type: "decision", text: "Check urine pH during systemic acidosis (serum bicarb <20)", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "Urine pH >5.5 despite acidosis → dRTA (Type 1). Urine pH <5.5 → pRTA (Type 2)", color: "bg-teal-600" },
+    { step: 4, type: "action", text: "dRTA confirmed: Urine anion gap (+ve). Urine Ca/Cr elevated, Urine citrate LOW → CaP stones", color: "bg-slate-600" },
+    { step: 5, type: "action", text: "Check ANA, anti-Ro/La (secondary SLE/Sjögren's). Genetic: ATP6V1B1 (+ deafness), ATP6V0A4, SLC4A1", color: "bg-violet-600" },
+    { step: 6, type: "outcome", text: "Treat: Potassium citrate 1–3 mEq/kg/day (corrects acidosis + provides citrate + K+). Target bicarb >22 mEq/L. Annual USS for nephrocalcinosis.", color: "bg-green-600" },
+  ],
+  prta: [
+    { step: 1, type: "start", text: "NAGMA + hypokalemia + glycosuria with normoglycaemia + rickets (phosphaturia)", color: "bg-blue-600" },
+    { step: 2, type: "decision", text: "Urine pH when serum bicarb <15 mEq/L?", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "Urine pH <5.5 at low bicarb → pRTA (can acidify). Urine pH >5.5 always → dRTA", color: "bg-teal-600" },
+    { step: 4, type: "action", text: "FEBicarb >15% (massive bicarb wasting). Glycosuria + normoglycaemia. TRP <85% (phosphate wasting).", color: "bg-slate-600" },
+    { step: 5, type: "action", text: "Fanconi panel: urine glucose + amino acids + phosphate + uric acid + bicarb. Look for underlying cause: cystinosis (WBC cystine), Wilson (ceruloplasmin), Lowe (slit lamp cataracts)", color: "bg-violet-600" },
+    { step: 6, type: "outcome", text: "Treat: NaHCO3/K citrate 5–15 mEq/kg/day (high doses needed). Phosphate 1–3 mmol/kg/day. Calcitriol 0.05 mcg/kg/day. Treat underlying cause.", color: "bg-green-600" },
+  ],
+  fanconi: [
+    { step: 1, type: "start", text: "Rickets + growth failure + polyuria + glycosuria with normal blood glucose", color: "bg-blue-600" },
+    { step: 2, type: "action", text: "Fanconi panel: Urine glucose (+), amino acids (+), phosphate (+), HCO3 (+), K+ (+) — all wasted simultaneously", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "TRP <85% (phosphaturia). FEbicarbonate >15%. Serum: K↓, PO4↓, HCO3↓, uric acid↓", color: "bg-teal-600" },
+    { step: 4, type: "decision", text: "Find underlying cause: (1) Cystinosis → WBC cystine, slit lamp crystals. (2) Wilson → ceruloplasmin, LFT. (3) Lowe → cataracts, ID. (4) Galactosaemia → reducing substances. (5) Ifosfamide → drug history", color: "bg-violet-600" },
+    { step: 5, type: "outcome", text: "Treat cause + Symptomatic: K+ citrate, NaHCO3, Joulie's phosphate 1–3 mmol/kg/day, Calcitriol 0.25–0.5 mcg/day. Growth monitoring 3-monthly.", color: "bg-green-600" },
+  ],
+  ndi: [
+    { step: 1, type: "start", text: "Infant/child with massive polyuria (>5 mL/kg/hr), hypernatraemia episodes, FTT", color: "bg-blue-600" },
+    { step: 2, type: "action", text: "Urine osmolality: persistently <200 mOsm/kg (dilute urine despite high serum osmolality)", color: "bg-amber-500" },
+    { step: 3, type: "decision", text: "DDAVP test: no rise in Uosm after DDAVP → NDI. Uosm rises >50% → Central DI", color: "bg-teal-600" },
+    { step: 4, type: "action", text: "Check serum ADH (elevated in NDI — compensatory). Renal USS (hydroureteronephrosis from polyuria). Check serum Ca, K (acquired NDI?)", color: "bg-slate-600" },
+    { step: 5, type: "action", text: "Genetic: AVPR2 (X-linked, males severe), AQP2 (AR/AD). Check drug history: lithium, demeclocycline.", color: "bg-violet-600" },
+    { step: 6, type: "outcome", text: "Treat: Free water (prevent hypernatraemia). Low-Na low-osmolar diet. Hydrochlorothiazide 1–2 mg/kg/day + Amiloride (if lithium-induced). Indomethacin (reduces urine volume). Monitor: serum Na, renal USS.", color: "bg-green-600" },
+  ],
+  cystinuria: [
+    { step: 1, type: "start", text: "Recurrent kidney stones from childhood (Ca, Mg, uric acid—all normal)", color: "bg-blue-600" },
+    { step: 2, type: "action", text: "Urine microscopy: hexagonal crystals (pathognomonic cystine crystals)", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "Spot urine cystine >250 mg/g Cr OR 24h urine cystine >250 mg/day → cystinuria", color: "bg-teal-600" },
+    { step: 4, type: "action", text: "Renal USS/CT: stones (staghorn calculi in advanced). Stone analysis (pure cystine stones).", color: "bg-slate-600" },
+    { step: 5, type: "action", text: "Genetic: SLC3A1 (Type A, AR), SLC7A9 (Type B, AR/AD). Screen siblings.", color: "bg-violet-600" },
+    { step: 6, type: "outcome", text: "Treat: High fluids >3L/m²/day. K+ citrate → target urine pH 7.0–7.5. Tiopronin (preferred) or D-penicillamine if pH alone insufficient. Urological referral for obstructing stones.", color: "bg-green-600" },
+  ],
+  hyperoxaluria: [
+    { step: 1, type: "start", text: "Calcium oxalate nephrocalcinosis/stones + progressive CKD in child", color: "bg-blue-600" },
+    { step: 2, type: "action", text: "24h urine oxalate >1 mmol/1.73m²/day (normal <0.5). Spot urine oxalate:Cr >0.1 mmol/mmol.", color: "bg-amber-500" },
+    { step: 3, type: "decision", text: "Urine glycolate elevated → PH1 (AGXT). L-glycerate elevated → PH2 (GRHPR). 2-oxoglutarate → PH3 (HOGA1).", color: "bg-teal-600" },
+    { step: 4, type: "action", text: "Plasma oxalate if eGFR <30. Genetic: AGXT/GRHPR/HOGA1 (mandatory before treatment). Liver biopsy if genetic inconclusive.", color: "bg-slate-600" },
+    { step: 5, type: "action", text: "Check pyridoxine response: trial pyridoxine 5–10 mg/kg/day × 3 months in PH1 — if 24h oxalate falls >30%: responder.", color: "bg-violet-600" },
+    { step: 6, type: "outcome", text: "PH1: Lumasiran (first-line, all ages). High fluids >3L/m²/day. K+ citrate. If eGFR<30: intensive HD pre-transplant. Liver transplant curative for PH1 (if lumasiran unavailable).", color: "bg-green-600" },
+  ],
+  dent: [
+    { step: 1, type: "start", text: "Male child with proteinuria (LMW type) + hypercalciuria + nephrocalcinosis", color: "bg-blue-600" },
+    { step: 2, type: "action", text: "Urine protein fractionation: β2-microglobulin dominant (not albumin) → LMW proteinuria (proximal tubule failure)", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "Urine Ca/Cr >0.6 (hypercalciuria) without hypercalcaemia. Variable glycosuria, aminoaciduria, phosphaturia (Fanconi features).", color: "bg-teal-600" },
+    { step: 4, type: "action", text: "X-linked pattern (males affected, female carriers). Genetic: CLCN5 (Dent 1), OCRL (Dent 2 — also Lowe syndrome).", color: "bg-violet-600" },
+    { step: 5, type: "outcome", text: "No cure. Thiazides (↓ hypercalciuria). K+ citrate (stones). ACEi/ARB (proteinuria). Avoid high Ca supplements. Monitor renal function q6–12m. Refer to nephrology for CKD management.", color: "bg-green-600" },
+  ],
+  liddle: [
+    { step: 1, type: "start", text: "Child/adolescent with early-onset severe hypertension + hypokalemia + metabolic alkalosis", color: "bg-blue-600" },
+    { step: 2, type: "decision", text: "Check plasma renin + aldosterone: BOTH LOW (unlike primary hyperaldosteronism)", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "Trial of spironolactone — NO RESPONSE (confirms not aldosterone-mediated). Trial of amiloride — GOOD RESPONSE (ENaC blockade).", color: "bg-teal-600" },
+    { step: 4, type: "action", text: "Family history of early hypertension/stroke. Genetic: SCNN1B or SCNN1G (ENaC beta/gamma). AD inheritance.", color: "bg-violet-600" },
+    { step: 5, type: "outcome", text: "Treat: Amiloride 5–10 mg/day OR Triamterene. NOT spironolactone. Low-Na diet. Lifelong treatment. Excellent prognosis if treated early.", color: "bg-green-600" },
+  ],
+  pha: [
+    { step: 1, type: "start", text: "Neonate with hyponatraemia + HYPERKALEMIA + metabolic acidosis + elevated aldosterone (PHA1) OR adolescent with HTN + hyperkalemia (PHA2)", color: "bg-blue-600" },
+    { step: 2, type: "decision", text: "PHA1A vs PHA1B: PHA1A = renal (self-limited by age 3). PHA1B = systemic (lifelong, sweat Na elevated). PHA2 = Gordon syndrome (HTN + hyperK + acidosis + low renin/aldosterone).", color: "bg-amber-500" },
+    { step: 3, type: "action", text: "Urine Na HIGH (PHA1: salt wasting). Plasma renin ↑ + aldosterone ↑ (PHA1). Genetic: NR3C2 (PHA1A, AD), SCNN1A/B/G (PHA1B, AR), WNK1/WNK4 (PHA2, AD).", color: "bg-teal-600" },
+    { step: 4, type: "outcome", text: "PHA1A: NaCl 5–10 mEq/kg/day. PHA1B: High-dose NaCl + K-binder (patiromer). PHA2: Thiazide highly effective (NCC inhibition). Genetic counselling.", color: "bg-green-600" },
+  ],
+};
+
+function AlgorithmDisplay({ conditionId }) {
+  const steps = ALGORITHMS[conditionId] || [];
+  if (!steps.length) return null;
+
+  const typeColors = {
+    start: "bg-blue-600 text-white",
+    decision: "bg-amber-500 text-white",
+    action: "bg-slate-600 text-white",
+    outcome: "bg-green-600 text-white",
+  };
+  const typeLabel = { start: "START", decision: "DECISION", action: "STEP", outcome: "OUTCOME" };
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1">
+        <GitBranch className="w-3.5 h-3.5" /> Diagnostic Algorithm
+      </p>
+      {steps.map((s, i) => (
+        <div key={i} className="flex items-start gap-2">
+          <div className={`flex-shrink-0 text-xs font-bold px-2 py-1 rounded-lg min-w-[72px] text-center ${typeColors[s.type] || "bg-slate-500 text-white"}`}>
+            {typeLabel[s.type] || s.type.toUpperCase()}
+          </div>
+          <div className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 leading-relaxed">
+            {s.text}
+          </div>
+          {i < steps.length - 1 && (
+            <div className="absolute ml-8 mt-8 text-slate-300 text-xs hidden" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const TUBULAR_CONDITIONS = [
   {
@@ -174,6 +295,7 @@ const SECTION_COLORS = {
 
 const TABS = [
   { id: "overview", label: "📋 Overview" },
+  { id: "algorithm", label: "🔀 Algorithm" },
   { id: "electrolytes", label: "⚗️ Electrolytes" },
   { id: "investigations", label: "🔬 Investigations" },
   { id: "management", label: "💊 Management" },
@@ -213,6 +335,10 @@ function TubularCard({ condition }) {
               </button>
             ))}
           </div>
+
+          {tab === "algorithm" && (
+            <AlgorithmDisplay conditionId={condition.id} />
+          )}
 
           {tab === "overview" && (
             <div className="space-y-2">

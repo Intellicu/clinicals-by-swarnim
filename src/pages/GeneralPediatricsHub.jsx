@@ -1017,6 +1017,45 @@ export default function GeneralPediatricsHub() {
               </div>
             </div>
 
+            {/* Detailed Developmental Monitoring Schedule */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div className="px-4 py-2.5 bg-blue-50 border-b border-blue-100">
+                <p className="text-sm font-bold text-blue-900">🗓️ Developmental Monitoring Schedule — WHO/IAP/AAP</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100">
+                      <th className="text-left px-3 py-2 font-bold text-slate-700">Visit Age</th>
+                      <th className="text-left px-2 py-2 font-bold text-blue-700">Screen/Tool</th>
+                      <th className="text-left px-2 py-2 font-bold text-green-700">Action if Concern</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { age: "Birth–4w", screen: "Hearing OAE (UNHS). APGAR. Tone. Reflexes.", action: "BERA if OAE fail. Neurology if tone abnormal." },
+                      { age: "6–8 weeks", screen: "Social smile. Fixation/tracking. No head control by 4m = flag.", action: "Ophthalmology for tracking failure. Neurology if floppy." },
+                      { age: "3–4 months", screen: "Head control, social smile, cooing. Visual tracking.", action: "MRI brain if no head control. Ophthalmology if no visual tracking." },
+                      { age: "6 months", screen: "Sitting with support, transfer, monosyllables. Stranger awareness.", action: "Refer GDD workup if 2+ domains delayed." },
+                      { age: "9 months", screen: "Pincer grasp, dada/mama non-specifically. Crawling.", action: "Physiotherapy if not crawling. Hearing reassessment." },
+                      { age: "12 months", screen: "Walk with support, 1 word with meaning. M-CHAT-R/F start.", action: "Developmental paediatrician if no words or no walking." },
+                      { age: "15–18 months", screen: "3–10 words, walks alone. M-CHAT-R/F. Point, show, wave.", action: "ASD workup if M-CHAT positive ≥2 critical items." },
+                      { age: "24 months", screen: "2-word phrases, runs. CARS-2. Imaginative play.", action: "Speech therapy if <50 words. ADOS-2 if ASD suspected." },
+                      { age: "3 years", screen: "Sentences, toilet trained. Preschool readiness.", action: "Cognitive testing. Special ed referral if needed." },
+                      { age: "4–5 years", screen: "Literacy readiness. Attention (ADHD screen: SNAP-IV). Vision/hearing before school.", action: "ADHD assessment. Reading support. Vision correction." },
+                      { age: "School age (6–12y)", screen: "Academic performance. ADHD, learning disability, anxiety screen.", action: "Psychoeducational assessment. ADHD management." },
+                    ].map((row, i) => (
+                      <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                        <td className="px-3 py-2 font-bold text-slate-700">{row.age}</td>
+                        <td className="px-2 py-2 text-blue-800">{row.screen}</td>
+                        <td className="px-2 py-2 text-green-800">{row.action}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* RBSK referral */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
               <p className="text-sm font-bold text-amber-900 mb-2">🏥 RBSK/DEIC Referral (India)</p>
@@ -1028,6 +1067,8 @@ export default function GeneralPediatricsHub() {
                   "ADIP scheme: free assistive devices for children with disability",
                   "Sarva Shiksha Abhiyan (SSA): integration into regular school",
                   "Disability certificate: obtained via DEIC → enables government benefits",
+                  "Rashtriya Bal Swasthya Karyakram (RBSK): screens all children 0–18y at Anganwadi, school level for 4Ds (Defects, Deficiencies, Diseases, Developmental delays)",
+                  "NIVH (National Institute for Visually Handicapped), ALI (Ali Yavar Jung) for sensory disabilities",
                 ].map((s, i) => <li key={i} className="text-xs text-amber-800 flex gap-1.5"><span className="font-bold text-amber-600">{i+1}.</span>{s}</li>)}
               </ol>
             </div>
@@ -1068,6 +1109,48 @@ export default function GeneralPediatricsHub() {
                 <NutritionGuidelineCard key={section.title} section={section} defaultOpen={!!search} />
               ))
             )}
+
+            {/* WHO/IAP Supplementation Schedule */}
+            <div className="rounded-xl border-2 border-green-200 bg-green-50 overflow-hidden">
+              <button className="w-full flex items-center justify-between px-4 py-3 bg-green-100 text-left"
+                onClick={e => e.currentTarget.nextElementSibling.classList.toggle('hidden')}>
+                <span className="text-sm font-bold text-green-900">📅 Supplementation Calendar — India (IAP/NHM)</span>
+                <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+              </button>
+              <div className="hidden p-4 overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead><tr className="bg-green-100">
+                    <th className="text-left px-2 py-2 font-bold">Age</th>
+                    <th className="text-left px-2 py-2 font-bold">Iron/Folate</th>
+                    <th className="text-left px-2 py-2 font-bold">Vitamin A</th>
+                    <th className="text-left px-2 py-2 font-bold">Vitamin D</th>
+                    <th className="text-left px-2 py-2 font-bold">Zinc</th>
+                    <th className="text-left px-2 py-2 font-bold">Others</th>
+                  </tr></thead>
+                  <tbody>
+                    {[
+                      { age: "Birth", fe: "Vit K 1mg IM (VKDB prevention)", va: "—", vd: "—", zn: "—", other: "BCG, OPV-0, HBV within 24h" },
+                      { age: "6 weeks", fe: "—", va: "—", vd: "400 IU/day (start)", zn: "—", other: "ReSoMal if SAM. ORS with zinc 10mg" },
+                      { age: "6 months", fe: "Fe drops 1mg/kg/day (start)", va: "100,000 IU (single dose)", vd: "400 IU/day continue", zn: "Zinc 10mg/day with diarrhoea (14d)", other: "Fluoride varnish if dentist available" },
+                      { age: "9 months", fe: "Continue Fe drops", va: "—", vd: "400 IU/day", zn: "—", other: "Measles-Rubella vaccine" },
+                      { age: "12 months", fe: "Continue Fe, add dietary Fe", va: "200,000 IU (q6 months)", vd: "Continue 400 IU", zn: "—", other: "MMR, JE (endemic areas)" },
+                      { age: "1–5 years", fe: "WIFS: 45mg/week + 400µg FA (school programme)", va: "200,000 IU every 6 months", vd: "600 IU/day OR 60,000 IU/month", zn: "20mg/day with diarrhoea (14d)", other: "Deworming 400mg Albendazole 6-monthly (>1y)" },
+                      { age: "5–10 years", fe: "WIFS continues", va: "No routine supplement", vd: "600 IU/day", zn: "As needed with illness", other: "Deworming 6-monthly" },
+                      { age: "10–18 years", fe: "Girls: Weekly Fe 60mg + FA 2.5mg (WIFS)", va: "No routine", vd: "600–1000 IU/day", zn: "—", other: "Calcium 1300mg/day (peak bone mass)" },
+                    ].map((r, i) => (
+                      <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-green-50"}>
+                        <td className="px-2 py-1.5 font-bold text-green-800">{r.age}</td>
+                        <td className="px-2 py-1.5 text-slate-700">{r.fe}</td>
+                        <td className="px-2 py-1.5 text-orange-700">{r.va}</td>
+                        <td className="px-2 py-1.5 text-amber-700">{r.vd}</td>
+                        <td className="px-2 py-1.5 text-blue-700">{r.zn}</td>
+                        <td className="px-2 py-1.5 text-slate-600">{r.other}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
             {/* Divider */}
             <div className="flex items-center gap-3">
