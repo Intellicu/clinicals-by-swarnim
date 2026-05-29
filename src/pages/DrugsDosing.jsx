@@ -199,7 +199,7 @@ export default function DrugsDosing() {
 
   const { data: drugs = [] } = useQuery({
     queryKey: ["drugs-full"],
-    queryFn: () => base44.entities.Drug.list("generic_name"),
+    queryFn: () => base44.entities.Drug.list("generic_name", 200),
   });
 
   // BSA (Mosteller)
