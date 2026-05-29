@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Search, BookOpen, ArrowLeft, ChevronRight, Calendar, Globe, Baby, Filter, GitBranch } from "lucide-react";
 import AdminEditButton from "../components/admin/AdminEditButton";
 import GuidelineDetailView from "../components/guidelines/GuidelineDetailView";
+import { BUILTIN_GUIDELINES } from "@/lib/guidelines/index";
 
 const SOURCES = ["All", "ISPN", "KDIGO", "IPNA", "ERKNet", "EAU/ESPU", "EULAR/ACR", "KDOQI", "ISPD", "IAP", "AAP", "ESPN", "WHO"];
 
@@ -160,10 +161,16 @@ export default function GuidelinesLibrary() {
   const [selected, setSelected] = useState(null);
   const [detailMode, setDetailMode] = useState(false);
 
-  const { data: guidelines = [], isLoading } = useQuery({
+  const { data: dbGuidelines = [], isLoading } = useQuery({
     queryKey: ["guidelines_library"],
     queryFn: () => base44.entities.Guideline.list("-year", 200),
+    initialData: [],
   });
+
+  const guidelines = useMemo(() => [
+    ...BUILTIN_GUIDELINES,
+    ...dbGuidelines.map(g => ({ ...g, _db: true }))
+  ], [dbGuidelines]);
 
   const filtered = useMemo(() => {
     return guidelines.filter(g => {
@@ -181,10 +188,10 @@ export default function GuidelinesLibrary() {
     });
   }, [guidelines, activeSource, search, libraryTab]);
 
-  const selected_guideline = selected ? guidelines.find(g => g.id === selected) : null;
+  const selected_guideline = selected ? guidelines.find(g => g.id === selected || g.title === selected) : null;
 
   const handleSelectGuideline = (g) => {
-    setSelected(g.id);
+    setSelected(g.id || g.title);
     setDetailMode(true);
   };
 
@@ -210,7 +217,7 @@ export default function GuidelinesLibrary() {
         <div className="flex items-center gap-3 mb-4">
           <BookOpen className="w-6 h-6 flex-shrink-0" />
           <h1 className="text-lg font-bold">Clinical Guidelines</h1>
-          <Badge className="bg-white/25 text-white border-0 text-xs ml-auto">{guidelines.length} guidelines</Badge>
+          <Badge className="bg-white/25 text-white border-0 text-xs ml-auto">{guidelines.length} guidelines · {BUILTIN_GUIDELINES.length} built-in</Badge>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />

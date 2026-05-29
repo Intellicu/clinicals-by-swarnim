@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import GuidelineDetailView from "../guidelines/GuidelineDetailView";
 import ConsolidatedAIHub from "./ConsolidatedAIHub";
+import TubularDisordersCenter from "../nephrology/TubularDisordersCenter";
 
 // ─── Icon map for CustomTool icons ───────────────────────────
 const ICON_MAP = {
@@ -23,101 +24,7 @@ function resolveIcon(name) {
 
 // ─── Tubular Disorders & RTA Section ─────────────────────────
 export function TubularDisordersSection({ onNavigate }) {
-  const [selectedGuideline, setSelectedGuideline] = useState(null);
-  const [search, setSearch] = useState("");
-  const [subFilter, setSubFilter] = useState("All");
-
-  const SUB_FILTERS = ["All", "RTA", "Fanconi/Genetic", "Channelopathy", "Concentration Defect", "Phosphate Wasting", "Dent/Lowe"];
-  const SUB_FILTER_MAP = {
-    "RTA": ["rta", "renal tubular acidosis", "proximal rta", "distal rta"],
-    "Fanconi/Genetic": ["fanconi", "cystinosis", "lowe", "galactosaemia"],
-    "Channelopathy": ["bartter", "gitelman", "liddle", "gordon"],
-    "Concentration Defect": ["nephrogenic diabetes insipidus", "ndi", "concentration"],
-    "Phosphate Wasting": ["hypophosphatemic", "phosphate", "tmp", "trp", "xlh"],
-    "Dent/Lowe": ["dent", "lowe", "ocrl"],
-  };
-
-  const { data: guidelines = [], isLoading } = useQuery({
-    queryKey: ["guidelines_tubular_v2"],
-    queryFn: () => base44.entities.Guideline.filter(
-      { category: { $in: ["Tubular Disorders", "RTA"] } },
-      "-year", 200
-    ),
-    staleTime: 60000,
-  });
-
-  const filtered = guidelines.filter(g => {
-    const matchSearch = !search || g.title?.toLowerCase().includes(search.toLowerCase()) ||
-      g.keywords?.some(k => k.toLowerCase().includes(search.toLowerCase()));
-    if (!matchSearch) return false;
-    if (subFilter === "All") return true;
-    const terms = SUB_FILTER_MAP[subFilter] || [];
-    return terms.some(t => g.title?.toLowerCase().includes(t) || g.summary?.toLowerCase().includes(t));
-  });
-
-  if (selectedGuideline) {
-    return (
-      <div className="p-4 space-y-4">
-        <Button variant="outline" size="sm" onClick={() => setSelectedGuideline(null)} className="gap-1.5">
-          <ArrowLeft className="w-4 h-4" /> Back to Tubular Disorders
-        </Button>
-        <GuidelineDetailView guideline={selectedGuideline} defaultMode="detailed" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {/* Header banner */}
-      <div className="p-4 bg-gradient-to-r from-cyan-700 to-teal-700 text-white rounded-xl">
-        <div className="flex items-center gap-3 mb-1">
-          <TestTube className="w-6 h-6 flex-shrink-0" />
-          <h2 className="font-bold text-base">Tubular Disorders & RTA</h2>
-          <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">{guidelines.length} conditions</span>
-        </div>
-        <p className="text-xs text-cyan-100 ml-9">RTA Types 1/2/4 · Bartter · Gitelman · Fanconi · NDI · Dent Disease · Lowe · Hypophosphatemic Rickets · Cystinosis</p>
-      </div>
-
-      {/* Sub-filter chips */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 px-4" style={{ scrollbarWidth: "none" }}>
-        {SUB_FILTERS.map(f => (
-          <button key={f} onClick={() => setSubFilter(f)}
-            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${subFilter === f ? "bg-cyan-600 text-white border-cyan-600" : "bg-white text-slate-600 border-slate-300 hover:border-cyan-400"}`}>
-            {f}
-          </button>
-        ))}
-      </div>
-
-      <div className="px-4 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search tubular guidelines…"
-            className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300" />
-        </div>
-
-        <p className="text-xs text-slate-500">{filtered.length} condition{filtered.length !== 1 ? "s" : ""} found</p>
-
-        {isLoading ? (
-          <div className="space-y-2">
-            {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-10 text-slate-400">
-            <TestTube className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">No tubular guidelines found for this filter</p>
-            <p className="text-xs mt-1">Try "All" or check the Guidelines Library to add records with category "Tubular Disorders" or "RTA"</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {filtered.map(g => (
-              <TubularGuidelineCard key={g.id} guideline={g} onClick={() => setSelectedGuideline(g)} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  return <TubularDisordersCenter />;
 }
 
 function TubularGuidelineCard({ guideline: g, onClick }) {
