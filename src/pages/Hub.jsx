@@ -1,19 +1,21 @@
-import React, { useState, useMemo, lazy, Suspense } from "react";
+import React, { useState, useMemo } from "react";
 import EmergencyAccessDrawer from "../components/EmergencyAccessDrawer";
+import EmergencyProtocolDrawer from "../components/hub/EmergencyProtocolDrawer";
+import DataDrivenToolGroups from "../components/hub/DataDrivenToolGroups";
+import GuidelineLinkedPathways from "../components/hub/GuidelineLinkedPathways";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Activity, Calculator, FileText, Heart, Droplet, Pill, BookOpen,
+  Activity, Calculator, Heart, Droplet, Pill, BookOpen,
   Stethoscope, TestTube, Baby, Zap, Sparkles, Brain, AlertCircle,
   UtensilsCrossed, GraduationCap, Layers, FlaskConical, ClipboardList,
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
-  RefreshCw, Shield, Info, BarChart2, Star, Clock,
+  RefreshCw, Shield, Info, BarChart2, Star,
   Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
   ChevronDown, ChevronUp, Thermometer } from
 "lucide-react";
@@ -379,78 +381,7 @@ const KNOWLEDGE_SECTIONS = [
   { name: "Tanner Staging", page: "CalculatorsHub", icon: Users }]
 
 },
-{
-  title: "Pediatric Emergency Tools",
-  icon: AlertCircle,
-  color: "border-red-200 bg-red-50",
-  iconColor: "text-red-600",
-  items: [
-  { name: "Emergency Hub (All)", page: "EmergencyHub", icon: AlertCircle },
-  { name: "Sepsis & Septic Shock", page: "EmergencyHub", icon: Zap },
-  { name: "Status Epilepticus", page: "EmergencyHub", icon: Brain },
-  { name: "DKA Management", page: "EmergencyHub", icon: Activity },
-  { name: "Hyperkalemia", page: "EmergencyHub", icon: Zap },
-  { name: "Hypertensive Emergency", page: "EmergencyHub", icon: Heart },
-  { name: "Anaphylaxis", page: "EmergencyHub", icon: AlertCircle },
-  { name: "Acute Severe Asthma", page: "EmergencyHub", icon: Wind },
-  { name: "Fluid Bolus Guidance", page: "FluidCalculator", icon: Droplet },
-  { name: "PICU Escalation Triggers", page: "EmergencyHub", icon: TrendingUp },
-  { name: "Intubation Quick Guide", page: "EmergencyHub", icon: Activity },
-  { name: "Toxicology Basics", page: "EmergencyHub", icon: Beaker }]
-
-},
-{
-  title: "General Pediatric Pathways",
-  icon: GitBranch,
-  color: "border-sky-200 bg-sky-50",
-  iconColor: "text-sky-700",
-  items: [
-  { name: "Fever Approach", page: "ClinicalApproaches", icon: Activity },
-  { name: "Failure to Thrive", page: "ClinicalApproaches", icon: Baby },
-  { name: "Developmental Delay", page: "ClinicalApproaches", icon: Brain },
-  { name: "Short Stature", page: "Anthropometry", icon: Baby },
-  { name: "Obesity & BMI", page: "Anthropometry", icon: Baby },
-  { name: "Anemia Approach", page: "ClinicalApproaches", icon: Droplet },
-  { name: "Neonatal Jaundice", page: "ClinicalApproaches", icon: Baby },
-  { name: "Dehydration", page: "FluidCalculator", icon: Waves },
-  { name: "Shock Approach", page: "EmergencyHub", icon: AlertCircle },
-  { name: "Seizures Pathway", page: "ClinicalApproaches", icon: Brain },
-  { name: "Poisoning Approach", page: "EmergencyHub", icon: Beaker },
-  { name: "Pediatric HTN Pathway", page: "BPPercentiles", icon: Heart }]
-
-},
-{
-  title: "Pediatric Procedures",
-  icon: ClipboardList,
-  color: "border-purple-200 bg-purple-50",
-  iconColor: "text-purple-700",
-  items: [
-  { name: "Lumbar Puncture Guide", page: "ClinicalApproaches", icon: Stethoscope },
-  { name: "Central Line Basics", page: "ClinicalApproaches", icon: Activity },
-  { name: "NG Tube Insertion", page: "ClinicalApproaches", icon: ClipboardList },
-  { name: "Urinary Catheterization", page: "ClinicalApproaches", icon: Droplet },
-  { name: "Intraosseous Access", page: "ClinicalApproaches", icon: Zap },
-  { name: "IV Access Pearls", page: "ClinicalApproaches", icon: Activity },
-  { name: "Airway Checklist", page: "EmergencyHub", icon: Wind },
-  { name: "Fluid Bolus Protocols", page: "FluidCalculator", icon: Waves }]
-
-},
-{
-  title: "Pediatric AI Analysers",
-  icon: Brain,
-  color: "border-violet-200 bg-violet-50",
-  iconColor: "text-violet-700",
-  items: [
-  { name: "CBC Analyzer", page: "ClinicalAIHub", icon: Microscope },
-  { name: "ABG Analyzer", page: "ABGInterpreter", icon: Wind },
-  { name: "DKA Analyzer", page: "ClinicalAIHub", icon: Activity },
-  { name: "Sepsis Risk Analyzer", page: "ClinicalAIHub", icon: AlertCircle },
-  { name: "Growth Failure Analyzer", page: "ClinicalAIHub", icon: Baby },
-  { name: "Nutrition Analyzer", page: "NutritionHub", icon: UtensilsCrossed },
-  { name: "Dehydration Analyzer", page: "ClinicalAIHub", icon: Droplet },
-  { name: "Lab Analyzer (Nephro)", page: "ClinicalAIHub", icon: FlaskConical }]
-
-}];
+];
 
 
 // ── OCR Scan cards ──
@@ -483,6 +414,7 @@ export default function Hub() {
   const isOnline = useOnlineStatus();
   const { patientData } = usePatient();
   const [emergencyDrawerOpen, setEmergencyDrawerOpen] = useState(false);
+  const [emergencyProtocolOpen, setEmergencyProtocolOpen] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -524,15 +456,24 @@ export default function Hub() {
             <h1 className="text-base font-bold text-white leading-tight">CliniCals Hub</h1>
             <p className="text-blue-200 text-xs">Pediatric Nephrology Bedside Assistant</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
-              {isOnline ? "Online" : "Offline"}
+              <span className="hidden sm:inline">{isOnline ? "Online" : "Offline"}</span>
             </span>
+            {/* Emergency Protocols button */}
+            <button
+              onClick={() => setEmergencyProtocolOpen(true)}
+              className="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white rounded-lg h-7 px-2.5 text-xs font-bold transition-colors shadow-sm"
+              aria-label="Emergency Protocols"
+            >
+              <AlertCircle className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Emergency</span>
+            </button>
             <Link to={createPageUrl("ClinicalWorkspace")}>
               <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
                 <Layers className="w-3 h-3" />
-                <span>Workspace</span>
+                <span className="hidden sm:inline">Workspace</span>
               </Button>
             </Link>
             {isAdmin &&
@@ -686,6 +627,7 @@ export default function Hub() {
           </Link>
         </div>
         <EmergencyAccessDrawer open={emergencyDrawerOpen} onClose={() => setEmergencyDrawerOpen(false)} />
+        <EmergencyProtocolDrawer open={emergencyProtocolOpen} onClose={() => setEmergencyProtocolOpen(false)} />
 
         {/* ── Key Module Chips ── */}
         <div>
@@ -787,6 +729,12 @@ export default function Hub() {
             </button>
           }
         </div>
+
+        {/* ── Data-driven tool groups (AI Analysers, Emergency Protocols, Procedures) ── */}
+        <DataDrivenToolGroups />
+
+        {/* ── General Pediatric Pathways (guideline-linked) ── */}
+        <GuidelineLinkedPathways />
 
         {/* ── Disclaimer ── */}
         <Alert className="bg-blue-50 border-blue-200">
