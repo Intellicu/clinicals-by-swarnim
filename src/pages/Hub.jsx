@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, lazy, Suspense } from "react";
+import EmergencyAccessDrawer from "../components/EmergencyAccessDrawer";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -180,6 +181,7 @@ const KNOWLEDGE_SECTIONS = [
   iconColor: "text-violet-700",
   items: [
   { name: "Rare Disease Module", page: "RareDiseaseModule", icon: Dna },
+  { name: "Rare Disease Diagnostic Checklist", page: "RareDiseaseModule", icon: FlaskConical },
   { name: "Genetic Report Analyzer", page: "GeneticReportAnalyzer", icon: Brain },
   { name: "aHUS · Cystinosis · Fabry", page: "RareDiseaseModule", icon: FlaskConical },
   { name: "NPRD & CoE Network", page: "RareDiseaseModule", icon: Shield },
@@ -208,6 +210,48 @@ const KNOWLEDGE_SECTIONS = [
   { name: "Schwartz GFR", page: "SchwartzGFR", icon: Activity },
   { name: "ABG Interpreter", page: "ABGInterpreter", icon: Wind },
   { name: "Drug Dosing Engine", page: "DrugsDosing", icon: Pill }]
+
+},
+{
+  title: "Procedural Medicine",
+  icon: ClipboardList,
+  color: "border-slate-200 bg-slate-50",
+  iconColor: "text-slate-700",
+  items: [
+  { name: "Procedure Hub", page: "ProcedureHub", icon: ClipboardList },
+  { name: "Kidney Biopsy Checklist", page: "ProcedureHub", icon: Shield },
+  { name: "HD Catheter Insertion Guide", page: "ProcedureHub", icon: Droplet },
+  { name: "CAPD Catheter Guide", page: "ProcedureHub", icon: Droplet },
+  { name: "CRRT Setup Guide", page: "ProcedureHub", icon: Activity },
+  { name: "Peritoneal Equilibration Test (PET)", page: "ProcedureHub", icon: Beaker }]
+
+},
+{
+  title: "Pediatric Subspecialties",
+  icon: Stethoscope,
+  color: "border-slate-200 bg-slate-50",
+  iconColor: "text-slate-600",
+  items: [
+  { name: "Subspecialties Hub", page: "SubspecialtiesHub", icon: Stethoscope },
+  { name: "Pediatric Neurology", page: "SubspecialtiesHub", icon: Brain },
+  { name: "Pediatric Cardiology", page: "SubspecialtiesHub", icon: Heart },
+  { name: "Pediatric Pulmonology", page: "SubspecialtiesHub", icon: Wind },
+  { name: "Neonatology", page: "SubspecialtiesHub", icon: Baby },
+  { name: "Pediatric Urology", page: "SubspecialtiesHub", icon: Droplet },
+  { name: "Pediatric Dermatology", page: "SubspecialtiesHub", icon: Layers }]
+
+},
+{
+  title: "Imaging & Radiology",
+  icon: Camera,
+  color: "border-blue-200 bg-blue-50",
+  iconColor: "text-blue-700",
+  items: [
+  { name: "Imaging Viewer & Guides", page: "ImagingViewer", icon: Camera },
+  { name: "CAKUT USS Interpretation", page: "ImagingViewer", icon: Activity },
+  { name: "MCU / VCUG Interpretation", page: "ImagingViewer", icon: Activity },
+  { name: "DMSA Scan Interpretation", page: "ImagingViewer", icon: Activity },
+  { name: "MAG3 Renogram Interpretation", page: "ImagingViewer", icon: Activity }]
 
 },
 {
@@ -438,6 +482,7 @@ function CollapsibleSection({ title, icon: Icon, iconColor, children, defaultOpe
 export default function Hub() {
   const isOnline = useOnlineStatus();
   const { patientData } = usePatient();
+  const [emergencyDrawerOpen, setEmergencyDrawerOpen] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -580,20 +625,19 @@ export default function Hub() {
               <span className="text-xs text-blue-600 font-semibold">All AI →</span>
             </Link>
           </div>
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {AI_TOOLS.map((tool) => {
               const Icon = tool.icon;
               const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
               return (
-                <Link key={tool.name} to={href}>
-                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm">
+                <Link key={tool.name} to={href} className="flex-shrink-0">
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-violet-300 hover:shadow-sm w-20">
                     <div className={`w-9 h-9 ${tool.color} rounded-xl flex items-center justify-center shadow-sm`}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-xs font-semibold text-slate-700 text-center leading-tight line-clamp-2">{tool.name}</span>
                   </div>
                 </Link>);
-
             })}
           </div>
         </div>
@@ -609,36 +653,39 @@ export default function Hub() {
               <span className="text-xs text-blue-600 font-semibold">All →</span>
             </Link>
           </div>
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {QUICK_CALCS.map((calc) => {
               const Icon = calc.icon;
               return (
-                <Link key={calc.name} to={createPageUrl(calc.page)}>
-                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm">
+                <Link key={calc.name} to={createPageUrl(calc.page)} className="flex-shrink-0">
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 flex flex-col items-center gap-1.5 active:scale-95 transition-transform hover:border-blue-300 hover:shadow-sm w-20">
                     <div className={`w-9 h-9 ${calc.color} rounded-xl flex items-center justify-center shadow-sm`}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-xs font-semibold text-slate-700 text-center leading-tight line-clamp-2">{calc.name}</span>
                   </div>
                 </Link>);
-
             })}
           </div>
         </div>
 
         {/* ── Emergency Quick Access ── */}
-        <Link to={createPageUrl("EmergencyHub")}>
-          <div className="bg-red-600 rounded-xl px-4 py-3 flex items-center justify-between active:scale-95 transition-transform shadow">
+        <div className="flex gap-2">
+          <button onClick={() => setEmergencyDrawerOpen(true)} className="flex-1 bg-red-600 rounded-xl px-4 py-3 flex items-center justify-between active:scale-95 transition-transform shadow">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-6 h-6 text-white" />
-              <div>
-                <p className="text-white font-bold text-sm">Emergency Hub</p>
-                <p className="text-red-200 text-xs">Hyperkalemia · HTN Crisis · HUS · RPGN · PD Peritonitis</p>
+              <AlertCircle className="w-5 h-5 text-white" />
+              <div className="text-left">
+                <p className="text-white font-bold text-sm">Emergency Access</p>
+                <p className="text-red-200 text-xs">Instant resus tools →</p>
               </div>
             </div>
             <ChevronRight className="w-5 h-5 text-red-200" />
-          </div>
-        </Link>
+          </button>
+          <Link to={createPageUrl("EmergencyHub")} className="bg-red-700 rounded-xl px-3 py-3 flex items-center justify-center active:scale-95 transition-transform shadow">
+            <Layers className="w-5 h-5 text-white" />
+          </Link>
+        </div>
+        <EmergencyAccessDrawer open={emergencyDrawerOpen} onClose={() => setEmergencyDrawerOpen(false)} />
 
         {/* ── Key Module Chips ── */}
         <div>
@@ -646,7 +693,7 @@ export default function Hub() {
             <Layers className="w-4 h-4 text-slate-500" />
             <h2 className="text-sm font-bold text-slate-700">Specialty Modules</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {[
             { name: "Pediatrics Hub", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
             { name: "Clinical Pathways", icon: GitBranch, color: "bg-sky-700", page: "ClinicalSupport" },
@@ -662,17 +709,18 @@ export default function Hub() {
             { name: "Pathway Builder", icon: GitBranch, color: "bg-violet-600", page: "PathwayBuilder" },
             { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" },
             { name: "Gastroenterology", icon: Activity, color: "bg-orange-600", page: "GeneralPediatricsHub" },
-            { name: "Haematology", icon: Beaker, color: "bg-red-700", page: "GeneralPediatricsHub" }].
+            { name: "Haematology", icon: Beaker, color: "bg-red-700", page: "GeneralPediatricsHub" },
+            { name: "Subspecialties", icon: Stethoscope, color: "bg-slate-600", page: "SubspecialtiesHub" },
+            { name: "Procedures", icon: ClipboardList, color: "bg-slate-800", page: "ProcedureHub" }].
             map((chip) => {
               const ChipIcon = chip.icon;
               return (
-                <Link key={chip.name} to={createPageUrl(chip.page)}>
-                  <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl ${chip.color} text-white active:scale-95 transition-transform shadow-sm`}>
-                    <ChipIcon className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-xs font-semibold leading-tight">{chip.name}</span>
+                <Link key={chip.name} to={createPageUrl(chip.page)} className="flex-shrink-0">
+                  <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl ${chip.color} text-white active:scale-95 transition-transform shadow-sm`}>
+                    <ChipIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span className="text-xs font-semibold leading-tight whitespace-nowrap">{chip.name}</span>
                   </div>
                 </Link>);
-
             })}
           </div>
         </div>

@@ -15,9 +15,11 @@ import AILabRareAnalyzers from "../components/rare-disease/AILabRareAnalyzers";
 import RegistryResearch from "../components/rare-disease/RegistryResearch";
 import FamilyEducation from "../components/rare-disease/FamilyEducation";
 import OtherDiseaseScreeningTools from "../components/rare-disease/OtherDiseaseScreeningTools";
+import RareDiagnosticChecklist from "../components/rare-disease/RareDiagnosticChecklist";
 
 const TABS = [
   { value: "screening",   label: "Rapid Screening",       icon: Search,       short: "Screen" },
+  { value: "checklist",   label: "Diagnostic Checklist",  icon: FlaskConical, short: "Checklist" },
   { value: "disease_screens", label: "Disease Screens",   icon: FlaskConical, short: "Screens" },
   { value: "clusters",    label: "Disease Clusters",       icon: Dna,          short: "Clusters" },
   { value: "symptoms",    label: "Symptom Approach",       icon: AlertTriangle, short: "Symptoms" },
@@ -74,7 +76,7 @@ export default function RareDiseaseModule() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Mobile: 2-row scrollable */}
           <div className="overflow-x-auto pb-1 mb-4">
-            <TabsList className="inline-flex h-auto gap-1 bg-white border border-violet-200 rounded-xl p-1 shadow-sm min-w-full md:grid md:grid-cols-11">
+            <TabsList className="inline-flex h-auto gap-1 bg-white border border-violet-200 rounded-xl p-1 shadow-sm min-w-full md:grid md:grid-cols-12">
               {TABS.map(t => {
                 const Icon = t.icon;
                 return (
@@ -93,6 +95,7 @@ export default function RareDiseaseModule() {
           </div>
 
           <TabsContent value="screening"><RapidScreening isAdmin={isAdmin} /></TabsContent>
+          <TabsContent value="checklist"><RareDiagnosticChecklist /></TabsContent>
           <TabsContent value="disease_screens"><OtherDiseaseScreeningTools isAdmin={isAdmin} /></TabsContent>
           <TabsContent value="clusters"><DiseaseClusters isAdmin={isAdmin} /></TabsContent>
           <TabsContent value="symptoms"><SymptomBasedApproach isAdmin={isAdmin} /></TabsContent>

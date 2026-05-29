@@ -39,6 +39,8 @@ import PathwayBuilder from './pages/PathwayBuilder';
 import PediatricEndocrinology from './pages/PediatricEndocrinology';
 import TubularDisordersHub from './pages/TubularDisordersHub';
 import AIAgentsHub from './pages/AIAgentsHub';
+import ProcedureHub from './pages/ProcedureHub';
+import SubspecialtiesHub from './pages/SubspecialtiesHub';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -122,6 +124,8 @@ const AuthenticatedApp = () => {
       <Route path="/PediatricEndocrinology" element={<LayoutWrapper currentPageName="PediatricEndocrinology"><PediatricEndocrinology /></LayoutWrapper>} />
       <Route path="/TubularDisordersHub" element={<LayoutWrapper currentPageName="TubularDisordersHub"><TubularDisordersHub /></LayoutWrapper>} />
       <Route path="/AIAgentsHub" element={<LayoutWrapper currentPageName="AIAgentsHub"><AIAgentsHub /></LayoutWrapper>} />
+      <Route path="/ProcedureHub" element={<LayoutWrapper currentPageName="ProcedureHub"><ProcedureHub /></LayoutWrapper>} />
+      <Route path="/SubspecialtiesHub" element={<LayoutWrapper currentPageName="SubspecialtiesHub"><SubspecialtiesHub /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

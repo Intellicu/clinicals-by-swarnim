@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Calculator, Droplets, Activity } from "lucide-react";
+import { AlertTriangle, Calculator, Droplets, Activity, Activity as ActivityIcon } from "lucide-react";
 
 // Based on AJKD 2023 Core Curriculum + ASFA 8th Edition 2019
 
@@ -185,6 +185,7 @@ export default function PlasmapheresisModule() {
   const sections = [
     { id: "calculator", label: "📐 EPV Calc" },
     { id: "indications", label: "📋 Indications" },
+    { id: "ispn", label: "🧒 ISPN Paeds" },
     { id: "fluids", label: "💉 Fluids" },
     { id: "anticoag", label: "🔬 Anticoag" },
     { id: "complications", label: "⚠️ Complications" },
@@ -224,6 +225,117 @@ export default function PlasmapheresisModule() {
 
       {activeSection === "calculator" && <EPVCalculator weight={weight} setWeight={setWeight} hematocrit={hematocrit} setHematocrit={setHematocrit} />}
       {activeSection === "indications" && <IndicationsTable />}
+
+      {activeSection === "ispn" && (
+        <Card className="bg-white border border-slate-200">
+          <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b py-3 px-4">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Activity className="w-4 h-4 text-teal-700" /> ISPN / Paediatric TPE Guidance
+              <Badge className="bg-teal-600 text-white text-xs ml-auto">ISPN 2019 + Bagga et al.</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 space-y-4">
+
+            <Alert className="bg-teal-50 border-teal-200">
+              <AlertTriangle className="w-3.5 h-3.5 text-teal-700" />
+              <AlertDescription className="text-xs text-teal-800">
+                <strong>Paediatric TPE differs from adults</strong> — blood volumes are small; extracorporeal volume must remain &lt;15% total blood volume. Circuit priming with albumin or blood may be necessary in children &lt;20 kg.
+              </AlertDescription>
+            </Alert>
+
+            <div className="rounded-xl border border-slate-200 overflow-hidden">
+              <div className="bg-teal-700 px-4 py-2 text-white text-xs font-bold">Key Paediatric Indications (ISPN 2019 Consensus)</div>
+              <table className="w-full text-xs border-collapse">
+                <thead><tr className="bg-slate-100">
+                  <th className="text-left px-3 py-2 font-bold">Indication</th>
+                  <th className="text-center px-2 py-2 font-bold">Evidence</th>
+                  <th className="text-left px-2 py-2 font-bold">ISPN Recommendation</th>
+                </tr></thead>
+                <tbody>
+                  {[
+                    { ind: "Anti-FH aHUS", ev: "Strong", rec: "First-line TPE daily until remission; bridge while anti-FH Ab titre falls; continue eculizumab if available" },
+                    { ind: "Post-transplant FSGS recurrence", ev: "Strong", rec: "Intensive TPE (daily ×3–5, then alternate day); aim for proteinuria remission; can be continued as maintenance" },
+                    { ind: "Acute Guillain-Barré Syndrome", ev: "Moderate", rec: "IVIG preferred if available; TPE equivalent efficacy (5 sessions); not combined with IVIG" },
+                    { ind: "SLE Nephritis — severe / refractory", ev: "Moderate", rec: "Adjunct to immunosuppression for severe class IV-V; 6–8 sessions over 2–4 weeks" },
+                    { ind: "TTP / ADAMTS13-deficient TMA", ev: "Strong", rec: "Daily TPE with FFP as replacement (ADAMTS13 source); continue until remission ≥2 days" },
+                    { ind: "Anti-GBM disease (Goodpasture)", ev: "Strong", rec: "Daily TPE with albumin (FFP if DAH) × 14 days or until anti-GBM Ab undetectable" },
+                    { ind: "Steroid-resistant Nephrotic Syndrome (research)", ev: "Weak", rec: "Not routinely recommended; limited evidence; may benefit a subset with circulating permeability factor" },
+                  ].map((r, i) => (
+                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                      <td className="px-3 py-2 font-semibold text-slate-900">{r.ind}</td>
+                      <td className="px-2 py-2 text-center"><Badge className={r.ev === "Strong" ? "bg-green-100 text-green-800 border-green-200" : r.ev === "Moderate" ? "bg-yellow-100 text-yellow-800" : "bg-slate-100 text-slate-700"} variant="outline">{r.ev}</Badge></td>
+                      <td className="px-2 py-2 text-slate-700 text-xs">{r.rec}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-3">
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                <p className="text-xs font-bold text-amber-800 mb-2">Paediatric Technical Considerations</p>
+                <ul className="space-y-1">
+                  {[
+                    "Extracorporeal volume: must be <15% of total blood volume",
+                    "Circuit priming: required if child <15–20 kg (use 5% albumin or O-neg pRBC)",
+                    "Volume exchanged: 1–1.5× estimated plasma volume per session",
+                    "Plasma volume (paeds): 40 mL/kg (neonate) → 45 mL/kg (infant) → 50 mL/kg (child)",
+                    "Calcium monitoring: 30–60 min; give IV calcium gluconate q30–60 min prophylactically",
+                    "Temperature: use warmer for replacement fluid; children prone to hypothermia",
+                    "Access: femoral or IJV CVC for most children; AVF uncommon in paeds",
+                  ].map((pt, i) => (
+                    <li key={i} className="flex items-start gap-1.5 text-xs text-amber-900">
+                      <span className="text-amber-500 mt-0.5">•</span>{pt}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                <p className="text-xs font-bold text-blue-800 mb-2">Monitoring Protocol (ISPN)</p>
+                <ul className="space-y-1">
+                  {[
+                    "Pre-procedure: CBC, PT/INR, APTT, ionised calcium, UEC, serum albumin",
+                    "During: BP, HR, SpO2 every 15 min; ionised Ca²⁺ every 30–60 min",
+                    "Post-procedure: repeat CBC, coagulation, electrolytes",
+                    "Disease-specific: anti-FH Ab titres, ADAMTS13 activity, anti-GBM Ab serially",
+                    "Albumin level: maintain >20 g/L; supplement if low post-TPE",
+                    "Immunoglobulins: fall after TPE; delay IVIG to 24–48h post-session",
+                    "Drug levels: antimicrobials, immunosuppressants removed by TPE — re-dose after",
+                  ].map((pt, i) => (
+                    <li key={i} className="flex items-start gap-1.5 text-xs text-blue-900">
+                      <span className="text-blue-500 mt-0.5">•</span>{pt}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs font-bold text-slate-700 mb-2">Endpoints for Discontinuation</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { cond: "aHUS / anti-FH", stop: "Anti-FH Ab titre <1:32 + platelet recovery + renal stabilisation" },
+                  { cond: "TTP", stop: "Platelets >150×10³ for ≥2 consecutive days + LDH normal" },
+                  { cond: "Anti-GBM", stop: "Anti-GBM Ab undetectable + renal function stable" },
+                  { cond: "FSGS post-Tx", stop: "Proteinuria in remission or no response after 2–3 weeks" },
+                ].map((e, i) => (
+                  <div key={i} className="bg-white rounded-lg p-2 border border-slate-200">
+                    <p className="text-xs font-bold text-slate-800">{e.cond}</p>
+                    <p className="text-xs text-slate-600 mt-0.5">{e.stop}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Alert className="bg-blue-50 border-blue-200">
+              <AlertTriangle className="w-3.5 h-3.5 text-blue-700" />
+              <AlertDescription className="text-xs text-blue-800">
+                <strong>References:</strong> Bagga A et al. Indian Pediatrics 2019 | ISPN Apheresis Working Group 2019 | Arbeiter K. Pediatr Nephrol 2020 | Padmanabhan A et al. ASFA 8th Ed 2019 | Schwartz J et al. J Clin Apher 2023.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      )}
 
       {activeSection === "fluids" && (
         <Card className="bg-white border border-slate-200">
