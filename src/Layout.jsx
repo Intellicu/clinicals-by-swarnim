@@ -235,17 +235,35 @@ export default function Layout({ children, currentPageName }) {
                 </h1>
               </div>
 
-              <Link to={createPageUrl("ClinicWorkflow")} aria-label="Open Clinic Mode">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-purple-50 border-purple-300 hover:bg-purple-100 text-purple-700 font-semibold text-xs h-9 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+              {user?.role === "admin" ? (
+                <Link to={createPageUrl("ClinicWorkflow")} aria-label="Open Clinic Mode">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-purple-50 border-purple-300 hover:bg-purple-100 text-purple-700 font-semibold text-xs h-9 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+                  >
+                    <Users className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span className="hidden sm:inline ml-1">Clinic Mode</span>
+                    <span className="sm:hidden ml-1">Clinic</span>
+                  </Button>
+                </Link>
+              ) : (
+                <a
+                  href="mailto:admin@clinicalshub.com?subject=Clinic Mode Access Request&body=I would like to request access to Clinic Mode. My account email is: "
+                  aria-label="Request Clinic Mode Access"
                 >
-                  <Users className="w-3.5 h-3.5" aria-hidden="true" />
-                  <span className="hidden sm:inline ml-1">Clinic Mode</span>
-                  <span className="sm:hidden ml-1">Clinic</span>
-                </Button>
-              </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-slate-50 border-slate-300 hover:bg-slate-100 text-slate-500 font-semibold text-xs h-9 focus:outline-none"
+                    title="View-only — contact admin to unlock Clinic Mode"
+                  >
+                    <Users className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span className="hidden sm:inline ml-1">Request Access</span>
+                    <span className="sm:hidden ml-1">Clinic</span>
+                  </Button>
+                </a>
+              )}
             </div>
           </header>
 

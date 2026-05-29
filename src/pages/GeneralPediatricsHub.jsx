@@ -414,16 +414,18 @@ function PathwayCard({ pathway, onEdit, onDelete }) {
   );
 }
 
-// ── AI Pathway Generator ─────────────────────────────────────────────────────
+// ── AI Pathway Generator (with approval step) ────────────────────────────────
 function AIPathwayGenerator({ onGenerated }) {
   const [mode, setMode] = useState("web");
   const [topic, setTopic] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState(null); // generated pathway awaiting approval
 
   const generate = async () => {
     if (!topic.trim() && !file) { toast.error("Enter a topic or upload a document"); return; }
     setLoading(true);
+    setPreview(null);
     toast.info("AI generating pathway — 30-60 seconds…");
     try {
       let fileUrls = [];
@@ -450,13 +452,75 @@ Return JSON: name, full, badge, color (amber/teal/violet/blue/green/rose), overv
           }
         }
       });
-      onGenerated({ ...res, id: `ai_${Date.now()}` });
-      setTopic(""); setFile(null);
+      setPreview({ ...res, id: `ai_${Date.now()}` });
     } catch (e) {
       toast.error("Generation failed: " + (e.message || "unknown error"));
     }
     setLoading(false);
   };
+
+  const handleApprove = () => {
+    if (!preview) return;
+    onGenerated(preview);
+    setPreview(null);
+    setTopic("");
+    setFile(null);
+    toast.success("✅ Pathway approved and added!");
+  };
+
+  const handleReject = () => {
+    setPreview(null);
+    toast.info("Pathway discarded. Try generating again.");
+  };
+
+  if (preview) {
+    return (
+      <div className="bg-gradient-to-br from-violet-50 to-indigo-50 border-2 border-violet-300 rounded-xl p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-violet-600" />
+            <h3 className="text-sm font-bold text-violet-900">Review AI-Generated Pathway</h3>
+          </div>
+          <Badge className="bg-amber-100 text-amber-700 text-xs">Pending Approval</Badge>
+        </div>
+
+        <div className="bg-white rounded-xl border border-violet-200 p-3 space-y-2 max-h-64 overflow-y-auto">
+          <div>
+            <p className="text-xs font-bold text-violet-800 uppercase tracking-wide">Name</p>
+            <p className="text-sm font-bold text-slate-800">{preview.name}</p>
+            <p className="text-xs text-slate-500">{preview.full}</p>
+          </div>
+          {preview.overview && (
+            <div>
+              <p className="text-xs font-bold text-slate-600 uppercase tracking-wide">Overview</p>
+              <p className="text-xs text-slate-700">{preview.overview}</p>
+            </div>
+          )}
+          {preview.management?.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-slate-600 uppercase tracking-wide">Key Management Steps ({preview.management.length})</p>
+              <ul className="space-y-0.5">
+                {preview.management.slice(0, 4).map((m, i) => (
+                  <li key={i} className="text-xs text-slate-700 flex gap-1.5"><span className="text-violet-500 font-bold">{i+1}.</span>{m}</li>
+                ))}
+                {preview.management.length > 4 && <li className="text-xs text-slate-400">+{preview.management.length - 4} more steps…</li>}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2">
+          <Button onClick={handleApprove} className="flex-1 bg-green-600 hover:bg-green-700 text-white h-9 text-sm">
+            <Check className="w-4 h-4 mr-1" /> Approve & Add
+          </Button>
+          <Button onClick={handleReject} variant="outline" className="flex-1 border-red-300 text-red-600 hover:bg-red-50 h-9 text-sm">
+            <X className="w-4 h-4 mr-1" /> Discard
+          </Button>
+        </div>
+        <p className="text-xs text-slate-400 text-center">Review the content before adding to your pathway library</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gradient-to-br from-violet-50 to-indigo-50 border-2 border-violet-200 rounded-xl p-4 space-y-3">
@@ -489,6 +553,7 @@ Return JSON: name, full, badge, color (amber/teal/violet/blue/green/rose), overv
       <Button onClick={generate} disabled={loading} className="w-full bg-violet-600 hover:bg-violet-700 text-white h-9 text-sm">
         {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating…</> : <><Sparkles className="w-4 h-4 mr-2" />Generate with AI</>}
       </Button>
+      <p className="text-xs text-slate-400 text-center">AI will generate a pathway for you to review before adding</p>
     </div>
   );
 }

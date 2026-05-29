@@ -475,6 +475,12 @@ export default function Hub() {
                 <span className="hidden sm:inline">Workspace</span>
               </Button>
             </Link>
+            <Link to={createPageUrl("ClinicalSupport")}>
+              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
+                <GitBranch className="w-3 h-3" />
+                <span className="hidden sm:inline">Pathways</span>
+              </Button>
+            </Link>
             {isAdmin &&
             <Link to={createPageUrl("ClinicDashboard")}>
                 <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2">

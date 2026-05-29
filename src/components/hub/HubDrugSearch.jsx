@@ -2,12 +2,12 @@
  * HubDrugSearch — compact inline drug dosing widget for the Hub.
  * Shows below Quick Patient Entry. Search → tap → inline dose card.
  */
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Pill, Search, X, ChevronRight } from "lucide-react";
+import { Pill, Search, X, ChevronRight, Star } from "lucide-react";
 import { usePatient } from "../PatientContext";
 
 function calcDose(drug, wt) {
@@ -29,7 +29,7 @@ function calcDose(drug, wt) {
   return { perDose: raw, freq, type: "fixed" };
 }
 
-const CATEGORY_FILTERS = ["All", "Immunosuppressant", "Antihypertensive", "Diuretic", "Antibiotic", "Emergency", "Corticosteroid"];
+const CATEGORY_FILTERS = ["All", "Starred", "Immunosuppressant", "Antihypertensive", "Diuretic", "Antibiotic", "Emergency", "Corticosteroid"];
 
 export default function HubDrugSearch() {
   const { patientData } = usePatient();
@@ -39,6 +39,18 @@ export default function HubDrugSearch() {
   const [catFilter, setCatFilter] = useState("All");
   const [selectedDrug, setSelectedDrug] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const [starredIds, setStarredIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("hub_drug_stars") || "[]"); } catch { return []; }
+  });
+
+  const toggleStar = useCallback((drugId, e) => {
+    e.stopPropagation();
+    setStarredIds(prev => {
+      const next = prev.includes(drugId) ? prev.filter(id => id !== drugId) : [...prev, drugId];
+      localStorage.setItem("hub_drug_stars", JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
   const { data: drugs = [] } = useQuery({
     queryKey: ["drugs-full"],
@@ -47,18 +59,24 @@ export default function HubDrugSearch() {
   });
 
   const filtered = useMemo(() => {
-    if (!query && catFilter === "All") return drugs.slice(0, 20);
+    if (!query && catFilter === "All") {
+      // Show starred first, then rest
+      const starred = drugs.filter(d => starredIds.includes(d.id));
+      const others = drugs.filter(d => !starredIds.includes(d.id)).slice(0, 20 - starred.length);
+      return [...starred, ...others];
+    }
     return drugs.filter(d => {
       const matchQ = !query ||
         d.generic_name?.toLowerCase().includes(query.toLowerCase()) ||
         d.brands_indian?.toLowerCase().includes(query.toLowerCase()) ||
         d.therapeutic_class?.toLowerCase().includes(query.toLowerCase());
-      const matchCat = catFilter === "All" ||
+      const matchCat = catFilter === "All" ? true :
+        catFilter === "Starred" ? starredIds.includes(d.id) :
         d.category?.toLowerCase().includes(catFilter.toLowerCase()) ||
         d.therapeutic_class?.toLowerCase().includes(catFilter.toLowerCase());
       return matchQ && matchCat;
     });
-  }, [drugs, query, catFilter]);
+  }, [drugs, query, catFilter, starredIds]);
 
   const dose = selectedDrug ? calcDose(selectedDrug, weight) : null;
 
@@ -170,6 +188,7 @@ export default function HubDrugSearch() {
           <div className="space-y-1 max-h-52 overflow-y-auto">
             {filtered.map(drug => {
               const isSelected = selectedDrug?.id === drug.id;
+              const isStarred = starredIds.includes(drug.id);
               return (
                 <button
                   key={drug.id}
@@ -186,6 +205,9 @@ export default function HubDrugSearch() {
                   {drug.renal_adjust && (
                     <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full flex-shrink-0">⚠️ Renal</span>
                   )}
+                  <button onClick={e => toggleStar(drug.id, e)} className="flex-shrink-0 p-1 rounded-full hover:bg-yellow-50" title={isStarred ? "Unstar" : "Star for quick access"}>
+                    <Star className={`w-3.5 h-3.5 ${isStarred ? "fill-yellow-400 text-yellow-400" : "text-slate-300"}`} />
+                  </button>
                 </button>
               );
             })}

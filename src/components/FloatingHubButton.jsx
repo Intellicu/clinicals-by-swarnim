@@ -53,7 +53,7 @@ export default function FloatingHubButton() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-20 lg:bottom-14 right-4 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        <div className="fixed bottom-20 lg:bottom-14 right-20 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-700 to-violet-700 px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -106,10 +106,10 @@ export default function FloatingHubButton() {
         </div>
       )}
 
-      {/* FAB button */}
+      {/* FAB button — positioned left of AI Assistant button */}
       <button
         onClick={() => setOpen(v => !v)}
-        className={`fixed bottom-20 lg:bottom-6 right-4 z-50 flex items-center gap-2 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95 ${open ? "bg-slate-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
+        className={`fixed bottom-20 lg:bottom-6 right-20 z-50 flex items-center gap-2 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95 ${open ? "bg-slate-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
         title="AI Analysers"
       >
         {open ? <X className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
