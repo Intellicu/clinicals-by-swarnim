@@ -145,6 +145,7 @@ export default function QuickCalculations() {
   const [selectedDrug, setSelectedDrug] = useState(null);
   const [showDrugCalc, setShowDrugCalc] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleOCR = async (e) => {
     const file = e.target.files[0];
@@ -386,29 +387,41 @@ export default function QuickCalculations() {
 
   return (
     <>
-      <Card className="bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-300 shadow-lg mb-6">
-        <CardHeader className="border-b border-green-200 pb-4">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
-            Quick Calculations - CliniCals by Swarnim
-          </CardTitle>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-xs text-slate-600">Click BP for percentile table • Click any result to explore</p>
-            <div>
-              <input type="file" accept="image/*" capture="environment" id="qc-ocr" className="hidden" onChange={handleOCR} />
-              <label htmlFor="qc-ocr">
-                <Button type="button" size="sm" variant="outline" className="cursor-pointer border-green-300 text-green-700 hover:bg-green-50 h-7 text-xs gap-1" asChild>
-                  <span>
-                    {ocrLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
-                    {ocrLoading ? 'Scanning...' : 'OCR Scan'}
-                  </span>
-                </Button>
-              </label>
-            </div>
+      <Card className="bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-300 shadow-md mb-4">
+        {/* Compact Header — always visible */}
+        <div
+          className="flex items-center justify-between px-3 py-2.5 cursor-pointer select-none"
+          onClick={() => setCollapsed(c => !c)}
+        >
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+            <span className="text-sm font-bold text-slate-800">Quick Calculations</span>
+            <span className="text-xs text-slate-500 hidden sm:inline">({calculations.length} results)</span>
           </div>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <div className="space-y-2 mb-4">
+          <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+            <input type="file" accept="image/*" capture="environment" id="qc-ocr" className="hidden" onChange={handleOCR} />
+            <label htmlFor="qc-ocr">
+              <Button type="button" size="sm" variant="outline" className="cursor-pointer border-green-300 text-green-700 hover:bg-green-50 h-7 text-xs gap-1 px-2" asChild>
+                <span>
+                  {ocrLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
+                  <span className="hidden sm:inline">{ocrLoading ? 'Scanning…' : 'OCR'}</span>
+                </span>
+              </Button>
+            </label>
+            <button
+              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-green-100 transition-colors"
+              onClick={() => setCollapsed(c => !c)}
+              aria-label="Toggle section"
+            >
+              {collapsed ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronUp className="w-4 h-4 text-slate-500" />}
+            </button>
+          </div>
+        </div>
+
+        {!collapsed && (
+          <CardContent className="px-3 pb-3 pt-0 border-t border-green-200">
+          {/* Results grid — compact rows */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-2 mb-3">
             {calculations.map((calc, idx) => {
               const IconComponent = calc.icon;
               const iconBg = {
@@ -426,51 +439,43 @@ export default function QuickCalculations() {
               }[calc.color] || "bg-slate-50 border-slate-200";
 
               const inner = (
-                <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${rowBg} hover:shadow-md transition-all cursor-pointer group`}>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg}`}>
-                    <IconComponent className="w-5 h-5" />
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${rowBg} hover:shadow-sm transition-all cursor-pointer group`}>
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+                    <IconComponent className="w-3.5 h-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-slate-500 leading-tight">{calc.name}</div>
-                    <div className="text-lg font-bold text-slate-900 leading-tight">{calc.value}</div>
-                    <div className="text-xs text-slate-500 leading-tight">{calc.subtext}</div>
+                    <div className="text-xs text-slate-500 leading-tight">{calc.name}</div>
+                    <div className="text-sm font-bold text-slate-900 leading-tight truncate">{calc.value}</div>
+                    <div className="text-xs text-slate-400 leading-tight truncate">{calc.subtext}</div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
                 </div>
               );
 
               if (calc.clickAction) {
-                return (
-                  <div key={idx} onClick={calc.clickAction}>{inner}</div>
-                );
+                return <div key={idx} onClick={calc.clickAction}>{inner}</div>;
               }
-              return (
-                <Link key={idx} to={createPageUrl(calc.page)}>{inner}</Link>
-              );
+              return <Link key={idx} to={createPageUrl(calc.page)}>{inner}</Link>;
             })}
           </div>
 
           {/* Drug Calculator */}
-          <div className="border-t-2 border-green-200 pt-4 mt-2">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                <Pill className="w-5 h-5 text-purple-600" />
-                Quick Drug Dosing (10 Common Medications)
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowDrugCalc(!showDrugCalc)}
-                className="border-purple-300 hover:bg-purple-50"
-              >
-                {showDrugCalc ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </Button>
-            </div>
+          <div className="border-t border-green-200 pt-2">
+            <button
+              className="w-full flex items-center justify-between py-1.5 group"
+              onClick={() => setShowDrugCalc(!showDrugCalc)}
+            >
+              <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <Pill className="w-3.5 h-3.5 text-purple-600" />
+                Quick Drug Dosing
+              </span>
+              {showDrugCalc ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+            </button>
             
             {showDrugCalc && patientData.weight && (
-              <div className="space-y-3">
+              <div className="space-y-2 mt-1">
                 <Select value={selectedDrug?.name} onValueChange={(drugName) => setSelectedDrug(COMMON_DRUGS.find(d => d.name === drugName))}>
-                  <SelectTrigger className="bg-white border-2 border-purple-200">
+                  <SelectTrigger className="bg-white border border-purple-200 h-8 text-xs">
                     <SelectValue placeholder="Select medication for quick dosing..." />
                   </SelectTrigger>
                   <SelectContent className="max-h-80">
@@ -486,14 +491,14 @@ export default function QuickCalculations() {
                 </Select>
 
                 {selectedDrug && (
-                  <Card className="bg-white border-2 border-purple-300 shadow-md">
-                    <CardHeader className="bg-purple-50 border-b pb-3">
-                      <CardTitle className="text-lg text-purple-900">{selectedDrug.name}</CardTitle>
+                  <Card className="bg-white border border-purple-300 shadow-sm">
+                    <CardHeader className="bg-purple-50 border-b py-2 px-3">
+                      <CardTitle className="text-sm text-purple-900">{selectedDrug.name}</CardTitle>
                     </CardHeader>
-                    <CardContent className="p-4 space-y-3">
-                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3 rounded-lg border border-purple-200">
-                        <p className="text-sm text-slate-700 mb-1"><strong>Calculated Dose:</strong></p>
-                        <p className="text-2xl font-bold text-purple-700">
+                    <CardContent className="p-3 space-y-2">
+                      <div className="bg-purple-50 px-3 py-2 rounded-lg border border-purple-200">
+                        <p className="text-xs text-slate-600 mb-0.5"><strong>Calculated Dose:</strong></p>
+                        <p className="text-lg font-bold text-purple-700">
                           {(() => {
                             if (selectedDrug.dosePerM2) {
                               const bsaCalc = calculations.find(c => c.name === "BSA");
@@ -507,34 +512,30 @@ export default function QuickCalculations() {
                             }
                           })()}
                         </p>
-                        <p className="text-sm text-purple-600 mt-1">{selectedDrug.frequency}</p>
+                        <p className="text-xs text-purple-600 mt-0.5">{selectedDrug.frequency}</p>
                       </div>
 
                       <div>
-                        <p className="text-sm font-semibold text-slate-700 mb-1">Indication:</p>
-                        <p className="text-sm text-slate-600">{selectedDrug.indication}</p>
+                        <p className="text-xs font-semibold text-slate-600">Indication: <span className="font-normal">{selectedDrug.indication}</span></p>
                       </div>
 
                       {selectedDrug.formulations && (
                         <div>
-                          <p className="text-sm font-semibold text-slate-700 mb-1">Available Formulations:</p>
-                          <ul className="text-sm text-slate-600 space-y-1">
+                          <p className="text-xs font-semibold text-slate-600 mb-0.5">Formulations:</p>
+                          <ul className="text-xs text-slate-500 space-y-0.5">
                             {selectedDrug.formulations.map((form, idx) => (
-                              <li key={idx} className="flex items-start gap-2">
-                                <span className="text-purple-600">•</span>
-                                <span>{form}</span>
-                              </li>
+                              <li key={idx}>• {form}</li>
                             ))}
                           </ul>
                         </div>
                       )}
 
                       {selectedDrug.sideEffects && (
-                        <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-                          <p className="text-sm font-semibold text-red-900 mb-1">Common Side Effects:</p>
+                        <div className="bg-red-50 px-2 py-1.5 rounded-lg border border-red-200">
+                          <p className="text-xs font-semibold text-red-800 mb-1">Side Effects:</p>
                           <div className="flex flex-wrap gap-1">
                             {selectedDrug.sideEffects.map((effect, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs border-red-300 text-red-700">
+                              <Badge key={idx} variant="outline" className="text-xs border-red-300 text-red-700 py-0">
                                 {effect}
                               </Badge>
                             ))}
@@ -543,9 +544,9 @@ export default function QuickCalculations() {
                       )}
 
                       {selectedDrug.monitoring && (
-                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                          <p className="text-sm font-semibold text-blue-900 mb-1">Monitoring Required:</p>
-                          <ul className="text-xs text-blue-800 space-y-1">
+                        <div className="bg-blue-50 px-2 py-1.5 rounded-lg border border-blue-200">
+                          <p className="text-xs font-semibold text-blue-800 mb-0.5">Monitoring:</p>
+                          <ul className="text-xs text-blue-700 space-y-0.5">
                             {selectedDrug.monitoring.map((mon, idx) => (
                               <li key={idx}>• {mon}</li>
                             ))}
@@ -554,10 +555,10 @@ export default function QuickCalculations() {
                       )}
 
                       {(selectedDrug.targetLevel || selectedDrug.maxCumulative || selectedDrug.infusion || selectedDrug.titration) && (
-                        <Alert className="bg-amber-50 border-amber-200">
-                          <Info className="w-4 h-4 text-amber-600" />
+                        <Alert className="bg-amber-50 border-amber-200 py-1.5">
+                          <Info className="w-3.5 h-3.5 text-amber-600" />
                           <AlertDescription className="text-xs text-amber-900">
-                            {selectedDrug.targetLevel && <p><strong>Target Level:</strong> {selectedDrug.targetLevel}</p>}
+                            {selectedDrug.targetLevel && <p><strong>Target:</strong> {selectedDrug.targetLevel}</p>}
                             {selectedDrug.maxCumulative && <p><strong>Max Cumulative:</strong> {selectedDrug.maxCumulative}</p>}
                             {selectedDrug.infusion && <p><strong>Infusion:</strong> {selectedDrug.infusion}</p>}
                             {selectedDrug.titration && <p><strong>Titration:</strong> {selectedDrug.titration}</p>}
@@ -570,7 +571,8 @@ export default function QuickCalculations() {
               </div>
             )}
           </div>
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
 
       {/* BP Details Dialog */}
