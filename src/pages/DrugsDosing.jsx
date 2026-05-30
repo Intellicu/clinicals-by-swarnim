@@ -17,7 +17,6 @@ import {
   FlaskConical, BookOpen, Syringe
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
-import DrugDoseScreen from "../components/drugs/DrugDoseScreen";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
@@ -195,8 +194,7 @@ export default function DrugsDosing() {
   const [query, setQuery] = useState("");
   const [catFilter, setCatFilter] = useState("All");
   const [activeTab, setActiveTab] = useState("search");
-  // 2-tap flow state: null = search screen, drug object = dose screen
-  const [doseScreenDrug, setDoseScreenDrug] = useState(null);
+  const [selectedDrug, setSelectedDrug] = useState(null);
 
   // Selected drugs for prescription / interaction check
   const [rxDrugs, setRxDrugs] = useState([]);
@@ -370,62 +368,64 @@ CliniCals by Swarnim | Verify all doses independently`;
             </TabsList>
           </div>
 
-          {/* ── SEARCH TAB — 2-tap flow ────────────────────── */}
+          {/* ── SEARCH TAB ────────────────────── */}
           <TabsContent value="search">
-            {doseScreenDrug ? (
-              /* TAP 2: Dose calculator screen */
-              <DrugDoseScreen drug={doseScreenDrug} onBack={() => setDoseScreenDrug(null)} />
-            ) : (
-              /* TAP 1: Search screen */
-              <div className="space-y-3">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    autoFocus
-                    type="text"
-                    value={query}
-                    onChange={e => setQuery(e.target.value)}
-                    placeholder="Search drug, e.g. furosemide, prednisolone…"
-                    className="w-full pl-12 pr-4 py-4 text-base border-2 border-slate-200 rounded-2xl focus:border-purple-400 focus:outline-none bg-white"
-                  />
-                  {query && (
-                    <button onClick={() => setQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2">
-                      <X className="w-4 h-4 text-slate-400" />
-                    </button>
-                  )}
+            <div className="space-y-4">
+              {/* Search + filter row */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input value={query} onChange={e => { setQuery(e.target.value); setSelectedDrug(null); }}
+                    placeholder="Search drug name, brand, class…" className="pl-9 text-sm" />
                 </div>
-                <p className="text-xs text-slate-400 px-1">{filtered.length} drug{filtered.length !== 1 ? "s" : ""} · tap to calculate dose</p>
-                <div className="space-y-2">
-                  {filtered.map(drug => (
-                    <button
-                      key={drug.id}
-                      className="w-full text-left flex items-center gap-3 px-4 py-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-purple-300 active:scale-[0.99] transition-all min-h-[64px]"
-                      onClick={() => setDoseScreenDrug(drug)}
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                        <Pill className="w-5 h-5 text-purple-600" />
+                <Select value={catFilter} onValueChange={setCatFilter}>
+                  <SelectTrigger className="sm:w-48 text-sm">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORY_FILTERS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <p className="text-xs text-slate-400">{filtered.length} drug{filtered.length !== 1 ? "s" : ""} found</p>
+
+              {/* Drug list */}
+              {!selectedDrug && (
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {filtered.slice(0, 30).map(drug => (
+                    <button key={drug.id}
+                      onClick={() => setSelectedDrug(drug)}
+                      className="text-left flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-purple-300 hover:shadow-sm transition-all">
+                      <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                        <Pill className="w-4 h-4 text-purple-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-900 text-sm leading-tight">{drug.generic_name}</p>
-                        {drug.brands_indian && (
-                          <p className="text-xs text-slate-400 truncate mt-0.5">{drug.brands_indian.split(",").slice(0,3).join(", ")}</p>
-                        )}
+                        <p className="font-semibold text-slate-900 text-sm truncate">{drug.generic_name}</p>
+                        {drug.brands_indian && <p className="text-xs text-slate-400 truncate">{drug.brands_indian.split(",").slice(0,2).join(", ")}</p>}
                       </div>
-                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        {drug.category && <Badge className="text-xs bg-purple-100 text-purple-700 border-0">{drug.category}</Badge>}
-                        {drug.route && <span className="text-xs text-slate-400">{drug.route}</span>}
-                      </div>
+                      <Badge className="text-xs bg-purple-50 text-purple-700 border-0 flex-shrink-0">{drug.category}</Badge>
                     </button>
                   ))}
                   {filtered.length === 0 && (
-                    <div className="text-center py-16 text-slate-400">
-                      <Pill className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                      <p className="text-sm">No drugs found for "{query}"</p>
+                    <div className="col-span-2 text-center py-12 text-slate-400">
+                      <Pill className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                      <p className="text-sm">No drugs found</p>
                     </div>
                   )}
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Selected drug detail */}
+              {selectedDrug && (
+                <div>
+                  <button onClick={() => setSelectedDrug(null)} className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 mb-3">
+                    <ArrowLeft className="w-4 h-4" /> Back to search
+                  </button>
+                  <DrugDetailCard drug={selectedDrug} weight={parseFloat(weight)} egfr={parseFloat(effectiveEgfr)} />
+                </div>
+              )}
+            </div>
           </TabsContent>
 
           {/* ── DOSE CALCULATOR TAB ───────────────────────────── */}

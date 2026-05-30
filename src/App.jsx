@@ -44,6 +44,7 @@ import SubspecialtiesHub from './pages/SubspecialtiesHub';
 import PathwayApprovalDashboard from './pages/PathwayApprovalDashboard';
 import ClinicalReferenceLibrary from './pages/ClinicalReferenceLibrary';
 import MonitoringTasksDashboard from './pages/MonitoringTasksDashboard';
+import PatientBedsideSummary from './pages/PatientBedsideSummary';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -132,6 +133,7 @@ const AuthenticatedApp = () => {
       <Route path="/PathwayApprovalDashboard" element={<LayoutWrapper currentPageName="PathwayApprovalDashboard"><PathwayApprovalDashboard /></LayoutWrapper>} />
       <Route path="/ClinicalReferenceLibrary" element={<LayoutWrapper currentPageName="ClinicalReferenceLibrary"><ClinicalReferenceLibrary /></LayoutWrapper>} />
       <Route path="/MonitoringTasksDashboard" element={<LayoutWrapper currentPageName="MonitoringTasksDashboard"><MonitoringTasksDashboard /></LayoutWrapper>} />
+      <Route path="/PatientBedsideSummary" element={<LayoutWrapper currentPageName="PatientBedsideSummary"><PatientBedsideSummary /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
