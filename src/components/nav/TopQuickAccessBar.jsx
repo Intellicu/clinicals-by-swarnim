@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Sparkles, Pill, FlaskConical, BookOpen, Dna, Droplet, Baby } from "lucide-react";
+import { Home, Sparkles, Pill, BookOpen, Dna, Droplet, Baby, GraduationCap, Brain } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Hub", icon: Home, page: "Hub", activeCheck: ["/Hub", "/"] },
@@ -10,6 +10,8 @@ const NAV_ITEMS = [
   { label: "Nephrology & Urology", icon: Droplet, page: "UrologyNephrologyHub", activeCheck: ["/ClinicalSupport", "/UrologyNephrologyHub"] },
   { label: "Rare Disease", icon: Dna, page: "RareDiseaseModule", activeCheck: ["/RareDiseaseModule"] },
   { label: "General Pediatrics", icon: Baby, page: "GeneralPediatricsHub", activeCheck: ["/GeneralPediatricsHub"] },
+  { label: "Teaching Hub", icon: GraduationCap, page: "TeachingHub", activeCheck: ["/TeachingHub"] },
+  { label: "Clinical OS", icon: Brain, page: "ClinicalOS", activeCheck: ["/ClinicalOS"] },
   { label: "AI Prescriber", icon: Sparkles, page: "AIPrescriber", activeCheck: ["/AIPrescriber"] },
 ];
 

@@ -41,6 +41,7 @@ import TubularDisordersHub from './pages/TubularDisordersHub';
 import AIAgentsHub from './pages/AIAgentsHub';
 import ProcedureHub from './pages/ProcedureHub';
 import SubspecialtiesHub from './pages/SubspecialtiesHub';
+import PathwayApprovalDashboard from './pages/PathwayApprovalDashboard';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -126,6 +127,7 @@ const AuthenticatedApp = () => {
       <Route path="/AIAgentsHub" element={<LayoutWrapper currentPageName="AIAgentsHub"><AIAgentsHub /></LayoutWrapper>} />
       <Route path="/ProcedureHub" element={<LayoutWrapper currentPageName="ProcedureHub"><ProcedureHub /></LayoutWrapper>} />
       <Route path="/SubspecialtiesHub" element={<LayoutWrapper currentPageName="SubspecialtiesHub"><SubspecialtiesHub /></LayoutWrapper>} />
+      <Route path="/PathwayApprovalDashboard" element={<LayoutWrapper currentPageName="PathwayApprovalDashboard"><PathwayApprovalDashboard /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

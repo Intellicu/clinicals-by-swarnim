@@ -49,7 +49,7 @@ const PROTOCOLS = [
     icon: Heart,
     color: "bg-red-700",
     severity: "EMERGENCY",
-    summary: "BP >99th+5 mmHg with end-organ damage (encephalopathy, seizure, retinal changes)",
+    summary: "BP ≥95th+12 mmHg (<13y) or ≥140/90 (≥13y) with end-organ damage (encephalopathy, seizure, retinal changes)",
     icu_triggers: ["Seizures/altered consciousness with HTN", "Papilledema / retinal hemorrhage", "Acute pulmonary edema + HTN", "Acute LV dysfunction", "Suspected aortic dissection"],
     algorithm: [
       { step: "1", action: "Confirm BP in both arms, correct cuff size; repeat in 5 min", time: "0 min", color: "bg-slate-600" },

@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Globe, FileText, Plus, Save, Loader2, Eye, Trash2, Edit3 } from "lucide-react";
+import { Sparkles, Globe, FileText, Save, Loader2, Eye, Trash2, Edit3 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
 import { useAdminStatus } from "@/lib/useAdminStatus";
@@ -136,21 +136,21 @@ export default function AdminPathwayGenerator({ onCreated, specialty = '' }) {
     }
   };
 
-  const handleSave = async (publish = false) => {
+  const handleSave = async () => {
     setSaving(true);
     try {
       await base44.entities.CustomSection.create({
         title: preview.title || form.title,
         name: preview.title || form.title,
         section_type: form.content_type,
-        status: publish ? 'published' : 'draft',
+        status: 'pending_approval',
         created_by_admin: true,
         generation_topic: form.topic,
         source_document_url: uploadedUrl,
         content: preview,
         specialty_id: specialty || undefined,
       });
-      toast.success(publish ? '✅ Pathway published and added to library!' : 'Saved as draft — review in Admin Content Manager');
+      toast.success('✅ Submitted for approval — an admin will review before publishing');
       if (onCreated) onCreated();
       setOpen(false);
       setStep('form');
@@ -333,22 +333,12 @@ export default function AdminPathwayGenerator({ onCreated, specialty = '' }) {
                 </Button>
                 <Button
                   size="sm"
-                  variant="outline"
-                  className="border-slate-400 text-slate-700"
-                  onClick={() => handleSave(false)}
+                  className="bg-amber-600 hover:bg-amber-700"
+                  onClick={() => handleSave()}
                   disabled={saving}
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
-                  Save as Draft
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => handleSave(true)}
-                  disabled={saving}
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
-                  {saving ? 'Publishing...' : 'Approve & Publish'}
+                  {saving ? 'Submitting...' : 'Submit for Approval'}
                 </Button>
               </div>
             </div>
