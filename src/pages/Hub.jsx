@@ -630,7 +630,7 @@ export default function Hub() {
             { name: "Nephrology & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
             { name: "Tubular Disorders", icon: Beaker, color: "bg-teal-700", page: "TubularDisordersHub" },
             { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
-            { name: "Drugs & Dosing", icon: Pill, color: "bg-purple-600", page: "DrugsDosing" },
+
             { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
             { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
             { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
