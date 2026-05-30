@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,12 +33,8 @@ import ClinicalFactsPanel from "@/components/clinicalOS/ClinicalFactsPanel";
 import AdminGovernanceQueue from "@/components/clinicalOS/AdminGovernanceQueue";
 import { getFactsForModule } from "@/lib/clinicalOS/ClinicalFactsRegistry";
 
-// ── Constants (static fallback only — real categories derived from data) ──
-const STATIC_CATEGORIES = [
-  "All", "AKI", "CKD", "Nephrotic Syndrome", "Hypertension", "Electrolytes",
-  "Acid-Base", "Dialysis", "Transplant", "Glomerular Diseases", "Infection",
-  "Tubular Disorders", "Nutrition"
-];
+// ── Constants ──────────────────────────────────────────────────────────────
+// Categories derived dynamically from fetched records (see below in component)
 
 const CAT_COLORS = {
   "AKI":                "bg-red-100 text-red-800 border-red-200",
@@ -325,22 +321,14 @@ export default function Guidelines() {
   const queryClient = useQueryClient();
   const { data: dbGuidelines = [], isLoading } = useQuery({
     queryKey: ["guidelines"],
-    queryFn: () => base44.entities.Guideline.list("-year", 1000),
+    queryFn: () => base44.entities.Guideline.list("-year", 500),
     initialData: [],
   });
 
-  const allGuidelines = [
-    ...BUILTIN_GUIDELINES,
-    ...dbGuidelines
-      .filter(g => g.status !== "Archived" && !g.is_duplicate_hidden)
-      .map(g => ({ ...g, _db: true }))
-  ];
+  const allGuidelines = [...BUILTIN_GUIDELINES, ...dbGuidelines.filter(g => g.status !== "Archived").map(g => ({ ...g, _db: true }))];
 
-  // Dynamic categories from real data
-  const CATEGORIES = useMemo(() => {
-    const cats = new Set(allGuidelines.map(g => g.category).filter(Boolean));
-    return ["All", ...Array.from(cats).sort()];
-  }, [allGuidelines]);
+  // Dynamic categories from all records
+  const CATEGORIES = ["All", ...Array.from(new Set(allGuidelines.map(g => g.category).filter(Boolean))).sort()];
 
   // Semantic + fuzzy search
   const filtered = allGuidelines.filter(g => {
