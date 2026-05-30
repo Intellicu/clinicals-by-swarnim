@@ -631,7 +631,7 @@ export default function Hub() {
             { name: "Tubular Disorders", icon: Beaker, color: "bg-teal-700", page: "TubularDisordersHub" },
             { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
 
-            { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-600", page: "AIPrescriber" },
+
             { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
             { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
             { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
