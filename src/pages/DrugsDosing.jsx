@@ -202,10 +202,11 @@ export default function DrugsDosing() {
   const [rxDrugs, setRxDrugs] = useState([]);
   const [focusDrug, setFocusDrug] = useState(null);
 
-  const { data: drugs = [] } = useQuery({
+  const { data: drugsRaw = [] } = useQuery({
     queryKey: ["drugs-full"],
-    queryFn: () => base44.entities.Drug.filter({ is_duplicate_hidden: false }, "generic_name", 500),
+    queryFn: () => base44.entities.Drug.list("generic_name", 500),
   });
+  const drugs = useMemo(() => drugsRaw.filter(d => !d.is_duplicate_hidden), [drugsRaw]);
 
   // BSA (Mosteller)
   const bsa = useMemo(() => {
