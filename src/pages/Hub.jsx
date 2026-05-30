@@ -25,6 +25,9 @@ import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
 import FrequencyQuickAccess from "../components/hub/FrequencyQuickAccess";
 import HubDrugSearch from "../components/hub/HubDrugSearch";
+import HubQuickLaunch from "../components/hub/HubQuickLaunch";
+import QuickLaunchBar from "../components/hub/QuickLaunchBar";
+import HubSectionCustomizer, { useHubSectionVisibility } from "../components/hub/HubSectionCustomizer";
 
 // ── AI Analyser Tools ── (url = full path, or page for createPageUrl)
 const AI_TOOLS = [
@@ -498,6 +501,9 @@ export default function Hub() {
             }
           </div>
         </div>
+
+        {/* ── Quick Launch (customisable) ── */}
+        <HubQuickLaunch />
 
         {/* ── Search ── */}
         <GlobalSearch
