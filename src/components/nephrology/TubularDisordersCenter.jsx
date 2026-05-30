@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ChevronDown, ChevronUp, FlaskConical, Dna, AlertTriangle, GitBranch, Loader2, ArrowRight } from "lucide-react";
+import { ChevronDown, ChevronUp, FlaskConical, Dna, AlertTriangle, GitBranch } from "lucide-react";
 
 // ── Diagnostic Algorithm per condition ─────────────────────────────────────
 const ALGORITHMS = {
@@ -410,147 +408,18 @@ function TubularCard({ condition }) {
   );
 }
 
-function GuidelineTubularCard({ guideline }) {
-  const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState("overview");
-  const sections = guideline.content?.sections || [];
-  const keyRecs = guideline.key_recommendations || [];
-  const tabs = [
-    { id: "overview", label: "📋 Overview" },
-    ...(sections.length > 0 ? [{ id: "sections", label: "📖 Content" }] : []),
-    ...(keyRecs.length > 0 ? [{ id: "recommendations", label: "✅ Recommendations" }] : []),
-    ...(guideline.keywords?.length > 0 ? [{ id: "genetics", label: "🧬 Genetics" }] : []),
-  ];
-
-  return (
-    <Card className="bg-white border-2 border-cyan-100 hover:border-cyan-300 transition-colors">
-      <CardHeader className="pb-2 cursor-pointer" onClick={() => setOpen(o => !o)}>
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <FlaskConical className="w-4 h-4 text-cyan-600" />
-              <span className="font-bold text-sm text-slate-900">{guideline.title}</span>
-            </div>
-            <div className="flex gap-1.5 flex-wrap">
-              <Badge className="text-xs bg-cyan-100 text-cyan-800 border-0">{guideline.category}</Badge>
-              {guideline.source && <Badge className="text-xs bg-slate-100 text-slate-600 border-0">{guideline.source}</Badge>}
-            </div>
-          </div>
-          {open ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
-        </div>
-      </CardHeader>
-
-      {open && (
-        <CardContent className="pt-0 space-y-3">
-          <div className="flex gap-1 flex-wrap border-b pb-2">
-            {tabs.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)}
-                className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition-colors ${tab === t.id ? "bg-cyan-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          {tab === "overview" && (
-            <div className="space-y-2">
-              {guideline.summary && (
-                <div className="rounded-lg p-2.5 border bg-blue-50 border-blue-200">
-                  <p className="text-xs font-bold mb-1 text-blue-900">Summary</p>
-                  <p className="text-xs text-blue-800">{guideline.summary}</p>
-                </div>
-              )}
-              {guideline.scope_and_population && (
-                <div className="rounded-lg p-2.5 border bg-slate-50 border-slate-200">
-                  <p className="text-xs font-bold mb-1">Scope & Population</p>
-                  <p className="text-xs text-slate-700">{guideline.scope_and_population}</p>
-                </div>
-              )}
-              {guideline.practice_pearls?.length > 0 && (
-                <div className="rounded-lg p-2.5 border bg-amber-50 border-amber-200">
-                  <p className="text-xs font-bold mb-1 text-amber-900">Practice Pearls</p>
-                  {guideline.practice_pearls.map((p, i) => (
-                    <p key={i} className="text-xs text-amber-800">• {p}</p>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {tab === "sections" && (
-            <div className="space-y-2">
-              {sections.map((sec, si) => (
-                <div key={si} className="rounded-lg p-2.5 border bg-slate-50 border-slate-200">
-                  {sec.heading && <p className="text-xs font-bold mb-1 text-slate-800">{sec.heading}</p>}
-                  {sec.content && <p className="text-xs text-slate-700 leading-relaxed">{sec.content}</p>}
-                  {sec.key_points?.map((kp, ki) => (
-                    <div key={ki} className="flex items-start gap-1.5 mt-1">
-                      <ArrowRight className="w-3 h-3 text-cyan-500 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-slate-700">{kp}</p>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {tab === "recommendations" && (
-            <div className="space-y-1.5">
-              {keyRecs.map((rec, i) => (
-                <div key={i} className="flex items-start gap-2 text-xs p-2 bg-teal-50 border border-teal-100 rounded">
-                  <span className="font-bold text-teal-600 flex-shrink-0">{i + 1}.</span>{rec}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {tab === "genetics" && (
-            <div className="space-y-2">
-              <div className="rounded-lg p-2.5 border bg-rose-50 border-rose-200">
-                <p className="text-xs font-bold mb-1 flex items-center gap-1 text-rose-900"><Dna className="w-3 h-3" />Keywords / Genes</p>
-                <p className="text-xs text-rose-800">{guideline.keywords?.join(", ")}</p>
-              </div>
-              {guideline.source && <p className="text-xs text-slate-400">📚 {guideline.source} {guideline.year || ""}</p>}
-            </div>
-          )}
-        </CardContent>
-      )}
-    </Card>
-  );
-}
-
 export default function TubularDisordersCenter() {
   const [search, setSearch] = useState("");
-
-  const { data: guidelines = [], isLoading } = useQuery({
-    queryKey: ["guidelines", "tubular"],
-    queryFn: () => base44.entities.Guideline.filter(
-      { status: { $ne: "Archived" }, category: { $in: ["RTA", "Tubular Disorders"] } },
-      "title", 50
-    ),
-    staleTime: 60000,
-  });
-
-  // Also include hardcoded conditions as fallback when DB has no records
-  const useGuidelines = guidelines.length > 0;
-
-  const filteredGuidelines = guidelines.filter(g =>
-    !search || g.title?.toLowerCase().includes(search.toLowerCase()) ||
-    g.summary?.toLowerCase().includes(search.toLowerCase())
+  const filtered = TUBULAR_CONDITIONS.filter(c =>
+    !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.electrolyte_pattern?.toLowerCase().includes(search.toLowerCase())
   );
-
-  const filteredHardcoded = TUBULAR_CONDITIONS.filter(c =>
-    !search || c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.electrolyte_pattern?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const displayCount = useGuidelines ? filteredGuidelines.length : filteredHardcoded.length;
 
   return (
     <div className="space-y-3">
       <Alert className="bg-cyan-50 border-cyan-200">
         <FlaskConical className="w-4 h-4 text-cyan-600" />
         <AlertDescription className="text-xs text-cyan-900">
-          <strong>Tubular Disorders Centre:</strong> {isLoading ? "Loading…" : `${displayCount} conditions`} — nephron physiology, electrolyte patterns, genetic testing, management.
+          <strong>Tubular Disorders Centre:</strong> {TUBULAR_CONDITIONS.length} conditions — nephron physiology, electrolyte patterns, urine electrolyte interpretation, genetic testing, management.
         </AlertDescription>
       </Alert>
       <div className="relative">
@@ -558,22 +427,8 @@ export default function TubularDisordersCenter() {
           className="w-full text-xs border-2 rounded-xl px-3 py-2 pl-8 focus:outline-none focus:ring-2 focus:ring-cyan-400" />
         <FlaskConical className="absolute left-2.5 top-2.5 w-3 h-3 text-slate-400" />
       </div>
-
-      {isLoading && (
-        <div className="flex items-center gap-2 text-xs text-slate-400 py-4">
-          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading guidelines…
-        </div>
-      )}
-
-      {!isLoading && (
-        <>
-          <p className="text-xs text-slate-400">{displayCount} conditions</p>
-          {useGuidelines
-            ? filteredGuidelines.map(g => <GuidelineTubularCard key={g.id} guideline={g} />)
-            : filteredHardcoded.map(c => <TubularCard key={c.id} condition={c} />)
-          }
-        </>
-      )}
+      <p className="text-xs text-slate-400">{filtered.length} conditions</p>
+      {filtered.map(c => <TubularCard key={c.id} condition={c} />)}
     </div>
   );
 }

@@ -5,27 +5,11 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, AlertTriangle, Zap, Plus, Trash2, X, Check, Loader2 } from "lucide-react";
+import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, AlertTriangle, Zap, Plus, Trash2, X, Check } from "lucide-react";
 import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
 
-const NEPHRO_CATEGORIES = ["AKI","CKD","Nephrotic Syndrome","Hypertension","Electrolytes","Glomerular Diseases","Dialysis","Transplant","Stones","Infection","RTA","Tubular Disorders","Acid-Base"];
-
-const CATEGORY_TAG_MAP = {
-  "AKI": "AKI", "CKD": "CKD", "Nephrotic Syndrome": "GN", "Glomerular Diseases": "GN",
-  "Hypertension": "HTN", "Electrolytes": "Electrolyte", "Dialysis": "Dialysis",
-  "Transplant": "Transplant", "Stones": "Urological", "Infection": "Diagnostic",
-  "RTA": "Tubular", "Tubular Disorders": "Tubular", "Acid-Base": "Electrolyte",
-};
-const CATEGORY_COLOR_MAP = {
-  "GN": "bg-purple-100 text-purple-800", "AKI": "bg-red-100 text-red-800",
-  "CKD": "bg-blue-100 text-blue-800", "HTN": "bg-pink-100 text-pink-800",
-  "Electrolyte": "bg-orange-100 text-orange-800", "Dialysis": "bg-indigo-100 text-indigo-800",
-  "Transplant": "bg-green-100 text-green-800", "Urological": "bg-yellow-100 text-yellow-800",
-  "Tubular": "bg-amber-100 text-amber-800", "Diagnostic": "bg-teal-100 text-teal-800",
-};
-
-// Legacy hardcoded pathways kept as fallback additions
 const PATHWAYS = [
+  // ── Glomerular Diseases (GN) ──────────────────────────────────────────
   { name: "Nephrotic Syndrome (Childhood SSNS)", tag: "GN", color: "bg-purple-100 text-purple-800",
     emergency: false,
     summary: "Edema + proteinuria + hypoalbuminaemia. ISPN/IPNA first-line steroid protocol.",
@@ -190,7 +174,7 @@ export default function HubNephrologyPathways() {
   const [customPathways, setCustomPathways] = useState(() => {
     try { return JSON.parse(localStorage.getItem("custom_pathways") || "[]"); } catch { return []; }
   });
-  const [editModal, setEditModal] = useState(null);
+  const [editModal, setEditModal] = useState(null); // null | { mode: "add"|"edit", idx, pathway, isCustom }
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -198,38 +182,6 @@ export default function HubNephrologyPathways() {
     staleTime: 60000,
   });
   const isAdmin = user?.role === "admin";
-
-  const { data: guidelineRecords = [], isLoading: loadingGuidelines } = useQuery({
-    queryKey: ["guidelines", "nephrology"],
-    queryFn: () => base44.entities.Guideline.filter(
-      { status: { $ne: "Archived" }, category: { $in: NEPHRO_CATEGORIES } },
-      "-usage_count", 200
-    ),
-    staleTime: 60000,
-  });
-
-  // Convert Guideline records to pathway shape
-  const guidelinePathways = guidelineRecords.map(g => {
-    const tag = CATEGORY_TAG_MAP[g.category] || "Diagnostic";
-    const color = CATEGORY_COLOR_MAP[tag] || "bg-slate-100 text-slate-800";
-    const sections = g.content?.sections || [];
-    const keys = g.key_recommendations?.length
-      ? g.key_recommendations.slice(0, 5)
-      : sections.flatMap(s => s.key_points || []).slice(0, 5);
-    return {
-      _id: g.id,
-      name: g.title,
-      tag,
-      color,
-      emergency: false,
-      summary: g.summary || sections[0]?.content?.slice(0, 200) || "",
-      keys: keys.length ? keys : ["See guideline for full details."],
-      scenario: null,
-      _fromGuideline: true,
-      _guidelineId: g.id,
-      _sections: sections,
-    };
-  });
 
   const saveCustom = (updated) => {
     setCustomPathways(updated);
@@ -259,7 +211,7 @@ export default function HubNephrologyPathways() {
     setOpen(null);
   };
 
-  const allPathways = [...guidelinePathways, ...customPathways.map(p => ({ ...p, _isCustom: true }))];
+  const allPathways = [...PATHWAYS, ...customPathways.map(p => ({ ...p, _isCustom: true }))];
 
   const filtered = allPathways.filter(p => {
     const matchTag = filter === "All" || p.tag === filter;
@@ -283,9 +235,7 @@ export default function HubNephrologyPathways() {
             <Stethoscope className="w-5 h-5" />
             <div>
               <h2 className="text-base font-bold">Nephrology Clinical Pathways</h2>
-              <p className="text-blue-100 text-xs">
-                KDIGO · ISPN · IPNA · AAP · ISKDC — {loadingGuidelines ? "Loading…" : `${allPathways.length} pathways`}
-              </p>
+              <p className="text-blue-100 text-xs">KDIGO · ISPN · IPNA · AAP · ISKDC — {PATHWAYS.length} pathways</p>
             </div>
           </div>
           {isAdmin && (
@@ -299,12 +249,6 @@ export default function HubNephrologyPathways() {
           )}
         </div>
       </div>
-
-      {loadingGuidelines && (
-        <div className="flex items-center gap-2 text-xs text-slate-400 py-2">
-          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading guidelines…
-        </div>
-      )}
 
       {/* Search */}
       <input
@@ -434,35 +378,14 @@ function PathwayCard({ pathway, idx, open, setOpen, goToPathway, isAdmin, onEdit
             {pathway.summary && (
               <p className="text-xs text-slate-500 italic leading-relaxed">{pathway.summary}</p>
             )}
-            {/* Guideline sections */}
-            {pathway._sections?.length > 0 ? (
-              <div className="space-y-2">
-                {pathway._sections.map((sec, si) => (
-                  <div key={si} className="bg-slate-50 rounded-lg p-2.5 border border-slate-200">
-                    {sec.heading && <p className="text-xs font-bold text-slate-700 mb-1">{sec.heading}</p>}
-                    {sec.content && <p className="text-xs text-slate-600 leading-relaxed">{sec.content}</p>}
-                    {sec.key_points?.length > 0 && (
-                      <ul className="mt-1 space-y-0.5">
-                        {sec.key_points.map((kp, ki) => (
-                          <li key={ki} className="flex items-start gap-1.5 text-xs text-slate-700">
-                            <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" />{kp}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {pathway.keys.filter(k => k.trim()).map((k, j) => (
-                  <div key={j} className="flex items-start gap-2">
-                    <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-slate-700">{k}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="space-y-1">
+              {pathway.keys.filter(k => k.trim()).map((k, j) => (
+                <div key={j} className="flex items-start gap-2">
+                  <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-slate-700">{k}</p>
+                </div>
+              ))}
+            </div>
             <div className="flex items-center gap-2 flex-wrap pt-1">
               {pathway.scenario && (
                 <Button size="sm" variant="outline"
