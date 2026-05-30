@@ -17,6 +17,7 @@ import {
   FlaskConical, BookOpen, Syringe
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
+import InlineDrugCard from "../components/drugs/InlineDrugCard";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
@@ -370,61 +371,60 @@ CliniCals by Swarnim | Verify all doses independently`;
 
           {/* ── SEARCH TAB ────────────────────── */}
           <TabsContent value="search">
-            <div className="space-y-4">
-              {/* Search + filter row */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input value={query} onChange={e => { setQuery(e.target.value); setSelectedDrug(null); }}
-                    placeholder="Search drug name, brand, class…" className="pl-9 text-sm" />
-                </div>
-                <Select value={catFilter} onValueChange={setCatFilter}>
-                  <SelectTrigger className="sm:w-48 text-sm">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORY_FILTERS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+            <div className="space-y-3">
+              {/* Search bar */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Input
+                  autoFocus
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="Search drug name, brand, class…"
+                  className="pl-12 pr-10 py-4 text-base border-2 border-slate-200 rounded-2xl focus:border-purple-400 h-auto"
+                />
+                {query && (
+                  <button onClick={() => setQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <X className="w-4 h-4 text-slate-400" />
+                  </button>
+                )}
               </div>
 
-              <p className="text-xs text-slate-400">{filtered.length} drug{filtered.length !== 1 ? "s" : ""} found</p>
-
-              {/* Drug list */}
-              {!selectedDrug && (
-                <div className="grid sm:grid-cols-2 gap-2">
-                  {filtered.slice(0, 30).map(drug => (
-                    <button key={drug.id}
-                      onClick={() => setSelectedDrug(drug)}
-                      className="text-left flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-purple-300 hover:shadow-sm transition-all">
-                      <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                        <Pill className="w-4 h-4 text-purple-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-slate-900 text-sm truncate">{drug.generic_name}</p>
-                        {drug.brands_indian && <p className="text-xs text-slate-400 truncate">{drug.brands_indian.split(",").slice(0,2).join(", ")}</p>}
-                      </div>
-                      <Badge className="text-xs bg-purple-50 text-purple-700 border-0 flex-shrink-0">{drug.category}</Badge>
-                    </button>
-                  ))}
-                  {filtered.length === 0 && (
-                    <div className="col-span-2 text-center py-12 text-slate-400">
-                      <Pill className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                      <p className="text-sm">No drugs found</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Selected drug detail */}
-              {selectedDrug && (
-                <div>
-                  <button onClick={() => setSelectedDrug(null)} className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 mb-3">
-                    <ArrowLeft className="w-4 h-4" /> Back to search
+              {/* Category chips */}
+              <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                {CATEGORY_FILTERS.map(c => (
+                  <button key={c} onClick={() => setCatFilter(c)}
+                    className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${catFilter === c ? "bg-purple-600 text-white border-purple-600" : "bg-white text-slate-600 border-slate-300 hover:border-purple-300"}`}>
+                    {c}
                   </button>
-                  <DrugDetailCard drug={selectedDrug} weight={parseFloat(weight)} egfr={parseFloat(effectiveEgfr)} />
-                </div>
-              )}
+                ))}
+              </div>
+
+              <p className="text-xs text-slate-400 px-1">{filtered.length} drug{filtered.length !== 1 ? "s" : ""} found · tap to expand</p>
+
+              {/* Drug list — inline expanding cards */}
+              <div className="space-y-2">
+                {filtered.slice(0, 50).map(drug => (
+                  <InlineDrugCard
+                    key={drug.id}
+                    drug={drug}
+                    weight={parseFloat(weight)}
+                    bsa={bsa}
+                    egfr={parseFloat(effectiveEgfr)}
+                    isOpen={selectedDrug?.id === drug.id}
+                    onToggle={() => setSelectedDrug(prev => prev?.id === drug.id ? null : drug)}
+                    onAddRx={() => addToRx(drug)}
+                    inRx={!!rxDrugs.find(d => d.id === drug.id)}
+                    calcDose={calcDose}
+                    getRenalFlag={getRenalFlag}
+                  />
+                ))}
+                {filtered.length === 0 && (
+                  <div className="text-center py-16 text-slate-400">
+                    <Pill className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No drugs found for "{query}"</p>
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
 
