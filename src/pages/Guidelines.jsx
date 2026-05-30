@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,8 +33,8 @@ import ClinicalFactsPanel from "@/components/clinicalOS/ClinicalFactsPanel";
 import AdminGovernanceQueue from "@/components/clinicalOS/AdminGovernanceQueue";
 import { getFactsForModule } from "@/lib/clinicalOS/ClinicalFactsRegistry";
 
-// ── Constants ──────────────────────────────────────────────────────────────
-const CATEGORIES = [
+// ── Constants (static fallback only — real categories derived from data) ──
+const STATIC_CATEGORIES = [
   "All", "AKI", "CKD", "Nephrotic Syndrome", "Hypertension", "Electrolytes",
   "Acid-Base", "Dialysis", "Transplant", "Glomerular Diseases", "Infection",
   "Tubular Disorders", "Nutrition"
@@ -329,7 +329,18 @@ export default function Guidelines() {
     initialData: [],
   });
 
-  const allGuidelines = [...BUILTIN_GUIDELINES, ...dbGuidelines.map(g => ({ ...g, _db: true }))];
+  const allGuidelines = [
+    ...BUILTIN_GUIDELINES,
+    ...dbGuidelines
+      .filter(g => g.status !== "Archived" && !g.is_duplicate_hidden)
+      .map(g => ({ ...g, _db: true }))
+  ];
+
+  // Dynamic categories from real data
+  const CATEGORIES = useMemo(() => {
+    const cats = new Set(allGuidelines.map(g => g.category).filter(Boolean));
+    return ["All", ...Array.from(cats).sort()];
+  }, [allGuidelines]);
 
   // Semantic + fuzzy search
   const filtered = allGuidelines.filter(g => {
@@ -389,7 +400,7 @@ export default function Guidelines() {
                   </Badge>
                 )}
               </div>
-              <p className="text-blue-100 text-xs">{allGuidelines.length} guidelines · {BUILTIN_GUIDELINES.length} built-in · KDIGO/IPNA/ESPN/AAP/EULAR</p>
+              <p className="text-blue-100 text-xs">{allGuidelines.length} guidelines · KDIGO/IPNA/ISPN/ESPN/AAP/EULAR/IAP</p>
             </div>
           </div>
 

@@ -17,6 +17,7 @@ import {
   FlaskConical, BookOpen, Syringe
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
+import DrugDoseScreen from "../components/drugs/DrugDoseScreen";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
@@ -194,6 +195,8 @@ export default function DrugsDosing() {
   const [query, setQuery] = useState("");
   const [catFilter, setCatFilter] = useState("All");
   const [activeTab, setActiveTab] = useState("search");
+  // 2-tap flow state: null = search screen, drug object = dose screen
+  const [doseScreenDrug, setDoseScreenDrug] = useState(null);
 
   // Selected drugs for prescription / interaction check
   const [rxDrugs, setRxDrugs] = useState([]);
@@ -201,7 +204,7 @@ export default function DrugsDosing() {
 
   const { data: drugs = [] } = useQuery({
     queryKey: ["drugs-full"],
-    queryFn: () => base44.entities.Drug.list("generic_name", 200),
+    queryFn: () => base44.entities.Drug.filter({ is_duplicate_hidden: false }, "generic_name", 500),
   });
 
   // BSA (Mosteller)
@@ -366,130 +369,62 @@ CliniCals by Swarnim | Verify all doses independently`;
             </TabsList>
           </div>
 
-          {/* ── SEARCH TAB ─────────────────────────────────────── */}
-          <TabsContent value="search" className="space-y-4">
-            <div className="flex gap-2 flex-wrap items-center">
-              <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input value={query} onChange={e => setQuery(e.target.value)}
-                  placeholder="Search drug name, brand, class..." className="pl-9 text-sm" />
-              </div>
-              <div className="flex gap-1.5 flex-wrap">
-                {CATEGORY_FILTERS.map(cat => (
-                  <button key={cat} onClick={() => setCatFilter(cat)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${catFilter === cat ? "bg-purple-600 text-white border-purple-600" : "bg-white border-slate-300 text-slate-600 hover:border-purple-400"}`}>
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="text-xs text-slate-500">{filtered.length} drug{filtered.length !== 1 ? "s" : ""} found</div>
-
-            {/* Inline dose result when a drug is tapped */}
-            {focusDrug && (() => {
-              const wt = parseFloat(weight);
-              const dose = calcDose(focusDrug, wt, bsa, effectiveEgfr);
-              const renalFlag = getRenalFlag(focusDrug, effectiveEgfr);
-              return (
-                <div className="bg-purple-50 border-2 border-purple-300 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="font-bold text-purple-900 text-base">{focusDrug.generic_name}</p>
-                      <p className="text-xs text-purple-600">{focusDrug.therapeutic_class}</p>
-                    </div>
-                    <div className="flex gap-2 items-center flex-shrink-0">
-                      <Button size="sm" onClick={() => addToRx(focusDrug)}
-                        className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-9 px-3">
-                        <Plus className="w-3 h-3 mr-1" /> Add Rx
-                      </Button>
-                      <button onClick={() => setFocusDrug(null)} className="text-slate-400 hover:text-slate-600">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {renalFlag && (
-                    <div className={`rounded-xl px-3 py-2 text-xs font-medium border ${renalFlag.level === "critical" ? "bg-red-50 border-red-300 text-red-800" : "bg-amber-50 border-amber-300 text-amber-800"}`}>
-                      ⚠️ {renalFlag.msg}
-                    </div>
+          {/* ── SEARCH TAB — 2-tap flow ────────────────────── */}
+          <TabsContent value="search">
+            {doseScreenDrug ? (
+              /* TAP 2: Dose calculator screen */
+              <DrugDoseScreen drug={doseScreenDrug} onBack={() => setDoseScreenDrug(null)} />
+            ) : (
+              /* TAP 1: Search screen */
+              <div className="space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    autoFocus
+                    type="text"
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    placeholder="Search drug, e.g. furosemide, prednisolone…"
+                    className="w-full pl-12 pr-4 py-4 text-base border-2 border-slate-200 rounded-2xl focus:border-purple-400 focus:outline-none bg-white"
+                  />
+                  {query && (
+                    <button onClick={() => setQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2">
+                      <X className="w-4 h-4 text-slate-400" />
+                    </button>
                   )}
-
-                  {dose && dose.type !== "TDM" ? (
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { label: "Per Dose", value: dose.perDose, highlight: true },
-                        { label: "Daily Total", value: dose.daily },
-                        { label: "Frequency", value: dose.freq },
-                        { label: "Route", value: focusDrug.route || "PO" },
-                      ].map(({ label, value, highlight }) => (
-                        <div key={label} className={`rounded-xl p-3 text-center border ${highlight ? "bg-white border-purple-300" : "bg-white border-slate-200"}`}>
-                          <p className="text-xs text-slate-500">{label}</p>
-                          <p className={`font-bold mt-0.5 ${highlight ? "text-purple-800 text-base" : "text-slate-800 text-sm"}`}>{value || "—"}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : dose?.type === "TDM" ? (
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs text-blue-800">
-                      <strong>TDM-guided dosing.</strong> {dose.note}
-                    </div>
-                  ) : null}
-
-                  {dose?.note && dose.type !== "TDM" && <p className="text-xs text-slate-500 bg-white rounded-lg px-2 py-1.5">{dose.note}</p>}
-                  {!weight && <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">Enter weight above for personalised dose calculation</p>}
-
-                  {focusDrug.renal_adjust && (
-                    <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-2 text-xs text-indigo-800">
-                      <strong>Renal adjustment:</strong> {focusDrug.renal_adjust}
-                      {focusDrug.hd_adjust && <p className="mt-0.5"><strong>HD:</strong> {focusDrug.hd_adjust}</p>}
-                      {focusDrug.pd_adjust && <p className="mt-0.5"><strong>PD:</strong> {focusDrug.pd_adjust}</p>}
-                    </div>
-                  )}
-                  {focusDrug.monitoring && (
-                    <div className="text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-3 py-2">
-                      <strong>Monitor:</strong> {focusDrug.monitoring}
+                </div>
+                <p className="text-xs text-slate-400 px-1">{filtered.length} drug{filtered.length !== 1 ? "s" : ""} · tap to calculate dose</p>
+                <div className="space-y-2">
+                  {filtered.map(drug => (
+                    <button
+                      key={drug.id}
+                      className="w-full text-left flex items-center gap-3 px-4 py-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-purple-300 active:scale-[0.99] transition-all min-h-[64px]"
+                      onClick={() => setDoseScreenDrug(drug)}
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                        <Pill className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-900 text-sm leading-tight">{drug.generic_name}</p>
+                        {drug.brands_indian && (
+                          <p className="text-xs text-slate-400 truncate mt-0.5">{drug.brands_indian.split(",").slice(0,3).join(", ")}</p>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                        {drug.category && <Badge className="text-xs bg-purple-100 text-purple-700 border-0">{drug.category}</Badge>}
+                        {drug.route && <span className="text-xs text-slate-400">{drug.route}</span>}
+                      </div>
+                    </button>
+                  ))}
+                  {filtered.length === 0 && (
+                    <div className="text-center py-16 text-slate-400">
+                      <Pill className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p className="text-sm">No drugs found for "{query}"</p>
                     </div>
                   )}
                 </div>
-              );
-            })()}
-
-            <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-0.5">
-              {filtered.map(drug => {
-                const isInRx = rxDrugs.find(d => d.id === drug.id);
-                const renalFlag = getRenalFlag(drug, effectiveEgfr);
-                const isSelected = focusDrug?.id === drug.id;
-                return (
-                  <button
-                    key={drug.id}
-                    className={`w-full text-left flex items-center gap-3 px-3 py-3 rounded-xl border-2 transition-all active:scale-[0.99] min-h-[56px] ${isSelected ? "border-purple-400 bg-purple-50" : isInRx ? "border-green-300 bg-green-50" : "border-slate-200 bg-white hover:border-purple-300"}`}
-                    onClick={() => setFocusDrug(isSelected ? null : drug)}
-                  >
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected ? "bg-purple-600" : "bg-slate-100"}`}>
-                      <Pill className={`w-4 h-4 ${isSelected ? "text-white" : "text-slate-500"}`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-slate-900 leading-tight">{drug.generic_name}</p>
-                      <p className="text-xs text-slate-400 truncate">{drug.therapeutic_class}{drug.brands_indian ? ` · ${drug.brands_indian.split(",")[0].trim()}` : ""}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      {renalFlag && (
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${renalFlag.level === "critical" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
-                          {renalFlag.level === "critical" ? "🔴" : "⚠️"}
-                        </span>
-                      )}
-                      {isInRx && <CheckCircle className="w-3.5 h-3.5 text-green-600" />}
-                    </div>
-                  </button>
-                );
-              })}
-              {filtered.length === 0 && (
-                <div className="text-center py-12 text-slate-400">
-                  <Pill className="w-10 h-10 mx-auto mb-3 opacity-40" />
-                  <p className="text-sm">No drugs found. Try a different search or filter.</p>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </TabsContent>
 
           {/* ── DOSE CALCULATOR TAB ───────────────────────────── */}

@@ -80,9 +80,52 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-box;
   }
 
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  html {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 }
+
+/* ── Global mobile horizontal-scroll prevention ─────────────────────── */
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* All images, videos, embeds must not overflow */
+img, video, iframe, embed, object, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Long strings (URLs, drug names, code) must wrap */
+p, span, h1, h2, h3, h4, h5, h6, li, td, th, label, a {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Horizontal-scrollable tab strips and chip rows — internal scroll only */
+.tabs-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+.tabs-scroll-x::-webkit-scrollbar { display: none; }
+
+/* Table wrapper — tables scroll internally, never push page */
+.table-scroll-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+.table-scroll-wrap::-webkit-scrollbar { display: none; }
