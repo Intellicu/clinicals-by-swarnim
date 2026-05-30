@@ -379,8 +379,8 @@ const KNOWLEDGE_SECTIONS = [
   { name: "APGAR Reference", page: "CalculatorsHub", icon: Star },
   { name: "Tanner Staging", page: "CalculatorsHub", icon: Users }]
 
-},
-];
+}];
+
 
 
 // ── OCR Scan cards ──
@@ -464,8 +464,8 @@ export default function Hub() {
             <button
               onClick={() => setEmergencyProtocolOpen(true)}
               className="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white rounded-lg h-7 px-2.5 text-xs font-bold transition-colors shadow-sm"
-              aria-label="Emergency Protocols"
-            >
+              aria-label="Emergency Protocols">
+              
               <AlertCircle className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Emergency</span>
             </button>
@@ -489,7 +489,7 @@ export default function Hub() {
                 </Button>
               </Link>
               <Link to={createPageUrl("PathwayApprovalDashboard")}>
-                <Button size="sm" className="bg-amber-500/80 hover:bg-amber-400 text-white border-amber-400/30 border text-xs h-7 px-2 gap-1">
+                <Button size="sm" className="bg-amber-500/80 hover:bg-amber-400 text-white border-amber-400/30 border text-xs h-7 px-2 gap-1 hidden">
                   <Sparkles className="w-3 h-3" />
                   <span className="hidden sm:inline">Approvals</span>
                 </Button>
