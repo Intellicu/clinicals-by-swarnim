@@ -625,11 +625,7 @@ export default function Hub() {
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {[
-            { name: "Pediatrics Hub", icon: Baby, color: "bg-teal-600", page: "GeneralPediatricsHub" },
-            { name: "Clinical Pathways", icon: GitBranch, color: "bg-sky-700", page: "ClinicalSupport" },
-            { name: "Nephrology & Urology", icon: Droplet, color: "bg-blue-800", page: "UrologyNephrologyHub" },
-            { name: "Tubular Disorders", icon: Beaker, color: "bg-teal-700", page: "TubularDisordersHub" },
-            { name: "Rare Diseases", icon: Dna, color: "bg-violet-700", page: "RareDiseaseModule" },
+
 
 
             { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
