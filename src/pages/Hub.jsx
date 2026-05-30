@@ -631,8 +631,7 @@ export default function Hub() {
             { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
             { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
             { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
-            { name: "Calculators", icon: Calculator, color: "bg-blue-600", page: "CalculatorsHub" },
-            { name: "Pathway Builder", icon: GitBranch, color: "bg-violet-600", page: "PathwayBuilder" },
+
             { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" },
             { name: "Gastroenterology", icon: Activity, color: "bg-orange-600", page: "GeneralPediatricsHub" },
             { name: "Haematology", icon: Beaker, color: "bg-red-700", page: "GeneralPediatricsHub" },
