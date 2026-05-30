@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { AlertTriangle, Activity, Zap, Heart, Wind, TestTube, Droplet, Brain, Star, Pill, GitBranch, BookOpen, TrendingUp } from "lucide-react";
 
-
 const SUGGESTIONS = [
 { id: "gfr", check: (d) => d.serumCreatinine && parseFloat(d.serumCreatinine) > 0 && d.height && d.weight, label: "Calculate GFR", icon: Activity, color: "bg-blue-600", page: "SchwartzGFR", reason: (d) => `Cr ${d.serumCreatinine} mg/dL entered` },
 { id: "aki", check: (d) => d.serumCreatinine && parseFloat(d.serumCreatinine) > 1.2, label: "AKI Staging", icon: AlertTriangle, color: "bg-red-600", page: "AKIStager", reason: (d) => `Cr ${d.serumCreatinine} — check AKI` },
