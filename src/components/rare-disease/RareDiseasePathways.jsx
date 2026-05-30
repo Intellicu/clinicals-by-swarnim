@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, BookOpen, Pencil, Check, X, Plus, Trash2, RefreshCw, ExternalLink, Loader2, GitBranch } from "lucide-react";
+import { ChevronDown, ChevronUp, BookOpen, Pencil, Check, X, Plus, Trash2, RefreshCw, ExternalLink, Loader2, GitBranch, ArrowRight } from "lucide-react";
 
 // ── Diagnostic Algorithms ─────────────────────────────────────────────────
 const PATHWAY_ALGORITHMS = {
@@ -516,55 +516,152 @@ function SyncButton({ pathwayId, pathwayName, onSynced }) {
   );
 }
 
-export default function RareDiseasePathways({ isAdmin }) {
-  const qc = useQueryClient();
-  const [syncResult, setSyncResult] = useState({});
-
-  const { data: dbRecords = [] } = useQuery({
-    queryKey: ["rdcontent", "pathway"],
-    queryFn: () => base44.entities.RareDiseaseContent.filter({ content_type: "pathway" }, "-updated_date", 50),
-  });
-
-  const getDbRecord = (id) => dbRecords.find(r => r.section_id === id);
-
-  const handleSyncResult = async (pathwayId, result) => {
-    if (!result) return;
-    const pathway = DEFAULT_PATHWAYS.find(p => p.id === pathwayId);
-    const existing = getDbRecord(pathwayId);
-    const note = result.recent_update ? `\n\n[Auto-synced ${new Date().toLocaleDateString()}]: ${result.recent_update}` : "";
-    const existingLinks = existing?.further_reading || pathway?.further_reading || [];
-    const newLinks = (result.new_links || []).filter(l => l.url && !existingLinks.find(e => e.url === l.url));
-    const merged = [...existingLinks, ...newLinks];
-
-    const payload = {
-      content_type: "pathway",
-      section_id: pathwayId,
-      title: pathway?.full || pathwayId,
-      data: { ...(existing?.data || pathway || {}), sync_note: note },
-      further_reading: merged,
-      last_synced: new Date().toISOString(),
-      is_active: true,
-    };
-    if (existing) await base44.entities.RareDiseaseContent.update(existing.id, payload);
-    else await base44.entities.RareDiseaseContent.create(payload);
-    qc.invalidateQueries({ queryKey: ["rdcontent", "pathway"] });
-    setSyncResult(prev => ({ ...prev, [pathwayId]: `Synced — ${newLinks.length} new link(s) added` }));
-  };
+function GuidelinePathwayDetail({ pathway }) {
+  const sections = pathway.sections || [];
+  const keyRecs = pathway.key_recommendations || [];
 
   return (
-    <Tabs defaultValue="ahus">
+    <div className="space-y-3">
+      {pathway.gene && (
+        <div className="rounded-lg border bg-slate-50 p-3">
+          <span className="text-xs font-bold text-slate-500 uppercase">Keywords/Genes: </span>
+          <code className="text-xs font-mono">{pathway.gene}</code>
+        </div>
+      )}
+
+      {pathway.overview && (
+        <div className="border border-slate-200 rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-slate-50 border-b">
+            <span className="font-semibold text-sm text-slate-800">Overview</span>
+          </div>
+          <div className="p-4 text-sm text-slate-700 leading-relaxed">{pathway.overview}</div>
+        </div>
+      )}
+
+      {keyRecs.length > 0 && (
+        <div className="border border-blue-200 rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-blue-50 border-b">
+            <span className="font-semibold text-sm text-blue-800">Key Recommendations</span>
+          </div>
+          <ul className="p-4 space-y-1.5">
+            {keyRecs.map((rec, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                <ArrowRight className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />{rec}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {sections.map((sec, si) => (
+        <div key={si} className="border border-slate-200 rounded-lg overflow-hidden">
+          {sec.heading && (
+            <div className="px-4 py-3 bg-slate-50 border-b">
+              <span className="font-semibold text-sm text-slate-800">{sec.heading}</span>
+            </div>
+          )}
+          <div className="p-4 space-y-2">
+            {sec.content && <p className="text-sm text-slate-700 leading-relaxed">{sec.content}</p>}
+            {sec.key_points?.length > 0 && (
+              <ul className="space-y-1">
+                {sec.key_points.map((kp, ki) => (
+                  <li key={ki} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="text-indigo-400 font-bold min-w-[20px]">{ki + 1}.</span>{kp}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {sec.recommendations?.length > 0 && (
+              <ul className="space-y-1">
+                {sec.recommendations.map((r, ri) => (
+                  <li key={ri} className="flex items-start gap-2 text-xs text-slate-700 bg-green-50 rounded p-2 border border-green-100">
+                    {r.grade && <Badge className="bg-green-100 text-green-800 text-xs flex-shrink-0">{r.grade}</Badge>}
+                    <span>{r.text}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function RareDiseasePathways({ isAdmin }) {
+  const { data: guidelines = [], isLoading } = useQuery({
+    queryKey: ["guidelines", "rare-disease"],
+    queryFn: () => base44.entities.Guideline.filter(
+      { status: { $ne: "Archived" }, category: "Rare Disease" },
+      "title", 50
+    ),
+    staleTime: 60000,
+  });
+
+  // Map Guideline records → pathway shape expected by existing card components
+  const pathways = guidelines.map(g => {
+    // Pick a color based on title keywords
+    const title = g.title?.toLowerCase() || "";
+    let color = "violet";
+    if (title.includes("ahus") || title.includes("hus")) color = "red";
+    else if (title.includes("alport")) color = "indigo";
+    else if (title.includes("fabry")) color = "violet";
+    else if (title.includes("cystinosis")) color = "amber";
+    else if (title.includes("arpkd") || title.includes("adpkd") || title.includes("pkd")) color = "teal";
+    else if (title.includes("nephronophthisis") || title.includes("nphp")) color = "blue";
+    else if (title.includes("hyperoxaluria") || title.includes("ph1")) color = "orange";
+    else if (title.includes("bardet") || title.includes("bbs")) color = "teal";
+    else if (title.includes("lowe") || title.includes("dent")) color = "orange";
+    const c = COLOR_MAP[color] || COLOR_MAP.violet;
+    const sections = g.content?.sections || [];
+    const overviewSection = sections.find(s => /overview|intro|background/i.test(s.heading || "")) || sections[0];
+    return {
+      id: g.id,
+      _guidelineId: g.id,
+      name: g.title?.split(/[:\-–(]/)[0]?.trim() || g.title,
+      full: g.title,
+      gene: g.keywords?.join(", ") || "",
+      color,
+      colorMap: c,
+      overview: overviewSection?.content || g.summary || "",
+      key_recommendations: g.key_recommendations || [],
+      sections,
+      source: g.source,
+      year: g.year,
+    };
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12 text-slate-400">
+        <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading rare disease guidelines…
+      </div>
+    );
+  }
+
+  if (!pathways.length) {
+    return (
+      <div className="text-center py-10 text-slate-400 text-sm">
+        No rare disease guidelines found. Add guidelines with category "Rare Disease" to populate this section.
+      </div>
+    );
+  }
+
+  const defaultTab = pathways[0]?.id;
+
+  return (
+    <Tabs defaultValue={defaultTab}>
       <div className="overflow-x-auto pb-1 mb-3">
-        <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1 min-w-full md:grid md:grid-cols-9">
-          {DEFAULT_PATHWAYS.map(p => (
+        <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1">
+          {pathways.map(p => (
             <TabsTrigger key={p.id} value={p.id} className="px-2 py-2 text-xs rounded-lg whitespace-nowrap data-[state=active]:bg-violet-600 data-[state=active]:text-white">
               {p.name}
             </TabsTrigger>
           ))}
         </TabsList>
       </div>
-      {DEFAULT_PATHWAYS.map(p => {
-        const dbRecord = getDbRecord(p.id);
-        const c = COLOR_MAP[p.color] || COLOR_MAP.violet;
+      {pathways.map(p => {
+        const c = p.colorMap;
         return (
           <TabsContent key={p.id} value={p.id}>
             <Card className="bg-white border border-slate-200 shadow-sm">
@@ -573,25 +670,12 @@ export default function RareDiseasePathways({ isAdmin }) {
                   <CardTitle className="flex items-center gap-2 flex-wrap">
                     <span className="text-base">{p.full}</span>
                     <Badge className={c.badge}>Rare Disease Pathway</Badge>
-                    {dbRecord?.last_synced && (
-                      <Badge className="bg-green-100 text-green-700 text-xs">Synced {new Date(dbRecord.last_synced).toLocaleDateString()}</Badge>
-                    )}
+                    {p.source && <Badge className="bg-slate-100 text-slate-600 text-xs">{p.source}{p.year ? ` ${p.year}` : ""}</Badge>}
                   </CardTitle>
-                  {isAdmin && (
-                    <SyncButton pathwayId={p.id} pathwayName={p.full} onSynced={(res) => handleSyncResult(p.id, res)} />
-                  )}
                 </div>
-                {syncResult[p.id] && (
-                  <p className="text-xs text-green-700 mt-1 flex items-center gap-1"><Check className="w-3 h-3" />{syncResult[p.id]}</p>
-                )}
               </CardHeader>
               <CardContent className="p-4">
-                <PathwayDetail
-                  pathway={p}
-                  dbRecord={dbRecord}
-                  isAdmin={isAdmin}
-                  onSave={() => qc.invalidateQueries({ queryKey: ["rdcontent", "pathway"] })}
-                />
+                <GuidelinePathwayDetail pathway={p} isAdmin={isAdmin} />
               </CardContent>
             </Card>
           </TabsContent>
