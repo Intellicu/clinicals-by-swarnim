@@ -13,7 +13,7 @@ import {
   Stethoscope, TestTube, Baby, Zap, Sparkles, Brain, AlertCircle,
   UtensilsCrossed, GraduationCap, Layers, FlaskConical, ClipboardList,
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
-  RefreshCw, Shield, Info, BarChart2, Star, FileCheck,
+  RefreshCw, Shield, Info, BarChart2, Star,
   Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
   ChevronDown, ChevronUp, Thermometer } from
 "lucide-react";
@@ -481,21 +481,21 @@ export default function Hub() {
                 <span className="hidden sm:inline">Pathways</span>
               </Button>
             </Link>
-            {isAdmin && (
-              <>
-                <Link to={createPageUrl("ClinicDashboard")}>
-                  <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2">
-                    <Users className="w-3 h-3" />
-                  </Button>
-                </Link>
-                <Link to={createPageUrl("PathwayApprovalDashboard")}>
-                  <Button size="sm" className="bg-amber-500/80 hover:bg-amber-400 text-white border-amber-400/30 border text-xs h-7 px-2 gap-1">
-                    <FileCheck className="w-3 h-3" />
-                    <span className="hidden sm:inline">Approve</span>
-                  </Button>
-                </Link>
-              </>
-            )}
+            {isAdmin &&
+            <>
+              <Link to={createPageUrl("ClinicDashboard")}>
+                <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2">
+                  <Users className="w-3 h-3" />
+                </Button>
+              </Link>
+              <Link to={createPageUrl("PathwayApprovalDashboard")}>
+                <Button size="sm" className="bg-amber-500/80 hover:bg-amber-400 text-white border-amber-400/30 border text-xs h-7 px-2 gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  <span className="hidden sm:inline">Approvals</span>
+                </Button>
+              </Link>
+            </>
+            }
           </div>
         </div>
 

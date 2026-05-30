@@ -389,9 +389,10 @@ export default function NephroticSyndromeChildhoodPathway() {
                 "Infections: Chief complication (19–44% hospitalizations). Peritonitis (pneumococcus/E. coli): IV ceftriaxone/cefotaxime 7–10 days",
                 "Varicella: IV acyclovir 1500 mg/m²/day in 3 doses (or oral 80 mg/kg/day in 4 doses) × 7–10 days",
                 "Thrombosis (rare in children ~3%): avoid central lines; LMWH enoxaparin for active thrombosis",
-                "Hypertension: amlodipine as first line; ACE-I if proteinuria-driven",
-                "Steroid toxicity: calcium 250–750 mg/day + Vitamin D 400–800 IU/day; growth monitoring q 3–6 months",
-                "Stress dosing: if steroids >2 wks in past year → hydrocortisone during fever ≥38°C, surgery, major illness"
+                "Hypertension — BP Classification (AAP 2017): Children <13y: Normal <90th %ile; Elevated 90th–<95th %ile (or ≥120/80); Stage 1 HTN 95th–<95th+12 mmHg (130/80–139/89); Stage 2 HTN ≥95th+12 mmHg (≥140/90). Adolescents ≥13y: Normal <120/80; Elevated 120–129/<80; Stage 1 130–139/80–89; Stage 2 ≥140/90",
+                "HTN treatment in NS: amlodipine first line; ACEi/ARB if persistent proteinuria-driven HTN (avoid in hypovolemia)",
+                "Steroid toxicity: calcium 500–1000 mg/day + Vitamin D 1000 IU/day; growth monitoring q 3–6 months; DEXA if cumulative steroids >1000 mg",
+                "Stress dosing: if steroids >2 wks in past year → hydrocortisone 10 mg/m² TID during fever ≥38°C, surgery, major illness"
               ]
             },
             {

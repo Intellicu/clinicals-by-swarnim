@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Globe, FileText, Save, Loader2, Eye, Trash2, Edit3 } from "lucide-react";
+import { Sparkles, Globe, FileText, Plus, Save, Loader2, Eye, Trash2, Edit3 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
 import { useAdminStatus } from "@/lib/useAdminStatus";
@@ -334,7 +334,7 @@ export default function AdminPathwayGenerator({ onCreated, specialty = '' }) {
                 <Button
                   size="sm"
                   className="bg-amber-600 hover:bg-amber-700"
-                  onClick={() => handleSave()}
+                  onClick={handleSave}
                   disabled={saving}
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}

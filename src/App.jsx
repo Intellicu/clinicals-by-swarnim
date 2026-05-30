@@ -42,6 +42,8 @@ import AIAgentsHub from './pages/AIAgentsHub';
 import ProcedureHub from './pages/ProcedureHub';
 import SubspecialtiesHub from './pages/SubspecialtiesHub';
 import PathwayApprovalDashboard from './pages/PathwayApprovalDashboard';
+import ClinicalReferenceLibrary from './pages/ClinicalReferenceLibrary';
+import MonitoringTasksDashboard from './pages/MonitoringTasksDashboard';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -128,6 +130,8 @@ const AuthenticatedApp = () => {
       <Route path="/ProcedureHub" element={<LayoutWrapper currentPageName="ProcedureHub"><ProcedureHub /></LayoutWrapper>} />
       <Route path="/SubspecialtiesHub" element={<LayoutWrapper currentPageName="SubspecialtiesHub"><SubspecialtiesHub /></LayoutWrapper>} />
       <Route path="/PathwayApprovalDashboard" element={<LayoutWrapper currentPageName="PathwayApprovalDashboard"><PathwayApprovalDashboard /></LayoutWrapper>} />
+      <Route path="/ClinicalReferenceLibrary" element={<LayoutWrapper currentPageName="ClinicalReferenceLibrary"><ClinicalReferenceLibrary /></LayoutWrapper>} />
+      <Route path="/MonitoringTasksDashboard" element={<LayoutWrapper currentPageName="MonitoringTasksDashboard"><MonitoringTasksDashboard /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
