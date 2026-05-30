@@ -34,7 +34,11 @@ import AdminGovernanceQueue from "@/components/clinicalOS/AdminGovernanceQueue";
 import { getFactsForModule } from "@/lib/clinicalOS/ClinicalFactsRegistry";
 
 // ── Constants ──────────────────────────────────────────────────────────────
-// Categories derived dynamically from fetched records (see below in component)
+const CATEGORIES = [
+  "All", "AKI", "CKD", "Nephrotic Syndrome", "Hypertension", "Electrolytes",
+  "Acid-Base", "Dialysis", "Transplant", "Glomerular Diseases", "Infection",
+  "Tubular Disorders", "Nutrition"
+];
 
 const CAT_COLORS = {
   "AKI":                "bg-red-100 text-red-800 border-red-200",
@@ -321,14 +325,11 @@ export default function Guidelines() {
   const queryClient = useQueryClient();
   const { data: dbGuidelines = [], isLoading } = useQuery({
     queryKey: ["guidelines"],
-    queryFn: () => base44.entities.Guideline.list("-year", 500),
+    queryFn: () => base44.entities.Guideline.list("-year", 1000),
     initialData: [],
   });
 
-  const allGuidelines = [...BUILTIN_GUIDELINES, ...dbGuidelines.filter(g => g.status !== "Archived").map(g => ({ ...g, _db: true }))];
-
-  // Dynamic categories from all records
-  const CATEGORIES = ["All", ...Array.from(new Set(allGuidelines.map(g => g.category).filter(Boolean))).sort()];
+  const allGuidelines = [...BUILTIN_GUIDELINES, ...dbGuidelines.map(g => ({ ...g, _db: true }))];
 
   // Semantic + fuzzy search
   const filtered = allGuidelines.filter(g => {
@@ -388,7 +389,7 @@ export default function Guidelines() {
                   </Badge>
                 )}
               </div>
-              <p className="text-blue-100 text-xs">{allGuidelines.length} guidelines · KDIGO/IPNA/ISPN/ESPN/AAP/EULAR/IAP</p>
+              <p className="text-blue-100 text-xs">{allGuidelines.length} guidelines · {BUILTIN_GUIDELINES.length} built-in · KDIGO/IPNA/ESPN/AAP/EULAR</p>
             </div>
           </div>
 
