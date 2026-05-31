@@ -8,11 +8,47 @@ const CONDITIONS = {
     tag: "Hypertension",
     color: "bg-red-100 text-red-800",
     guidance: "AAP 2017 · ISPN",
-    overview: "Correct technique is foundational. In India: auscultatory method or validated oscillometric device (Omron HBP-1120 recommended by ISPN for clinical settings). BP interpretation requires age/sex/height-specific percentile tables.",
-    diagnosis: ["Cuff selection: bladder covers 80–100% arm circumference; width 40% mid-arm — too small → falsely HIGH", "Position: right arm, seated, supported, 5 min rest, no caffeine/exercise 30 min prior", "Children <13y: AAP 2017 percentile tables (NHANES normative data by age/sex/height)", "Adolescents ≥13y: fixed threshold — Normal <120/80; Elevated 120-129/<80; Stage1 130-139/80-89; Stage2 ≥140/90", "Confirm on 3 separate occasions before labelling hypertension", "Omron HBP-1120: validated for paediatric use; recommended over aneroid sphygmomanometer in India"],
-    treatment: ["Stage 1 (95th-99th percentile without symptoms): lifestyle modification × 6 months before drug therapy", "Stage 2 (>99th+5mmHg OR symptomatic): start antihypertensive immediately", "Lifestyle: weight loss (obese), DASH diet (low sodium <2g/day), exercise 30-60 min/day", "1st line: ACEi/ARB (CKD/proteinuria), CCB (general), thiazide (volume-mediated)", "Target: <90th percentile (with CKD: <50th percentile)"],
-    monitoring: ["Confirm with ABPM if white coat suspected (15-40% of referrals)", "Home BP monitoring: twice daily × 7 days (validated paediatric device)", "ABPM: gold standard — 24h profile, nocturnal dipping, masked HTN", "End-organ: echocardiogram (LVH), fundoscopy, urine UPCR at diagnosis"],
-    pearls: ["Omron HBP-1120 (validated paediatric): ~₹6000 in India — cost-effective investment for nephrology clinic", "Non-dipping (nocturnal BP >10% of daytime): associated with CKD progression and cardiovascular risk", "White coat HTN: ABPM or home monitoring before starting medication", "Secondary HTN much more common in children than adults — always investigate"]
+    overview: "Correct BP measurement technique is foundational. Use validated oscillometric device (Omron HBP-1120 recommended by ISPN). BP interpretation requires age/sex/height-specific percentile tables for children <13 years; fixed thresholds for ≥13 years.",
+    diagnosis: [
+      "CLASSIFICATION (Children <13y — percentile-based by age/sex/height):",
+      "Normal: <90th percentile",
+      "Elevated: 90th to <95th percentile (or 120/80 to <95th percentile, whichever is lower)",
+      "Stage 1 HTN: 95th percentile to <95th+12 mmHg (or 130/80 to 139/89 mmHg)",
+      "Stage 2 HTN: ≥95th+12 mmHg (or ≥140/90 mmHg)",
+      "CLASSIFICATION (Adolescents ≥13y — fixed thresholds, AAP 2017):",
+      "Normal: <120/<80 mmHg",
+      "Elevated: 120–129/<80 mmHg",
+      "Stage 1 HTN: 130–139/80–89 mmHg",
+      "Stage 2 HTN: ≥140/≥90 mmHg",
+      "Confirm diagnosis: ≥3 separate occasions (except urgency/emergency)",
+      "Cuff: bladder covers 80–100% arm circumference; too small → falsely HIGH",
+      "Position: right arm, seated, supported, 5 min rest, no caffeine/exercise 30 min prior",
+      "Omron HBP-1120: ISPN-recommended validated oscillometric device for paediatric use in India"
+    ],
+    treatment: [
+      "Stage 1 (no symptoms, no CKD, no organ damage): lifestyle modification × 3–6 months before drug therapy",
+      "Stage 2 OR symptomatic OR secondary HTN: start antihypertensive immediately",
+      "Lifestyle: DASH diet (sodium <2g/day), weight loss if obese, 30–60 min aerobic exercise/day",
+      "1st line drug choices: ACEi/ARB (CKD/proteinuria), CCB (amlodipine) for general/secondary HTN",
+      "Target BP: <90th percentile for age/sex/height (CKD patients: <50th percentile per KDIGO)",
+      "Thiazide diuretics: volume-mediated HTN (e.g. CKD, obesity)",
+      "Beta-blockers: avoid as 1st line in children unless specific indication (e.g. portal HTN)"
+    ],
+    monitoring: [
+      "Confirm with ABPM if white coat suspected (15–40% of paediatric HTN referrals)",
+      "Home BP monitoring: twice daily × 7 days with validated paediatric device",
+      "ABPM: gold standard — 24h profile, nocturnal dipping pattern, masked HTN detection",
+      "End-organ assessment at diagnosis: echocardiogram (LVH), fundoscopy, urine UPCR, eGFR",
+      "Repeat echocardiogram 6-monthly if LVH detected"
+    ],
+    pearls: [
+      "Stage 1 vs Stage 2 distinction changed in AAP 2017: Stage 1 upper limit is 95th+12mmHg (NOT 99th+5mmHg as in old JNC4 criteria)",
+      "Old classification used 99th+5mmHg for Stage 2 — this is now ONLY Stage 2 threshold upper boundary",
+      "Omron HBP-1120 (~₹6000 in India) — worthwhile investment for any nephrology clinic",
+      "Non-dipping (nocturnal BP <10% fall): associated with CKD progression and cardiovascular risk",
+      "White coat HTN: ABPM before starting medication — avoid unnecessary treatment",
+      "Secondary HTN much more common in children than adults (>85%) — always investigate cause"
+    ]
   },
   htn_emergency: {
     title: "Hypertensive Emergency & PRES",
@@ -91,12 +127,23 @@ export default function HypertensionPathways({ condition }) {
               <p className="text-sm text-red-900 leading-relaxed">{data.overview}</p>
             </div>
           )}
-          {section !== "overview" && data[section]?.map((item, i) => (
-            <div key={i} className={`flex items-start gap-2 p-3 rounded-lg ${section === "pearls" ? "bg-amber-50 border border-amber-200" : section === "treatment" ? "bg-green-50 border border-green-200" : section === "diagnosis" ? "bg-blue-50 border border-blue-200" : "bg-slate-50 border border-slate-200"}`}>
-              <ArrowRight className={`w-3 h-3 flex-shrink-0 mt-0.5 ${section === "pearls" ? "text-amber-600" : section === "treatment" ? "text-green-600" : "text-blue-500"}`} />
-              <p className="text-xs text-slate-800 leading-relaxed">{item}</p>
-            </div>
-          ))}
+          {section !== "overview" && data[section]?.map((item, i) => {
+            const isSubItem = item.startsWith("  ");
+            const isHeader = item.endsWith(":") && !item.startsWith("  ");
+            return (
+              <div key={i} className={`flex items-start gap-2 p-2.5 rounded-lg ${
+                isHeader ? "bg-slate-100 border border-slate-300" :
+                isSubItem ? "ml-4 bg-slate-50 border border-slate-100" :
+                section === "pearls" ? "bg-amber-50 border border-amber-200" :
+                section === "treatment" ? "bg-green-50 border border-green-200" :
+                section === "diagnosis" ? "bg-blue-50 border border-blue-200" :
+                "bg-slate-50 border border-slate-200"
+              }`}>
+                {isHeader ? null : <ArrowRight className={`w-3 h-3 flex-shrink-0 mt-0.5 ${section === "pearls" ? "text-amber-600" : section === "treatment" ? "text-green-600" : "text-blue-500"}`} />}
+                <p className={`text-xs leading-relaxed ${isHeader ? "font-bold text-slate-700 w-full" : "text-slate-800"}`}>{item.trim()}</p>
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
 

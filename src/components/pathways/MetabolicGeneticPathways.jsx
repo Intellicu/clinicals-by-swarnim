@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, ChevronDown, ChevronUp, ArrowRight, Dna, Info } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronUp, ArrowRight, Dna, Info, CheckCircle2, Circle, Clipboard } from "lucide-react";
 
 const CONDITIONS = {
   cystinosis: {
@@ -72,10 +72,173 @@ const CONDITIONS = {
   }
 };
 
+// Fabry Screening Checklist Tool
+function FabryScreeningTool() {
+  const features = [
+    { id: "pain", label: "Neuropathic pain / acroparesthesia (hands & feet, worse with fever/exercise)", points: 2 },
+    { id: "angiokeratoma", label: "Angiokeratomas (dark red papules on trunk/groin/umbilical area)", points: 3 },
+    { id: "cornea", label: "Cornea verticillata on slit-lamp (whorl-like corneal opacities)", points: 3 },
+    { id: "proteinuria", label: "Proteinuria / microalbuminuria unexplained (especially in young male)", points: 2 },
+    { id: "lvh", label: "LVH / hypertrophic cardiomyopathy (unexplained in child/adolescent)", points: 2 },
+    { id: "stroke", label: "Stroke or TIA in child/young adult without traditional risk factors", points: 3 },
+    { id: "hearing", label: "Sensorineural hearing loss", points: 1 },
+    { id: "family", label: "Family history of Fabry disease or unexplained ESRD + cardiac disease", points: 3 },
+    { id: "gi", label: "Recurrent GI symptoms (abdominal pain, diarrhoea) in childhood", points: 1 },
+    { id: "anhidrosis", label: "Hypohidrosis / anhidrosis (reduced sweating)", points: 2 },
+  ];
+  const [checked, setChecked] = useState({});
+  const score = features.filter(f => checked[f.id]).reduce((s, f) => s + f.points, 0);
+  const risk = score >= 6 ? "HIGH" : score >= 3 ? "MODERATE" : "LOW";
+  const riskColor = risk === "HIGH" ? "text-red-700 bg-red-50 border-red-300" : risk === "MODERATE" ? "text-amber-700 bg-amber-50 border-amber-300" : "text-green-700 bg-green-50 border-green-300";
+
+  return (
+    <div className="space-y-3">
+      <div className="bg-pink-50 border border-pink-200 rounded-xl p-3">
+        <p className="text-xs font-bold text-pink-800 mb-1">Fabry Disease Screening Checklist</p>
+        <p className="text-xs text-pink-700">Tick all features present. Score ≥6 = HIGH suspicion → enzyme assay + GLA sequencing urgently.</p>
+      </div>
+      <div className="space-y-1.5">
+        {features.map(f => (
+          <button key={f.id} onClick={() => setChecked(c => ({ ...c, [f.id]: !c[f.id] }))}
+            className={`w-full flex items-center gap-2 p-2.5 rounded-lg border text-left transition-all ${checked[f.id] ? "bg-pink-50 border-pink-300" : "bg-white border-slate-200 hover:border-pink-200"}`}>
+            {checked[f.id] ? <CheckCircle2 className="w-4 h-4 text-pink-600 flex-shrink-0" /> : <Circle className="w-4 h-4 text-slate-300 flex-shrink-0" />}
+            <span className="text-xs text-slate-800 flex-1">{f.label}</span>
+            <span className="text-xs font-bold text-pink-600 flex-shrink-0">+{f.points}</span>
+          </button>
+        ))}
+      </div>
+      <div className={`p-3 rounded-xl border-2 font-bold text-center ${riskColor}`}>
+        Score: {score} — {risk} RISK
+        {risk === "HIGH" && <p className="text-xs font-normal mt-1">→ Order alpha-Gal A enzyme assay (males) + GLA sequencing (all). Refer to metabolic team.</p>}
+        {risk === "MODERATE" && <p className="text-xs font-normal mt-1">→ Discuss with metabolic nephrology. Consider enzyme assay + lyso-Gb3.</p>}
+        {risk === "LOW" && <p className="text-xs font-normal mt-1">→ Low suspicion. Re-evaluate if new features develop.</p>}
+      </div>
+    </div>
+  );
+}
+
+// aHUS Plasma Exchange / Eculizumab Protocol Tool
+function AHUSPlexGuide() {
+  const [weight, setWeight] = useState("");
+  const [step, setStep] = useState(0);
+  const wt = parseFloat(weight) || null;
+
+  const eculizumabDose = wt ? (
+    wt < 5 ? { ind: "600 mg", maint: "300 mg Q3W", induction: "1 dose" } :
+    wt < 10 ? { ind: "600 mg", maint: "300 mg Q3W", induction: "1 dose" } :
+    wt < 20 ? { ind: "600 mg", maint: "600 mg Q2W", induction: "1 dose" } :
+    wt < 30 ? { ind: "900 mg", maint: "600 mg Q2W", induction: "1 dose" } :
+    wt < 40 ? { ind: "900 mg", maint: "900 mg Q2W", induction: "1 dose" } :
+    { ind: "900 mg", maint: "1200 mg Q2W", induction: "4 doses" }
+  ) : null;
+
+  const plex = [
+    "Volume: 1–1.5× plasma volume (40–50 mL/kg); replacement: FFP 10–15 mL/kg",
+    "Daily PLEX × 5 days (induction), then every 48h × 2 weeks, then 3× weekly",
+    "Bridge to eculizumab: continue PLEX until eculizumab levels therapeutic",
+    "Central access: large-bore CVC or Permcath (quinton catheter) required",
+    "Monitor: platelets, LDH, haptoglobin, creatinine after each session",
+    "Stop PLEX only when eculizumab initiated and platelet/LDH normalising",
+  ];
+
+  const checklist = [
+    "Meningococcal vaccine (MenACWY + MenB) BEFORE eculizumab — or penicillin prophylaxis if urgent",
+    "Genetic panel: CFH, CFI, CD46/MCP, C3, CFB, THBD, CFHR1/3 (aHUS panel)",
+    "ADAMTS13 activity >10% (excludes TTP)",
+    "Stool/rectal swab for Shiga-toxin STEC (excludes D+HUS)",
+    "Anti-CFH antibodies (especially children — CFH autoantibody-mediated aHUS)",
+    "Baseline: C3, C4, CH50, AH50, factor H level",
+    "Eculizumab compassionate access form (Alexion) if not available commercially",
+  ];
+
+  return (
+    <div className="space-y-3">
+      <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+        <p className="text-xs font-bold text-red-800 mb-1">aHUS — PLEX & Eculizumab Protocol</p>
+        <p className="text-xs text-red-700">Complement-mediated TMA. Do NOT delay eculizumab. PLEX is a bridge — not definitive treatment.</p>
+      </div>
+
+      <div className="flex gap-1.5">
+        {["Pre-Treatment Checklist", "PLEX Protocol", "Eculizumab Dosing"].map((t, i) => (
+          <button key={i} onClick={() => setStep(i)}
+            className={`flex-1 text-xs py-2 px-1 rounded-lg font-medium border transition-all ${step === i ? "bg-red-700 text-white border-red-700" : "bg-white border-slate-200 text-slate-600"}`}>
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {step === 0 && (
+        <div className="space-y-1.5">
+          {checklist.map((item, i) => (
+            <div key={i} className="flex items-start gap-2 p-2.5 bg-white border border-slate-200 rounded-lg">
+              <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-slate-800">{item}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {step === 1 && (
+        <div className="space-y-1.5">
+          {plex.map((item, i) => (
+            <div key={i} className="flex items-start gap-2 p-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+              <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-slate-800">{item}</p>
+            </div>
+          ))}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+            <p className="text-xs text-amber-800"><strong>Note:</strong> PLEX removes anti-CFH antibodies and depletes complement — temporary. Eculizumab blocks terminal complement permanently.</p>
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div className="space-y-3">
+          <div className="bg-white border-2 border-slate-200 rounded-xl p-3">
+            <p className="text-xs font-semibold text-slate-600 mb-1">Patient Weight (kg)</p>
+            <input type="number" inputMode="decimal" value={weight} onChange={e => setWeight(e.target.value)}
+              placeholder="Enter weight" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none focus:border-red-400" />
+          </div>
+          {eculizumabDose ? (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-3 text-center">
+                <p className="text-xs text-slate-500">Induction Dose</p>
+                <p className="text-lg font-black text-red-800">{eculizumabDose.ind}</p>
+                <p className="text-xs text-slate-500">{eculizumabDose.induction} × weekly</p>
+              </div>
+              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-3 text-center">
+                <p className="text-xs text-slate-500">Maintenance</p>
+                <p className="text-base font-black text-green-800">{eculizumabDose.maint}</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 text-center">Enter weight for dose calculation</p>
+          )}
+          <div className="space-y-1.5">
+            {["900 mg IV over 35 min (undiluted); 600 mg over 21 min",
+              "Premedicate: antihistamine + paracetamol 30 min before",
+              "Monitor: infusion reactions, BP, HR during and 1h after",
+              "Duration: indefinite in genetic aHUS; consider discontinuation in anti-CFH Ab–mediated aHUS after Ab clearance",
+              "India: compassionate use via Alexion/AstraZeneca or PMJAY (selected centres: AIIMS, PGIMER, CMC, Medanta)"
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-2 p-2.5 bg-green-50 border border-green-200 rounded-lg">
+                <ArrowRight className="w-3 h-3 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-slate-800">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function MetabolicGeneticPathways({ condition }) {
   const [section, setSection] = useState("overview");
   const data = CONDITIONS[condition];
   if (!data) return null;
+
+  const hasTool = condition === "fabry" || condition === "arpkd_adpkd";
 
   const sections = [
     { key: "overview", label: "Overview" },
@@ -83,6 +246,8 @@ export default function MetabolicGeneticPathways({ condition }) {
     { key: "treatment", label: "Treatment" },
     { key: "monitoring", label: "Monitoring" },
     { key: "pearls", label: "Clinical Pearls" },
+    ...(condition === "fabry" ? [{ key: "screening_tool", label: "🔍 Screening Tool" }] : []),
+    ...(condition === "arpkd_adpkd" ? [{ key: "ahus_tool", label: "💊 aHUS Protocol" }] : []),
   ];
 
   return (
@@ -116,10 +281,17 @@ export default function MetabolicGeneticPathways({ condition }) {
               <p className="text-sm text-violet-900 leading-relaxed">{data.overview}</p>
             </div>
           )}
-          {section !== "overview" && data[section]?.map((item, i) => (
-            <div key={i} className={`flex items-start gap-2 p-3 rounded-lg ${section === "pearls" ? "bg-amber-50 border border-amber-200" : section === "treatment" ? "bg-green-50 border border-green-200" : section === "diagnosis" ? "bg-blue-50 border border-blue-200" : "bg-slate-50 border border-slate-200"}`}>
+          {section === "screening_tool" && <FabryScreeningTool />}
+          {section === "ahus_tool" && <AHUSPlexGuide />}
+          {section !== "overview" && section !== "screening_tool" && section !== "ahus_tool" && data[section]?.map((item, i) => (
+            <div key={i} className={`flex items-start gap-2 p-3 rounded-lg ${
+              item.startsWith("  ") ? "ml-4 bg-slate-50 border border-slate-100" :
+              section === "pearls" ? "bg-amber-50 border border-amber-200" :
+              section === "treatment" ? "bg-green-50 border border-green-200" :
+              section === "diagnosis" ? "bg-blue-50 border border-blue-200" :
+              "bg-slate-50 border border-slate-200"}`}>
               <ArrowRight className={`w-3 h-3 flex-shrink-0 mt-0.5 ${section === "pearls" ? "text-amber-600" : section === "treatment" ? "text-green-600" : "text-blue-500"}`} />
-              <p className="text-xs text-slate-800 leading-relaxed">{item}</p>
+              <p className="text-xs text-slate-800 leading-relaxed">{item.trim()}</p>
             </div>
           ))}
         </CardContent>
