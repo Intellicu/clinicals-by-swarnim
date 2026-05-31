@@ -15,7 +15,7 @@ import {
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
   RefreshCw, Shield, Info, BarChart2, Star,
   Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
-  ChevronDown, ChevronUp, Thermometer } from
+  ChevronDown, ChevronUp, Thermometer, Cpu } from
 "lucide-react";
 import QuickPatientEntry from "../components/QuickPatientEntry";
 import { useOnlineStatus } from "../components/OfflineDataManager";

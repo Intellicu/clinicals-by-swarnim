@@ -300,7 +300,7 @@ export default function HubNephrologyPathways() {
         <div>
           <div className="flex items-center gap-1.5 mb-2">
             <GitBranch className="w-3.5 h-3.5 text-violet-600" />
-            <span className="text-xs font-bold text-violet-700 uppercase tracking-wider">Intelligence Engines (LEILA-style)</span>
+            <span className="text-xs font-bold text-violet-700 uppercase tracking-wider">Intelligence Engines</span>
             <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">{engineList.length}</span>
           </div>
           <div className="space-y-1.5">
@@ -415,7 +415,7 @@ function PathwayCard({ pathway, idx, open, setOpen, goToPathway, isAdmin, onEdit
             {pathway.tag === "Engine" ? <GitBranch className="w-3.5 h-3.5 text-violet-600 flex-shrink-0" /> : pathway.emergency ? <Zap className="w-3.5 h-3.5 text-red-500 flex-shrink-0" /> : null}
             <span className="font-semibold text-sm text-slate-800">{pathway.name}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${pathway.color}`}>{pathway.tag}</span>
-            {pathway.tag === "Engine" && <span className="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full font-bold">LEILA</span>}
+            {pathway.tag === "Engine" && <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-semibold border border-violet-300">AI Engine</span>}
             {pathway._isCustom && <span className="text-xs text-amber-600 font-medium">Custom</span>}
           </div>
           {open === idx ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />}

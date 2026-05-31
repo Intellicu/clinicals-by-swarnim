@@ -5,7 +5,7 @@ import {
   Activity, Droplet, Layers, Dna, TestTube, Brain,
   Settings, X, Plus, Check, GripVertical, AlertTriangle,
   Heart, Zap, Wind, Calculator, Pill, Microscope, BookOpen,
-  FlaskConical, Stethoscope, TrendingUp, Star, Beaker
+  FlaskConical, Stethoscope, TrendingUp, Star, Beaker, GitBranch
 } from "lucide-react";
 
 // ── All available quick-launch apps ──
@@ -34,9 +34,25 @@ export const ALL_QUICK_APPS = [
   { id: "fluids",     label: "Fluid Calculator",       icon: Droplet,      color: "bg-cyan-600",    page: "FluidCalculator",       desc: "Maintenance fluids" },
   { id: "tubular",    label: "Tubular Disorders",      icon: Beaker,       color: "bg-teal-800",    page: "TubularDisordersHub",   desc: "RTA · Tubular" },
   { id: "rare_disease", label: "Rare Disease",         icon: Dna,          color: "bg-indigo-800",  page: "RareDiseaseModule",     desc: "Rare dx module" },
+  // ── Intelligence Engines ──
+  { id: "eng_ns",       label: "NS Engine",            icon: GitBranch,    color: "bg-violet-600",  page: "ClinicalSupport",       desc: "Nephrotic Syndrome",    params: "?tab=pathways&scenario=ns-engine" },
+  { id: "eng_hypo_na",  label: "Hyponatraemia Eng.",   icon: GitBranch,    color: "bg-cyan-600",    page: "ClinicalSupport",       desc: "Hyponatraemia Engine",  params: "?tab=pathways&scenario=hyponatremia-engine" },
+  { id: "eng_rpgn",     label: "RPGN Engine",          icon: GitBranch,    color: "bg-red-700",     page: "ClinicalSupport",       desc: "Crescentic GN",         params: "?tab=pathways&scenario=rpgn-deep-engine" },
+  { id: "eng_aki",      label: "AKI Engine",           icon: GitBranch,    color: "bg-red-600",     page: "ClinicalSupport",       desc: "AKI Diagnostic Engine", params: "?tab=pathways&scenario=aki-engine" },
+  { id: "eng_hk",       label: "Hyperkalaemia Eng.",   icon: GitBranch,    color: "bg-orange-600",  page: "ClinicalSupport",       desc: "Full K+ Engine",        params: "?tab=pathways&scenario=hyperkalemia-deep-engine" },
+  { id: "eng_tma",      label: "TMA Engine",           icon: GitBranch,    color: "bg-rose-700",    page: "ClinicalSupport",       desc: "HUS / TMA Decision",    params: "?tab=pathways&scenario=tma-engine" },
+  { id: "eng_hematuria",label: "Haematuria Eng.",      icon: GitBranch,    color: "bg-rose-600",    page: "ClinicalSupport",       desc: "Haematuria Engine",     params: "?tab=pathways&scenario=hematuria-engine" },
+  { id: "eng_genetic",  label: "Genetic Engine",       icon: GitBranch,    color: "bg-violet-700",  page: "ClinicalSupport",       desc: "Genetic Test Triggers", params: "?tab=pathways&scenario=genetic-engine" },
+  { id: "eng_ckdprog",  label: "CKD Progression",      icon: GitBranch,    color: "bg-blue-700",    page: "ClinicalSupport",       desc: "CKD Progression Engine",params: "?tab=pathways&scenario=ckd-progression-engine" },
+  { id: "eng_biopsy",   label: "Biopsy Engine",        icon: GitBranch,    color: "bg-amber-700",   page: "ClinicalSupport",       desc: "Biopsy Trigger Engine", params: "?tab=pathways&scenario=biopsy-engine" },
+  { id: "eng_ma",       label: "Metabolic Acidosis",   icon: GitBranch,    color: "bg-amber-600",   page: "ClinicalSupport",       desc: "Met. Acidosis Engine",  params: "?tab=pathways&scenario=metabolic-acidosis-engine" },
+  { id: "eng_hypokal",  label: "Hypokalaemia Eng.",    icon: GitBranch,    color: "bg-yellow-600",  page: "ClinicalSupport",       desc: "Hypokalemia Engine",    params: "?tab=pathways&scenario=hypokalemia-engine" },
+  { id: "eng_polyuria", label: "Polyuria Engine",      icon: GitBranch,    color: "bg-teal-600",    page: "ClinicalSupport",       desc: "Polyuria / DI Engine",  params: "?tab=pathways&scenario=polyuria-engine" },
+  { id: "eng_eculizumab",label: "Eculizumab Engine",  icon: GitBranch,    color: "bg-purple-700",  page: "ClinicalSupport",       desc: "Eculizumab Eligibility",params: "?tab=pathways&scenario=eculizumab-engine" },
+  { id: "eng_c3g",      label: "C3G Engine",           icon: GitBranch,    color: "bg-cyan-700",    page: "ClinicalSupport",       desc: "C3 Glomerulopathy",     params: "?tab=pathways&scenario=c3g-engine" },
 ];
 
-const DEFAULT_IDS = ["rrt", "stone", "biopsy", "genetics", "uroflow", "uds"];
+const DEFAULT_IDS = ["eng_ns", "eng_aki", "eng_hk", "eng_rpgn", "eng_hypo_na", "rrt", "biopsy", "genetics", "emergency", "drugs"];
 const STORAGE_KEY = "hub_quick_launch_ids";
 
 function loadIds() {
