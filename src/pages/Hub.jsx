@@ -513,7 +513,7 @@ export default function Hub() {
               <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
               <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">27</span>
             </div>
-            <Link to={createPageUrl("ClinicalSupport") + "?tab=pathways&scenario=ns-engine"}>
+            <Link to={createPageUrl("ClinicalSupport") + "?tab=engines"}>
               <span className="text-xs text-violet-600 font-semibold">All →</span>
             </Link>
           </div>

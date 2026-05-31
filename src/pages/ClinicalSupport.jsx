@@ -1866,6 +1866,9 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               <TabsTrigger value="scenarios" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
                 <Clipboard className="w-3 h-3" /><span>Scenarios</span>
               </TabsTrigger>
+              <TabsTrigger value="engines" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 text-violet-700">
+                <Cpu className="w-3 h-3" /><span>🧠 Engines</span>
+              </TabsTrigger>
               <TabsTrigger value="glomerular" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
                 <Microscope className="w-3 h-3" /><span>GN Pathways</span>
               </TabsTrigger>
@@ -1880,9 +1883,6 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               </TabsTrigger>
               <TabsTrigger value="pathways" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
                 <GitBranch className="w-3 h-3" /><span>Pathways</span>
-              </TabsTrigger>
-              <TabsTrigger value="engines" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 text-violet-700">
-                <Cpu className="w-3 h-3" /><span>🧠 Engines</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -1978,7 +1978,10 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
           </TabsContent>
 
           <TabsContent value="engines">
-            <IntelligenceEnginesTab onSelectEngine={(scenario) => { setSelectedScenario(scenario); setActiveTab("pathways"); }} />
+            <IntelligenceEnginesTab
+              onSelectEngine={(scenario) => { setSelectedScenario(scenario); setActiveTab("pathways"); }}
+              onBack={() => setActiveTab("scenarios")}
+            />
           </TabsContent>
         </Tabs>
 
