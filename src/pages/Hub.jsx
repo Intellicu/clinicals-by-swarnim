@@ -505,6 +505,49 @@ export default function Hub() {
         {/* ── Quick Launch (customisable) ── */}
         <HubQuickLaunch />
 
+        {/* ── Intelligence Engines ── */}
+        <div className="bg-white rounded-xl border border-violet-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-3 py-2.5 border-b border-violet-100 bg-violet-50">
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-violet-600" />
+              <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
+              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">15</span>
+            </div>
+            <Link to={createPageUrl("ClinicalSupport") + "?tab=pathways&scenario=ns-engine"}>
+              <span className="text-xs text-violet-600 font-semibold">All →</span>
+            </Link>
+          </div>
+          <div className="flex gap-2 overflow-x-auto p-2.5" style={{ scrollbarWidth: "none" }}>
+            {[
+              { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
+              { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
+              { label: "Hyperkalaemia",      desc: "K+ Emergency",          color: "bg-orange-600", scenario: "hyperkalemia-deep-engine" },
+              { label: "Hyponatraemia",      desc: "Na Correction",         color: "bg-cyan-600",   scenario: "hyponatremia-engine" },
+              { label: "RPGN Engine",        desc: "Crescentic GN",         color: "bg-red-700",    scenario: "rpgn-deep-engine" },
+              { label: "TMA Engine",         desc: "HUS / aHUS",            color: "bg-rose-700",   scenario: "tma-engine" },
+              { label: "Haematuria",         desc: "Haematuria Workup",     color: "bg-rose-600",   scenario: "hematuria-engine" },
+              { label: "Genetic Engine",     desc: "Testing Triggers",      color: "bg-violet-700", scenario: "genetic-engine" },
+              { label: "CKD Progression",    desc: "Risk Stratification",   color: "bg-blue-700",   scenario: "ckd-progression-engine" },
+              { label: "Biopsy Engine",      desc: "When to Biopsy",        color: "bg-amber-700",  scenario: "biopsy-engine" },
+              { label: "Met. Acidosis",      desc: "AG / RTA Engine",       color: "bg-amber-600",  scenario: "metabolic-acidosis-engine" },
+              { label: "Hypokalemia",        desc: "K+ Deficiency",         color: "bg-yellow-600", scenario: "hypokalemia-engine" },
+              { label: "Polyuria / DI",      desc: "DI Engine",             color: "bg-teal-600",   scenario: "polyuria-engine" },
+              { label: "Eculizumab",         desc: "Eligibility Engine",    color: "bg-purple-700", scenario: "eculizumab-engine" },
+              { label: "C3G Engine",         desc: "C3 Glomerulopathy",     color: "bg-cyan-700",   scenario: "c3g-engine" },
+            ].map((eng) => (
+              <Link key={eng.scenario} to={createPageUrl("ClinicalSupport") + `?tab=pathways&scenario=${eng.scenario}`} className="flex-shrink-0">
+                <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-violet-50 active:bg-violet-100 transition-colors w-20">
+                  <div className={`w-10 h-10 ${eng.color} rounded-xl flex items-center justify-center shadow-sm`}>
+                    <GitBranch className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-700 text-center leading-tight">{eng.label}</span>
+                  <span className="text-xs text-violet-500 text-center leading-tight hidden sm:block">{eng.desc}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* ── Search ── */}
         <GlobalSearch
           placeholder="Search calculators, pathways, drugs, AI tools…"
