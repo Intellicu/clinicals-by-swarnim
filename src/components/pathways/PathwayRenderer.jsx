@@ -65,6 +65,18 @@ import HyponatremiaEngine from "../engines/HyponatremiaEngine";
 import RPGNEngine from "../engines/RPGNEngine";
 import AKIEngine from "../engines/AKIEngine";
 import HyperkalemiaDeepEngine from "../engines/HyperkalemiaDeepEngine";
+import FabryEngine from "../engines/FabryEngine";
+import VoidingDysfunctionEngine from "../engines/VoidingDysfunctionEngine";
+import CysticKidneyEngine from "../engines/CysticKidneyEngine";
+import CAKUTEngine from "../engines/CAKUTEngine";
+import PUVEngine from "../engines/PUVEngine";
+import VURRecurrentUTIEngine from "../engines/VURRecurrentUTIEngine";
+import HNF1BAlportEngine from "../engines/HNF1BAlportEngine";
+import PrimaryHyperoxaluriaEngine from "../engines/PrimaryHyperoxaluriaEngine";
+import CystinosisEngine from "../engines/CystinosisEngine";
+import PediatricHypertensionEngine from "../engines/PediatricHypertensionEngine";
+import TubularDisordersEngine from "../engines/TubularDisordersEngine";
+import KidneyStoneEngine from "../engines/KidneyStoneEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -84,6 +96,9 @@ const HANDLED_IDS = new Set([
   "biopsy-engine","eculizumab-engine","hypokalemia-engine","metabolic-acidosis-engine",
   "polyuria-engine","hyperkalemia-engine","c3g-engine","rpgn-engine",
   "ns-engine","hyponatremia-engine","rpgn-deep-engine","aki-engine","hyperkalemia-deep-engine",
+  "fabry-engine","voiding-engine","cystic-kidney-engine","cakut-engine","puv-engine",
+  "vur-uti-engine","hnf1b-alport-engine","hyperoxaluria-engine","cystinosis-engine",
+  "htn-engine","tubular-engine","stone-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -172,6 +187,19 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "rpgn-deep-engine") return <RPGNEngine />;
   if (id === "aki-engine") return <AKIEngine />;
   if (id === "hyperkalemia-deep-engine") return <HyperkalemiaDeepEngine />;
+  // ── New Intelligence Engines ──────────────────────────────────────────────
+  if (id === "fabry-engine") return <FabryEngine />;
+  if (id === "voiding-engine") return <VoidingDysfunctionEngine />;
+  if (id === "cystic-kidney-engine") return <CysticKidneyEngine />;
+  if (id === "cakut-engine") return <CAKUTEngine />;
+  if (id === "puv-engine") return <PUVEngine />;
+  if (id === "vur-uti-engine") return <VURRecurrentUTIEngine />;
+  if (id === "hnf1b-alport-engine") return <HNF1BAlportEngine />;
+  if (id === "hyperoxaluria-engine") return <PrimaryHyperoxaluriaEngine />;
+  if (id === "cystinosis-engine") return <CystinosisEngine />;
+  if (id === "htn-engine") return <PediatricHypertensionEngine />;
+  if (id === "tubular-engine") return <TubularDisordersEngine />;
+  if (id === "stone-engine") return <KidneyStoneEngine />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

@@ -52,7 +52,7 @@ export const ALL_QUICK_APPS = [
   { id: "eng_c3g",      label: "C3G Engine",           icon: GitBranch,    color: "bg-cyan-700",    page: "ClinicalSupport",       desc: "C3 Glomerulopathy",     params: "?tab=pathways&scenario=c3g-engine" },
 ];
 
-const DEFAULT_IDS = ["eng_ns", "eng_aki", "eng_hk", "eng_rpgn", "eng_hypo_na", "rrt", "biopsy", "genetics", "emergency", "drugs"];
+const DEFAULT_IDS = ["rrt", "biopsy", "genetics", "emergency", "drugs", "lab_ai", "aki", "bp_pct", "ckd", "differential"];
 const STORAGE_KEY = "hub_quick_launch_ids";
 
 function loadIds() {

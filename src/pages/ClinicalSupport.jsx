@@ -60,7 +60,8 @@ import GlomerularDiseasesPathway from '../components/pathways/GlomerularDiseases
 import PathwayRenderer from '../components/pathways/PathwayRenderer';
 import { TubularDisordersSection, ClinicalAIAgentsSection, RareDiseaseScreeningSection } from '../components/hub/HubSpecialtySections';
 import { PathwayModal, AIPathwayGenerator, PathwayCard, QuickAccessDashboard } from '../components/hub/ClinicalPathwayManager';
-import { Star, Plus, Sparkles } from 'lucide-react';
+import { Star, Plus, Sparkles, Cpu } from 'lucide-react';
+import IntelligenceEnginesTab from '../components/engines/IntelligenceEnginesTab';
 
 
 // Symptom templates based on chief complaints
@@ -715,7 +716,7 @@ export default function ClinicalSupport() {
     const p = new URLSearchParams(location.search);
     const tab = p.get("tab");
     // remap legacy tab names
-    const remapped = tab === "diagnostic" ? "ai-agents" : (tab || "scenarios");
+    const remapped = tab === "diagnostic" ? "ai-agents" : tab === "engines" ? "engines" : (tab || "scenarios");
     return { tab: remapped, scenario: p.get("scenario") || null };
   };
 
@@ -1880,6 +1881,9 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               <TabsTrigger value="pathways" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1">
                 <GitBranch className="w-3 h-3" /><span>Pathways</span>
               </TabsTrigger>
+              <TabsTrigger value="engines" className="px-2 py-1.5 text-xs font-medium rounded-xl whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow flex items-center gap-1 text-violet-700">
+                <Cpu className="w-3 h-3" /><span>🧠 Engines</span>
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -1971,6 +1975,10 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
           <TabsContent value="pathways">
             {renderSelectedPathway()}
+          </TabsContent>
+
+          <TabsContent value="engines">
+            <IntelligenceEnginesTab onSelectEngine={(scenario) => { setSelectedScenario(scenario); setActiveTab("pathways"); }} />
           </TabsContent>
         </Tabs>
 
