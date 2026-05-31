@@ -160,6 +160,39 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "metabolic-acidosis-engine") return <MetabolicAcidosisEngine />;
   if (id === "polyuria-engine") return <PolyuriaEngine />;
   if (id === "hyperkalemia-engine") return <HyperkalemiaEngine />;
+  if (id === "rpgn-engine") return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">
+        <h3 className="text-sm font-bold">RPGN Emergency Engine</h3>
+        <p className="text-xs text-red-100">Rapid GFR loss + crescents · AKI + haematuria · Urgent biopsy + IF-guided treatment</p>
+      </div>
+      {[
+        { title: "RPGN Definition & Urgency", color: "bg-red-50 border-red-300", items: [
+          "eGFR decline >50% in ≤3 months + haematuria ± RBC casts",
+          "Urgent biopsy 24–48h — IF pattern determines treatment completely",
+          "Pulse methylprednisolone 500–1000 mg (30 mg/kg, max 1g) × 3 IMMEDIATELY",
+          "RPGN panel STAT: ANCA + anti-GBM + ANA + C3/C4 + anti-dsDNA",
+        ]},
+        { title: "Biopsy → IF Pattern → Treatment", color: "bg-blue-50 border-blue-200", items: [
+          "LINEAR IgG (anti-GBM / Goodpasture): → PLEX daily × 14 days + CYC + steroids",
+          "GRANULAR Ig+C3 (immune-complex): → Lupus/IgAN/PSGN/C3G — treat underlying",
+          "PAUCI-IMMUNE (no deposits): → ANCA vasculitis (GPA/MPA) — RTX or CYC + steroids",
+          "% Crescents (prognostic): <50% → better renal survival; >70% + anuric → PLEX urgently",
+        ]},
+        { title: "PLEX Indications (any ONE = initiate)", color: "bg-orange-50 border-orange-200", items: [
+          "Anti-GBM antibody positive (always — daily PLEX × 14 days)",
+          "Cr >500 µmol/L OR dialysis-dependent at presentation",
+          "Diffuse alveolar haemorrhage (ANCA + DAH)",
+          "ANCA + anti-GBM double positive: aggressive PLEX",
+        ]},
+      ].map((s, i) => (
+        <div key={i} className={`rounded-xl border-2 p-3 ${s.color}`}>
+          <p className="text-xs font-bold text-slate-800 mb-2">{s.title}</p>
+          {s.items.map((item, j) => <div key={j} className="flex items-start gap-1.5 text-xs text-slate-800 mb-1"><span className="text-red-500 font-bold flex-shrink-0">→</span>{item}</div>)}
+        </div>
+      ))}
+    </div>
+  );
   if (id === "c3g-engine") return (
     <div className="space-y-4">
       <div className="rounded-xl bg-gradient-to-r from-cyan-700 to-teal-700 p-4 text-white">
