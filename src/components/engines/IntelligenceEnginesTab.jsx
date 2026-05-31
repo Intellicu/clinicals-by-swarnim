@@ -14,10 +14,12 @@ const ENGINES = [
   { label: "Polyuria / DI", desc: "Central vs Nephrogenic DI", scenario: "polyuria-engine", tags: ["polyuria", "diabetes insipidus", "NDI", "polydipsia"], group: "Emergency & Electrolytes" },
 
   // ── Glomerular ──
+  { label: "GN Engine", desc: "IgAN · LN · MN · FSGS · PSGN · ANCA · Alport · C3G · IgAVN", scenario: "gn-engine", tags: ["glomerulonephritis", "IgA", "lupus nephritis", "membranous", "FSGS", "PSGN", "ANCA", "Alport", "C3G", "HSP"], group: "Glomerular Disease" },
   { label: "NS Engine", desc: "Nephrotic Syndrome full engine", scenario: "ns-engine", tags: ["nephrotic syndrome", "edema", "proteinuria", "steroid"], group: "Glomerular Disease" },
   { label: "RPGN Engine", desc: "Crescentic GN + PLEX", scenario: "rpgn-deep-engine", tags: ["RPGN", "crescentic GN", "plasmapheresis", "ANCA", "anti-GBM"], group: "Glomerular Disease" },
   { label: "TMA Engine", desc: "HUS / aHUS / TTP", scenario: "tma-engine", tags: ["HUS", "aHUS", "TTP", "TMA", "thrombocytopenia"], group: "Glomerular Disease" },
-  { label: "Hematuria Engine", desc: "Glomerular vs urological workup", scenario: "hematuria-engine", tags: ["hematuria", "blood urine", "RBC", "glomerular", "dysmorphic", "alport", "IgA"], group: "Glomerular Disease" },
+  { label: "Hematuria Engine", desc: "6-step algorithm: glomerular vs urological", scenario: "hematuria-engine", tags: ["hematuria", "blood urine", "RBC", "glomerular", "dysmorphic", "alport", "IgA"], group: "Glomerular Disease" },
+  { label: "Proteinuria Engine", desc: "Dipstick → UPCR → biopsy indications", scenario: "proteinuria-engine", tags: ["proteinuria", "urine protein", "UPCR", "nephrotic", "tubular", "orthostatic"], group: "Glomerular Disease" },
   { label: "Biopsy Engine", desc: "When to biopsy", scenario: "biopsy-engine", tags: ["biopsy", "kidney biopsy", "histology", "indication"], group: "Glomerular Disease" },
   { label: "C3G Engine", desc: "C3 Glomerulopathy", scenario: "c3g-engine", tags: ["C3G", "MPGN", "complement", "dense deposit"], group: "Glomerular Disease" },
   { label: "Eculizumab", desc: "Eligibility + dosing", scenario: "eculizumab-engine", tags: ["eculizumab", "aHUS", "complement", "eligibility"], group: "Glomerular Disease" },
@@ -40,6 +42,7 @@ const ENGINES = [
   // ── Tubular & Metabolic ──
   { label: "Tubular Engine", desc: "Fanconi / XLH / NDI", scenario: "tubular-engine", tags: ["Fanconi", "rickets", "XLH", "NDI", "tubular", "phosphate"], group: "Tubular & Metabolic" },
   { label: "Stone Engine", desc: "Renal stones full workup", scenario: "stone-engine", tags: ["stones", "urolithiasis", "calcium oxalate", "cystinuria", "uric acid"], group: "Tubular & Metabolic" },
+  { label: "Nephrocalcinosis", desc: "Grading + metabolic workup + management", scenario: "nephrocalcinosis-stone-engine", tags: ["nephrocalcinosis", "stones", "hypercalciuria", "oxaluria", "dRTA", "Bartter", "cystinuria"], group: "Tubular & Metabolic" },
 
   // ── Hypertension ──
   { label: "HTN Engine", desc: "AAP 2017 + secondary workup", scenario: "htn-engine", tags: ["hypertension", "BP", "AAP 2017", "secondary HTN", "stage 2"], group: "Hypertension" },
@@ -73,6 +76,9 @@ const ENGINE_GUIDELINE_KEYS = {
   "hyponatremia-engine": ["Hyponatremia", "Hyponatraemia", "Sodium"],
   "hematuria-engine": ["Hematuria", "Haematuria"],
   "htn-engine": ["Hypertension", "AAP 2017", "Blood Pressure"],
+  "gn-engine": ["Glomerulonephritis", "IgA Nephropathy", "Lupus Nephritis", "FSGS", "PSGN", "Membranous"],
+  "proteinuria-engine": ["Proteinuria", "Nephrotic"],
+  "nephrocalcinosis-stone-engine": ["Nephrocalcinosis", "Stone", "Urolithiasis", "Hypercalciuria"],
   "fabry-engine": ["Fabry"],
   "cystic-kidney-engine": ["ADPKD", "ARPKD", "Cystic Kidney", "Nephronophthisis"],
   "cakut-engine": ["CAKUT", "Hydronephrosis"],

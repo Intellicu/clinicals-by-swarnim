@@ -1,405 +1,512 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2, Circle, ArrowLeft, ChevronRight, Droplet, AlertTriangle, Microscope, Activity } from "lucide-react";
+import { CheckCircle2, ArrowLeft, ChevronRight, Droplet, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// Based on Jaypee Brothers algorithm (Fig 1.2, 1.3, 1.4)
+// Reference: Yap HK, Lau PYW (2008) Comprehensive Pediatric Nephrology; KDIGO; AAP
 
-const STEP_KEYS = {
+const STEPS = {
   START: "start",
+  CONFIRM: "confirm",
+  NEPHRITIC_SIGNS: "nephritic_signs",
+  NEPHRITIC_WORKUP: "nephritic_workup",
+  LUTS: "luts",
+  LUTS_WORKUP: "luts_workup",
   MACRO_MICRO: "macro_micro",
-  MICRO_SYMPTOMATIC: "micro_symptomatic",
-  MICRO_ASYMPTOMATIC: "micro_asymptomatic",
-  MICRO_ASYM_FAMILY: "micro_asym_family",
-  MICRO_ASYM_WORKUP: "micro_asym_workup",
-  MACRO_COLOR: "macro_color",
-  GLOMERULAR_WORKUP: "glomerular_workup",
-  NON_GLOMERULAR_WORKUP: "non_glomerular_workup",
-  FAMILY_POSITIVE: "family_positive",
-  CRYSTALLURIA_WORKUP: "crystalluria_workup",
-  GN_WORKUP: "gn_workup",
+  MACRO_EXCLUDE_EXERCISE: "macro_exclude_exercise",
+  PHASE_CONTRAST: "phase_contrast",
+  GLOMERULAR: "glomerular",
+  NON_GLOMERULAR: "non_glom",
+  GLOM_FAMILY: "glom_family",
+  GLOM_FAMILY_POSITIVE: "glom_family_pos",
+  GLOM_BIOPSY: "glom_biopsy",
+  NON_GLOM_CAUSES: "non_glom_causes",
   UTI_WORKUP: "uti_workup",
-  RENAL_MASS_WORKUP: "renal_mass_workup",
-  UROLITHIASIS_WORKUP: "urolithiasis_workup",
+  STONE_WORKUP: "stone_workup",
   HYPERCALCIURIA_WORKUP: "hypercalciuria_workup",
+  MASS_WORKUP: "mass_workup",
   TRAUMA_WORKUP: "trauma_workup",
-  RESULT: "result",
+  ISOLATED_MICRO: "isolated_micro",
 };
 
-export default function HematuriaEngine() {
-  const [step, setStep] = useState(STEP_KEYS.START);
-  const [history, setHistory] = useState([]);
-  const [answers, setAnswers] = useState({});
+const Chip = ({ children, color = "slate" }) => {
+  const map = { red: "bg-red-100 text-red-800", blue: "bg-blue-100 text-blue-800", green: "bg-green-100 text-green-800", amber: "bg-amber-100 text-amber-800", violet: "bg-violet-100 text-violet-800", slate: "bg-slate-100 text-slate-700" };
+  return <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${map[color]}`}>{children}</span>;
+};
 
-  const go = (nextStep, key, value) => {
-    setHistory(h => [...h, step]);
-    if (key) setAnswers(a => ({ ...a, [key]: value }));
-    setStep(nextStep);
-  };
+const InfoBox = ({ title, color = "blue", items, urgent, referral, children }) => {
+  const styles = { blue: "border-blue-300 bg-blue-50", green: "border-green-300 bg-green-50", amber: "border-amber-300 bg-amber-50", red: "border-red-300 bg-red-50", violet: "border-violet-300 bg-violet-50" };
+  const titleColor = { blue: "text-blue-900", green: "text-green-900", amber: "text-amber-900", red: "text-red-900", violet: "text-violet-900" };
+  return (
+    <Card className={`border-2 ${styles[color]}`}>
+      <CardContent className="p-4 space-y-2">
+        {urgent && <div className="flex items-center gap-1.5 text-red-700 font-bold text-xs"><AlertTriangle className="w-3.5 h-3.5" /> Urgent referral required</div>}
+        <p className={`font-bold text-sm ${titleColor[color]}`}>{title}</p>
+        {items && <ul className="space-y-1.5">{items.map((it, i) => <li key={i} className="flex items-start gap-2 text-xs text-slate-700"><CheckCircle2 className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-blue-500" /><span>{it}</span></li>)}</ul>}
+        {children}
+        {referral && <div className="mt-2 p-2 bg-violet-50 border border-violet-200 rounded-lg text-xs text-violet-800 font-medium">📋 {referral}</div>}
+      </CardContent>
+    </Card>
+  );
+};
 
-  const back = () => {
-    const prev = history[history.length - 1];
-    if (prev) {
-      setHistory(h => h.slice(0, -1));
-      setStep(prev);
-    }
-  };
-
-  const reset = () => { setStep(STEP_KEYS.START); setHistory([]); setAnswers({}); };
-
-  const Q = ({ question, options }) => (
+const Q = ({ question, note, options, onSelect }) => (
+  <div className="space-y-3">
+    <p className="font-semibold text-sm text-slate-800">{question}</p>
+    {note && <p className="text-xs text-slate-500 italic">{note}</p>}
     <div className="space-y-2">
-      <p className="font-semibold text-sm text-slate-800 mb-3">{question}</p>
       {options.map(opt => (
-        <button key={opt.label} onClick={() => go(opt.next, opt.key, opt.value)}
+        <button key={opt.label} onClick={() => onSelect(opt.next, opt.key, opt.value)}
           className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-blue-400 hover:bg-blue-50 active:scale-[0.99] transition-all text-left">
-          <span className="text-sm font-medium text-slate-700">{opt.label}</span>
-          <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <span className="text-sm font-medium text-slate-700 leading-snug">{opt.label}</span>
+          <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
         </button>
       ))}
     </div>
-  );
+  </div>
+);
 
-  const Result = ({ title, color = "blue", items, urgent = false, referral }) => (
-    <div className="space-y-3">
-      {urgent && (
-        <Alert className="border-red-300 bg-red-50">
-          <AlertTriangle className="w-4 h-4 text-red-600" />
-          <AlertDescription className="text-red-800 text-xs font-semibold">Urgent nephrology referral required</AlertDescription>
-        </Alert>
-      )}
-      <Card className={`border-2 ${urgent ? "border-red-300 bg-red-50" : color === "green" ? "border-green-300 bg-green-50" : color === "amber" ? "border-amber-300 bg-amber-50" : "border-blue-300 bg-blue-50"}`}>
-        <CardContent className="p-4">
-          <p className={`font-bold text-sm mb-3 ${urgent ? "text-red-900" : color === "green" ? "text-green-900" : color === "amber" ? "text-amber-900" : "text-blue-900"}`}>{title}</p>
-          <ul className="space-y-2">
-            {items.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
-                <CheckCircle2 className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${urgent ? "text-red-600" : color === "green" ? "text-green-600" : "text-blue-600"}`} />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-      {referral && (
-        <Card className="border-violet-300 bg-violet-50">
-          <CardContent className="p-3">
-            <p className="text-xs font-bold text-violet-900 mb-1">Referral</p>
-            <p className="text-xs text-violet-800">{referral}</p>
-          </CardContent>
-        </Card>
-      )}
-      <div className="flex gap-2 pt-2">
-        <Button variant="outline" size="sm" className="flex-1" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back</Button>
-        <Button variant="outline" size="sm" className="flex-1" onClick={reset}>Restart</Button>
-      </div>
+export default function HematuriaEngine() {
+  const [step, setStep] = useState(STEPS.START);
+  const [history, setHistory] = useState([]);
+  const [answers, setAnswers] = useState({});
+
+  const go = (next, key, value) => {
+    setHistory(h => [...h, step]);
+    if (key) setAnswers(a => ({ ...a, [key]: value }));
+    setStep(next);
+  };
+  const back = () => { const prev = history[history.length - 1]; if (prev) { setHistory(h => h.slice(0, -1)); setStep(prev); } };
+  const reset = () => { setStep(STEPS.START); setHistory([]); setAnswers({}); };
+
+  const NavBtns = () => (
+    <div className="flex gap-2 pt-2">
+      {history.length > 0 && <Button variant="outline" size="sm" className="flex-1" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>}
+      <Button variant="outline" size="sm" className="flex-1" onClick={reset}>Restart</Button>
     </div>
   );
 
   const renderStep = () => {
     switch (step) {
-      case STEP_KEYS.START:
-        return (
-          <Q question="Type of hematuria confirmed on urinalysis?" options={[
-            { label: "Microscopic hematuria (≥5 RBC/HPF, urine looks normal)", next: STEP_KEYS.MACRO_MICRO, key: "type", value: "microscopic" },
-            { label: "Macroscopic / gross hematuria (visibly red/cola/tea urine)", next: STEP_KEYS.MACRO_COLOR, key: "type", value: "macroscopic" },
-          ]} />
-        );
 
-      // ──────── MICROSCOPIC BRANCH ────────
-      case STEP_KEYS.MACRO_MICRO:
+      // ── STEP 1: Confirm hematuria ──
+      case STEPS.START:
         return (
-          <Q question="Is the child symptomatic?" options={[
-            { label: "Yes — has symptoms (UTI sx, loin pain, dysuria, stones hx, recent pharyngitis, rash/joint pain)", next: STEP_KEYS.MICRO_SYMPTOMATIC, key: "micro_sx", value: "yes" },
-            { label: "No — completely asymptomatic", next: STEP_KEYS.MICRO_ASYMPTOMATIC, key: "micro_sx", value: "no" },
-          ]} />
-        );
-
-      case STEP_KEYS.MICRO_ASYMPTOMATIC:
-        return (
-          <Q question="Risk features present?" options={[
-            { label: "None — no proteinuria, normal BP, no family hx CKD/deafness, -ve urine culture", next: STEP_KEYS.MICRO_ASYM_FAMILY, key: "micro_risk", value: "none" },
-            { label: "Proteinuria and/or hypertension and/or abnormal renal function", next: STEP_KEYS.GN_WORKUP, key: "micro_risk", value: "gn_features" },
-            { label: "Family history of renal failure / GN / deafness", next: STEP_KEYS.FAMILY_POSITIVE, key: "micro_risk", value: "family" },
-          ]} />
-        );
-
-      case STEP_KEYS.MICRO_ASYM_FAMILY:
-        return (
-          <Q question="Test parents/siblings for hematuria:" options={[
-            { label: "Positive — family members also have hematuria", next: STEP_KEYS.FAMILY_POSITIVE, key: "family_test", value: "positive" },
-            { label: "Negative — no family hematuria", next: STEP_KEYS.MICRO_ASYM_WORKUP, key: "family_test", value: "negative" },
-          ]} />
-        );
-
-      case STEP_KEYS.FAMILY_POSITIVE:
-        return (
-          <Result title="Benign Familial Hematuria / Alport Syndrome Evaluation" color="amber"
-            items={[
-              "COL4A3 / COL4A4 / COL4A5 gene panel (Alport syndrome)",
-              "Audiometry (sensorineural hearing loss — Alport)",
-              "Slit-lamp eye examination (anterior lenticonus — Alport)",
-              "Skin biopsy for type IV collagen (if gene panel unavailable)",
-              "Renal biopsy: electron microscopy — GBM thinning / lamellation",
-              "If COL4A3/A4 heterozygous: Thin Basement Membrane Nephropathy (TBMN)",
-              "Annual urine PCR, BP, eGFR — watch for proteinuria progression",
-            ]}
-            referral="Paediatric nephrology for Alport/TBMN workup and genetic counselling"
-          />
-        );
-
-      case STEP_KEYS.MICRO_ASYM_WORKUP:
-        return (
-          <Q question="Calcium/crystalluria workup result?" options={[
-            { label: "Abnormal calcium:creatinine ratio or crystalluria", next: STEP_KEYS.CRYSTALLURIA_WORKUP, key: "ca_workup", value: "abnormal" },
-            { label: "Normal urine calcium — but abnormal renal USS", next: STEP_KEYS.RESULT, key: "ca_workup", value: "normal_usg_abnormal" },
-            { label: "All normal — isolated microscopic hematuria", next: STEP_KEYS.RESULT, key: "ca_workup", value: "all_normal" },
-          ]} />
-        );
-
-      case STEP_KEYS.CRYSTALLURIA_WORKUP:
-        return (
-          <Result title="Crystalluria / Hypercalciuria Workup" color="amber"
-            items={[
-              "Spot urine Ca:Cr ratio (normal <0.2 in >5y, <0.4 in <2y)",
-              "24h urine: calcium, uric acid, oxalate, citrate, phosphate",
-              "Serum calcium, phosphate, PTH, vitamin D",
-              "Renal USS (nephrocalcinosis, renal stones)",
-              "If hypercalciuria confirmed: low calcium diet, increase fluid, potassium citrate",
-              "If nephrocalcinosis: check dRTA (urine pH, serum HCO3)",
-            ]}
-            referral="Paediatric nephrology / metabolic stone clinic"
-          />
-        );
-
-      case STEP_KEYS.MICRO_SYMPTOMATIC:
-        return (
-          <Q question="Predominant symptom pattern?" options={[
-            { label: "LUTS — dysuria, frequency, urgency (UTI symptoms)", next: STEP_KEYS.UTI_WORKUP, key: "micro_sym_type", value: "uti" },
-            { label: "History of hematuria with stone passage / loin-to-groin pain", next: STEP_KEYS.UROLITHIASIS_WORKUP, key: "micro_sym_type", value: "stones" },
-            { label: "Proteinuria + hypertension + abnormal renal function / family hx deafness", next: STEP_KEYS.GN_WORKUP, key: "micro_sym_type", value: "gn" },
-          ]} />
-        );
-
-      case STEP_KEYS.GN_WORKUP:
-        return (
-          <Result title="Glomerulonephritis / Alport Syndrome Workup" color="blue" urgent
-            items={[
-              "Urine protein:creatinine ratio (PCR), 24h urine protein",
-              "Phase-contrast microscopy: dysmorphic RBCs (>80%) / acanthocytes",
-              "Blood: Cr, BUN, eGFR, albumin, CBC, electrolytes",
-              "Complement: C3, C4 (low in PSGN, SLE, MPGN)",
-              "Serology: ANA, anti-dsDNA, ANCA (pANCA/cANCA), anti-GBM",
-              "ASO titer / anti-DNase B (if recent sore throat/impetigo)",
-              "HBsAg, anti-HCV (secondary GN)",
-              "Renal USS: size, echogenicity, doppler",
-              "Audiometry + slit-lamp (if Alport suspected)",
-              "Renal biopsy if: persistent, progressive, or severe proteinuria",
-            ]}
-            referral="Urgent paediatric nephrology referral — biopsy decision within 1–2 weeks"
-          />
-        );
-
-      // ──────── MACROSCOPIC BRANCH ────────
-      case STEP_KEYS.MACRO_COLOR:
-        return (
-          <Q question="Urine colour and urinalysis features?" options={[
-            { label: "Bright red / pink — no dysmorphic RBCs, no casts, non-significant proteinuria", next: STEP_KEYS.NON_GLOMERULAR_WORKUP, key: "macro_color", value: "non_glom" },
-            { label: "Cola / tea / brown — dysmorphic RBCs >15%, cellular/RBC casts, significant proteinuria", next: STEP_KEYS.GLOMERULAR_WORKUP, key: "macro_color", value: "glom" },
-          ]} />
-        );
-
-      case STEP_KEYS.NON_GLOMERULAR_WORKUP:
-        return (
-          <Q question="Non-glomerular hematuria — associated features?" options={[
-            { label: "Dysuria / abdominal pain → suspect UTI", next: STEP_KEYS.UTI_WORKUP, key: "non_glom_cause", value: "uti" },
-            { label: "Loin-to-groin pain / stone passage → suspect urolithiasis", next: STEP_KEYS.UROLITHIASIS_WORKUP, key: "non_glom_cause", value: "stones" },
-            { label: "Hypercalciuria features (recurrent painless hematuria)", next: STEP_KEYS.HYPERCALCIURIA_WORKUP, key: "non_glom_cause", value: "hypercalciuria" },
-            { label: "Abdominal mass / flank mass → suspect renal tumour", next: STEP_KEYS.RENAL_MASS_WORKUP, key: "non_glom_cause", value: "mass" },
-            { label: "Recent trauma / sport injury", next: STEP_KEYS.TRAUMA_WORKUP, key: "non_glom_cause", value: "trauma" },
-          ]} />
-        );
-
-      case STEP_KEYS.GLOMERULAR_WORKUP:
-        return (
-          <Q question="Family history in 1st degree relatives?" options={[
-            { label: "Positive — family history of renal failure / GN / deafness", next: STEP_KEYS.FAMILY_POSITIVE, key: "glom_family", value: "positive" },
-            { label: "Negative — no family history", next: STEP_KEYS.RESULT, key: "glom_family", value: "negative" },
-          ]} />
-        );
-
-      case STEP_KEYS.UTI_WORKUP:
-        return (
-          <Result title="UTI Workup" color="green"
-            items={[
-              "Urine culture and sensitivity (mid-stream clean catch)",
-              "Urine dipstick: nitrites, leucocytes, blood",
-              "Renal-bladder USS (if febrile UTI or first UTI in child <2y)",
-              "DMSA scan at 4–6 weeks (if febrile UTI, renal scarring suspected)",
-              "VCUG / MCU if: recurrent UTIs, grade III–V on DMSA, structural anomaly on USS",
-              "X-ray KUB: if calculi or radio-opaque stones suspected",
-              "Treat with culture-directed antibiotics; review VUR status post-treatment",
-            ]}
-            referral="Paediatric nephrology / urology if recurrent, structural anomaly or VUR grade III+"
-          />
-        );
-
-      case STEP_KEYS.UROLITHIASIS_WORKUP:
-        return (
-          <Result title="Urolithiasis / Renal Stones Workup" color="amber"
-            items={[
-              "Serum: calcium, phosphate, uric acid, bicarbonate, creatinine",
-              "Spot urine Ca:Cr ratio; 24h urine calcium, uric acid, oxalate, citrate",
-              "Serum albumin and protein (rule out hypercalcaemia of malignancy)",
-              "Renal USS (first-line — stone, hydronephrosis, nephrocalcinosis)",
-              "Non-contrast CT KUB (if USS inconclusive, for accurate stone sizing)",
-              "Stone analysis (if stone passed/retrieved)",
-              "If cystinuria suspected: urinary cystine, ornithine, arginine, lysine (COAL)",
-              "If PH1 suspected: urine oxalate, AGXT gene mutation",
-            ]}
-            referral="Paediatric nephrology + urology for stone removal if obstructive; metabolic stone clinic"
-          />
-        );
-
-      case STEP_KEYS.HYPERCALCIURIA_WORKUP:
-        return (
-          <Result title="Hypercalciuria Workup" color="amber"
-            items={[
-              "Spot urine Ca:Cr ratio (normal <0.21 mg/mg in children >5y)",
-              "24h urine calcium (>4 mg/kg/day = hypercalciuria)",
-              "Serum: calcium, phosphate, PTH, 25-OH Vit D, creatinine",
-              "Renal USS (nephrocalcinosis, medullary sponge kidney)",
-              "If nephrocalcinosis: dRTA workup (urine pH post NH4Cl load, serum HCO3)",
-              "Dietary calcium restriction (avoid excess), increase fluid intake",
-              "Thiazide diuretics if severe/persistent hypercalciuria",
-            ]}
-          />
-        );
-
-      case STEP_KEYS.RENAL_MASS_WORKUP:
-        return (
-          <Result title="Renal Mass / Tumour Workup" urgent color="blue"
-            items={[
-              "Renal-bladder USS (urgent — Wilms tumour most common in <5y)",
-              "CECT abdomen: staging, IVC involvement, contralateral kidney",
-              "DTPA/MAG3 scan: differential renal function",
-              "VCU (if bladder involvement suspected)",
-              "Chest CT (staging for Wilms tumour)",
-              "Serum: AFP (hepatoblastoma if liver mass coexists), LDH",
-              "Refer to paediatric oncology / urology urgently",
-            ]}
-            referral="Urgent paediatric oncology + urology referral"
-          />
-        );
-
-      case STEP_KEYS.TRAUMA_WORKUP:
-        return (
-          <Result title="Renal Trauma Workup" color="blue"
-            items={[
-              "CECT abdomen (gold standard for renal trauma grading — AAST scale)",
-              "USS Abdomen: quick bedside screening",
-              "Angiography if vascular injury suspected (renal artery/vein)",
-              "Grade I–II: conservative management, bed rest, serial USS",
-              "Grade III–V: urology/interventional radiology consultation",
-              "Monitor BP, urine output, serial haematocrit, renal function",
-            ]}
-            referral="Paediatric surgery / urology for grade III+ renal trauma"
-          />
-        );
-
-      case STEP_KEYS.RESULT:
-        if (answers.ca_workup === "all_normal") {
-          return (
-            <Result title="Isolated Asymptomatic Microscopic Hematuria — Monitoring" color="green"
-              items={[
-                "Reassure parents — most resolve spontaneously",
-                "Repeat urine dipstick + microscopy at 3–6 months",
-                "Annual BP, urine PCR, eGFR check",
-                "No activity restriction required",
-                "Refer nephrology if: persists >12 months, proteinuria develops, BP rises, family hx CKD/deafness",
-                "No imaging required unless structural anomaly suspected",
-              ]}
+          <div className="space-y-4">
+            <InfoBox title="Step 1: Confirm Hematuria" color="slate"
+              items={["Urine dipstick (stick): positive for blood", "Urine microscopy: ≥5 RBC/HPF on fresh mid-stream urine", "Dipstick positive but NO RBC → evaluate for myoglobinuria, haemoglobinuria (pigmenturia)"]}
             />
-          );
-        }
-        if (answers.ca_workup === "normal_usg_abnormal") {
-          return (
-            <Result title="Abnormal Renal USS — Urological Hematuria / Anatomic Disease" color="amber"
-              items={[
-                "Evaluate for: ureteropelvic junction obstruction, MCDK, renal cyst, structural anomaly",
-                "DTPA / MAG3 scan: differential function + drainage",
-                "VCUG if VUR suspected",
-                "Refer to paediatric urology for anatomic cause management",
-              ]}
-              referral="Paediatric urology + nephrology co-referral"
-            />
-          );
-        }
-        // glom_family negative
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1">
+              <p className="font-bold text-amber-900">Causes of dipstick-positive without RBC:</p>
+              {["Haemoglobinuria (haemolysis)", "Myoglobinuria (rhabdomyolysis)", "Porphyria", "Foods: beets, blackberries, rifampicin"].map((c, i) => <p key={i} className="text-amber-800">• {c}</p>)}
+            </div>
+            <Q question="What does urine microscopy show?" onSelect={go} options={[
+              { label: "Significant RBC seen (≥5/HPF) — true hematuria", next: STEPS.NEPHRITIC_SIGNS, key: "confirmed", value: true },
+              { label: "No RBC — dipstick positive only", next: "pigment", key: "confirmed", value: false },
+            ]} />
+          </div>
+        );
+
+      case "pigment":
         return (
-          <Result title="Glomerular Hematuria — Investigate for GN" color="blue" urgent
-            items={[
-              "Check for: Post-streptococcal GN (High ASO, low C3) — most common",
-              "IgA Nephropathy: serum IgA (not sensitive); confirm by biopsy",
-              "Non-PSGN IgA nephropathy: RFT, serology (ANA, ANCA, anti-GBM)",
-              "Natural history: PSGN usually resolves; IgA may progress",
-              "Biopsy if: proteinuria persists >3 months, eGFR declining, natural course not followed",
-              "If PSGN: supportive — antihypertensives, diuretics; follow up 6 months",
-              "If biopsy shows IgA: KDIGO-based therapy (RAS blockade ± steroids)",
-            ]}
-            referral="Paediatric nephrology — biopsy decision and long-term follow-up"
-          />
+          <div className="space-y-3">
+            <InfoBox title="Pigmenturia Workup" color="amber"
+              items={["Serum LDH, haptoglobin, free haemoglobin (haemolysis)", "Serum CK, urine myoglobin (rhabdomyolysis)", "Urine porphyrins if porphyria suspected", "Review medications (rifampicin, nitrofurantoin, deferoxamine)"]}
+            />
+            <NavBtns />
+          </div>
+        );
+
+      // ── STEP 2: Nephritic syndrome signs ──
+      case STEPS.NEPHRITIC_SIGNS:
+        return (
+          <Q question="Symptoms/signs of acute nephritic syndrome?" note="Oedema + hypertension + oliguria ± haematuria ± azotaemia"
+            onSelect={go} options={[
+              { label: "YES — oedema, hypertension, oliguria present", next: STEPS.NEPHRITIC_WORKUP, key: "nephritic", value: true },
+              { label: "NO — none of these features", next: STEPS.LUTS, key: "nephritic", value: false },
+            ]} />
+        );
+
+      case STEPS.NEPHRITIC_WORKUP:
+        return (
+          <div className="space-y-3">
+            <Alert className="border-red-300 bg-red-50"><AlertTriangle className="w-4 h-4 text-red-600" /><AlertDescription className="text-red-800 text-xs font-bold">Acute nephritic syndrome — urgent evaluation</AlertDescription></Alert>
+            <InfoBox title="Nephritic Syndrome Workup" color="red" urgent
+              items={[
+                "Urine protein:creatinine ratio (PCR) + 24h urine protein",
+                "Serum urea, creatinine, electrolytes, albumin — STAT",
+                "Complete blood count (CBC) with differential",
+                "Serum complement C3 and C4",
+                "ASO titre or anti-DNase B (post-streptococcal)",
+                "ANA + anti-dsDNA antibody (lupus nephritis)",
+                "ANCA — pANCA (MPO) + cANCA (PR3) (ANCA vasculitis)",
+                "Anti-GBM antibody if pulmonary haemorrhage (Goodpasture)",
+                "HBsAg, HCV Ab (secondary GN)",
+                "Renal USS: size, echogenicity, Doppler",
+              ]}
+              referral="Urgent paediatric nephrology — biopsy decision within 24–48h"
+            />
+            <NavBtns />
+          </div>
+        );
+
+      // ── STEP 3: LUTS ──
+      case STEPS.LUTS:
+        return (
+          <Q question="Lower urinary tract symptoms (LUTS)?" note="Dysuria, frequency, urgency, suprapubic/flank/abdominal pain"
+            onSelect={go} options={[
+              { label: "YES — dysuria, frequency, urgency, pain", next: STEPS.LUTS_WORKUP, key: "luts", value: true },
+              { label: "NO — no LUTS", next: STEPS.MACRO_MICRO, key: "luts", value: false },
+            ]} />
+        );
+
+      case STEPS.LUTS_WORKUP:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="LUTS Workup — Suspect UTI / Stones / Bladder" color="green"
+              items={[
+                "Urine microscopy + culture and sensitivity",
+                "Urine dipstick: nitrites, leucocytes",
+                "Renal-bladder USS (first episode UTI in child <2y, febrile UTI)",
+                "X-ray KUB if renal calculi suspected",
+                "Serum creatinine, electrolytes",
+                "Spot urine Ca:Cr ratio (exclude hypercalciuria)",
+                "24h urine Ca, oxalate, uric acid, citrate if calculi suspected",
+                "Urine culture for adenovirus (haemorrhagic cystitis)",
+              ]}
+              referral="Paediatric nephrology/urology if recurrent or structural abnormality"
+            />
+            <NavBtns />
+          </div>
+        );
+
+      // ── STEP 4: Macro vs Micro ──
+      case STEPS.MACRO_MICRO:
+        return (
+          <Q question="Type of hematuria?" onSelect={go} options={[
+            { label: "Macroscopic — visible red/brown/cola urine", next: STEPS.MACRO_EXCLUDE_EXERCISE, key: "type", value: "macro" },
+            { label: "Microscopic — urine appears normal, RBC on microscopy only", next: STEPS.PHASE_CONTRAST, key: "type", value: "micro" },
+          ]} />
+        );
+
+      // ── STEP 4 (Macro): exclude exercise ──
+      case STEPS.MACRO_EXCLUDE_EXERCISE:
+        return (
+          <div className="space-y-3">
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5">
+              <p className="font-bold text-slate-800">Step 4: Macroscopic Hematuria Considerations</p>
+              <p className="text-slate-700">• Glomerular origin: usually brown/tea/cola-coloured</p>
+              <p className="text-slate-700">• Lower urinary tract origin: usually pink or bright red</p>
+              <p className="text-slate-700">• Initial hematuria → urethral origin; Terminal → bladder cause</p>
+              <p className="text-slate-700">• Preceding exercise can cause transient macroscopic haematuria</p>
+            </div>
+            <Q question="Was macroscopic haematuria preceded by vigorous exercise?" onSelect={go} options={[
+              { label: "YES — exercise-induced (repeat urinalysis in 48–72h without exercise)", next: "exercise_f", key: "exercise", value: true },
+              { label: "NO — not exercise-related", next: STEPS.PHASE_CONTRAST, key: "exercise", value: false },
+            ]} />
+          </div>
+        );
+
+      case "exercise_f":
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Exercise-Induced Haematuria" color="green"
+              items={["Repeat urinalysis weekly × 2 without exercise", "If clears: reassure — no further workup needed", "If persists after 2 weeks rest: proceed to full evaluation", "Exclude trauma, renal contusion if heavy contact sport"]}
+            />
+            <NavBtns />
+          </div>
+        );
+
+      // ── STEP 5: Phase-contrast microscopy ──
+      case STEPS.PHASE_CONTRAST:
+        return (
+          <div className="space-y-3">
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs space-y-1.5">
+              <p className="font-bold text-blue-900">Step 5: Phase-Contrast Microscopy + UPCR</p>
+              <p className="text-blue-800">• Perform on freshly voided urine (RBC casts disintegrate in alkaline/stored urine)</p>
+              <p className="text-blue-800">• Urine protein:creatinine ratio (UPCR) on early morning specimen</p>
+              <p className="font-semibold text-blue-900 mt-1">{"Glomerular pattern: dysmorphic RBC >30%, acanthocytes, RBC casts, proteinuria"}</p>
+              <p className="font-semibold text-blue-900">{"Non-glomerular: >90% isomorphic RBC, no casts, minimal/no proteinuria"}</p>
+            </div>
+            <Q question="Phase-contrast microscopy result?" onSelect={go} options={[
+              { label: "GLOMERULAR — dysmorphic RBC >30%, RBC casts, or significant proteinuria", next: STEPS.GLOMERULAR, key: "phase", value: "glom" },
+              { label: "NON-GLOMERULAR — isomorphic RBC, no casts, no/minimal proteinuria", next: STEPS.NON_GLOMERULAR, key: "phase", value: "nonglom" },
+            ]} />
+          </div>
+        );
+
+      // ── STEP 6A: Glomerular hematuria ──
+      case STEPS.GLOMERULAR:
+        return (
+          <Q question="Glomerular hematuria — family history?" note="Test parents and siblings for haematuria first"
+            onSelect={go} options={[
+              { label: "Family members also have haematuria / renal failure / deafness", next: STEPS.GLOM_FAMILY_POSITIVE, key: "glom_family", value: "positive" },
+              { label: "Family screen negative — no family haematuria", next: STEPS.GLOM_BIOPSY, key: "glom_family", value: "negative" },
+            ]} />
+        );
+
+      case STEPS.GLOM_FAMILY_POSITIVE:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Familial Haematuria — Alport / TBMN Workup" color="violet"
+              items={[
+                "Audiometry for sensorineural hearing loss (high-tone)",
+                "Ophthalmologic assessment: anterior lenticonus, sub-capsular cataracts, retinal/corneal changes",
+                "COL4A3 / COL4A4 / COL4A5 gene panel",
+                "Skin biopsy with immunostaining for α5(IV) collagen (X-linked Alport)",
+                "Peripheral blood smear: macrothrobocytopenia + Döhle-like bodies → MYH9 syndrome",
+                "Renal biopsy EM: GBM thinning (TBMN) or lamellation/basket-weave (Alport)",
+                "Annual urine PCR, eGFR, BP monitoring — watch for proteinuria progression",
+              ]}
+              referral="Paediatric nephrology — genetic counselling + COL4A panel + family surveillance"
+            >
+              <div className="mt-2 p-2 bg-violet-50 rounded-lg">
+                <p className="text-xs font-bold text-violet-900 mb-1">Genetic causes of familial haematuria:</p>
+                {[
+                  ["AD Alport / TBMN", "COL4A3/A4 heterozygous", "α3/α4(IV)"],
+                  ["X-linked Alport (males)", "COL4A5 hemizygous", "α5(IV)"],
+                  ["X-linked Alport (females)", "COL4A5 heterozygous", "α5(IV)"],
+                  ["AR Alport", "COL4A3/A4 biallelic", "α3/α4(IV)"],
+                  ["MYH9 syndrome", "MYH9 heterozygous", "NMHC-IIA"],
+                  ["CFHR5 nephropathy", "CFHR5 heterozygous", "Factor H-related 5"],
+                ].map(([d, g, p], i) => (
+                  <div key={i} className="grid grid-cols-3 gap-1 text-xs py-0.5 border-b border-violet-100 last:border-0">
+                    <span className="text-violet-800 font-medium">{d}</span>
+                    <span className="text-slate-600">{g}</span>
+                    <span className="text-slate-500 italic">{p}</span>
+                  </div>
+                ))}
+              </div>
+            </InfoBox>
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.GLOM_BIOPSY:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Glomerular Haematuria — Full Investigation + Biopsy Indications" color="blue" urgent
+              items={[
+                "Serum urea, creatinine, electrolytes, eGFR",
+                "CBC, albumin, total cholesterol",
+                "24h urine protein and creatinine clearance",
+                "Serum complement C3, C4 (low in PSGN, SLE, MPGN, C3G)",
+                "Serum IgA (elevated in IgA nephropathy — not sensitive)",
+                "ANA + anti-dsDNA antibody",
+                "ANCA (pANCA/cANCA), Anti-GBM antibody",
+                "ASO titre + anti-DNase B (post-streptococcal GN)",
+                "HBsAg, HCV Ab (secondary GN)",
+                "Renal USS: size, echogenicity, cystic disease",
+                "Audiometry + slit-lamp (exclude Alport if not done)",
+                "Urine microscopy for family members",
+              ]}
+              referral="Paediatric nephrology — decide on renal biopsy"
+            >
+              <div className="mt-2 p-2 bg-slate-50 rounded-lg">
+                <p className="text-xs font-bold text-slate-800 mb-1">Indications for Kidney Biopsy:</p>
+                {[
+                  "Significant proteinuria >1 g/1.73m²/day",
+                  "Persistently low C3 >3 months",
+                  "Unexplained azotaemia / declining eGFR",
+                  "Systemic disease (SLE, IgA vasculitis, ANCA vasculitis)",
+                  "Family history significant kidney disease (Alport)",
+                  "Recurrent gross haematuria of unknown aetiology",
+                  "Persistent glomerular haematuria + parental anxiety",
+                  "NOTE: Biopsy usually NOT indicated in isolated glomerular haematuria",
+                ].map((b, i) => <p key={i} className="text-xs text-slate-700">• {b}</p>)}
+              </div>
+            </InfoBox>
+            <div className="p-3 bg-green-50 border border-green-200 rounded-xl">
+              <p className="text-xs font-bold text-green-900">If investigations normal — isolated/intermittent haematuria:</p>
+              <p className="text-xs text-green-800 mt-1">Follow-up with yearly urinalysis (urine dipstick + microscopy + BP + eGFR)</p>
+            </div>
+            <NavBtns />
+          </div>
+        );
+
+      // ── STEP 6B: Non-glomerular hematuria ──
+      case STEPS.NON_GLOMERULAR:
+        return (
+          <div className="space-y-3">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+              <p className="text-xs font-bold text-amber-900 mb-2">Non-Glomerular Causes — Common:</p>
+              <div className="grid grid-cols-2 gap-1 text-xs text-amber-800">
+                {["UTI (including adenovirus)", "Urolithiasis / nephrocalcinosis", "Hypercalciuria", "Trauma", "Renal tumour (Wilms, RCC)", "Nutcracker syndrome", "Cystic kidney disease", "Bleeding disorder", "Schistosoma (endemic)", "Menstrual contamination"].map((c, i) => <span key={i}>• {c}</span>)}
+              </div>
+            </div>
+            <Q question="Most likely non-glomerular cause based on history?" onSelect={go} options={[
+              { label: "UTI — dysuria, fever, pyuria, positive culture", next: STEPS.UTI_WORKUP },
+              { label: "Stones / urolithiasis — loin-to-groin pain, stone passage", next: STEPS.STONE_WORKUP },
+              { label: "Hypercalciuria — recurrent painless haematuria, no infection", next: STEPS.HYPERCALCIURIA_WORKUP },
+              { label: "Renal mass — abdominal mass on examination", next: STEPS.MASS_WORKUP },
+              { label: "Trauma — history of injury or contact sport", next: STEPS.TRAUMA_WORKUP },
+              { label: "No obvious cause — asymptomatic microscopic", next: STEPS.ISOLATED_MICRO },
+            ]} />
+          </div>
+        );
+
+      case STEPS.UTI_WORKUP:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="UTI Workup" color="green"
+              items={[
+                "Urine culture + sensitivity (mid-stream clean catch)",
+                "Urine microscopy: WBC, organisms",
+                "Urine adenovirus culture if haemorrhagic cystitis (sterile pyuria + haematuria)",
+                "Renal-bladder USS (first UTI <2y, febrile UTI, recurrent UTI)",
+                "DMSA scan at 4–6 months (cortical scarring after febrile UTI)",
+                "VCUG / MCU if: <2y age, recurrent febrile UTIs, USS abnormal, DMSA scar",
+                "Screen for bleeding disorder if: FBC, PT, aPTT",
+                "Treat with culture-directed antibiotics; prophylaxis if VUR grade III+",
+              ]}
+              referral="Nephrology/urology if VUR ≥ grade III, recurrent febrile UTI, structural anomaly"
+            />
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.STONE_WORKUP:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Urolithiasis Workup" color="amber"
+              items={[
+                "Renal-bladder USS (first-line: stones, hydronephrosis, nephrocalcinosis)",
+                "Plain abdominal X-ray (KUB) if radio-opaque stones suspected",
+                "Non-contrast CT KUB (most sensitive: ureteral stones, radiolucent)",
+                "Stone analysis if stone retrieved (chemical + infrared spectroscopy + XRD)",
+                "Serum: creatinine, calcium, phosphate, uric acid, bicarbonate, magnesium, potassium",
+                "Spot urine molar Ca, oxalate, uric acid, citrate:creatinine ratios",
+                "Spot urine Ca:Cr ratio (normal <0.21 mg/mg >5y, <0.4 <2y)",
+                "24h urine: Ca, oxalate, uric acid, citrate, cystine, creatinine",
+                "PTH + 25-OHVitD if hypercalcaemia",
+                "Urine cystine screen (nitroprusside test) → quantitative if positive",
+                "Cystoscopy if bladder/urethral pathology suspected",
+              ]}
+              referral="Paediatric urology + metabolic stone clinic (nephrology)"
+            />
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.HYPERCALCIURIA_WORKUP:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Hypercalciuria Workup" color="amber"
+              items={[
+                "Spot urine Ca:Cr ratio (normal <0.21 in >5y; <0.4 in <2y)",
+                "24h urine calcium >4 mg/kg/day = hypercalciuria",
+                "Serum calcium, phosphate, PTH, 25-OH vitamin D, creatinine",
+                "Renal USS (nephrocalcinosis, medullary sponge kidney)",
+                "If nephrocalcinosis: dRTA workup (urine pH, serum HCO3, NH4Cl load test)",
+                "Distinguish types: absorptive, renal, resorptive hypercalciuria",
+                "Repeat 24h urine Ca after 7-day low-calcium diet (400 mg/day)",
+              ]}
+            >
+              <div className="mt-2 p-2 bg-amber-50 rounded-lg">
+                <p className="text-xs font-bold text-amber-900">Doppler USS for Nutcracker Syndrome (if asthenic habitus + orthostatic haematuria):</p>
+                {["AP diameter ratio distended:narrowed left renal vein >4.0", "Peak velocity ratio narrowed:distended left renal vein >4.2", "Hilar to aortomesenteric diameter ratio >4.9", "SMA-aorta angle <35°"].map((c, i) => <p key={i} className="text-xs text-amber-800">• {c}</p>)}
+              </div>
+            </InfoBox>
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.MASS_WORKUP:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Renal Mass Workup" color="red" urgent
+              items={[
+                "Renal-bladder USS (urgent — Wilms tumour most common <5y)",
+                "CECT abdomen: tumour staging, IVC extension, contralateral kidney",
+                "Chest CT for staging (Wilms tumour metastasis)",
+                "DTPA/MAG3: differential renal function",
+                "AFP (if hepatoblastoma), LDH, CBC, coagulation",
+                "Urine catecholamines / VMA (if phaeochromocytoma/neuroblastoma)",
+              ]}
+              referral="URGENT — paediatric oncology + urology"
+            />
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.TRAUMA_WORKUP:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Renal Trauma Workup" color="blue"
+              items={[
+                "CECT abdomen (gold standard — AAST renal trauma grading I–V)",
+                "USS abdomen (bedside screening, less sensitive for Grade I)",
+                "Grade I–II: conservative management, bed rest, serial USS",
+                "Grade III–V: urology/interventional radiology consultation",
+                "Monitor BP, urine output, serial haematocrit",
+                "Angiography + embolisation if vascular injury",
+              ]}
+              referral="Paediatric surgery/urology for Grade III+ renal trauma"
+            />
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.ISOLATED_MICRO:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="Isolated Asymptomatic Microscopic Haematuria" color="green"
+              items={[
+                "Non-glomerular: isomorphic RBC, no casts, no proteinuria, no hypertension",
+                "Urine Ca:Cr ratio + 24h urine calcium (exclude hypercalciuria)",
+                "Urine culture (exclude UTI, adenovirus)",
+                "Urine adenovirus culture (endemic areas)",
+                "Screen for bleeding disorder: FBC, PT, aPTT",
+                "Spot urine: Ca, uric acid, oxalate, cystine:Cr ratios",
+                "Renal USS (exclude structural abnormality, tumour)",
+                "If USS abnormal: consider DTPA/MAG3, VCUG",
+                "Abdominal X-ray KUB if ureteric calculi suspected",
+                "Computed tomography abdomen (trauma or tumour suspected)",
+                "Doppler USS left renal vein if nutcracker syndrome suspected",
+                "Genetic testing: familial haematuria syndromes (COL4A, MYH9)",
+                "Cystoscopy if bladder/urethral pathology suspected",
+              ]}
+              referral="Nephrology if persists >12 months, proteinuria develops, BP rises"
+            >
+              <div className="mt-2 p-2 bg-green-50 rounded-lg">
+                <p className="text-xs font-bold text-green-900">Monitoring (if isolated, all investigations normal):</p>
+                <p className="text-xs text-green-800">Repeat urinalysis + BP + eGFR annually. Reassure — most resolve spontaneously. No activity restriction.</p>
+              </div>
+            </InfoBox>
+            <NavBtns />
+          </div>
         );
 
       default:
-        return null;
+        return <div className="text-center py-8"><Button onClick={reset}>Restart</Button></div>;
     }
   };
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="rounded-xl bg-gradient-to-r from-rose-700 to-red-700 p-4 text-white">
         <div className="flex items-center gap-2">
           <Droplet className="w-5 h-5" />
           <div>
             <h3 className="font-bold text-sm">Hematuria Decision Engine</h3>
-            <p className="text-xs text-rose-200">Jaypee Figs 1.2–1.4 · Microscopic & Macroscopic · Glomerular vs Non-Glomerular</p>
+            <p className="text-xs text-rose-200">Yap HK 2008 · KDIGO · AAP · 6-Step Algorithm</p>
           </div>
         </div>
       </div>
 
-      {/* Progress breadcrumb */}
       {history.length > 0 && (
         <div className="flex items-center gap-1 flex-wrap">
-          {history.map((h, i) => (
-            <span key={i} className="flex items-center gap-1">
-              <Badge variant="outline" className="text-xs px-2 py-0.5 text-slate-500">{h.replace(/_/g, " ").slice(0, 20)}</Badge>
-              {i < history.length - 1 && <ChevronRight className="w-3 h-3 text-slate-300" />}
-            </span>
-          ))}
-          <ChevronRight className="w-3 h-3 text-slate-300" />
-          <Badge className="text-xs px-2 py-0.5 bg-rose-600">{step.replace(/_/g, " ").slice(0, 20)}</Badge>
+          <Badge variant="outline" className="text-xs">Step {history.length + 1}</Badge>
+          <Badge className="text-xs bg-rose-600 text-white">{step.replace(/_/g, " ")}</Badge>
         </div>
       )}
 
-      <Card>
-        <CardContent className="p-4">
-          {renderStep()}
-        </CardContent>
-      </Card>
+      <Card><CardContent className="p-4">{renderStep()}</CardContent></Card>
 
-      {history.length > 0 && step !== STEP_KEYS.RESULT && (
-        <Button variant="outline" size="sm" className="w-full" onClick={back}>
-          <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back
-        </Button>
-      )}
-
-      {/* Reference note */}
-      <div className="text-xs text-slate-400 text-center px-2">
-        Ref: Jaypee Pediatric Nephrology, Fig 1.2–1.4 · ISKDC · KDIGO · AAP UTI Guidelines
+      <div className="text-xs text-slate-400 text-center">
+        Ref: Yap HK (2008) Comprehensive Pediatric Nephrology · KDIGO · AAP UTI Guidelines
       </div>
     </div>
   );

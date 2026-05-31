@@ -61,6 +61,9 @@ import {
   PolyuriaEngine, HyperkalemiaEngine
 } from "./DecisionEngines";
 import HematuriaEngine from "../engines/HematuriaEngine";
+import ProteinuriaEngine from "../engines/ProteinuriaEngine";
+import NephrocalcinosisStoneEngine from "../engines/NephrocalcinosisStoneEngine";
+import GlomerulonephritisEngine from "../engines/GlomerulonephritisEngine";
 import NephroticSyndromeEngine from "../engines/NephroticSyndromeEngine";
 import HyponatremiaEngine from "../engines/HyponatremiaEngine";
 import RPGNEngine from "../engines/RPGNEngine";
@@ -101,6 +104,7 @@ const HANDLED_IDS = new Set([
   "vur-uti-engine","hnf1b-alport-engine","hyperoxaluria-engine","cystinosis-engine",
   "htn-engine","tubular-engine","stone-engine",
   "alport-hnf1b-engine","stone-ph-engine","tubular-disorder-engine",
+  "proteinuria-engine","nephrocalcinosis-stone-engine","gn-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -175,6 +179,9 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   // Shared Decision Engines
   if (id === "tma-engine") return <TMADecisionEngine />;
   if (id === "hematuria-engine") return <HematuriaEngine />;
+  if (id === "proteinuria-engine") return <ProteinuriaEngine />;
+  if (id === "nephrocalcinosis-stone-engine") return <NephrocalcinosisStoneEngine />;
+  if (id === "gn-engine") return <GlomerulonephritisEngine />;
   if (id === "alport-hnf1b-engine") return <HNF1BAlportEngine />;
   if (id === "stone-ph-engine") return <KidneyStoneEngine />;
   if (id === "tubular-disorder-engine") return <TubularDisordersEngine />;
