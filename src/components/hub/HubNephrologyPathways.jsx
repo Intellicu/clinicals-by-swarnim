@@ -100,7 +100,7 @@ const PATHWAYS = [
   { name: "Metabolic Acidosis / RTA", tag: "Tubular", color: "bg-amber-100 text-amber-800",
     emergency: false,
     summary: "Non-AG acidosis with normal anion gap. Urine anion gap distinguishes dRTA from GI loss.",
-    keys: ["Anion gap = Na − (Cl + HCO3). Normal <12", "Non-AG: urine anion gap (UAG) = Na + K − Cl", "Positive UAG = dRTA (Type 1). Negative = GI loss", "Type 2 pRTA: Fanconi; Type 4: hyperkalaemia + low renin/aldo"], scenario: "rta-workup" },
+    keys: ["Anion gap = Na − (Cl + HCO3). Normal <12", "Non-AG: urine anion gap (UAG) = Na + K − Cl", "Positive UAG = dRTA (Type 1). Negative = GI loss", "Type 2 pRTA: Fanconi; Type 4: hyperkalaemia + low renin/aldo"], scenario: "rta-diagnosis" },
   { name: "Hypocalcaemia", tag: "Electrolyte", color: "bg-amber-100 text-amber-800",
     emergency: true,
     summary: "Corrected Ca <8.5 mg/dL. Tetany/seizures at <7 mg/dL.",
@@ -135,14 +135,6 @@ const PATHWAYS = [
     emergency: true,
     summary: "Rising creatinine post-Tx. Banff criteria. Treat TCMR vs AMR differently.",
     keys: ["Rising Cr + graft tenderness = urgent biopsy", "TCMR: pulse steroids; severe: anti-thymocyte globulin", "AMR: IVIG + plasma exchange + rituximab", "BK nephropathy: reduce IS (stop MMF first)"], scenario: "transplant-rejection" },
-  { name: "Peritoneal Dialysis", tag: "Dialysis", color: "bg-indigo-100 text-indigo-800",
-    emergency: false,
-    summary: "First-choice RRT in children <20 kg. ISPD evidence-based.",
-    keys: ["CAPD vs APD; ISPD guidelines for prescriptions", "Peritonitis: cloudy effluent + WBC>100/mm³", "Empirical: vancomycin + ceftazidime IP", "Adequacy: weekly Kt/V ≥1.7"], scenario: "peritoneal-dialysis" },
-  { name: "Haemodialysis in Children", tag: "Dialysis", color: "bg-indigo-100 text-indigo-800",
-    emergency: false,
-    summary: "Preferred for older children/adolescents. Kt/V ≥1.2 per session.",
-    keys: ["Access: AVF preferred (long-term); CVC for acute", "Target Kt/V ≥1.2 per session", "Anticoagulation: UFH", "Intradialytic hypotension: fluid management"], scenario: "hemodialysis" },
   // ── Hypertension ─────────────────────────────────────────────────────────
   { name: "Paediatric Hypertension", tag: "HTN", color: "bg-pink-100 text-pink-800",
     emergency: false,
@@ -160,7 +152,7 @@ const PATHWAYS = [
   { name: "Nephrocalcinosis / Nephrolithiasis", tag: "Tubular", color: "bg-amber-100 text-amber-800",
     emergency: false,
     summary: "Calcium deposits in renal parenchyma. Associated with dRTA, HPT, hypercalcaemia.",
-    keys: ["Medullary (cortical rare) — check Ca, PO4, PTH, Vit D", "dRTA: hypercalciuria + alkaline urine + distal gradient failure", "Primary HPT: elevated PTH + Ca; parathyroidectomy", "Rare: Bartter, FHHNC (CLDN16/CLDN19)"], scenario: "rta-workup" },
+    keys: ["Medullary (cortical rare) — check Ca, PO4, PTH, Vit D", "dRTA: hypercalciuria + alkaline urine + distal gradient failure", "Primary HPT: elevated PTH + Ca; parathyroidectomy", "Rare: Bartter, FHHNC (CLDN16/CLDN19)"], scenario: "nephrocalcinosis" },
 ];
 
 const TAGS = ["All", "GN", "AKI", "CKD", "Electrolyte", "Tubular", "Dialysis", "Transplant", "HTN", "Diagnostic", "Urological"];
@@ -204,14 +196,33 @@ export default function HubNephrologyPathways() {
     setEditModal(null);
   };
 
-  const handleDelete = (idx, isCustom) => {
-    if (!isCustom) return; // only delete custom ones
-    const updated = customPathways.filter((_, i) => i !== idx);
-    saveCustom(updated);
+  // Tracks built-in pathways hidden by admin
+  const [hiddenBuiltinIndices, setHiddenBuiltinIndices] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("hidden_builtin_pathways") || "[]"); } catch { return []; }
+  });
+
+  const hideBuiltin = (pathwayName) => {
+    const updated = [...hiddenBuiltinIndices, pathwayName];
+    setHiddenBuiltinIndices(updated);
+    localStorage.setItem("hidden_builtin_pathways", JSON.stringify(updated));
     setOpen(null);
   };
 
-  const allPathways = [...PATHWAYS, ...customPathways.map(p => ({ ...p, _isCustom: true }))];
+  const handleDelete = (pathway, idx, isCustom) => {
+    if (isCustom) {
+      const updated = customPathways.filter((_, i) => i !== idx);
+      saveCustom(updated);
+    } else {
+      if (!confirm(`Hide "${pathway.name}" from the list? (Admin only, reversible via browser storage)`)) return;
+      hideBuiltin(pathway.name);
+    }
+    setOpen(null);
+  };
+
+  const allPathways = [
+    ...PATHWAYS.filter(p => !hiddenBuiltinIndices.includes(p.name)),
+    ...customPathways.map(p => ({ ...p, _isCustom: true }))
+  ];
 
   const filtered = allPathways.filter(p => {
     const matchTag = filter === "All" || p.tag === filter;
@@ -277,7 +288,7 @@ export default function HubNephrologyPathways() {
           </div>
           <div className="space-y-1.5">
             {emergencyList.map((pathway, i) => (
-              <PathwayCard key={`e-${i}`} pathway={pathway} idx={`e-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, customPathways.indexOf(pathway), pathway._isCustom)} onDelete={() => handleDelete(customPathways.indexOf(pathway), pathway._isCustom)} />
+              <PathwayCard key={`e-${i}`} pathway={pathway} idx={`e-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, customPathways.indexOf(pathway), pathway._isCustom)} onDelete={() => handleDelete(pathway, customPathways.indexOf(pathway), pathway._isCustom)} />
             ))}
           </div>
         </div>
@@ -290,7 +301,7 @@ export default function HubNephrologyPathways() {
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">All Pathways</p>
           )}
           {otherList.map((pathway, i) => (
-            <PathwayCard key={`p-${i}`} pathway={pathway} idx={`p-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, customPathways.indexOf(pathway), pathway._isCustom)} onDelete={() => handleDelete(customPathways.indexOf(pathway), pathway._isCustom)} />
+            <PathwayCard key={`p-${i}`} pathway={pathway} idx={`p-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, customPathways.indexOf(pathway), pathway._isCustom)} onDelete={() => handleDelete(pathway, customPathways.indexOf(pathway), pathway._isCustom)} />
           ))}
         </div>
       )}
@@ -401,13 +412,11 @@ function PathwayCard({ pathway, idx, open, setOpen, goToPathway, isAdmin, onEdit
                     onClick={onEdit}>
                     <Pencil className="w-3 h-3 mr-1" /> Edit
                   </Button>
-                  {pathway._isCustom && (
-                    <Button size="sm" variant="outline"
-                      className="text-xs border-red-200 text-red-600 hover:bg-red-50 h-7"
-                      onClick={onDelete}>
-                      <Trash2 className="w-3 h-3 mr-1" /> Delete
-                    </Button>
-                  )}
+                  <Button size="sm" variant="outline"
+                    className="text-xs border-red-200 text-red-600 hover:bg-red-50 h-7"
+                    onClick={onDelete}>
+                    <Trash2 className="w-3 h-3 mr-1" /> {pathway._isCustom ? "Delete" : "Hide"}
+                  </Button>
                 </>
               )}
             </div>

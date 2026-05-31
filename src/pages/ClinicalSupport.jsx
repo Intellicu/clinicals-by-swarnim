@@ -191,15 +191,7 @@ const clinicalScenarios = [
   icon: Droplet,
   hasFullPathway: true
 },
-{
-  id: "rta-workup",
-  title: "Renal Tubular Acidosis (RTA) Diagnosis",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "Diagnostic approach to classify RTA type I, II, IV",
-  icon: Beaker,
-  hasFullPathway: true
-},
+
 {
   id: "ckd-mbd",
   title: "CKD-Mineral Bone Disease Management",
@@ -263,15 +255,7 @@ const clinicalScenarios = [
   icon: Microscope,
   hasFullPathway: true
 },
-{
-  id: "aki-cardiac-surgery",
-  title: "Post-Cardiac Surgery AKI",
-  category: "Acute Kidney Disease",
-  priority: "warning",
-  description: "AKI after cardiopulmonary bypass - fluid management",
-  icon: Heart,
-  hasFullPathway: true
-},
+
 {
   id: "hypophosphatemia",
   title: "Severe Hypophosphatemia (<1.5 mg/dL)",
@@ -749,6 +733,19 @@ export default function ClinicalSupport() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeTab, selectedScenario]);
+
+  // Handle mobile hardware back button — when a scenario is open, go back to list
+  useEffect(() => {
+    if (selectedScenario) {
+      window.history.pushState({ scenarioOpen: true }, "");
+      const handlePop = () => {
+        setSelectedScenario(null);
+        setActiveTab("scenarios");
+      };
+      window.addEventListener("popstate", handlePop);
+      return () => window.removeEventListener("popstate", handlePop);
+    }
+  }, [selectedScenario]);
 
   // Diagnostic AI state
   const [diagnosticStep, setDiagnosticStep] = useState(1);
@@ -1466,7 +1463,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
     toast.success("Pathway deleted");
   };
 
-  const CATEGORY_ORDER = ["Metabolic & Genetic", "Tubular Disorders", "Hypertension", "Nephrotic Syndrome", "Acute Kidney Disease", "CKD", "Glomerular Disease", "Electrolytes", "Fluids & Electrolytes", "Transplant", "Infection", "Peritoneal Dialysis", "Hemodialysis", "Developmental Kidney", "Urinary Tract", "Lower Urinary Tract"];
+  const CATEGORY_ORDER = ["CKD", "Glomerular Disease", "Nephrotic Syndrome", "Acute Kidney Disease", "Hypertension", "Transplant", "Tubular Disorders", "Electrolytes", "Fluids & Electrolytes", "Infection", "Peritoneal Dialysis", "Hemodialysis", "Developmental Kidney", "Urinary Tract", "Lower Urinary Tract", "Metabolic & Genetic"];
 
   const filteredScenarios = clinicalScenarios.filter(s =>
     !scenarioSearch.trim() ||
@@ -1839,12 +1836,20 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-3 md:p-6">
       <div className="max-w-7xl mx-auto">
-        <Link to={createPageUrl("Hub")}>
-          <Button variant="outline" size="sm" className="mb-4">
+        {selectedScenario ? (
+          <Button variant="outline" size="sm" className="mb-4"
+            onClick={() => { setSelectedScenario(null); setActiveTab("scenarios"); }}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            Back to Pathways
           </Button>
-        </Link>
+        ) : (
+          <Link to={createPageUrl("Hub")}>
+            <Button variant="outline" size="sm" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </Link>
+        )}
 
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-3">

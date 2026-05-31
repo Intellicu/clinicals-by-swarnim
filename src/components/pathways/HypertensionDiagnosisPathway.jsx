@@ -9,9 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const BP_STAGES = [
   { label: "Normal", color: "bg-green-100 text-green-800", range: "<90th percentile" },
-  { label: "Elevated", color: "bg-yellow-100 text-yellow-800", range: "90th–<95th percentile" },
-  { label: "Stage 1 HTN", color: "bg-orange-100 text-orange-800", range: "95th–99th+5 mmHg" },
-  { label: "Stage 2 HTN", color: "bg-red-100 text-red-800", range: ">99th+5 mmHg" }
+  { label: "Elevated", color: "bg-yellow-100 text-yellow-800", range: "90th–<95th percentile (or 120/80 to <95th)" },
+  { label: "Stage 1 HTN", color: "bg-orange-100 text-orange-800", range: "95th percentile to <95th+12 mmHg (or 130/80–139/89)" },
+  { label: "Stage 2 HTN", color: "bg-red-100 text-red-800", range: "≥95th+12 mmHg (or ≥140/90)" }
 ];
 
 export default function HypertensionDiagnosisPathway() {
@@ -25,18 +25,26 @@ export default function HypertensionDiagnosisPathway() {
       </Alert>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">BP Classification (AAP 2017)</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="text-base">BP Classification (AAP 2017)</CardTitle>
+          <p className="text-xs text-slate-500 mt-1">Children &lt;13 years: percentile-based (age/sex/height). Children ≥13 years: absolute values apply.</p>
+        </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {BP_STAGES.map((s,i) => (
               <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${s.color.split(' ')[0]} border`}>
                 <Badge className={s.color}>{s.label}</Badge>
-                <span className="text-sm font-medium">{s.range}</span>
+                <span className="text-sm font-medium text-right">{s.range}</span>
               </div>
             ))}
           </div>
-          <div className="mt-3 p-3 bg-blue-50 rounded-lg text-xs text-blue-800">
-            <strong>Note:</strong> Use oscillometric device confirmed by auscultatory method. Measure in right arm, seated, after 5 min rest. Use appropriate cuff size (bladder covers 80–100% arm circumference).
+          <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 space-y-1">
+            <p><strong>Stage 1 clarification:</strong> 95th percentile to &lt;95th+12 mmHg. For ≥13 yrs: 130/80 to 139/89 mmHg.</p>
+            <p><strong>Stage 2 clarification:</strong> ≥95th percentile+12 mmHg. For ≥13 yrs: ≥140/90 mmHg.</p>
+            <p><strong>Diagnosis requires:</strong> Confirmed on ≥3 separate occasions (except urgency/emergency).</p>
+          </div>
+          <div className="mt-2 p-3 bg-blue-50 rounded-lg text-xs text-blue-800">
+            <strong>Measurement:</strong> Oscillometric confirmed by auscultation. Right arm, seated, 5 min rest. Cuff bladder covers 80–100% arm circumference.
           </div>
         </CardContent>
       </Card>
