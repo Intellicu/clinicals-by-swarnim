@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, AlertTriangle, Zap, Plus, Trash2, X, Check } from "lucide-react";
+import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, AlertTriangle, Zap, Plus, Trash2, X, Check, GitBranch } from "lucide-react";
 import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
 
 const PATHWAYS = [
@@ -246,8 +246,9 @@ export default function HubNephrologyPathways() {
     return matchTag && matchSearch;
   });
 
-  const emergencyList = filtered.filter(p => p.emergency);
-  const otherList = filtered.filter(p => !p.emergency);
+  const engineList = filtered.filter(p => p.tag === "Engine");
+  const emergencyList = filtered.filter(p => p.emergency && p.tag !== "Engine");
+  const otherList = filtered.filter(p => !p.emergency && p.tag !== "Engine");
 
   const goToPathway = (scenario) => {
     navigate(`/ClinicalSupport?tab=pathways&scenario=${scenario}`);
@@ -293,6 +294,23 @@ export default function HubNephrologyPathways() {
           </button>
         ))}
       </div>
+
+      {/* Intelligence Engines strip */}
+      {engineList.length > 0 && (
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <GitBranch className="w-3.5 h-3.5 text-violet-600" />
+            <span className="text-xs font-bold text-violet-700 uppercase tracking-wider">Intelligence Engines (LEILA-style)</span>
+            <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">{engineList.length}</span>
+          </div>
+          <div className="space-y-1.5">
+            {engineList.map((pathway, i) => {
+              const custIdx = pathway._isCustom ? customPathways.findIndex(p => p.name === pathway.name) : -1;
+              return <PathwayCard key={`eng-${i}`} pathway={pathway} idx={`eng-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, custIdx, !!pathway._isCustom)} onDelete={() => handleDelete(pathway, custIdx, !!pathway._isCustom)} />;
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Emergency strip */}
       {emergencyList.length > 0 && (
@@ -390,13 +408,14 @@ export default function HubNephrologyPathways() {
 
 function PathwayCard({ pathway, idx, open, setOpen, goToPathway, isAdmin, onEdit, onDelete }) {
   return (
-    <Card className={`border-slate-200 shadow-sm ${pathway.emergency ? "border-l-4 border-l-red-500" : ""} ${pathway._isCustom ? "border-l-4 border-l-amber-400" : ""}`}>
+    <Card className={`border-slate-200 shadow-sm ${pathway.tag === "Engine" ? "border-l-4 border-l-violet-500 bg-violet-50/30" : pathway.emergency ? "border-l-4 border-l-red-500" : ""} ${pathway._isCustom ? "border-l-4 border-l-amber-400" : ""}`}>
       <CardContent className="p-0">
         <button className="w-full flex items-center justify-between p-3 text-left" onClick={() => setOpen(open === idx ? null : idx)}>
           <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-            {pathway.emergency && <Zap className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />}
+            {pathway.tag === "Engine" ? <GitBranch className="w-3.5 h-3.5 text-violet-600 flex-shrink-0" /> : pathway.emergency ? <Zap className="w-3.5 h-3.5 text-red-500 flex-shrink-0" /> : null}
             <span className="font-semibold text-sm text-slate-800">{pathway.name}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${pathway.color}`}>{pathway.tag}</span>
+            {pathway.tag === "Engine" && <span className="text-xs bg-violet-600 text-white px-2 py-0.5 rounded-full font-bold">LEILA</span>}
             {pathway._isCustom && <span className="text-xs text-amber-600 font-medium">Custom</span>}
           </div>
           {open === idx ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />}
@@ -417,9 +436,10 @@ function PathwayCard({ pathway, idx, open, setOpen, goToPathway, isAdmin, onEdit
             <div className="flex items-center gap-2 flex-wrap pt-1">
               {pathway.scenario && (
                 <Button size="sm" variant="outline"
-                  className="text-xs border-blue-200 text-blue-700 hover:bg-blue-50 h-7"
+                  className={`text-xs h-7 ${pathway.tag === "Engine" ? "border-violet-300 text-violet-700 hover:bg-violet-50 font-semibold" : "border-blue-200 text-blue-700 hover:bg-blue-50"}`}
                   onClick={() => goToPathway(pathway.scenario)}>
-                  <ExternalLink className="w-3 h-3 mr-1" /> Full Pathway
+                  {pathway.tag === "Engine" ? <GitBranch className="w-3 h-3 mr-1" /> : <ExternalLink className="w-3 h-3 mr-1" />}
+                  {pathway.tag === "Engine" ? "Launch Engine" : "Full Pathway"}
                 </Button>
               )}
               {isAdmin && (
