@@ -60,6 +60,11 @@ import {
   BiopsyTriggerEngine, EculizumabEngine, HypokalemiaEngine, MetabolicAcidosisEngine,
   PolyuriaEngine, HyperkalemiaEngine
 } from "./DecisionEngines";
+import NephroticSyndromeEngine from "../engines/NephroticSyndromeEngine";
+import HyponatremiaEngine from "../engines/HyponatremiaEngine";
+import RPGNEngine from "../engines/RPGNEngine";
+import AKIEngine from "../engines/AKIEngine";
+import HyperkalemiaDeepEngine from "../engines/HyperkalemiaDeepEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -78,6 +83,7 @@ const HANDLED_IDS = new Set([
   "tma-engine","hematuria-engine","genetic-engine","ckd-progression-engine",
   "biopsy-engine","eculizumab-engine","hypokalemia-engine","metabolic-acidosis-engine",
   "polyuria-engine","hyperkalemia-engine","c3g-engine","rpgn-engine",
+  "ns-engine","hyponatremia-engine","rpgn-deep-engine","aki-engine","hyperkalemia-deep-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -160,6 +166,12 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "metabolic-acidosis-engine") return <MetabolicAcidosisEngine />;
   if (id === "polyuria-engine") return <PolyuriaEngine />;
   if (id === "hyperkalemia-engine") return <HyperkalemiaEngine />;
+  // ── Deep LEILA Engines ────────────────────────────────────────────────────
+  if (id === "ns-engine") return <NephroticSyndromeEngine />;
+  if (id === "hyponatremia-engine") return <HyponatremiaEngine />;
+  if (id === "rpgn-deep-engine") return <RPGNEngine />;
+  if (id === "aki-engine") return <AKIEngine />;
+  if (id === "hyperkalemia-deep-engine") return <HyperkalemiaDeepEngine />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

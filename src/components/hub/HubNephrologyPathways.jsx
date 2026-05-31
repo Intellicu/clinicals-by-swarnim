@@ -9,6 +9,27 @@ import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, 
 import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
 
 const PATHWAYS = [
+  // ── Deep Intelligence Engines (LEILA-style) ───────────────────────────────
+  { name: "Nephrotic Syndrome Intelligence Engine", tag: "Engine", color: "bg-violet-100 text-violet-900", emergency: false,
+    summary: "Full LEILA engine: First episode → Relapse → FRNS → SDNS → SRNS → Congenital NS. Age-based branching, genetic triggers, ISKDC protocol.",
+    keys: ["First episode: ISKDC prednisolone 60 mg/m²/day × 4–6 weeks", "Atypical features trigger biopsy + genetic workup", "FRNS/SDNS: Rituximab / MMF / Levamisole decision tree", "SRNS: biopsy + genetic panel mandatory before CNI"],
+    scenario: "ns-engine" },
+  { name: "Hyponatremia Intelligence Engine", tag: "Engine", color: "bg-cyan-100 text-cyan-900", emergency: true,
+    summary: "Full LEILA engine: Na → osmolality → volume → urine Na/Osm → SIADH / CSW / hypovolaemia. Hypertonic saline calculator. Correction rate enforced.",
+    keys: ["Serum osmolality: hypotonic / isotonic / hypertonic branching", "Volume status: hypovolaemic / euvolaemic / hypervolaemic", "Urine Na + urine osmolality → SIADH / CSW / NS / CHF", "Symptomatic: 3% NaCl 2 mL/kg IV — max correction 10 mEq/L/24h"],
+    scenario: "hyponatremia-engine" },
+  { name: "RPGN / Crescentic GN Engine", tag: "Engine", color: "bg-red-100 text-red-900", emergency: true,
+    summary: "Full LEILA engine: AKI + haematuria → ANCA / anti-GBM / ANA / C3 → Biopsy IF pattern → Disease-specific treatment. PLEX criteria built-in.",
+    keys: ["Immunoprofile: ANCA / anti-GBM / ANA / C3 → separate treatment branch per diagnosis", "PLEX criteria: anti-GBM always; ANCA if Cr >500 or DAH", "AAV: RTX (GPA/PR3) vs IV CYC (MPA/MPO) — RAVE trial-based", "Lupus / C3G / pauci-immune: individual protocols"],
+    scenario: "rpgn-deep-engine" },
+  { name: "AKI Diagnostic Engine", tag: "Engine", color: "bg-red-100 text-red-900", emergency: true,
+    summary: "Full LEILA engine: KDIGO staging + pRIFLE → Pre/Intrinsic/Post-renal → ATN / GN / TMA / AIN / Rhabdo. Dose calculators. RRT AEIOU criteria.",
+    keys: ["KDIGO 1–3 + pRIFLE staging with creatinine ratio calculator", "Pre-renal: fluid challenge protocol; post-renal: obstruction decompression", "Intrinsic: active sediment (GN) / granular casts (ATN) / TMA branching", "AEIOU criteria for RRT: Acidosis / Electrolytes / Intoxication / Overload / Uraemia"],
+    scenario: "aki-engine" },
+  { name: "Hyperkalaemia Emergency Engine (Full)", tag: "Engine", color: "bg-orange-100 text-orange-900", emergency: true,
+    summary: "Full LEILA engine: K+ value → ECG changes → Cause analysis → Weight-based dose calculator (Ca gluconate, insulin, salbutamol, NaHCO3) → Dialysis decision.",
+    keys: ["Weight-based dose calculator: Ca gluconate / insulin-dextrose / salbutamol / NaHCO3", "ECG stratification: peaked T → wide QRS → sine wave → arrest protocol", "Cause identification: AKI / drugs / acidosis / adrenal / cellular release", "RRT modality selection: HD vs CRRT vs PD by age + haemodynamics"],
+    scenario: "hyperkalemia-deep-engine" },
   // ── Glomerular Diseases ───────────────────────────────────────────────────
   { name: "Nephrotic Syndrome (Childhood SSNS)", tag: "GN", color: "bg-purple-100 text-purple-800", emergency: false,
     summary: "Edema + proteinuria + hypoalbuminaemia. ISPN/IPNA first-line steroid protocol.",
@@ -136,7 +157,7 @@ const PATHWAYS = [
     scenario: "nephrocalcinosis" },
 ];
 
-const TAGS = ["All", "GN", "AKI", "CKD", "Electrolyte", "Tubular", "Dialysis", "Transplant", "HTN", "Diagnostic", "Urological", "Genetic"];
+const TAGS = ["All", "Engine", "GN", "AKI", "CKD", "Electrolyte", "Tubular", "Dialysis", "Transplant", "HTN", "Diagnostic", "Urological", "Genetic"];
 const EMPTY_PATHWAY = { name: "", tag: "GN", color: "bg-blue-100 text-blue-800", emergency: false, summary: "", keys: [""], scenario: "" };
 
 export default function HubNephrologyPathways() {
