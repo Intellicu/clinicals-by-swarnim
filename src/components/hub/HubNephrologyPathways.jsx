@@ -9,153 +9,134 @@ import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, 
 import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
 
 const PATHWAYS = [
-  // ── Glomerular Diseases (GN) ──────────────────────────────────────────
-  { name: "Nephrotic Syndrome (Childhood SSNS)", tag: "GN", color: "bg-purple-100 text-purple-800",
-    emergency: false,
+  // ── Glomerular Diseases ───────────────────────────────────────────────────
+  { name: "Nephrotic Syndrome (Childhood SSNS)", tag: "GN", color: "bg-purple-100 text-purple-800", emergency: false,
     summary: "Edema + proteinuria + hypoalbuminaemia. ISPN/IPNA first-line steroid protocol.",
-    keys: ["ISKDC: prednisolone 60 mg/m²/day × 4 wks, then 40 mg/m² alternate day × 4 wks", "Relapse: dipstick ≥3+ × 3 consecutive days", "Frequent relapse (≥2/6m): MMF / levamisole", "SRNS: CNI (tacrolimus/CsA) + genetic testing"], scenario: "childhood-nephrotic" },
-  { name: "Steroid-Resistant NS (SRNS)", tag: "GN", color: "bg-purple-100 text-purple-800",
-    emergency: false,
-    summary: "No remission after 4 weeks full-dose steroid. Genetic workup mandatory.",
-    keys: ["Complete genetic panel: NPHS1/2, PLCE1, WT1, etc.", "Biopsy before CNI initiation", "Tacrolimus target trough 5–10 ng/mL", "Rituximab: 375 mg/m² × 2–4 doses for FRNS/SDNS"], scenario: "steroid-resistant-ns" },
-  { name: "IgA Nephropathy (IgAN)", tag: "GN", color: "bg-blue-100 text-blue-800",
-    emergency: false,
-    summary: "Most common primary GN. MEST-C scoring. KDIGO 2021.",
-    keys: ["IgA + mesangial deposits on biopsy", "Haematuria ± proteinuria post-URTI", "MEST-C Oxford classification", "RAAS blockade (ACEi/ARB) if proteinuria >0.5 g/day", "Steroids if GFR declining + proteinuria >1 g/day"], scenario: "iga-nephropathy" },
-  { name: "IgA Vasculitis Nephritis (IgAV/HSP)", tag: "GN", color: "bg-blue-100 text-blue-800",
-    emergency: false,
-    summary: "Purpura + arthritis + abdominal pain + nephritis. KDIGO/EULAR criteria.",
-    keys: ["Purpuric rash (non-thrombocytopenic) + IgA deposits", "Urine microscopy at every visit", "Nephrotic/nephritic range: biopsy + IS", "ACEi/ARB for proteinuria, steroids for severe nephritis"], scenario: "iga-vasculitis" },
-  { name: "Lupus Nephritis", tag: "GN", color: "bg-rose-100 text-rose-800",
-    emergency: false,
-    summary: "Class III/IV most common in children. ACR/EULAR 2019.",
-    keys: ["ISN/RPS 2003 classes I–VI", "Induction: pulse methylprednisolone + MMF or cyclophosphamide", "Maintenance: MMF + hydroxychloroquine", "Target: urine protein <500 mg/day, normal C3/C4, anti-dsDNA falling"], scenario: "lupus-nephritis" },
-  { name: "ANCA Vasculitis (GPA/MPA)", tag: "GN", color: "bg-red-100 text-red-800",
-    emergency: true,
-    summary: "RPGN + pulmonary haemorrhage emergency. Rituximab or CYC induction.",
-    keys: ["PR3-ANCA (GPA) vs MPO-ANCA (MPA)", "Induction: RTX or IV CYC + high-dose steroids", "Plasma exchange if Cr >500 or dialysis-dependent", "Maintenance: RTX 500 mg Q6 monthly × 2 years"], scenario: "anca-vasculitis" },
-  { name: "Anti-GBM / Goodpasture", tag: "GN", color: "bg-red-100 text-red-800",
-    emergency: true,
-    summary: "Linear IgG anti-GBM. RPGN + pulmonary haemorrhage. Urgent plasma exchange.",
-    keys: ["Anti-GBM antibody titre", "Linear IgG on immunofluorescence", "Plasma exchange daily × 14 days", "CYC 2–3 mg/kg/day + pulse steroids"], scenario: "thrombotic-microangiopathy" },
-  { name: "RPGN / Crescentic GN", tag: "GN", color: "bg-red-100 text-red-800",
-    emergency: true,
-    summary: "Rapid GFR loss + crescents on biopsy. Divide by IF pattern for treatment.",
-    keys: ["Biopsy urgently: linear (anti-GBM) vs granular (immune) vs pauci-immune (ANCA)", "Pulse methylprednisolone 500–1000 mg/day × 3", "Plasma exchange for anti-GBM or severe ANCA", "Risk of dialysis dependence if >50% crescents"], scenario: "aki-prifle" },
-  { name: "PSGL / Post-Streptococcal GN", tag: "GN", color: "bg-sky-100 text-sky-800",
-    emergency: false,
-    summary: "Acute nephritis 1–3 wks post strep. Usually self-limited.",
-    keys: ["Haematuria + oedema + HTN + oliguria", "Low C3, normal C4, elevated ASO/Anti-DNase B", "'Humps' on EM: subepithelial deposits", "Supportive: diuretics, antihypertensives. Penicillin course."], scenario: "post-strep-gn" },
-  { name: "Membranous Nephropathy", tag: "GN", color: "bg-violet-100 text-violet-800",
-    emergency: false,
-    summary: "PLA2R-positive in adults. Secondary causes common in children.",
-    keys: ["PLA2R antibody (adults), secondary causes in children", "Subepithelial 'spikes' on silver stain", "Low-risk: RAAS blockade + watch", "High-risk: CsA or RTX + steroids"], scenario: "membranous-nephropathy" },
-  { name: "Focal Segmental Glomerulosclerosis (FSGS)", tag: "GN", color: "bg-purple-100 text-purple-800",
-    emergency: false,
-    summary: "Most common cause of SRNS. Genetic and secondary forms.",
-    keys: ["Podocin/NPHS2 mutations most common genetic cause", "Secondary: obesity, reflux, sickle cell, heroin", "CNI (tacrolimus) ± steroids for primary FSGS", "Rituximab for RTX-sensitive minimal change-like FSGS"], scenario: "steroid-resistant-ns" },
-  { name: "C3 Glomerulopathy (C3G/MPGN)", tag: "GN", color: "bg-cyan-100 text-cyan-800",
-    emergency: false,
-    summary: "Complement-mediated. Low C3. Dense deposits or C3GN on IF.",
-    keys: ["Low C3, normal C4 = alternative pathway activation", "IF: C3 dominant without Ig", "aHUS overlap: check CFH/CFI/MCP/C3 mutations", "Eculizumab for progressive C3G with complement mutations"], scenario: "thrombotic-microangiopathy" },
+    keys: ["ISKDC: prednisolone 60 mg/m²/day × 4 wks, then 40 mg/m² alternate day × 4 wks", "Relapse: dipstick ≥3+ × 3 consecutive days", "Frequent relapse (≥2/6m): MMF / levamisole / RTX", "SRNS: CNI (tacrolimus) + genetic testing — see SRNS pathway"],
+    scenario: "childhood-nephrotic" },
+  { name: "Steroid-Resistant NS / FSGS (SRNS)", tag: "GN", color: "bg-purple-100 text-purple-800", emergency: false,
+    summary: "No remission after 4 weeks. Includes FSGS. Genetic workup mandatory before CNI.",
+    keys: ["Genetic panel: NPHS1/2, PLCE1, WT1, LAMB2, COQ genes", "Renal biopsy (MCD vs FSGS vs DMS) before CNI initiation", "Tacrolimus: trough 5–10 ng/mL × 6 months; assess response", "Rituximab: 375 mg/m² × 2 doses for FRNS/SDNS (steroid-dependent relapsing)"],
+    scenario: "steroid-resistant-ns" },
+  { name: "IgA Nephropathy + IgA Vasculitis (IgAV/HSP)", tag: "GN", color: "bg-blue-100 text-blue-800", emergency: false,
+    summary: "Most common primary GN. MEST-C scoring + HSP nephritis management combined.",
+    keys: ["IgAN: haematuria ± proteinuria post-URTI; MEST-C biopsy classification", "IgAN treatment: ACEi/ARB if UPCR >0.5; steroids if GFR declining + UPCR >1", "IgAV: purpura + arthritis + abdominal pain + nephritis (non-thrombocytopenic)", "IgAV nephritis: biopsy if nephrotic/nephritic range; ACEi/ARB; steroids for severe"],
+    scenario: "iga-nephropathy" },
+  { name: "Lupus Nephritis (LN)", tag: "GN", color: "bg-rose-100 text-rose-800", emergency: false,
+    summary: "Class III/IV most common in children. ACR/EULAR 2019. Biopsy mandatory.",
+    keys: ["ISN/RPS classes I–VI; biopsy guides induction", "Induction: pulse methylprednisolone + MMF (preferred) or IV CYC (severe)", "Maintenance: MMF + hydroxychloroquine + low-dose prednisolone", "Target: UPCR <500 mg/mg, normal C3/C4, anti-dsDNA declining"],
+    scenario: "lupus-nephritis" },
+  { name: "ANCA Vasculitis + RPGN Engine", tag: "GN", color: "bg-red-100 text-red-800", emergency: true,
+    summary: "RPGN + pulmonary haemorrhage. Decision algorithm: biopsy → induction → PLEX criteria.",
+    keys: ["c-ANCA/PR3 = GPA; p-ANCA/MPO = MPA", "Biopsy urgently — % crescents determines treatment intensity", "Induction: RTX (GPA/PR3) or IV CYC (severe/DAH) + high-dose steroids", "PLEX if: Cr >500 μmol/L, dialysis-dependent, or diffuse alveolar haemorrhage"],
+    scenario: "anca-vasculitis" },
+  { name: "C3 Glomerulopathy (C3G / MPGN)", tag: "GN", color: "bg-cyan-100 text-cyan-800", emergency: false,
+    summary: "Complement alternative pathway. Low C3 + C3-dominant IF. Biopsy + genetic panel.",
+    keys: ["Low C3, normal C4 = alternative pathway (AP) activation", "IF: C3 dominant with minimal Ig — C3GN vs DDD (EM)", "AP genetics: CFH, CFI, MCP, C3, CFB, CFHR1/3/5 — overlap with aHUS", "Treatment: MMF ± steroids; eculizumab for CFH/C3 mutation with rapid progression"],
+    scenario: "c3g-engine" },
+  { name: "Post-Streptococcal GN (PSGN)", tag: "GN", color: "bg-sky-100 text-sky-800", emergency: false,
+    summary: "Acute nephritis 1–3 weeks post strep. Low C3, high ASO. Usually self-limited.",
+    keys: ["Haematuria + oedema + HTN + oliguria post-URTI/skin infection", "Low C3 (returns to normal in 6–8 weeks), normal C4, elevated ASO/anti-DNase B", "'Humps' on EM: subepithelial deposits", "Supportive: fluid restriction, diuretics, antihypertensives; penicillin course"],
+    scenario: "post-strep-gn" },
+  { name: "Membranous Nephropathy", tag: "GN", color: "bg-violet-100 text-violet-800", emergency: false,
+    summary: "Subepithelial deposits. PLA2R secondary in adults. Secondary causes in children.",
+    keys: ["PLA2R antibody (adults); in children: exclude SLE, HBV, drugs", "Subepithelial 'spikes' on silver stain; 'spike-and-dome' on EM", "Low-risk: RAAS blockade + watchful waiting × 6 months", "High-risk (declining GFR, heavy proteinuria): CsA + steroids or Rituximab"],
+    scenario: "membranous-nephropathy" },
   // ── AKI ──────────────────────────────────────────────────────────────────
-  { name: "AKI — Acute Kidney Injury", tag: "AKI", color: "bg-red-100 text-red-800",
-    emergency: true,
-    summary: "KDIGO staging by SCr rise/UO criteria. Identify cause and RRT triggers.",
-    keys: ["KDIGO staging 1–3 by SCr rise or urine output", "Prerenal (volume, sepsis) vs intrinsic vs postrenal", "Stop nephrotoxins, optimise haemodynamics", "RRT: AEIOU — Acidosis, Electrolytes, Ingestion, Overload, Uraemia"], scenario: "aki-prifle" },
-  { name: "HUS / STEC-HUS", tag: "AKI", color: "bg-red-100 text-red-800",
-    emergency: true,
-    summary: "Diarrhoea + microangiopathic haemolytic anaemia + AKI. No antibiotics.",
-    keys: ["Shiga-toxin E. coli O157 (STEC) most common", "Avoid antibiotics (increase toxin release)", "Supportive: fluid management, transfuse if Hb <7", "Dialysis often required. Eculizumab: only atypical HUS (aHUS)"], scenario: "hemolytic-uremic" },
-  { name: "aHUS / Complement-mediated TMA", tag: "AKI", color: "bg-red-100 text-red-800",
-    emergency: true,
-    summary: "Non-diarrhoeal TMA. Complement dysregulation. Eculizumab life-saving.",
-    keys: ["Rule out STEC-HUS, ADAMTS13 deficiency (TTP)", "Genetic panel: CFH, CFI, MCP, C3, CFB, THBD", "Eculizumab: 900 mg IV weekly × 4, then 1200 mg Q2W", "Do not delay eculizumab pending genetics"], scenario: "thrombotic-microangiopathy" },
+  { name: "AKI — Staging & Management", tag: "AKI", color: "bg-red-100 text-red-800", emergency: true,
+    summary: "KDIGO staging. Identify cause. RRT triggers: AEIOU.",
+    keys: ["KDIGO stages 1–3 by SCr rise or urine output (<0.5 mL/kg/h × 6h)", "Prerenal vs intrinsic (ATN, GN, interstitial) vs postrenal — USG urgently", "Stop nephrotoxins; optimise haemodynamics; daily weights", "RRT triggers (AEIOU): Acidosis, Electrolytes, Ingestion, Overload, Uraemia"],
+    scenario: "aki-prifle" },
+  { name: "HUS / TMA Decision Engine", tag: "AKI", color: "bg-red-100 text-red-800", emergency: true,
+    summary: "STEC-HUS vs aHUS vs TTP. Algorithmic TMA differentiation. Includes aHUS PLEX + Eculizumab.",
+    keys: ["TMA triad: MAHA + thrombocytopenia + organ injury", "STEC-HUS: Shiga-toxin positive → supportive only, NO antibiotics, NO eculizumab", "aHUS: complement genetic panel, do NOT delay eculizumab", "TTP: ADAMTS13 <10% → urgent PEX + steroids ± caplacizumab"],
+    scenario: "hemolytic-uremic" },
   // ── CKD ──────────────────────────────────────────────────────────────────
-  { name: "CKD Staging & Management", tag: "CKD", color: "bg-blue-100 text-blue-800",
-    emergency: false,
-    summary: "KDIGO G1–G5 + albuminuria A1–A3. Nephroprotection strategy.",
-    keys: ["KDIGO G1–G5 by eGFR, A1–A3 by albuminuria", "Schwartz/CKiD GFR estimation in children", "ACEi/ARB for proteinuric CKD >500 mg/day", "CKD-MBD: Ca, PO₄, PTH targets by stage"], scenario: "ckd-staging" },
-  { name: "CKD-MBD (Bone & Mineral)", tag: "CKD", color: "bg-blue-100 text-blue-800",
-    emergency: false,
-    summary: "Mineral metabolism abnormalities in CKD. Renal osteodystrophy prevention.",
-    keys: ["Monitor Ca, PO4, PTH, ALP, 25-OH Vit D", "Target PTH: 2–9× ULN for stage (KDIGO)", "Dietary phosphate restriction; binders if needed", "Active Vit D (calcitriol/alfacalcidol) for secondary HPT"], scenario: "ckd-mbd" },
-  { name: "Anaemia of CKD", tag: "CKD", color: "bg-blue-100 text-blue-800",
-    emergency: false,
-    summary: "ESA therapy + IV iron. Hb target 10–12 g/dL.",
-    keys: ["Evaluate iron stores first (TSAT >20%, ferritin >100)", "IV iron preferred (oral poorly absorbed in CKD)", "ESA (darbepoetin/EPO): start if Hb <10 after iron repletion", "Target Hb 10–12 g/dL; avoid >13 (risk thrombosis)"], scenario: "ckd-anemia-mbd" },
+  { name: "CKD Staging & Progression Engine", tag: "CKD", color: "bg-blue-100 text-blue-800", emergency: false,
+    summary: "KDIGO G1–G5 + albuminuria risk matrix. Monitoring interval calculator.",
+    keys: ["KDIGO G1–G5 by eGFR + A1–A3 albuminuria risk matrix", "Schwartz/CKiD formula for eGFR in children", "ACEi/ARB: UPCR >500 mg/g; target BP <50th percentile in CKD", "Progression Engine: eGFR + UPCR + BP → risk score → monitoring interval"],
+    scenario: "ckd-staging" },
+  { name: "CKD-MBD & Anaemia", tag: "CKD", color: "bg-blue-100 text-blue-800", emergency: false,
+    summary: "Mineral metabolism + anaemia. KDIGO targets by CKD stage.",
+    keys: ["PTH target: 2–9× ULN per stage; active Vit D for secondary HPT", "Phosphate binders: calcium-based (mild CKD), sevelamer/lanthanum (CKD 4–5)", "Anaemia: IV iron first (TSAT <30%), then ESA (darbepoetin) if Hb <10", "Target Hb 10–12 g/dL; avoid >13 (thrombosis risk)"],
+    scenario: "ckd-mbd" },
   // ── Electrolytes ──────────────────────────────────────────────────────────
-  { name: "Hyperkalaemia (K+ >5.5)", tag: "Electrolyte", color: "bg-orange-100 text-orange-800",
-    emergency: true,
-    summary: "Cardiac arrest risk at K+ >6.5. Treat ECG changes immediately.",
-    keys: ["K+ >6 or ECG changes: IV calcium gluconate 10% 0.5–1 mL/kg", "Shift K+: insulin-dextrose (0.1 U/kg + D25 2 mL/kg)", "Salbutamol nebulisation (binds K+ into cells)", "Remove K+: resonium / patiromer; dialysis if refractory"], scenario: "hyperkalemia" },
-  { name: "Hyponatraemia", tag: "Electrolyte", color: "bg-cyan-100 text-cyan-800",
-    emergency: true,
-    summary: "Serum Na <135 mEq/L. Correct ≤10 mEq/L/24h to avoid ODS.",
-    keys: ["Assess serum osmolality + urine Na + urine osmolality", "SIADH (urine Na>20, urine osm>300, euvolaemic)", "Symptomatic (<125 + seizures): 3% NaCl 2 mL/kg bolus", "Max correction rate: 10 mEq/L/24h"], scenario: "hyponatremia" },
-  { name: "Hypernatraemia", tag: "Electrolyte", color: "bg-cyan-100 text-cyan-800",
-    emergency: true,
-    summary: "Na >145 mEq/L. Usually water deficit. Slow correction to avoid cerebral oedema.",
-    keys: ["Calculate free water deficit", "Correct ≤10–12 mEq/L/24h (chronic >48h)", "DI: DDAVP for central DI", "Hyperaldosteronism: fludrocortisone trial"], scenario: "fluid-electrolyte" },
-  { name: "Metabolic Acidosis / RTA", tag: "Tubular", color: "bg-amber-100 text-amber-800",
-    emergency: false,
-    summary: "Non-AG acidosis with normal anion gap. Urine anion gap distinguishes dRTA from GI loss.",
-    keys: ["Anion gap = Na − (Cl + HCO3). Normal <12", "Non-AG: urine anion gap (UAG) = Na + K − Cl", "Positive UAG = dRTA (Type 1). Negative = GI loss", "Type 2 pRTA: Fanconi; Type 4: hyperkalaemia + low renin/aldo"], scenario: "rta-diagnosis" },
-  { name: "Hypocalcaemia", tag: "Electrolyte", color: "bg-amber-100 text-amber-800",
-    emergency: true,
-    summary: "Corrected Ca <8.5 mg/dL. Tetany/seizures at <7 mg/dL.",
-    keys: ["Correct for albumin: Ca + 0.8 × (4 − albumin)", "Symptomatic: IV calcium gluconate 10% 1–2 mL/kg slowly", "Check Mg, PTH, Vit D", "Chronic: oral calcium + active Vit D supplements"], scenario: "hypocalcemia" },
-  { name: "Proteinuria Workup", tag: "Diagnostic", color: "bg-teal-100 text-teal-800",
-    emergency: false,
-    summary: "UPCR >0.2 mg/mg significant in children. Distinguishes nephrotic vs subnephrotic.",
-    keys: ["UPCR: >0.2 mg/mg = significant; >2 = nephrotic range", "Orthostatic vs persistent (early morning specimen)", "Nephrotic range + symptoms: biopsy if atypical", "Microalbuminuria: screen in DM, HTN, CKD"], scenario: "proteinuria-approach" },
-  { name: "Haematuria Pathway", tag: "Diagnostic", color: "bg-rose-100 text-rose-800",
-    emergency: false,
-    summary: "Glomerular vs non-glomerular differentiation. Dysmorphic RBCs and RBC casts = glomerular.",
-    keys: ["Phase contrast: dysmorphic RBCs = glomerular", "Acanthocytes (G1 cells) >5% = glomerular", "IgAN: episodic macrohaematuria post-URTI", "Full panel: ASO, ANA, ANCA, C3, C4, anti-dsDNA"], scenario: "hematuria-approach" },
+  { name: "Hyperkalaemia Engine", tag: "Electrolyte", color: "bg-orange-100 text-orange-800", emergency: true,
+    summary: "K+ → ECG → Membrane stabilisation → Shift → Remove. Dialysis if refractory.",
+    keys: ["K >6 or ECG changes: Ca gluconate 10% 0.5–1 mL/kg IV immediately", "Shift: Insulin-dextrose (0.1 U/kg + D25 2 mL/kg) + Salbutamol nebulisation", "Remove: resonium/patiromer oral; furosemide if UO adequate", "Dialysis if K >7, anuric, or no response to above"],
+    scenario: "hyperkalemia-engine" },
+  { name: "Hyponatraemia", tag: "Electrolyte", color: "bg-cyan-100 text-cyan-800", emergency: true,
+    summary: "Na <135 mEq/L. Correct ≤10 mEq/L/24h. Serum osmolality first.",
+    keys: ["Assess: serum osmolality + urine Na + urine osmolality + volume status", "SIADH: urine Na>20, urine osm>300, euvolaemic", "Symptomatic + seizures: 3% NaCl 2 mL/kg bolus IV", "Max correction: 10 mEq/L per 24h (chronic) — osmotic demyelination risk"],
+    scenario: "hyponatremia" },
+  { name: "Metabolic Acidosis Engine", tag: "Tubular", color: "bg-amber-100 text-amber-800", emergency: false,
+    summary: "AG calculation → UAG → RTA classification. Integrated calculator.",
+    keys: ["AG = Na − (Cl + HCO3). Normal <12. High AG = MUDPILES", "Non-AG: UAG = Na + K − Cl. Positive UAG = dRTA. Negative = GI loss.", "dRTA: urine pH >5.5 + nephrocalcinosis. K citrate + thiazide.", "pRTA/Fanconi: glucosuria + aminoaciduria + phosphaturia + low urate"],
+    scenario: "metabolic-acidosis-engine" },
+  { name: "Hypokalemia Engine", tag: "Tubular", color: "bg-amber-100 text-amber-800", emergency: false,
+    summary: "BP + acid-base → Bartter / Gitelman / Liddle / AME. Decision algorithm.",
+    keys: ["HTN + low K: check renin/aldosterone (primary aldosteronism), Cushing, AME, Liddle", "Low BP + alkalosis + high UCl: Bartter or Gitelman (Gitelman: low Mg, low Ca:Cr)", "Low BP + acidosis: RTA type II / Fanconi syndrome", "Genetic panel triggered by pattern + family history"],
+    scenario: "hypokalemia-engine" },
+  { name: "Polyuria Engine", tag: "Tubular", color: "bg-blue-100 text-blue-800", emergency: false,
+    summary: "Urine osmolality → water deprivation → DDAVP → Central DI vs Nephrogenic DI.",
+    keys: ["Random urine osm <300: DI vs psychogenic polydipsia", "Water deprivation: urine still dilute after 4-6h = DI confirmed", "DDAVP response: >50% rise = Central DI; <10% = Nephrogenic DI", "NDI genetics: AVPR2 (X-linked), AQP2; treatment: low-solute diet + thiazide + amiloride"],
+    scenario: "polyuria-engine" },
+  { name: "Hypocalcaemia", tag: "Electrolyte", color: "bg-amber-100 text-amber-800", emergency: true,
+    summary: "Corrected Ca <8.5. Tetany/seizures at Ca <7 mg/dL.",
+    keys: ["Correct for albumin: Ca + 0.8 × (4 − albumin)", "Symptomatic: IV Ca gluconate 10% 1–2 mL/kg slowly over 10 min", "Check Mg, PTH, Vit D — hypomagnesaemia causes refractory hypocalcaemia", "Chronic: oral calcium + active Vit D (calcitriol)"],
+    scenario: "hypocalcemia" },
+  { name: "Proteinuria Workup", tag: "Diagnostic", color: "bg-teal-100 text-teal-800", emergency: false,
+    summary: "UPCR >0.2 mg/mg significant. Nephrotic vs subnephrotic. Orthostatic screening.",
+    keys: ["UPCR: >0.2 = significant; >2 = nephrotic range (in children)", "Orthostatic: early morning UPCR (supine) vs midday — >50% orthostatic = benign", "Nephrotic range + symptoms in atypical age: biopsy", "Microalbuminuria (30–300 mg/g): screen annually in CKD, DM, HTN"],
+    scenario: "proteinuria-approach" },
+  { name: "Haematuria Evaluation Engine", tag: "Diagnostic", color: "bg-rose-100 text-rose-800", emergency: false,
+    summary: "Glomerular vs urological. Stepwise: proteinuria → C3 → family Hx → Alport → Stone.",
+    keys: ["Phase contrast: dysmorphic RBCs / acanthocytes >5% = glomerular", "Proteinuria + low C3 → C3G/PSGN; post-URTI → IgAN", "Family history + hearing loss → Alport (COL4A3/A4/A5 panel)", "Urine Ca:Cr >0.2 → hypercalciuria/stone workup"],
+    scenario: "hematuria-engine" },
   // ── Dialysis & RRT ────────────────────────────────────────────────────────
-  { name: "Peritoneal Dialysis", tag: "Dialysis", color: "bg-indigo-100 text-indigo-800",
-    emergency: false,
-    summary: "First-choice RRT in children <20 kg. ISPD evidence-based.",
-    keys: ["CAPD vs APD; ISPD guidelines for prescriptions", "Peritonitis: cloudy effluent + WBC>100/mm³", "Empirical: vancomycin + ceftazidime IP", "Adequacy: weekly Kt/V ≥1.7"], scenario: "peritoneal-dialysis" },
-  { name: "Haemodialysis in Children", tag: "Dialysis", color: "bg-indigo-100 text-indigo-800",
-    emergency: false,
-    summary: "Preferred for older children/adolescents. Kt/V ≥1.2 per session.",
-    keys: ["Access: AVF preferred (long-term); CVC for acute", "Target Kt/V ≥1.2 per session", "Anticoagulation: UFH (LMWH in neonates)", "Intradialytic hypotension: fluid management"], scenario: "hemodialysis" },
-  { name: "CRRT / SLED", tag: "Dialysis", color: "bg-indigo-100 text-indigo-800",
-    emergency: true,
-    summary: "ICU AKI management. Dose 20–25 mL/kg/h. Regional citrate anticoagulation preferred.",
-    keys: ["Dose: 20–25 mL/kg/h (prescribed 25–30 to account for down-time)", "Regional citrate anticoagulation preferred in bleeding risk", "Monitor: ionised Ca every 6h when on citrate", "Filter life: typically 24–72h; change if clotted"], scenario: "crrt" },
+  { name: "Peritoneal Dialysis", tag: "Dialysis", color: "bg-indigo-100 text-indigo-800", emergency: false,
+    summary: "First-choice RRT in children <20 kg. ISPD 2022.",
+    keys: ["CAPD vs APD — APD preferred (automated, overnight)", "Peritonitis: cloudy effluent + WBC >100/mm³ → empirical vancomycin + ceftazidime IP", "Adequacy: weekly Kt/V ≥1.7; measure at 4 weeks of stable PD", "Catheter exit site: daily cleaning; tunnel infection → consider catheter change"],
+    scenario: "peritoneal-dialysis" },
+  { name: "Haemodialysis", tag: "Dialysis", color: "bg-indigo-100 text-indigo-800", emergency: false,
+    summary: "Older children/adolescents. Kt/V ≥1.2 per session.",
+    keys: ["Access: AVF preferred long-term; CVC/Permcath for acute/temporary", "Adequacy: Kt/V ≥1.2 per session × 3/week minimum", "Intradialytic hypotension: commonest complication — cool dialysate, sodium profiling", "CRRT for ICU AKI: dose 20–25 mL/kg/h; citrate anticoagulation preferred"],
+    scenario: "hemodialysis" },
   // ── Transplant ────────────────────────────────────────────────────────────
-  { name: "Renal Transplant", tag: "Transplant", color: "bg-green-100 text-green-800",
-    emergency: false,
-    summary: "Standard IS: Tacrolimus + MMF + prednisolone. Annual surveillance.",
-    keys: ["Tacrolimus target: 8–12 ng/mL (early), 5–8 ng/mL (maintenance)", "MMF: 1200 mg/m²/day in 2 divided doses", "Acute rejection: pulse methylprednisolone 10 mg/kg × 3", "Annual: eGFR, proteinuria, DSA, BK PCR"], scenario: "kidney-transplant" },
-  { name: "Transplant Rejection", tag: "Transplant", color: "bg-green-100 text-green-800",
-    emergency: true,
-    summary: "Rising creatinine post-Tx. Banff criteria. Treat TCMR vs AMR differently.",
-    keys: ["Rising Cr + graft tenderness = urgent biopsy", "TCMR: pulse steroids; severe: anti-thymocyte globulin", "AMR: IVIG + plasma exchange + rituximab", "BK nephropathy: reduce IS (stop MMF first)"], scenario: "transplant-rejection" },
+  { name: "Renal Transplant — Immunosuppression", tag: "Transplant", color: "bg-green-100 text-green-800", emergency: false,
+    summary: "Standard: Tacrolimus + MMF + prednisolone. Surveillance biopsy at 1 year.",
+    keys: ["Tacrolimus: 8–12 ng/mL (first 3 months) → 5–8 ng/mL (maintenance)", "MMF: 1200 mg/m²/day in 2 divided doses", "Annual: eGFR, UPCR, DSA (donor-specific antibodies), BK PCR, tacrolimus trough", "VACCINES: MMR/Varicella before transplant (live vaccines contraindicated post-Tx)"],
+    scenario: "kidney-transplant" },
+  { name: "Transplant Rejection Engine", tag: "Transplant", color: "bg-green-100 text-green-800", emergency: true,
+    summary: "Rising creatinine. Banff criteria. TCMR vs AMR vs BK nephropathy.",
+    keys: ["Urgent biopsy: Banff classification — TCMR (cellular) vs AMR (antibody-mediated)", "TCMR: pulse methylprednisolone 10 mg/kg × 3; severe: ATG", "AMR: IVIG + PEX + Rituximab ± bortezomib", "BK nephropathy: reduce IS (stop MMF first, reduce tacrolimus to 3–5 ng/mL)"],
+    scenario: "transplant-rejection" },
   // ── Hypertension ─────────────────────────────────────────────────────────
-  { name: "Paediatric Hypertension", tag: "HTN", color: "bg-pink-100 text-pink-800",
-    emergency: false,
-    summary: "AAP 2017 definitions by age/sex/height percentiles.",
-    keys: ["Normal <90th percentile", "Elevated: 90–95th; Stage 1: 95–99th+5mmHg; Stage 2: >99th+5mmHg", "Secondary workup: renal USS, DMSA, renal artery Doppler", "First-line drug: ACEi/ARB (proteinuria) or CCB (no proteinuria)"], scenario: "htn-diagnosis" },
-  { name: "HTN Emergency", tag: "HTN", color: "bg-red-100 text-red-800",
-    emergency: true,
-    summary: "Severe HTN + end-organ damage. MAP reduction ≤25% in first hour is UPPER LIMIT not target.",
-    keys: ["IV access + continuous BP monitoring", "IV labetalol or nicardipine infusion first-line", "MAP reduction: ≤25% in first hour (upper limit — not target!)", "Avoid nifedipine sublingual (unpredictable drop)"], scenario: "htn-emergency" },
+  { name: "Paediatric Hypertension Workup", tag: "HTN", color: "bg-pink-100 text-pink-800", emergency: false,
+    summary: "AAP 2017 classification. Secondary workup algorithm.",
+    keys: ["Stages by age/sex/height percentiles for <13y; fixed thresholds ≥13y", "Secondary (>85% paediatric): renal, renovascular, endocrine", "Workup: USG kidneys, DMSA, renal artery Doppler, plasma metanephrines", "1st line: ACEi/ARB (CKD/proteinuria) or CCB (no proteinuria/CKD)"],
+    scenario: "htn-diagnosis" },
+  { name: "HTN Emergency + PRES", tag: "HTN", color: "bg-red-100 text-red-800", emergency: true,
+    summary: "BP + end-organ damage. MAP ≤25% reduction in first hour. PRES protocol.",
+    keys: ["IV labetalol (preferred) or nicardipine infusion", "Goal: ≤25% MAP reduction in first hour — too fast risks watershed infarction", "PRES: MRI FLAIR posterior changes → BP control + levetiracetam", "Avoid sublingual nifedipine (uncontrolled BP drop)"],
+    scenario: "htn-emergency" },
+  // ── Genetic / Metabolic ──────────────────────────────────────────────────
+  { name: "Genetic Testing Trigger Engine", tag: "Genetic", color: "bg-violet-100 text-violet-800", emergency: false,
+    summary: "SRNS · Alport · CAKUT · Tubulopathies · aHUS. Indication → panel → urgency.",
+    keys: ["SRNS: genetic panel before CNI (NPHS1/2, WT1, PLCE1, COQ genes)", "Alport: COL4A3/4/5 + audiometry + slit-lamp", "Ciliopathies/NPHP: NPHP1 deletion first; ciliopathy panel if negative", "aHUS: complement genetics URGENT (do not delay eculizumab)"],
+    scenario: "genetic-engine" },
+  { name: "Biopsy Trigger Engine", tag: "Diagnostic", color: "bg-amber-100 text-amber-800", emergency: false,
+    summary: "When to biopsy vs observe. Indication by disease pattern.",
+    keys: ["NS: biopsy if age <1y or >12y, atypical, steroid-resistant/dependent", "IgAN/Lupus/C3G: biopsy for classification + guides intensity of IS", "RPGN: urgent biopsy within 24–48h — IF pattern determines treatment", "Alport: EM required (GBM thinning/lamellation); skin biopsy for X-linked"],
+    scenario: "biopsy-engine" },
   // ── Stones & Tubular ─────────────────────────────────────────────────────
-  { name: "Renal Stone Disease", tag: "Urological", color: "bg-yellow-100 text-yellow-800",
-    emergency: false,
-    summary: "24h urine analysis essential. Identify metabolic risk factors.",
-    keys: ["24h urine: Ca, oxalate, citrate, urate, volume", "Hypercalciuria: thiazide diuretics", "Hyperoxaluria: Vit B6, hydration; PH1: lumasiran/liver-Tx", "Cystinuria: D-penicillamine/tiopronin + alkalinisation"], scenario: "renal-stone" },
-  { name: "Nephrocalcinosis / Nephrolithiasis", tag: "Tubular", color: "bg-amber-100 text-amber-800",
-    emergency: false,
-    summary: "Calcium deposits in renal parenchyma. Associated with dRTA, HPT, hypercalcaemia.",
-    keys: ["Medullary (cortical rare) — check Ca, PO4, PTH, Vit D", "dRTA: hypercalciuria + alkaline urine + distal gradient failure", "Primary HPT: elevated PTH + Ca; parathyroidectomy", "Rare: Bartter, FHHNC (CLDN16/CLDN19)"], scenario: "nephrocalcinosis" },
+  { name: "Renal Stone & Nephrocalcinosis", tag: "Urological", color: "bg-yellow-100 text-yellow-800", emergency: false,
+    summary: "24h urine metabolic workup. Identify hypercalciuria, hyperoxaluria, hypocitraturia.",
+    keys: ["24h urine: Ca, oxalate, citrate, urate, cystine, volume", "Hypercalciuria: thiazide + low-Na diet + hydration", "PH1: lumasiran (RNAi) + combined liver-kidney Tx for ESRD; pyridoxine trial", "Nephrocalcinosis: dRTA, HPT, hypercalcaemia, Bartter, FHHNC"],
+    scenario: "nephrocalcinosis" },
 ];
 
-const TAGS = ["All", "GN", "AKI", "CKD", "Electrolyte", "Tubular", "Dialysis", "Transplant", "HTN", "Diagnostic", "Urological"];
+const TAGS = ["All", "GN", "AKI", "CKD", "Electrolyte", "Tubular", "Dialysis", "Transplant", "HTN", "Diagnostic", "Urological", "Genetic"];
 const EMPTY_PATHWAY = { name: "", tag: "GN", color: "bg-blue-100 text-blue-800", emergency: false, summary: "", keys: [""], scenario: "" };
 
 export default function HubNephrologyPathways() {
@@ -187,14 +168,26 @@ export default function HubNephrologyPathways() {
     const p = editModal.pathway;
     if (!p.name.trim()) return;
     if (editModal.mode === "add") {
-      saveCustom([...customPathways, p]);
-    } else if (editModal.isCustom) {
+      saveCustom([...customPathways, { ...p, _isCustom: true }]);
+    } else if (editModal.isCustom && editModal.idx >= 0) {
       const updated = [...customPathways];
       updated[editModal.idx] = p;
       saveCustom(updated);
+    } else if (!editModal.isCustom) {
+      // Store built-in edit override in localStorage
+      const overrides = JSON.parse(localStorage.getItem("builtin_pathway_overrides") || "{}");
+      overrides[p.name] = p;
+      localStorage.setItem("builtin_pathway_overrides", JSON.stringify(overrides));
+      // Force re-render
+      setHiddenBuiltinIndices(h => [...h]); // trigger re-render
     }
     setEditModal(null);
   };
+
+  // Load built-in overrides from localStorage
+  const [builtinOverrides] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem("builtin_pathway_overrides") || "{}"); } catch { return {}; }
+  });
 
   // Tracks built-in pathways hidden by admin
   const [hiddenBuiltinIndices, setHiddenBuiltinIndices] = useState(() => {
@@ -220,7 +213,8 @@ export default function HubNephrologyPathways() {
   };
 
   const allPathways = [
-    ...PATHWAYS.filter(p => !hiddenBuiltinIndices.includes(p.name)),
+    ...PATHWAYS.filter(p => !hiddenBuiltinIndices.includes(p.name))
+      .map(p => builtinOverrides[p.name] ? { ...p, ...builtinOverrides[p.name] } : p),
     ...customPathways.map(p => ({ ...p, _isCustom: true }))
   ];
 
@@ -246,7 +240,7 @@ export default function HubNephrologyPathways() {
             <Stethoscope className="w-5 h-5" />
             <div>
               <h2 className="text-base font-bold">Nephrology Clinical Pathways</h2>
-              <p className="text-blue-100 text-xs">KDIGO · ISPN · IPNA · AAP · ISKDC — {PATHWAYS.length} pathways</p>
+              <p className="text-blue-100 text-xs">KDIGO · ISPN · IPNA · AAP · ISKDC — {allPathways?.length || PATHWAYS.length} pathways + Decision Engines</p>
             </div>
           </div>
           {isAdmin && (
@@ -287,9 +281,10 @@ export default function HubNephrologyPathways() {
             <span className="text-xs font-bold text-red-600 uppercase tracking-wider">Emergency Pathways</span>
           </div>
           <div className="space-y-1.5">
-            {emergencyList.map((pathway, i) => (
-              <PathwayCard key={`e-${i}`} pathway={pathway} idx={`e-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, customPathways.indexOf(pathway), pathway._isCustom)} onDelete={() => handleDelete(pathway, customPathways.indexOf(pathway), pathway._isCustom)} />
-            ))}
+            {emergencyList.map((pathway, i) => {
+              const custIdx = pathway._isCustom ? customPathways.findIndex(p => p.name === pathway.name) : -1;
+              return <PathwayCard key={`e-${i}`} pathway={pathway} idx={`e-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, custIdx, !!pathway._isCustom)} onDelete={() => handleDelete(pathway, custIdx, !!pathway._isCustom)} />;
+            })}
           </div>
         </div>
       )}
@@ -297,12 +292,13 @@ export default function HubNephrologyPathways() {
       {/* Regular pathways */}
       {otherList.length > 0 && (
         <div className="space-y-1.5">
-          {emergencyList.length > 0 && (
+                {emergencyList.length > 0 && (
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">All Pathways</p>
           )}
-          {otherList.map((pathway, i) => (
-            <PathwayCard key={`p-${i}`} pathway={pathway} idx={`p-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, customPathways.indexOf(pathway), pathway._isCustom)} onDelete={() => handleDelete(pathway, customPathways.indexOf(pathway), pathway._isCustom)} />
-          ))}
+          {otherList.map((pathway, i) => {
+            const custIdx = pathway._isCustom ? customPathways.findIndex(p => p.name === pathway.name) : -1;
+            return <PathwayCard key={`p-${i}`} pathway={pathway} idx={`p-${i}`} open={open} setOpen={setOpen} goToPathway={goToPathway} isAdmin={isAdmin} onEdit={() => openEdit(pathway, custIdx, !!pathway._isCustom)} onDelete={() => handleDelete(pathway, custIdx, !!pathway._isCustom)} />;
+          })}
         </div>
       )}
 

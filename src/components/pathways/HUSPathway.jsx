@@ -3,256 +3,139 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Activity, AlertTriangle, CheckCircle, Droplet, Zap, Info, Calculator, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { AlertTriangle, CheckCircle2, ArrowRight, ArrowDown, Calculator, Activity } from "lucide-react";
+import { TMADecisionEngine, EculizumabEngine } from "./DecisionEngines";
+
+const TABS = ["TMA Engine", "STEC-HUS Protocol", "aHUS + PLEX", "Eculizumab Dosing"];
 
 export default function HUSPathway() {
-  const [step, setStep] = useState(1);
-  const [patientData, setPatientData] = useState({
-    hemoglobin: "",
-    schistocytes: false,
-    ldh: "",
-    platelets: "",
-    creatinine: "",
-    hasBloodyDiarrhea: null,
-    diarrheaDuration: "",
-    hasPneumonia: null,
-    ageMonths: ""
-  });
-  const [diagnosis, setDiagnosis] = useState(null);
-  const [managementPlan, setManagementPlan] = useState(null);
-
-  const assessHUS = () => {
-    const hgb = parseFloat(patientData.hemoglobin);
-    const ldh = parseFloat(patientData.ldh);
-    const plt = parseFloat(patientData.platelets);
-
-    const hasMaha = hgb < 10 && (patientData.schistocytes || ldh > 450);
-    const hasThrombocytopenia = plt < 150000;
-    const hasAKI = true;
-
-    if (hasMaha && hasThrombocytopenia && hasAKI) {
-      let husType = "Atypical HUS";
-      let priority = "danger";
-      
-      if (patientData.hasBloodyDiarrhea && patientData.diarrheaDuration <= 21) {
-        husType = "STEC-HUS (Suspected)";
-        priority = "warning";
-      } else if (patientData.hasPneumonia && parseFloat(patientData.ageMonths) < 24) {
-        husType = "Pneumococcal HUS (Suspected)";
-        priority = "danger";
-      }
-
-      setDiagnosis({
-        confirmed: true,
-        type: husType,
-        priority,
-        hasMaha,
-        hasThrombocytopenia,
-        hasAKI
-      });
-
-      generateManagement(husType);
-    } else {
-      const missingCriteria = [];
-      if (!hasMaha) missingCriteria.push("MAHA (Hgb<10, schistocytes ≥2%, LDH>450)");
-      if (!hasThrombocytopenia) missingCriteria.push("Thrombocytopenia (Plt<150,000)");
-      if (!hasAKI) missingCriteria.push("Acute kidney injury");
-      
-      setDiagnosis({
-        confirmed: false,
-        missing: missingCriteria
-      });
-    }
-
-    setStep(2);
-  };
-
-  const generateManagement = (husType) => {
-    if (husType === "STEC-HUS (Suspected)") {
-      setManagementPlan({
-        immediate: [
-          "SUPPORTIVE CARE - No PEX unless severe neuro/cardiac",
-          "Early isotonic fluids from onset of diarrhea to prevent dehydration",
-          "Monitor fluid balance (fluid overload increases mortality in AKI)",
-          "Antibiotics: Ciprofloxacin 10 mg/kg BID OR azithromycin 10 mg/kg OD × 5 days"
-        ],
-        investigations: [
-          "Stool culture + PCR for stx1, stx2, eae genes",
-          "ELISA for Shiga toxin",
-          "Serum IgM to E. coli LPS (if delayed)",
-          "Rule out DIC: PT/aPTT, fibrinogen, D-dimer"
-        ]
-      });
-    } else if (husType === "Atypical HUS") {
-      setManagementPlan({
-        immediate: [
-          "URGENT: PEX within 24h OR eculizumab if available",
-          "Daily PEX 1.5× plasma volume (60-75 mL/kg) until remission",
-          "If eculizumab: Give first dose after vaccination (or with prophylactic antibiotics)",
-          "Manage AKI supportively"
-        ],
-        investigations: [
-          "Before PEX: Anti-FH antibodies, C3, CD46 flow cytometry",
-          "Store: ADAMTS13 (frozen citrated plasma), homocysteine (EDTA -20°C)",
-          "Genetic screening: CFH, CFI, CFB, C3, CD46, THBD, DGKE"
-        ],
-        antiFHprotocol: [
-          "IF ANTI-FH POSITIVE (>150 AU/mL):",
-          "Continue PEX daily × 5-7 days, taper over 4-6 weeks",
-          "START: Prednisolone 1 mg/kg/day × 1mo → alternate days",
-          "PLUS: IV Cyclophosphamide 500 mg/m² q3-4wk × 3-5 doses",
-          "Monitor titers: Target <1000 AU/mL"
-        ]
-      });
-    }
-  };
+  const [tab, setTab] = useState(0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Alert className="bg-red-50 border-red-300 border-2">
         <AlertTriangle className="w-5 h-5 text-red-600" />
-        <AlertDescription className="text-red-900">
-          <strong>MEDICAL EMERGENCY:</strong> HUS is life-threatening. Urgent evaluation required within 24 hours.
+        <AlertDescription className="text-red-900 text-xs">
+          <strong>MEDICAL EMERGENCY:</strong> TMA (HUS/TTP/aHUS) is life-threatening. Differentiate STEC-HUS from aHUS before treatment. Do NOT use eculizumab for STEC-HUS or TTP.
         </AlertDescription>
       </Alert>
 
-      {step === 1 ? (
-        <Card>
-          <CardHeader className="bg-slate-50 border-b">
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="w-6 h-6 text-red-600" />
-              HUS Diagnostic Criteria Assessment
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label>Hemoglobin (g/dL) *</Label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  value={patientData.hemoglobin}
-                  onChange={(e) => setPatientData({...patientData, hemoglobin: e.target.value})}
-                />
-              </div>
+      <div className="flex flex-wrap gap-1.5">
+        {TABS.map((t, i) => (
+          <button key={i} onClick={() => setTab(i)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${tab === i ? "bg-red-700 text-white border-red-700" : "bg-white border-slate-200 text-slate-600 hover:border-red-300"}`}>
+            {t}
+          </button>
+        ))}
+      </div>
 
-              <div>
-                <Label>LDH (IU/L)</Label>
-                <Input
-                  type="number"
-                  value={patientData.ldh}
-                  onChange={(e) => setPatientData({...patientData, ldh: e.target.value})}
-                />
-              </div>
+      {tab === 0 && <TMADecisionEngine />}
 
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={patientData.schistocytes}
-                    onCheckedChange={(checked) => setPatientData({...patientData, schistocytes: checked})}
-                    id="schistocytes"
-                  />
-                  <Label htmlFor="schistocytes" className="cursor-pointer">
-                    Schistocytes ≥2% on peripheral smear
-                  </Label>
-                </div>
-              </div>
-
-              <div>
-                <Label>Platelets (/μL) *</Label>
-                <Input
-                  type="number"
-                  value={patientData.platelets}
-                  onChange={(e) => setPatientData({...patientData, platelets: e.target.value})}
-                />
-              </div>
-
-              <div>
-                <Label>Creatinine (mg/dL) *</Label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  value={patientData.creatinine}
-                  onChange={(e) => setPatientData({...patientData, creatinine: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <Card className="bg-blue-50 border-blue-200">
-              <CardHeader>
-                <CardTitle className="text-base">Clinical History</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <Label>Bloody diarrhea in past 3 weeks?</Label>
-                  <div className="flex gap-3 mt-2">
-                    <Button
-                      variant={patientData.hasBloodyDiarrhea === true ? "default" : "outline"}
-                      onClick={() => setPatientData({...patientData, hasBloodyDiarrhea: true})}
-                    >
-                      Yes
-                    </Button>
-                    <Button
-                      variant={patientData.hasBloodyDiarrhea === false ? "default" : "outline"}
-                      onClick={() => setPatientData({...patientData, hasBloodyDiarrhea: false})}
-                    >
-                      No
-                    </Button>
-                  </div>
-                </div>
-
-                {patientData.hasBloodyDiarrhea && (
-                  <Input
-                    type="number"
-                    value={patientData.diarrheaDuration}
-                    onChange={(e) => setPatientData({...patientData, diarrheaDuration: e.target.value})}
-                    placeholder="Days since onset"
-                  />
-                )}
+      {tab === 1 && (
+        <div className="space-y-3">
+          <div className="rounded-xl bg-gradient-to-r from-orange-700 to-red-700 p-4 text-white">
+            <h3 className="text-sm font-bold">STEC-HUS Management Protocol</h3>
+            <p className="text-xs text-orange-100">Shiga-toxin E. coli O157:H7 · KDIGO 2022 · ISPN</p>
+          </div>
+          {[
+            { title: "Immediate Assessment", color: "bg-blue-50 border-blue-200", items: [
+              "Confirm TMA triad: MAHA (Hb <10 + schistocytes ≥2%) + thrombocytopenia (Plt <150k) + AKI",
+              "Stool culture + PCR (stx1/stx2/eae) + Shiga-toxin ELISA",
+              "Peripheral smear URGENTLY — report schistocyte %",
+              "ADAMTS13 activity (store frozen citrated plasma before any PEX)",
+              "Anti-CFH antibodies — crucial to distinguish aHUS",
+              "FBC, LDH, haptoglobin (undetectable = MAHA), renal panel, urinalysis"
+            ]},
+            { title: "Key DO NOTs", color: "bg-red-50 border-red-200", items: [
+              "NO antibiotics — increases Shiga-toxin release by lysing bacteria → worsens HUS",
+              "NO anti-motility agents (loperamide, opioids) — prolong toxin exposure",
+              "NO plasma exchange for STEC-HUS (does not help, may worsen)",
+              "NO eculizumab for STEC-HUS (not beneficial per ECUSTEC trial)",
+              "NO NSAIDs — nephrotoxic in AKI"
+            ]},
+            { title: "Supportive Management", color: "bg-green-50 border-green-200", items: [
+              "IV fluids: early isotonic normal saline from prodromal diarrhoea onset — prevents severe AKI",
+              "Strict fluid balance — avoid fluid overload (worsens cerebral oedema + pulmonary oedema in AKI)",
+              "Transfuse pRBC if Hb <7 g/dL (aim 8–9 g/dL — avoid >10 in AKI)",
+              "Platelet transfusion ONLY if active bleeding or pre-procedure — avoid otherwise (worsens TMA)",
+              "Antihypertensives: amlodipine or labetalol for severe HTN",
+              "Dialysis: initiate early per KDIGO AKI criteria (AEIOU criteria)"
+            ]},
+            { title: "Neurological HUS (severe)", color: "bg-purple-50 border-purple-200", items: [
+              "Seizures/encephalopathy in 20–50% STEC-HUS — high-risk marker",
+              "MRI brain: basal ganglia + white matter lesions (PRES, direct toxin effect)",
+              "Eculizumab: CONSIDER in neurological STEC-HUS with deterioration (NOT routine) — case-by-case decision with specialist",
+              "Maintain MAP to prevent cerebral hypoperfusion",
+              "Levetiracetam for seizures (avoid enzyme-inducing AEDs)"
+            ]},
+          ].map((s, i) => (
+            <Card key={i} className={`border-2 ${s.color}`}>
+              <CardHeader className="pb-2 pt-3 px-3"><CardTitle className="text-xs font-bold">{s.title}</CardTitle></CardHeader>
+              <CardContent className="px-3 pb-3">
+                <ul className="space-y-1">{s.items.map((item, j) => (
+                  <li key={j} className="flex items-start gap-2 text-xs text-slate-800">
+                    <ArrowRight className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" />{item}
+                  </li>
+                ))}</ul>
               </CardContent>
             </Card>
-
-            <Button
-              onClick={assessHUS}
-              disabled={!patientData.hemoglobin || !patientData.platelets || !patientData.creatinine}
-              className="w-full bg-red-600 hover:bg-red-700 py-6"
-            >
-              <Calculator className="w-5 h-5 mr-2" />
-              Assess & Generate Management
-            </Button>
-          </CardContent>
-        </Card>
-      ) : diagnosis && managementPlan && (
-        <div className="space-y-6">
-          <Card className="border-2 border-red-400 bg-red-50">
-            <CardHeader className="bg-red-100">
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-                HUS CONFIRMED: {diagnosis.type}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader className="bg-purple-50">
-              <CardTitle>Immediate Management</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {managementPlan.immediate.map((action, idx) => (
-                <div key={idx} className="flex gap-3 mb-3">
-                  <Badge className="bg-purple-600 text-white">{idx + 1}</Badge>
-                  <p>{action}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          ))}
         </div>
       )}
+
+      {tab === 2 && (
+        <div className="space-y-3">
+          <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">
+            <h3 className="text-sm font-bold">aHUS — Complement-Mediated TMA</h3>
+            <p className="text-xs text-red-100">Non-diarrhoeal TMA · Genetic complement dysregulation · Eculizumab life-saving</p>
+          </div>
+          {[
+            { title: "Diagnostic Criteria for aHUS", color: "bg-blue-50 border-blue-200", items: [
+              "TMA CONFIRMED (MAHA + thrombocytopenia + organ injury)",
+              "STEC-HUS excluded: stool Shiga-toxin NEGATIVE (stool PCR + culture)",
+              "TTP excluded: ADAMTS13 activity >10%",
+              "No secondary cause (SLE, drugs, HSCT, HIV, malignancy)",
+              "Complement markers: low C3, normal C4, low Factor H level, anti-CFH Ab"
+            ]},
+            { title: "Pre-Treatment Checklist", color: "bg-amber-50 border-amber-200", items: [
+              "MenACWY + MenB vaccines BEFORE eculizumab (or co-prescribe penicillin V 250mg BD prophylaxis if urgent)",
+              "Store 10 mL frozen EDTA plasma BEFORE any PEX or eculizumab",
+              "Genetic panel: CFH, CFI, MCP/CD46, C3, CFB, THBD, CFHR1/3 (send to AIIMS/Medgenome)",
+              "Anti-CFH antibody titre (ELISA) — if >150 AU/mL: anti-CFH–mediated aHUS protocol",
+              "Baseline: C3, C4, CH50, AH50, Factor H, Factor I, sC5b-9"
+            ]},
+            { title: "Plasma Exchange Protocol (Bridge to Eculizumab)", color: "bg-slate-50 border-slate-200", items: [
+              "Initiate PEX if eculizumab unavailable — NOT definitive treatment",
+              "Volume: 1–1.5× plasma volume (40–60 mL/kg); replacement with FFP",
+              "Daily × 5 sessions, then every 48h × 2 weeks, then 3× weekly",
+              "Central access: large-bore CVC or Permcath required",
+              "Monitor: platelets, LDH, haptoglobin, creatinine after each session",
+              "Transition to eculizumab as soon as available — continue PEX until therapeutic eculizumab levels"
+            ]},
+            { title: "Anti-CFH Antibody–Mediated aHUS (Special Protocol)", color: "bg-purple-50 border-purple-200", items: [
+              "Anti-CFH Ab titre >150 AU/mL: aggressive immune suppression + PEX",
+              "PEX daily × 5–7 days to remove Ab; taper over 4–6 weeks",
+              "Prednisolone 1–2 mg/kg/day × 1 month → alternate day taper",
+              "IV Cyclophosphamide 500 mg/m² q3-4w × 3–5 doses (or Rituximab 375 mg/m² × 2 doses)",
+              "Monitor Ab titres: target <150 AU/mL; may taper eculizumab if sustained clearance",
+              "India: anti-CFH Ab test at AIIMS-New Delhi, PGIMER Chandigarh"
+            ]},
+          ].map((s, i) => (
+            <Card key={i} className={`border-2 ${s.color}`}>
+              <CardHeader className="pb-2 pt-3 px-3"><CardTitle className="text-xs font-bold">{s.title}</CardTitle></CardHeader>
+              <CardContent className="px-3 pb-3">
+                <ul className="space-y-1">{s.items.map((item, j) => (
+                  <li key={j} className="flex items-start gap-2 text-xs text-slate-800">
+                    <CheckCircle2 className="w-3 h-3 text-green-600 flex-shrink-0 mt-0.5" />{item}
+                  </li>
+                ))}</ul>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {tab === 3 && <EculizumabEngine />}
     </div>
   );
 }

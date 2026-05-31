@@ -55,7 +55,11 @@ import MetabolicGeneticPathways from "./MetabolicGeneticPathways";
 import TubularDisorderPathways from "./TubularDisorderPathways";
 import HypertensionPathways from "./HypertensionPathways";
 import NephrocalcinosisNephrolithiasisPathway from "./NephrocalcinosisNephrolithiasisPathway";
-
+import {
+  TMADecisionEngine, HematuriaEngine, GeneticTestingEngine, CKDProgressionEngine,
+  BiopsyTriggerEngine, EculizumabEngine, HypokalemiaEngine, MetabolicAcidosisEngine,
+  PolyuriaEngine, HyperkalemiaEngine
+} from "./DecisionEngines";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -71,6 +75,9 @@ const HANDLED_IDS = new Set([
   "cystinosis","fabry","primary-hyperoxaluria","arpkd-adpkd","nephronophthisis",
   "genetic-nephrotic","distal-rta","proximal-rta","bartter","gitelman","ndi",
   "bp-classification","htn-pres","secondary-htn","neonatal-htn","nephrocalcinosis",
+  "tma-engine","hematuria-engine","genetic-engine","ckd-progression-engine",
+  "biopsy-engine","eculizumab-engine","hypokalemia-engine","metabolic-acidosis-engine",
+  "polyuria-engine","hyperkalemia-engine","c3g-engine","rpgn-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -142,6 +149,66 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "htn-pres") return <HypertensionPathways condition="htn_emergency" />;
   if (id === "secondary-htn") return <HypertensionPathways condition="secondary_htn" />;
   if (id === "neonatal-htn") return <HypertensionPathways condition="neonatal_htn" />;
+  // Shared Decision Engines
+  if (id === "tma-engine") return <TMADecisionEngine />;
+  if (id === "hematuria-engine") return <HematuriaEngine />;
+  if (id === "genetic-engine") return <GeneticTestingEngine />;
+  if (id === "ckd-progression-engine") return <CKDProgressionEngine />;
+  if (id === "biopsy-engine") return <BiopsyTriggerEngine />;
+  if (id === "eculizumab-engine") return <EculizumabEngine />;
+  if (id === "hypokalemia-engine") return <HypokalemiaEngine />;
+  if (id === "metabolic-acidosis-engine") return <MetabolicAcidosisEngine />;
+  if (id === "polyuria-engine") return <PolyuriaEngine />;
+  if (id === "hyperkalemia-engine") return <HyperkalemiaEngine />;
+  if (id === "c3g-engine") return (
+    <div className="space-y-4">
+      <div className="rounded-xl bg-gradient-to-r from-cyan-700 to-teal-700 p-4 text-white">
+        <h3 className="text-sm font-bold">C3 Glomerulopathy (C3GN / DDD / Immune-complex MPGN)</h3>
+        <p className="text-xs text-cyan-100">Complement alternative pathway · KDIGO · ERKNet 2023</p>
+      </div>
+      {[
+        { title: "Algorithm: Low C3 → C3G Diagnosis", color: "bg-blue-50 border-blue-200", items: [
+          "Persistent low C3 (>8 weeks) + normal C4 → alternative pathway activation",
+          "Renal biopsy with IF: C3 dominant (>2 orders of magnitude above any Ig) = C3G",
+          "EM: DDD (Dense Deposit Disease) — intramembranous osmiophilic deposits",
+          "EM: C3GN — mesangial/subendothelial/subepithelial deposits",
+          "Exclude: PSGN (C3 normalises in 6–8 weeks), infection-related GN",
+        ]},
+        { title: "Complement Panel + Genetic Testing", color: "bg-violet-50 border-violet-200", items: [
+          "C3, C4, CH50 (AP), AH50 (AP) — AP dysregulation pattern",
+          "Factor H level + anti-CFH Ab (ELISA) — CFH autoantibody-mediated C3G",
+          "Genetic panel: CFH, CFI, MCP/CD46, C3, CFB, CFHR1/2/3/5, THBD",
+          "C3 nephritic factor (C3 NeF) — stabilises C3bBb convertase → persistent AP activation",
+          "Store serum pre-treatment for future WES/complement proteomics",
+        ]},
+        { title: "Treatment", color: "bg-green-50 border-green-200", items: [
+          "RAAS blockade (ACEi/ARB): all patients with proteinuria >500 mg/day",
+          "MMF (mycophenolate mofetil) 600 mg/m²/dose BD: for progressive C3G (declining eGFR + active sediment)",
+          "Low-dose prednisolone: adjunct to MMF for moderate-severe disease",
+          "Eculizumab: consider for CFH/C3 mutation-positive with rapid progression or refractory disease",
+          "Avacopan (C5a receptor blocker): investigational — early trial data",
+          "Plasmapheresis: for anti-CFH Ab–mediated C3G + autoantibody titre >150",
+        ]},
+        { title: "Monitoring", color: "bg-amber-50 border-amber-200", items: [
+          "eGFR + UPCR every 3 months", "C3 every 3–6 months (normalisation = disease control)",
+          "Anti-CFH Ab titre if autoantibody-mediated (every 3 months on treatment)",
+          "Repeat biopsy at 2 years if initial biopsy or if rapid decline",
+          "Transplant: high recurrence rate (50–70% in C3G) — discuss with family pre-transplant",
+        ]},
+      ].map((s, i) => (
+        <div key={i} className={`rounded-xl border-2 p-3 ${s.color}`}>
+          <p className="text-xs font-bold text-slate-800 mb-2">{s.title}</p>
+          {s.items.map((item, j) => (
+            <div key={j} className="flex items-start gap-1.5 text-xs text-slate-800 mb-1">
+              <span className="text-blue-500 font-bold flex-shrink-0">→</span>{item}
+            </div>
+          ))}
+        </div>
+      ))}
+      <BiopsyTriggerEngine />
+    </div>
+  );
+
   // IgA Nephropathy is handled inline in ClinicalSupport (MEST-C widget)
   if (id === "iga-nephropathy") return null; // signal to parent to use its own renderer
 
