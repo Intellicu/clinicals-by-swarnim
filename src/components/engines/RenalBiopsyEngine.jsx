@@ -7,7 +7,8 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight, Microscope, ExternalLink, Link } from "lucide-react";
+import { ArrowLeft, ChevronRight, Microscope, ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CONDITIONS = [
   { id: "SSNS_SRNS", label: "Minimal Change Disease / FSGS", badge: "bg-blue-600", tags: ["nephrotic", "SSNS", "SRNS", "FSGS", "MCD"] },
@@ -175,6 +176,7 @@ export default function RenalBiopsyEngine() {
   const [selected, setSelected] = useState(null);
   const [tab, setTab] = useState("lm");
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   const filtered = CONDITIONS.filter(c =>
     !search || c.label.toLowerCase().includes(search.toLowerCase()) ||
@@ -234,12 +236,13 @@ export default function RenalBiopsyEngine() {
         </CardContent></Card>
 
         {/* AI Analyser Link */}
-        <a href={data.analyserLink}
-          className="flex items-center gap-2 p-3 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-slate-700 transition-colors">
+        <button
+          onClick={() => navigate("/ImagingViewer")}
+          className="flex items-center gap-2 p-3 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-slate-700 transition-colors w-full text-left">
           <Microscope className="w-4 h-4 flex-shrink-0" />
           <span>Open AI Biopsy Analyser — analyse biopsy images with AI</span>
           <ExternalLink className="w-3.5 h-3.5 ml-auto flex-shrink-0" />
-        </a>
+        </button>
 
         <Button variant="outline" className="w-full" onClick={() => { setSelected(null); setTab("lm"); }}><ArrowLeft className="w-4 h-4 mr-2" />Back to All Conditions</Button>
       </div>
@@ -282,12 +285,13 @@ export default function RenalBiopsyEngine() {
         ))}
       </div>
 
-      <a href="/imaging-viewer"
-        className="flex items-center gap-2 p-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors">
+      <button
+        onClick={() => navigate("/ImagingViewer")}
+        className="flex items-center gap-2 p-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors w-full text-left">
         <Microscope className="w-4 h-4" />
         <span>Open AI Biopsy Analyser — upload biopsy images for AI analysis</span>
         <ExternalLink className="w-3.5 h-3.5 ml-auto" />
-      </a>
+      </button>
     </div>
   );
 }

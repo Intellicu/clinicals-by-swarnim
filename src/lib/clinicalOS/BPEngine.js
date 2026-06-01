@@ -60,6 +60,8 @@ function estimatePercentile(value, p50, p90, p95, p99) {
 /**
  * Classify BP stage from a combined percentile (AAP 2017)
  * Based on the HIGHER of SBP or DBP percentile
+ * AAP 2017: Stage 2 = ≥95th+12 mmHg (percentile ≥99th by approximation) OR ≥140/90
+ * Stage 1 = 95th–<95th+12, Elevated = 90th–<95th or ≥120/<80, Normal = <90th
  */
 function classifyFromPercentile(pct) {
   if (pct >= 99) return "Stage 2 HTN";
@@ -128,26 +130,32 @@ export function calculateBPPercentile({ age_years, sex, systolic, diastolic, hei
   const diaPercentile = Math.min(99, Math.max(1, estimatePercentile(diastolic, adjP50d, adjP90d, adjP95d, adjP99d)));
 
   // Classify each component separately
-  const sysStage = classifyFromPercentile(sysPercentile);
-  const diaStage = classifyFromPercentile(diaPercentile);
+  let sysStage = classifyFromPercentile(sysPercentile);
+  let diaStage = classifyFromPercentile(diaPercentile);
 
-  // AAP operational logic: overall stage = HIGHER of SBP or DBP percentile
+  // AAP 2017 special rule for <13y: SBP ≥120 or DBP ≥80 = at minimum "Elevated BP"
+  // even if below the 90th percentile (accounts for early adolescents with low percentile thresholds)
+  const stageRankMap = { "Normal": 0, "Elevated BP": 1, "Stage 1 HTN": 2, "Stage 2 HTN": 3 };
+  if (systolic >= 120 && stageRankMap[sysStage] < stageRankMap["Elevated BP"]) sysStage = "Elevated BP";
+  if (diastolic >= 80 && stageRankMap[diaStage] < stageRankMap["Stage 1 HTN"]) diaStage = "Stage 1 HTN";
+
+  // AAP operational logic: overall stage = HIGHER of SBP or DBP stage
   const dominantPct = Math.max(sysPercentile, diaPercentile);
-  const dominantComponent = sysPercentile >= diaPercentile ? "systolic" : "diastolic";
-  const combinedStage = classifyFromPercentile(dominantPct);
+  // Combined stage = higher of the two individual stages (accounts for absolute thresholds)
+  const combinedStage = stageRankMap[sysStage] >= stageRankMap[diaStage] ? sysStage : diaStage;
 
   return {
     // Separate percentiles
     systolic_percentile: sysPercentile,
     diastolic_percentile: diaPercentile,
     dominant_percentile: dominantPct,
-    dominant_component: dominantComponent,
+    dominant_component: stageRankMap[sysStage] >= stageRankMap[diaStage] ? "systolic" : "diastolic",
 
     // Separate classifications
     systolic_stage: sysStage,
     diastolic_stage: diaStage,
 
-    // Overall classification (AAP: based on higher percentile)
+    // Overall classification (AAP 2017: higher of SBP or DBP stage)
     classification: combinedStage,
     stage: combinedStage,
 
@@ -162,8 +170,8 @@ export function calculateBPPercentile({ age_years, sex, systolic, diastolic, hei
     // Clinical outputs
     management_recommendation: getManagementRecommendation(combinedStage, { age, systolic, diastolic }),
     source: "AAP Clinical Practice Guideline 2017 (Pediatrics 140:e20171904)",
-    note: `Height percentile (${height_percentile}th) adjusted. Classification based on higher of SBP (${sysPercentile}th %ile) vs DBP (${diaPercentile}th %ile). Confirm with full AAP tables.`,
-    aap_operational_note: "AAP 2017: overall BP category determined by the higher of the two percentiles (SBP or DBP). Both are reported separately.",
+    note: `Height percentile (${height_percentile}th) adjusted. Classification based on higher of SBP (${sysPercentile}th %ile, ${sysStage}) vs DBP (${diaPercentile}th %ile, ${diaStage}). ≥120 SBP or ≥80 DBP = at minimum Elevated BP per AAP 2017. Confirm with full AAP tables.`,
+    aap_operational_note: `AAP 2017 (<13y): Normal <90th %ile; Elevated = 90th–<95th or SBP≥120/DBP≥80; Stage 1 = 95th–<99th; Stage 2 = ≥99th or ≥95th+12 mmHg. Overall stage = higher of SBP or DBP stage.`,
 
     guideline_context: {
       primary: "AAP 2017",
