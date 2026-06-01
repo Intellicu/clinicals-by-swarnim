@@ -89,6 +89,8 @@ import AcidBaseHubEngine from "../engines/AcidBaseHubEngine";
 import NeurogenicBladderEngine from "../engines/NeurogenicBladderEngine";
 import BladderDiaryEngine from "../engines/BladderDiaryEngine";
 import RenalBiopsyEngine from "../engines/RenalBiopsyEngine";
+import PediatricDietEngine from "../engines/PediatricDietEngine";
+import RheumatologyEngine from "../engines/RheumatologyEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -116,6 +118,7 @@ const HANDLED_IDS = new Set([
   "rrt-engine","ckd-engine","polyuria-full-engine",
   "electrolytes-hub","acid-base-hub","neurogenic-bladder-engine",
   "bladder-diary-engine","renal-biopsy-engine",
+  "diet-engine","rheumatology-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -231,6 +234,8 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "neurogenic-bladder-engine") return <NeurogenicBladderEngine />;
   if (id === "bladder-diary-engine") return <BladderDiaryEngine />;
   if (id === "renal-biopsy-engine") return <RenalBiopsyEngine />;
+  if (id === "diet-engine") return <PediatricDietEngine />;
+  if (id === "rheumatology-engine") return <RheumatologyEngine />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

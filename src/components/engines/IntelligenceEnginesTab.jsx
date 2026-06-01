@@ -66,6 +66,12 @@ const ENGINES = [
 
   // ── Biopsy ──
   { label: "Renal Biopsy Engine", desc: "LM · IF · EM · Patterns for MCD/FSGS · IgAN · LN · MN · ANCA · Alport · C3G — linked to AI Analyser", scenario: "renal-biopsy-engine", tags: ["biopsy", "histology", "LM", "IF", "EM", "FSGS", "IgA", "lupus", "ANCA", "anti-GBM", "Alport", "C3G", "membranous", "PSGN"], group: "Glomerular Disease" },
+
+  // ── Nutrition ──
+  { label: "Renal Diet Engine", desc: "CKD · NS · Stones · Nephrocalcinosis · HD · PD · Transplant · Hyperoxaluria — what to eat, what to avoid", scenario: "diet-engine", tags: ["diet", "nutrition", "CKD diet", "renal diet", "potassium", "phosphorus", "oxalate", "nephrotic diet", "stone diet", "HD diet", "PD diet", "transplant diet"], group: "Nutrition & Diet" },
+
+  // ── Rheumatology ──
+  { label: "Rheumatology Engine", desc: "JIA · SLE/LN · ANCA Vasculitis · HSP · Periodic Fevers · JDM · KD · MAS — diagnosis + management", scenario: "rheumatology-engine", tags: ["JIA", "SLE", "lupus", "vasculitis", "ANCA", "GPA", "MPA", "HSP", "IgA vasculitis", "periodic fever", "FMF", "CAPS", "JDM", "Kawasaki", "MAS", "HLH", "arthritis", "rheumatology"], group: "Rheumatology" },
 ];
 
 const GROUP_STYLE = {
@@ -76,6 +82,8 @@ const GROUP_STYLE = {
   "Tubular & Metabolic": "bg-amber-50 border-amber-200 text-amber-900",
   "Hypertension": "bg-rose-50 border-rose-200 text-rose-900",
   "RRT & Dialysis": "bg-indigo-50 border-indigo-200 text-indigo-900",
+  "Nutrition & Diet": "bg-green-50 border-green-200 text-green-900",
+  "Rheumatology": "bg-violet-50 border-violet-200 text-violet-900",
 };
 
 const GROUP_BADGE = {
@@ -86,6 +94,8 @@ const GROUP_BADGE = {
   "Tubular & Metabolic": "bg-amber-600",
   "Hypertension": "bg-rose-600",
   "RRT & Dialysis": "bg-indigo-600",
+  "Nutrition & Diet": "bg-green-600",
+  "Rheumatology": "bg-violet-700",
 };
 
 const GROUPS = [...new Set(ENGINES.map(e => e.group))];
@@ -112,6 +122,8 @@ const ENGINE_GUIDELINE_KEYS = {
   "neurogenic-bladder-engine": ["Neurogenic", "Bladder", "CIC", "Spina Bifida"],
   "bladder-diary-engine": ["Voiding", "Bladder", "Uroflow", "Urodynamics"],
   "renal-biopsy-engine": ["Glomerulonephritis", "FSGS", "IgA Nephropathy", "Lupus Nephritis", "Biopsy"],
+  "diet-engine": ["CKD", "Nutrition", "Nephrotic Syndrome", "Stone", "Dialysis", "Transplant"],
+  "rheumatology-engine": ["SLE", "Lupus", "Vasculitis", "JIA", "Arthritis", "HSP", "ANCA", "Kawasaki"],
   "electrolytes-hub": ["Electrolyte", "Potassium", "Sodium", "Calcium"],
   "acid-base-hub": ["Acid-Base", "Metabolic Acidosis", "Alkalosis", "ABG"],
   "hyperoxaluria-engine": ["Hyperoxaluria", "Primary Hyperoxaluria"],
