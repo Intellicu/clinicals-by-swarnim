@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ArrowLeft, ChevronRight, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Reference: Yap HK (2008) Comprehensive Pediatric Nephrology; Hoppe B et al. Pediatr Nephrol
+// References: KDIGO · Pediatr Nephrol consensus · IPNA · Hoppe B et al. Pediatr Nephrol · ESPGHAN
 
 const STEPS = {
   START: "start",
@@ -371,13 +371,13 @@ export default function NephrocalcinosisStoneEngine() {
           <Gem className="w-5 h-5" />
           <div>
             <h3 className="font-bold text-sm">Nephrocalcinosis & Urolithiasis Engine</h3>
-            <p className="text-xs text-amber-200">Yap HK (2008) · Hoppe B Pediatr Nephrol · KDIGO</p>
+            <p className="text-xs text-amber-200">KDIGO · IPNA · Hoppe et al. Pediatr Nephrol · ESPGHAN</p>
           </div>
         </div>
       </div>
       {history.length > 0 && <Badge variant="outline" className="text-xs">Step {history.length + 1}</Badge>}
       <Card><CardContent className="p-4">{renderStep()}</CardContent></Card>
-      <div className="text-xs text-slate-400 text-center">Ref: Yap HK Comprehensive Pediatric Nephrology 2008 · Hoppe B Pediatr Nephrol · KDIGO</div>
+      <div className="text-xs text-slate-400 text-center">KDIGO · Hoppe et al. Pediatr Nephrol · IPNA · ESPGHAN</div>
     </div>
   );
 }

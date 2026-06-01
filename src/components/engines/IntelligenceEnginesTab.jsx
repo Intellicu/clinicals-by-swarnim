@@ -25,6 +25,7 @@ const ENGINES = [
   { label: "Eculizumab", desc: "Eligibility + dosing", scenario: "eculizumab-engine", tags: ["eculizumab", "aHUS", "complement", "eligibility"], group: "Glomerular Disease" },
 
   // ── CKD & Genetics ──
+  { label: "CKD Engine", desc: "Classify · Etiology · Treatment · MBD · Anaemia · Monitoring · ESRD prep", scenario: "ckd-engine", tags: ["CKD", "chronic kidney disease", "staging", "eGFR", "albuminuria", "MBD", "anaemia", "ESRD"], group: "CKD & Genetics" },
   { label: "CKD Progression", desc: "Risk stratification", scenario: "ckd-progression-engine", tags: ["CKD", "progression", "eGFR", "fibrosis", "risk"], group: "CKD & Genetics" },
   { label: "Genetic Engine", desc: "When to test + which panel", scenario: "genetic-engine", tags: ["genetics", "gene panel", "WES", "SRNS", "Alport", "COL4"], group: "CKD & Genetics" },
   { label: "Alport/HNF1B", desc: "COL4 + most missed diagnosis", scenario: "alport-hnf1b-engine", tags: ["Alport", "HNF1B", "hereditary", "COL4A5", "deafness"], group: "CKD & Genetics" },
@@ -44,6 +45,12 @@ const ENGINES = [
   { label: "Stone Engine", desc: "Renal stones full workup", scenario: "stone-engine", tags: ["stones", "urolithiasis", "calcium oxalate", "cystinuria", "uric acid"], group: "Tubular & Metabolic" },
   { label: "Nephrocalcinosis", desc: "Grading + metabolic workup + management", scenario: "nephrocalcinosis-stone-engine", tags: ["nephrocalcinosis", "stones", "hypercalciuria", "oxaluria", "dRTA", "Bartter", "cystinuria"], group: "Tubular & Metabolic" },
 
+  // ── RRT ──
+  { label: "RRT Engine", desc: "Indications · PD/HD/CRRT/SLED prescriptions · Access · Monitoring", scenario: "rrt-engine", tags: ["RRT", "dialysis", "CRRT", "peritoneal dialysis", "haemodialysis", "SLED", "access", "catheter"], group: "RRT & Dialysis" },
+
+  // ── Polyuria ──
+  { label: "Polyuria Engine", desc: "Water deprivation → Central DI vs Nephrogenic DI", scenario: "polyuria-full-engine", tags: ["polyuria", "diabetes insipidus", "NDI", "central DI", "DDAVP", "polydipsia"], group: "Emergency & Electrolytes" },
+
   // ── Hypertension ──
   { label: "HTN Engine", desc: "AAP 2017 + secondary workup", scenario: "htn-engine", tags: ["hypertension", "BP", "AAP 2017", "secondary HTN", "stage 2"], group: "Hypertension" },
 ];
@@ -57,6 +64,7 @@ const GROUP_STYLE = {
   "CAKUT & Urology": "bg-teal-50 border-teal-200 text-teal-900",
   "Tubular & Metabolic": "bg-amber-50 border-amber-200 text-amber-900",
   "Hypertension": "bg-rose-50 border-rose-200 text-rose-900",
+  "RRT & Dialysis": "bg-indigo-50 border-indigo-200 text-indigo-900",
 };
 
 const GROUP_BADGE = {
@@ -66,6 +74,7 @@ const GROUP_BADGE = {
   "CAKUT & Urology": "bg-teal-600",
   "Tubular & Metabolic": "bg-amber-600",
   "Hypertension": "bg-rose-600",
+  "RRT & Dialysis": "bg-indigo-600",
 };
 
 // Keyword → guideline title fragments for matching from DB
@@ -76,6 +85,9 @@ const ENGINE_GUIDELINE_KEYS = {
   "hyponatremia-engine": ["Hyponatremia", "Hyponatraemia", "Sodium"],
   "hematuria-engine": ["Hematuria", "Haematuria"],
   "htn-engine": ["Hypertension", "AAP 2017", "Blood Pressure"],
+  "ckd-engine": ["CKD", "Chronic Kidney Disease", "KDIGO CKD", "MBD", "Anaemia"],
+  "rrt-engine": ["Dialysis", "Peritoneal Dialysis", "Haemodialysis", "CRRT", "RRT", "KDIGO AKI"],
+  "polyuria-full-engine": ["Polyuria", "Diabetes Insipidus", "NDI"],
   "gn-engine": ["Glomerulonephritis", "IgA Nephropathy", "Lupus Nephritis", "FSGS", "PSGN", "Membranous"],
   "proteinuria-engine": ["Proteinuria", "Nephrotic"],
   "nephrocalcinosis-stone-engine": ["Nephrocalcinosis", "Stone", "Urolithiasis", "Hypercalciuria"],

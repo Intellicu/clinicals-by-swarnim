@@ -16,22 +16,33 @@ const SYMPTOMS = [
   { id: "family_htn", label: "Family history of hypertension" },
 ];
 
-function calcBpCategory(sbp, age, sex, heightPct) {
+// AAP 2017 BP classification:
+// ≥13y: fixed thresholds (Stage 2 ≥140/90; Stage 1 130–139/80–89; Elevated 120–129/<80; Normal <120/80)
+// <13y: percentile-based (Stage 2 ≥99th+12; Stage 1 ≥95th; Elevated ≥90th to <95th; Normal <90th)
+// IMPORTANT: <13y requires AAP normative tables (height/age/sex-specific). The values below are
+// population-averaged approximations only — confirm with full AAP 2017 tables for individual patients.
+// AAP 2017 approximate 90th/95th percentile SBP by age (average height, male):
+const AAP_95TH = { 1:100, 2:101, 3:103, 4:104, 5:106, 6:108, 7:110, 8:111, 9:113, 10:115, 11:117, 12:119 };
+const AAP_90TH = { 1:98, 2:99, 3:101, 4:102, 5:104, 6:106, 7:108, 8:109, 9:111, 10:113, 11:115, 12:117 };
+
+function calcBpCategory(sbp, age) {
   if (!sbp || !age) return null;
+  const s = parseInt(sbp);
   const a = parseInt(age);
+  // ≥13y — fixed AAP 2017 thresholds
   if (a >= 13) {
-    if (sbp >= 180) return { cat: "Stage 2 HTN", color: "bg-red-700" };
-    if (sbp >= 140) return { cat: "Stage 1 HTN", color: "bg-orange-600" };
-    if (sbp >= 130) return { cat: "Elevated BP", color: "bg-amber-500" };
-    return { cat: "Normal", color: "bg-green-600" };
+    if (s >= 140) return { cat: "Stage 2 HTN (≥140 mmHg)", color: "bg-red-700" };
+    if (s >= 130) return { cat: "Stage 1 HTN (130–139 mmHg)", color: "bg-orange-600" };
+    if (s >= 120) return { cat: "Elevated BP (120–129 mmHg)", color: "bg-amber-500" };
+    return { cat: "Normal (<120 mmHg)", color: "bg-green-600" };
   }
-  // Simplified for under 13: use ≥95th percentile approximations
-  const threshold95 = 100 + a; // very simplified
-  const threshold99plus12 = threshold95 + 12;
-  if (sbp >= threshold99plus12) return { cat: "Stage 2 HTN (>99th+12)", color: "bg-red-700" };
-  if (sbp >= threshold95) return { cat: "Stage 1 HTN (≥95th)", color: "bg-orange-600" };
-  if (sbp >= threshold95 - 10) return { cat: "Elevated BP (90th–<95th)", color: "bg-amber-500" };
-  return { cat: "Normal", color: "bg-green-600" };
+  // <13y — percentile-based (AAP 2017 approximation; use full tables for individual patients)
+  const p95 = AAP_95TH[a] || (100 + a);
+  const p90 = AAP_90TH[a] || (98 + a);
+  if (s >= p95 + 12) return { cat: `Stage 2 HTN (≥99th+12 ≈≥${p95+12} mmHg)`, color: "bg-red-700" };
+  if (s >= p95) return { cat: `Stage 1 HTN (≥95th ≈≥${p95} mmHg)`, color: "bg-orange-600" };
+  if (s >= p90) return { cat: `Elevated BP (90th–<95th ≈${p90}–${p95-1} mmHg)`, color: "bg-amber-500" };
+  return { cat: `Normal (<90th ≈<${p90} mmHg)`, color: "bg-green-600" };
 }
 
 export default function PediatricHTNEngine() {
@@ -46,7 +57,7 @@ export default function PediatricHTNEngine() {
 
   const isEmergency = symptoms.seizures || symptoms.visual || (parseInt(sbp) >= 180 && (symptoms.headache || symptoms.chest_pain));
   const isSecondary = symptoms.hematuria || symptoms.proteinuria || symptoms.ckd;
-  const bpCat = calcBpCategory(sbp, age, sex, "");
+  const bpCat = calcBpCategory(sbp, age);
 
   const getDrug = () => {
     if (symptoms.ckd || symptoms.proteinuria) return "ACEi (enalapril 0.1 mg/kg/day or lisinopril 0.07 mg/kg/day) — renoprotective. Monitor K+ and Cr.";
@@ -151,7 +162,7 @@ export default function PediatricHTNEngine() {
           <Heart className="w-5 h-5" />
           <div>
             <h3 className="font-bold text-sm">Pediatric Hypertension Decision Engine</h3>
-            <p className="text-xs text-red-200">AAP 2017 · Stage classification · Emergency · Secondary workup</p>
+            <p className="text-xs text-red-200">AAP 2017 · ISPN · Percentile-based {"<"}13y; fixed thresholds ≥13y</p>
           </div>
         </div>
       </div>
@@ -175,7 +186,7 @@ export default function PediatricHTNEngine() {
               <button key={s} onClick={() => setSex(s)} className={`py-2 border-2 rounded-lg text-xs font-semibold transition-all ${sex === s ? "border-red-400 bg-red-50 text-red-800" : "border-slate-200"}`}>{s}</button>
             ))}
           </div>
-          <p className="text-xs text-amber-600 font-semibold">Ensure BP measured correctly: correct cuff size, right arm, seated, 3 readings. Use AAP tables for exact percentile in {"<"}13y.</p>
+          <p className="text-xs text-amber-600 font-semibold">⚠ AAP 2017: Use full percentile tables (age/sex/height) for {"<"}13y. Values shown are approximate — confirm with AAP 2017 normative tables for individual patients. For ≥13y: fixed thresholds apply (Stage 1 ≥130, Stage 2 ≥140 mmHg).</p>
           <Button size="sm" className="w-full bg-red-600 hover:bg-red-700" disabled={!age || !sbp || !sex} onClick={() => setStep(1)}>Next: Symptoms <ChevronRight className="w-4 h-4 ml-1" /></Button>
         </CardContent></Card>
       )}

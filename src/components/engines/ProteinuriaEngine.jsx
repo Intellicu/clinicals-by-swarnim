@@ -5,7 +5,7 @@ import { CheckCircle2, ArrowLeft, ChevronRight, Activity, AlertTriangle } from "
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Reference: Boyer OG (2020) UpToDate; Yap HK (2008) Comprehensive Pediatric Nephrology; KDIGO CKD 2012
+// References: KDIGO CKD 2012 · IPNA · ISKDC · ISPN
 
 const STEPS = {
   START: "start",
@@ -322,13 +322,13 @@ export default function ProteinuriaEngine() {
           <Activity className="w-5 h-5" />
           <div>
             <h3 className="font-bold text-sm">Proteinuria Approach Engine</h3>
-            <p className="text-xs text-blue-200">Boyer OG (UpToDate 2020) · Yap HK (2008) · KDIGO CKD 2012</p>
+            <p className="text-xs text-blue-200">KDIGO CKD 2012 · IPNA · ISKDC · ISPN</p>
           </div>
         </div>
       </div>
       {history.length > 0 && <Badge variant="outline" className="text-xs">Step {history.length + 1}</Badge>}
       <Card><CardContent className="p-4">{renderStep()}</CardContent></Card>
-      <div className="text-xs text-slate-400 text-center">Ref: Boyer OG UpToDate 2020 · Yap HK Comprehensive Pediatric Nephrology 2008 · KDIGO 2012</div>
+      <div className="text-xs text-slate-400 text-center">KDIGO CKD 2012 · IPNA Clinical Practice Recommendations · ISKDC · ISPN Guidelines</div>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowLeft, ChevronRight, Microscope } from "lucide-react";
+import { CheckCircle2, ArrowLeft, ChevronRight, Microscope, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// References: KDIGO GN 2021, IPNA 2020 (Lupus), ISKDC, EULAR/ERA-EDTA
+// References: KDIGO GN 2021 · IPNA 2020 · ISKDC · EULAR/ERA-EDTA · ACR/EULAR 2019
 
 const CONDITIONS = [
   { id: "iga", label: "IgA Nephropathy", badge: "IgA", color: "blue" },
@@ -375,7 +375,49 @@ export default function GlomerulonephritisEngine() {
           </div>
 
           {tab === "diagnosis" && (
-            <GNSection title="Diagnostic Approach" color={cond.color} items={cond.diagnosis} />
+            <div className="space-y-2">
+              <GNSection title="Diagnostic Approach" color={cond.color} items={cond.diagnosis} />
+              {/* Tool links for specific conditions */}
+              {selected === "iga" && (
+                <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-xs font-bold text-blue-900 mb-1.5">🔗 Related Tools & Calculators</p>
+                  <div className="space-y-1">
+                    <a href="https://www.oxfordnephron.org/mest" target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-blue-700 hover:underline">
+                      <ExternalLink className="w-3 h-3" />Oxford MEST-C Classification Score
+                    </a>
+                    <a href="https://www.igan-prognosis.org" target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-blue-700 hover:underline">
+                      <ExternalLink className="w-3 h-3" />IgAN Prognosis Tool (International IgAN Prediction Tool)
+                    </a>
+                  </div>
+                </div>
+              )}
+              {selected === "lupus" && (
+                <div className="p-2.5 bg-violet-50 border border-violet-200 rounded-xl">
+                  <p className="text-xs font-bold text-violet-900 mb-1.5">🔗 Related Tools</p>
+                  <div className="space-y-1">
+                    <a href="https://www.eular.org/tools/sledai-calculator" target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-violet-700 hover:underline">
+                      <ExternalLink className="w-3 h-3" />SLEDAI-2K Disease Activity Calculator
+                    </a>
+                    <a href="https://www.mdcalc.com/calc/1018/systemic-lupus-erythematosus-sle-classification-criteria-acreular-2019" target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-violet-700 hover:underline">
+                      <ExternalLink className="w-3 h-3" />ACR/EULAR 2019 SLE Classification Criteria (MDCalc)
+                    </a>
+                  </div>
+                </div>
+              )}
+              {selected === "anca" && (
+                <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-xs font-bold text-red-900 mb-1.5">🔗 Related Tools</p>
+                  <a href="https://www.mdcalc.com/calc/3931/birmingham-vasculitis-activity-score-bvas" target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-red-700 hover:underline">
+                    <ExternalLink className="w-3 h-3" />Birmingham Vasculitis Activity Score (BVAS)
+                  </a>
+                </div>
+              )}
+            </div>
           )}
           {tab === "treatment" && (
             <GNSection title="Treatment Protocol" color={cond.color} items={cond.treatment} />

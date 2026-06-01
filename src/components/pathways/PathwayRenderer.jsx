@@ -81,6 +81,9 @@ import CystinosisEngine from "../engines/CystinosisEngine";
 import PediatricHypertensionEngine from "../engines/PediatricHypertensionEngine";
 import TubularDisordersEngine from "../engines/TubularDisordersEngine";
 import KidneyStoneEngine from "../engines/KidneyStoneEngine";
+import RRTEngine from "../engines/RRTEngine";
+import CKDEngine from "../engines/CKDEngine";
+import PolyuriaFullEngine from "../engines/PolyuriaEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -105,6 +108,7 @@ const HANDLED_IDS = new Set([
   "htn-engine","tubular-engine","stone-engine",
   "alport-hnf1b-engine","stone-ph-engine","tubular-disorder-engine",
   "proteinuria-engine","nephrocalcinosis-stone-engine","gn-engine",
+  "rrt-engine","ckd-engine","polyuria-full-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -212,6 +216,9 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "htn-engine") return <PediatricHypertensionEngine />;
   if (id === "tubular-engine") return <TubularDisordersEngine />;
   if (id === "stone-engine") return <KidneyStoneEngine />;
+  if (id === "rrt-engine") return <RRTEngine />;
+  if (id === "ckd-engine") return <CKDEngine />;
+  if (id === "polyuria-full-engine") return <PolyuriaFullEngine />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

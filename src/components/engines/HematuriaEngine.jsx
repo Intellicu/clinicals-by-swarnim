@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, ArrowLeft, ChevronRight, Droplet, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Reference: Yap HK, Lau PYW (2008) Comprehensive Pediatric Nephrology; KDIGO; AAP
+// References: KDIGO GN Guidelines · AAP UTI Guidelines · IPNA · ISPN
 
 const STEPS = {
   START: "start",
@@ -491,7 +491,7 @@ export default function HematuriaEngine() {
           <Droplet className="w-5 h-5" />
           <div>
             <h3 className="font-bold text-sm">Hematuria Decision Engine</h3>
-            <p className="text-xs text-rose-200">Yap HK 2008 · KDIGO · AAP · 6-Step Algorithm</p>
+            <p className="text-xs text-rose-200">KDIGO · AAP · IPNA · 6-Step Algorithm</p>
           </div>
         </div>
       </div>
@@ -506,7 +506,7 @@ export default function HematuriaEngine() {
       <Card><CardContent className="p-4">{renderStep()}</CardContent></Card>
 
       <div className="text-xs text-slate-400 text-center">
-        Ref: Yap HK (2008) Comprehensive Pediatric Nephrology · KDIGO · AAP UTI Guidelines
+        KDIGO GN Guidelines · AAP UTI Guidelines · IPNA · ISPN
       </div>
     </div>
   );
