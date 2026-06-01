@@ -722,6 +722,7 @@ export default function ClinicalSupport() {
 
   const [activeTab, setActiveTab] = useState(() => getUrlParams().tab);
   const [selectedScenario, setSelectedScenario] = useState(() => getUrlParams().scenario);
+  const [scenarioSource, setScenarioSource] = useState("scenarios"); // track where user came from
 
   // Re-read URL params whenever location changes (e.g. navigation from hub)
   useEffect(() => {
@@ -1812,10 +1813,11 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
             </div>
             <Button variant="outline" onClick={() => {
               setSelectedScenario(null);
-              setActiveTab("engines");
+              setActiveTab(scenarioSource === "engines" ? "engines" : "scenarios");
+              setScenarioSource("scenarios");
             }}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Engines
+              {scenarioSource === "engines" ? "← Engines" : "Change"}
             </Button>
           </div>
         </div>
@@ -1839,9 +1841,9 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
       <div className="max-w-7xl mx-auto">
         {selectedScenario ? (
           <Button variant="outline" size="sm" className="mb-4"
-            onClick={() => { setSelectedScenario(null); setActiveTab("engines"); }}>
+            onClick={() => { setSelectedScenario(null); setActiveTab(scenarioSource === "engines" ? "engines" : "scenarios"); setScenarioSource("scenarios"); }}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Engines
+            {scenarioSource === "engines" ? "Back to Engines" : "Back to Pathways"}
           </Button>
         ) : (
           <Link to={createPageUrl("Hub")}>
@@ -1979,12 +1981,10 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
           <TabsContent value="engines">
             <IntelligenceEnginesTab
-              onSelectEngine={(scenario) => { setSelectedScenario(scenario); setActiveTab("pathways"); }}
+              onSelectEngine={(scenario) => { setSelectedScenario(scenario); setScenarioSource("engines"); setActiveTab("pathways"); }}
               onBack={() => setActiveTab("scenarios")}
             />
           </TabsContent>
-
-          {/* Engine back button handler — when inside a pathway launched from engines tab, back should return to engines */}
         </Tabs>
 
         <Alert className="mt-6 bg-purple-50 border-purple-200">

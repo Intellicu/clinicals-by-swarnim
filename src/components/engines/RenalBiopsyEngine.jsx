@@ -1,227 +1,293 @@
 /**
  * Renal Biopsy Findings Engine
- * Key histopathology, LM/IF/EM findings, clinical correlation, AI Analyser link
- * KDIGO · ISN · Banff Classification
+ * Interactive guide to key biopsy findings in common renal conditions
+ * Links to AI Biopsy Analyzer
  */
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight, Microscope, ExternalLink } from "lucide-react";
+import { ArrowLeft, ChevronRight, Microscope, ExternalLink, Link } from "lucide-react";
 
 const CONDITIONS = [
-  { id: "minimal_change", label: "Minimal Change Disease (MCD)", color: "bg-blue-50 border-blue-300 text-blue-900" },
-  { id: "fsgs", label: "Focal Segmental Glomerulosclerosis (FSGS)", color: "bg-purple-50 border-purple-300 text-purple-900" },
-  { id: "membranous", label: "Membranous Nephropathy (MN)", color: "bg-amber-50 border-amber-300 text-amber-900" },
-  { id: "igan", label: "IgA Nephropathy (IgAN)", color: "bg-orange-50 border-orange-300 text-orange-900" },
-  { id: "lupus", label: "Lupus Nephritis (LN) — ISN/RPS", color: "bg-red-50 border-red-300 text-red-900" },
-  { id: "c3g", label: "C3 Glomerulopathy (C3GN / DDD)", color: "bg-teal-50 border-teal-300 text-teal-900" },
-  { id: "anca", label: "ANCA Vasculitis / RPGN", color: "bg-rose-50 border-rose-300 text-rose-900" },
-  { id: "alport", label: "Alport Syndrome", color: "bg-green-50 border-green-300 text-green-900" },
-  { id: "tin", label: "Tubulointerstitial Nephritis (TIN)", color: "bg-cyan-50 border-cyan-300 text-cyan-900" },
-  { id: "transplant", label: "Transplant Rejection (Banff)", color: "bg-slate-100 border-slate-300 text-slate-900" },
-  { id: "thrombotic", label: "Thrombotic Microangiopathy (TMA/HUS)", color: "bg-pink-50 border-pink-300 text-pink-900" },
-  { id: "diabetic", label: "Diabetic Nephropathy", color: "bg-yellow-50 border-yellow-300 text-yellow-900" },
+  { id: "SSNS_SRNS", label: "Minimal Change Disease / FSGS", badge: "bg-blue-600", tags: ["nephrotic", "SSNS", "SRNS", "FSGS", "MCD"] },
+  { id: "IgAN", label: "IgA Nephropathy", badge: "bg-indigo-600", tags: ["IgA", "haematuria", "proteinuria", "MEST-C"] },
+  { id: "LN", label: "Lupus Nephritis", badge: "bg-violet-600", tags: ["lupus", "SLE", "LN class", "proliferative"] },
+  { id: "MN", label: "Membranous Nephropathy", badge: "bg-cyan-600", tags: ["membranous", "PLA2R", "spike", "nephrotic"] },
+  { id: "C3G", label: "C3 Glomerulopathy / MPGN", badge: "bg-teal-600", tags: ["C3G", "DDD", "MPGN", "complement", "C3"] },
+  { id: "PSGN", label: "Post-infectious GN (PSGN)", badge: "bg-green-600", tags: ["PSGN", "streptococcal", "post-infectious", "hump"] },
+  { id: "ANCA", label: "ANCA Vasculitis (GPA/MPA)", badge: "bg-red-600", tags: ["ANCA", "pauci-immune", "crescentic", "RPGN"] },
+  { id: "ANTI_GBM", label: "Anti-GBM / Goodpasture", badge: "bg-rose-600", tags: ["anti-GBM", "linear IgG", "Goodpasture", "crescentic"] },
+  { id: "NPHP", label: "Nephronophthisis / TIN", badge: "bg-amber-600", tags: ["NPHP", "tubulointerstitial", "fibrous", "corticomedullary"] },
+  { id: "ALPORT", label: "Alport Syndrome", badge: "bg-orange-600", tags: ["Alport", "COL4A", "GBM thinning", "basket weave"] },
+  { id: "DM_NEPHRO", label: "Diabetic Nephropathy", badge: "bg-yellow-600", tags: ["diabetic", "Kimmelstiel-Wilson", "nodular", "mesangial"] },
+  { id: "TIN", label: "Acute Tubulointerstitial Nephritis", badge: "bg-lime-600", tags: ["TIN", "drug-induced", "interstitial", "eosinophils"] },
 ];
 
 const BIOPSY_DATA = {
-  minimal_change: {
-    headline: "Minimal Change Disease (MCD)",
-    lm: ["Light Microscopy: NORMAL (or minimal mesangial hypercellularity) — 'minimal change' by definition", "No glomerulosclerosis, no mesangial deposits, no crescents"],
-    if_: ["Immunofluorescence: NEGATIVE — no immunoglobulin or complement deposits", "May have trace IgM (non-specific mesangial 'traffic jam')"],
-    em: ["Electron Microscopy: Diffuse podocyte foot process EFFACEMENT (100%) — the key diagnostic finding", "No immune complex deposits", "GBM normal thickness"],
-    clinical: ["Commonest cause of nephrotic syndrome in children 1–8y (>80% steroid-sensitive)", "Normalises completely with steroid treatment", "If EM shows no deposits + full FPE → MCD (even if not biopsied in typical cases)"],
-    tx: "High-dose prednisolone 60 mg/m²/day × 4 weeks → 40 mg/m² alternate days × 4 weeks",
-    ref: "IPNA 2021 · KDIGO NS 2021 · ISKDC",
+  SSNS_SRNS: {
+    title: "Minimal Change Disease (MCD) / FSGS",
+    lm: "MCD: Normal light microscopy (hence 'minimal change'). FSGS: Segmental sclerosis in some glomeruli — podocyte injury pattern. Secondary FSGS: look for tubular atrophy, glomerulomegaly (adaptive), viral injury.",
+    if: "MCD: Negative immunofluorescence (no deposits). FSGS: Variable — IgM + C3 in sclerotic segments (non-specific, trapped). Primary FSGS: negative Ig; secondary FSGS (lupus, virus): may show Ig deposits.",
+    em: "MCD: Diffuse foot process effacement (podocyte spreading) — no deposits. FSGS: Focal foot process effacement + sclerosis. Podocytopenia (reduced podocyte number) on morphometry.",
+    key_pearl: "Foot process effacement is present in BOTH MCD and FSGS — EM alone cannot distinguish. The degree of sclerosis on LM separates them. Biopsy indications: steroid resistance, atypical features, suspected genetic cause.",
+    patterns: ["MCD: Normal LM + diffuse FPE on EM + negative IF = MCD diagnosis", "Primary FSGS (tip lesion, NOS, collapsing, cellular, perihilar)", "Collapsing variant: HIV, pamidronate, COVID — worst prognosis; COL4A3/APOL1 variants", "Genetic podocytopathies: NPHS1, NPHS2, WT1 — routine genetic testing in SRNS", "FSGS NOS: most common variant; ~50% reach ESKD in 10y if SRNS"],
+    stains: ["PAS: best for GBM and mesangium", "Masson trichrome: sclerosis (blue) vs normal (red)", "Silver methenamine: GBM detail; FSGS sclerosis", "CD68 (macrophages): collapsing FSGS infiltration"],
+    grades: "ISKDC classification (NS response): primary guide; FSGS Columbia classification: NOS / tip / perihilar / collapsing / cellular",
+    refs: "KDIGO 2021 Glomerular Diseases · Columbia FSGS classification (D'Agati et al. JASN 2004) · IPNA SRNS 2020",
+    analyserLink: "/imaging-viewer",
   },
-  fsgs: {
-    headline: "Focal Segmental Glomerulosclerosis (FSGS)",
-    lm: ["Focal (not all glomeruli) + Segmental (part of tuft) sclerosis and collapse", "Columbia Classification: NOS, Tip, Cellular, Collapsing (worst prognosis), Perihilar", "Collapsing FSGS: wrinkling + collapse of capillary tuft; podocyte hypertrophy/hyperplasia", "Tip variant: sclerosis at tubular pole; best prognosis"],
-    if_: ["IgM + C3 trapped in sclerotic lesions (non-specific, NOT immune complex deposition)", "Negative for IgG, IgA unless secondary"],
-    em: ["Diffuse podocyte foot process effacement (like MCD)", "Focal capillary collapse, mesangial expansion, occasional deposits"],
-    clinical: ["Steroid-resistant nephrotic syndrome (SRNS) in 20–30% of NS in children", "Genetic FSGS: NPHS1, NPHS2 (most common), WT1, TRPC6, ACTN4", "HIV-associated FSGS: collapsing variant", "Secondary FSGS: solitary kidney, obesity, reflux nephropathy, hyperfiltration"],
-    tx: "Calcineurin inhibitors (tacrolimus 0.1 mg/kg/day or cyclosporine 3–5 mg/kg/day) + prednisolone; RAAS blockade",
-    ref: "KDIGO SRNS 2021 · IPNA 2021",
+  IgAN: {
+    title: "IgA Nephropathy — Oxford MEST-C Classification",
+    lm: "Mesangial hypercellularity (M), endocapillary hypercellularity (E), segmental glomerulosclerosis (S), tubular atrophy/interstitial fibrosis (T), crescents (C). Variable from mild mesangial to severe crescentic.",
+    if: "Dominant or co-dominant IgA deposits in mesangium (characteristic). IgG and IgM often co-deposit (less intense). C3 in mesangium/capillary wall. IgA1-dominant (galactose-deficient IgA1 pathogenic).",
+    em: "Electron-dense deposits in mesangium. ± paramesangial extension. Foot process effacement in proportion to proteinuria.",
+    key_pearl: "Oxford MEST-C score each lesion separately: M0/M1 (mesangial cellularity), E0/E1, S0/S1, T0/T1/T2, C0/C1/C2. S and T lesions most predictive of poor outcome. Higher MEST-C total = worse prognosis.",
+    patterns: ["M1 (>half glomeruli mesangial hypercellular): active inflammation", "E1 (endocapillary): may respond to immunosuppression", "S1 (segmental sclerosis): podocyte loss — poor prognosis", "T1/T2 (>25%/>50% tubular atrophy): irreversible fibrosis", "C1/C2 (crescents): RPGN-like; aggressive treatment warranted"],
+    stains: ["IgA immunofluorescence: dominant staining (hallmark)", "PAS, silver for mesangial matrix", "Trichrome for fibrosis quantification"],
+    grades: "Oxford MEST-C (Cattran et al. Kidney Int 2009; updated 2017). International IgAN Prognosis Tool: https://www.qxmd.com/calculate/calculator_408",
+    refs: "Oxford Classification IgAN 2017 · KDIGO 2021 · IPNA IgAN/IgAVN 2021",
+    analyserLink: "/imaging-viewer",
   },
-  membranous: {
-    headline: "Membranous Nephropathy (MN)",
-    lm: ["Glomerular basement membrane thickening (silver stain: 'spikes' on epithelial side)", "Stage 1: subepithelial deposits without spike formation → Stage 4: incorporation of deposits into GBM", "Ehrenreich-Churg staging: I–IV"],
-    if_: ["Granular IgG + C3 along capillary loops (subepithelial) — 'full house' pattern sometimes", "PLA2R staining (anti-PLA2R): positive in 70% primary MN", "THSD7A: 3–5% primary MN"],
-    em: ["Subepithelial electron-dense deposits", "Foot process effacement, GBM thickening with projections (spikes)"],
-    clinical: ["Primary (PLA2R +ve) vs Secondary (SLE, Hep B — in children most MN is secondary)", "Hep B–associated MN: IgM + IgG subepithelial; IgA in mesangium", "Check PLA2R, HBsAg, ANA, complement"],
-    tx: "RAAS blockade first; Rituximab (anti-CD20) for high-risk primary MN; cytotoxics for secondary causes",
-    ref: "KDIGO GN 2021 · EULAR · IPNA",
+  LN: {
+    title: "Lupus Nephritis — ISN/RPS Classification",
+    lm: "Class I: Normal. Class II: Mesangial. Class III: Focal (<50% glomeruli). Class IV: Diffuse (>50%). Class V: Membranous. Class VI: Advanced sclerosis (>90%). Wire-loop lesions: class III/IV hallmark (subendothelial deposits). Hyaline thrombi, 'full-house' deposits.",
+    if: "'Full house' immunofluorescence: IgG + IgM + IgA + C3 + C1q — PATHOGNOMONIC of LN (rarely seen in other GN). C1q deposition indicates immune-complex activation. Class V: granular subepithelial + mesangial.",
+    em: "Subendothelial deposits (class III/IV); subepithelial (class V); mesangial (all). Tubuloreticular inclusions (TRI — 'interferon fingerprints'): specific to LN in endothelial cells. Endothelial swelling.",
+    key_pearl: "Class IV (diffuse proliferative) is most common and most severe — high risk ESKD. Class V+IV: combined pattern — treat both. Repeat biopsy if flare or worsening despite treatment (transformation between classes).",
+    patterns: ["Class III: focal (<50%) proliferative — risk of transformation to Class IV", "Class IV: diffuse — most severe; pulse steroids + MMF/CYC (EULAR/ERA 2023)", "Class V: membranous LN — nephrotic range proteinuria; lower risk of RPGN", "Active + Chronic lesions scored separately (AI = activity index, CI = chronicity)", "High CI (fibrosis) = worse prognosis independent of class"],
+    stains: ["H&E + PAS + Silver + Trichrome (standard quadruple stain)", "C1q IF: pathognomonic for LN", "IgG subclass: IgG1/IgG3 dominant in LN"],
+    grades: "ISN/RPS 2003 Classification · EULAR/ERA-EDTA Revised 2018",
+    refs: "KDIGO 2021 LN · EULAR/ERA 2023 LN recommendations · Bajema IM et al. Kidney Int 2018",
+    analyserLink: "/imaging-viewer",
   },
-  igan: {
-    headline: "IgA Nephropathy (IgAN) — Oxford MEST-C Score",
-    lm: ["Mesangial hypercellularity (M: >50% of glomeruli)", "Endocapillary proliferation (E)", "Segmental sclerosis (S)", "Tubular atrophy/interstitial fibrosis (T: 0 <25%; 1 = 25–50%; 2 >50%)", "Crescents (C: 0 absent; 1 <25%; 2 ≥25%) — added in Oxford 2016 update"],
-    if_: ["IgA dominant (or co-dominant) mesangial deposits — DIAGNOSTIC", "C3 often present; IgG/IgM variable"],
-    em: ["Electron-dense mesangial deposits (sometimes subendothelial/subepithelial in acute phase)"],
-    clinical: ["Most common GN globally; episodic macroscopic haematuria after URTI (synpharyngitic haematuria)", "MEST-C score guides prognosis: T1/T2 = significant fibrosis = worse outcome", "IgAV (Henoch-Schönlein) — same lesion but systemic vasculitis context"],
-    tx: "RAAS blockade (KDIGO 2021 — cornerstone); corticosteroids for high-risk IgAN (proteinuria >1g + GFR declining); Sparsentan/Budesonide (investigational)",
-    ref: "KDIGO GN 2021 · Oxford Classification (MEST-C) · IgAN Prognosis Tool: https://qxmd.com/calculate/calculator_308/",
+  MN: {
+    title: "Membranous Nephropathy (MN)",
+    lm: "Thickened GBM with 'spike' formation on silver stain (methenamine silver). Subepithelial deposits outlined by basement membrane reaction. Stages I–IV (Ehrenreich-Churg). No endocapillary cellularity (unlike MPGN/C3G).",
+    if: "Fine granular subepithelial IgG deposits (dominant IgG4 in primary/PLA2R-mediated MN). C3 (variable). C4d positive: immune-complex mediated. Negative for PLA2R = secondary MN more likely.",
+    em: "Subepithelial deposits (Stage I: small/rare; Stage II: medium; Stage III: GBM between deposits — spikes; Stage IV: deposits incorporated into GBM). Podocyte foot process effacement.",
+    key_pearl: "PLA2R1 antibody (anti-phospholipase A2 receptor): 70–80% of primary MN. THSD7A: 5–10% of primary MN. Anti-PLA2R correlates with disease activity — falling titre = remission. Negative anti-PLA2R = secondary MN (malignancy, SLE, hepatitis B/C, drugs, lupus).",
+    patterns: ["Primary MN: anti-PLA2R dominant IgG4 staining in GBM", "Secondary MN (LN class V): 'full house' IF; IgG1 dominant; C1q positive", "Malignancy-associated: PLA2R-negative; IgG1/IgG2 dominant; workup for occult malignancy", "Drug-induced (NSAID, gold, penicillamine): usually PLA2R-negative"],
+    stains: ["Silver stain: spikes pathognomonic", "PLA2R IF (if available): confirms primary MN", "IgG subclass IF: IgG4 dominant = primary"],
+    grades: "Ehrenreich-Churg Stage I–IV (historical). KDIGO 2021: clinical risk-based management (not stage-based).",
+    refs: "KDIGO 2021 MN · Beck LH Jr, NEJM 2009 (PLA2R discovery) · Ronco P, Debiec H, Kidney Int 2022",
+    analyserLink: "/imaging-viewer",
   },
-  lupus: {
-    headline: "Lupus Nephritis — ISN/RPS Classification",
-    lm: ["Class I: Minimal mesangial LN (normal LM, mesangial deposits on IF/EM)", "Class II: Mesangial proliferative LN (mesangial hypercellularity only)", "Class III: Focal LN (<50% glomeruli involved)", "Class IV: Diffuse LN (≥50% glomeruli; segmental IV-S or global IV-G) — MOST SEVERE", "Class V: Membranous LN (may overlap with III or IV)", "Class VI: Advanced sclerosing (≥90% sclerosed)"],
-    if_: ["Full house pattern: IgG + IgM + IgA + C3 + C1q (C1q = HALLMARK of lupus nephritis)", "Wire loop lesions on LM = massive subendothelial deposits"],
-    em: ["Subendothelial, mesangial, and subepithelial deposits", "Tubuloreticular inclusions (viral-like; interferon signature) in Class IV"],
-    clinical: ["Most common in adolescent girls; ANA + anti-dsDNA + low complement", "SLEDAI score for activity", "Class III/IV requires aggressive immunosuppression; Class V = membranous treatment"],
-    tx: "Class III/IV: Induction with MMF (2–3g/day) or IV cyclophosphamide + methylprednisolone pulses; Maintenance: MMF + hydroxychloroquine; Belimumab (approved >5y)",
-    ref: "EULAR/ERA-EDTA 2019 · ACR 2019 · ISN/RPS Classification 2018",
+  C3G: {
+    title: "C3 Glomerulopathy (C3G) / Dense Deposit Disease (DDD) / MPGN",
+    lm: "MPGN (membranoproliferative) pattern: mesangial expansion + endocapillary hypercellularity + GBM 'double contour' (tram-tracking). DDD: variable — may also show MPGN pattern. Lobular accentuation of glomeruli.",
+    if: "C3 dominant staining (≥2 orders of magnitude above any Ig): pathognomonic of C3G. Absent or trace Ig — distinguishes from immune-complex MPGN. DDD: same IF as C3GN (C3 dominant). MPGN type 2 = DDD.",
+    em: "DDD: Intramembranous osmiophilic (electron-dense) ribbon-like deposits — PATHOGNOMONIC. C3GN: Mesangial, subendothelial, subepithelial deposits without dense ribbon pattern.",
+    key_pearl: "IF is the key discriminator: C3 dominant = C3G. Abundant Ig = immune-complex MPGN (treat underlying — SLE, hepatitis B/C, cryoglobulinaemia). DDD and C3GN both have C3 dominant but differ only on EM (ribbon vs non-ribbon deposits).",
+    patterns: ["C3GN: mesangial/subendothelial/subepithelial deposits; heterogeneous morphology", "DDD: intramembranous ribbon deposits (sausage-shaped); high recurrence post-transplant (85%)", "C3 NeF (C3 nephritic factor): stabilises C3bBb convertase → persistent complement activation", "Genetic: CFH, CFI, MCP, C3, CFB mutations — test all C3G"],
+    stains: ["C3 IF: positive (dominant)", "IgG, IgM, IgA IF: negative or trace", "Complement panel: CH50, AH50, Factor H, C3, C4"],
+    grades: "No formal histological scoring system; C3G consensus paper (Sethi et al., KI 2012); activity + chronicity assessment",
+    refs: "KDIGO 2021 C3G · Sethi S et al. KI 2012 (C3G definition) · ERKNet/ESPN C3G Network 2022",
+    analyserLink: "/imaging-viewer",
   },
-  c3g: {
-    headline: "C3 Glomerulopathy (C3GN / Dense Deposit Disease)",
-    lm: ["MPGN (membranoproliferative) pattern: mesangial proliferation + thickened GBM", "DDD: homogeneous thickening of GBM ('ribbon-like')", "C3GN: lobular proliferation without the DDD thick deposits"],
-    if_: ["C3 dominant deposits (>2 orders of magnitude above any Ig) — DIAGNOSTIC", "Minimal or absent IgG, IgM, IgA", "DDD: bright C3 linear/granular in GBM; C3GN: mesangial + subendothelial granular C3"],
-    em: ["DDD: osmiophilic dense continuous deposits WITHIN GBM ('sausage' — pathognomonic)", "C3GN: mesangial ± subendothelial ± subepithelial deposits, NOT dense"],
-    clinical: ["Low C3, normal C4 (alternative pathway); C3NeF often positive", "Genetic panel: CFH/CFI/MCP/CFB/CFHR genes", "Recurrence after transplant: 50–80%"],
-    tx: "RAAS blockade; MMF 600 mg/m²/dose BD for progressive disease; Eculizumab for complement-driven refractory; Avacopan (investigational)",
-    ref: "KDIGO GN 2021 · ERKNet Consensus 2023 · IPNA",
+  PSGN: {
+    title: "Post-infectious GN (PSGN / Post-Streptococcal GN)",
+    lm: "Diffuse endocapillary proliferative GN: endocapillary (mesangial + endothelial) hypercellularity. Neutrophil infiltration in acute phase. No crescents in typical cases. Exudative GN appearance.",
+    if: "Granular IgG + C3 in mesangium and capillary walls. 'Starry sky' or 'garland' pattern (large subepithelial deposits along GBM). C4d absent (alternative pathway activation). IgA minor.",
+    em: "Subepithelial 'humps' (large dome-shaped electron-dense deposits on epithelial side of GBM) — PATHOGNOMONIC of PSGN. Present in acute phase; resolve in 8–12 weeks. Mesangial deposits also present.",
+    key_pearl: "'Humps' (subepithelial deposits on EM) are pathognomonic but only present for 6–8 weeks — early biopsy maximises detection. By 6–8 weeks, C3 normalises (prolonged low C3 = C3G). ASO titre elevated 2–4 weeks post-throat infection; anti-DNase B more sensitive for skin infection.",
+    patterns: ["Acute PSGN: humps + endocapillary proliferation + C3 low (recovers by 6–8 weeks)", "Atypical: persistent low C3 >8 weeks → consider C3G/MPGN + complement workup", "IgA-dominant post-infectious GN: older patients; diabetes; alcohol — different treatment"],
+    stains: ["C3 IF: positive (mesangial + capillary)", "IgG IF: granular 'starry sky' pattern", "EM: subepithelial humps"],
+    grades: "No formal grading — clinical context (post-strep, low C3, recovery) guides; biopsy rarely needed if classic presentation",
+    refs: "KDIGO 2021 PSGN · Couser WG review, Kidney Int 2012 · Pediatr Nephrol 2015",
+    analyserLink: "/imaging-viewer",
   },
-  anca: {
-    headline: "ANCA-associated Vasculitis / Pauci-immune RPGN",
-    lm: ["Crescentic GN — circumferential cellular crescents in Bowman's space", "Fibrinoid necrosis of glomerular tufts", "No or minimal immune complex deposits on IF ('pauci-immune')", "Interstitial granulomas: suggest GPA (Wegener's)"],
-    if_: ["PAUCI-IMMUNE — negative/trace IgG, C3 (this distinguishes ANCA from immune-complex RPGN)", "Fibrin within crescents"],
-    em: ["Rare deposits; GBM disruption + fibrin in Bowman's space"],
-    clinical: ["PR3-ANCA (c-ANCA) → GPA (Wegener's): ENT, lung, kidney", "MPO-ANCA (p-ANCA) → MPA (microscopic polyangiitis): kidney + lung", "Haematuria + RBC casts + rapidly rising creatinine → RPGN emergency"],
-    tx: "Induction: IV methylprednisolone pulses + Rituximab (preferred over CYC — equally effective, less gonadotoxic); PLEX for DAH or dialysis-dependent; Maintenance: Rituximab 500 mg q6m × 2y",
-    ref: "EULAR/ERA 2022 · KDIGO ANCA Vasculitis 2021 · IPNA",
+  ANCA: {
+    title: "ANCA-Associated Vasculitis (Pauci-immune RPGN)",
+    lm: "Crescentic GN — cellular (acute) or fibrous (chronic) crescents in Bowman's space. Fibrinoid necrosis: coagulative necrosis of glomerular capillary tufts. Pauci-immune: minimal deposits on IF. Interstitial infiltrate (T cells, macrophages).",
+    if: "PAUCI-IMMUNE: absent or trace Ig and complement on IF. This is the KEY feature — negative/trace IF in a patient with RPGN on LM points to ANCA vasculitis. (Distinguish from anti-GBM: linear IgG; immune-complex MPGN: granular Ig).",
+    em: "Foot process effacement (in proportion to proteinuria). No immune-complex deposits (pauci-immune). Rupture of GBM at necrotic sites. Fibrin within crescents.",
+    key_pearl: "Pauci-immune crescentic GN = ANCA vasculitis until proven otherwise. Test ANCA (PR3-ANCA / GPA; MPO-ANCA / MPA), anti-GBM antibody simultaneously. ANCA + anti-GBM double positive = worst prognosis (plasmapheresis required).",
+    patterns: ["Focal (<25% crescents): best prognosis", "Crescentic (>50%): risk of ESKD", "Sclerotic pattern: late disease, irreversible — poor response to immunosuppression", "Mixed pattern (focal + sclerotic): intermediate", "Berden ANCA classification predicts outcome by crescent %, fibrosis"],
+    stains: ["H&E: crescents, fibrinoid necrosis", "Fibrin special stain: confirms fibrinoid necrosis", "CD68: macrophage infiltration in crescents", "PAS silver: GBM rupture"],
+    grades: "Berden ANCA Classification: Focal / Crescentic / Mixed / Sclerotic (Berden et al. JASN 2010)",
+    refs: "KDIGO 2021 ANCA · ACR/EULAR 2019 classification criteria · Berden JASN 2010 · EULAR/ERA 2022",
+    analyserLink: "/imaging-viewer",
   },
-  alport: {
-    headline: "Alport Syndrome (COL4A3/4/5 Mutations)",
-    lm: ["Light Microscopy: initially NORMAL or mild mesangial hypercellularity", "Late stage: focal global glomerulosclerosis, FSGS-like lesion, interstitial fibrosis"],
-    if_: ["Normal IgG, C3 (no immune deposits)", "Collagen IV staining: COL4A5 (X-linked) — absent/mosaic on GBM in males; mosaic in carrier females", "COL4A3/A4 — both sexes affected"],
-    em: ["PATHOGNOMONIC: irregular GBM thickening with multilamellation (splitting/basket-weave pattern of lamina densa)", "GBM thinning in early disease (can mimic thin basement membrane disease)", "Foot process effacement proportional to proteinuria"],
-    clinical: ["X-linked (COL4A5) = 80%: males severe; females variable; hearing loss + ocular changes (lenticonus)", "Autosomal recessive (COL4A3/4) = 15%: severe, like XLMT males", "Autosomal dominant (COL4A3/4 heterozygous) = 5%: milder, late ESRD", "ESRD by 25y (XLMT males); 60y (AR dominant)"],
-    tx: "RAAS blockade as soon as proteinuria/microalbuminuria detected; trial: SGLT2 inhibitor + sparsentan; Gene therapy trials ongoing",
-    ref: "KDIGO GN 2021 · IPNA Alport 2020 · Gross et al. JASN 2018",
+  ANTI_GBM: {
+    title: "Anti-GBM Disease (Goodpasture Syndrome)",
+    lm: "Severe crescentic GN (often >80% crescents) + fibrinoid necrosis. Rapidly progressive course. Identical to ANCA crescentic GN on LM alone.",
+    if: "LINEAR IgG along GBM — PATHOGNOMONIC. (Thin, bright, continuous ribbon of IgG along all capillary walls). IgG4 subclass dominant. C3 linear also possible. Tubular basement membrane staining in some patients (lung affected).",
+    em: "No immune-complex deposits (unlike PSGN or LN). GBM ruptures. Fibrin within crescents.",
+    key_pearl: "Linear IgG IF = anti-GBM disease. This is the single most important IF pattern to know. Alport syndrome patients post-transplant can develop anti-GBM (de novo anti-GBM) — transplanted normal COL4A3/A4 collagen triggers an immune response in Alport patients who lack it.",
+    patterns: ["Classical Goodpasture: anti-GBM + DAH (diffuse alveolar haemorrhage)", "Renal-limited anti-GBM (no lung involvement): 30%", "Double-positive (anti-GBM + ANCA): worst prognosis; PLEX + CYC + steroids urgently", "Post-transplant Alport: de novo anti-GBM antibody"],
+    stains: ["IgG IF: linear pattern along GBM", "IgG subclass: IgG4 dominant in anti-GBM (vs IgG4 in MN — subepithelial not linear)", "C3: may be linear"],
+    grades: "No formal grading; clinical: % crescents + serum creatinine at presentation predicts dialysis-free survival (>600 µmol/L at presentation → poor renal outcome despite PLEX)",
+    refs: "KDIGO 2021 · Hellmark T & Segelmark M, CJASN 2014 · Pedchenko V, NEJM 2010",
+    analyserLink: "/imaging-viewer",
   },
-  tin: {
-    headline: "Tubulointerstitial Nephritis (TIN)",
-    lm: ["Interstitial oedema + mononuclear cell infiltrate (lymphocytes, plasma cells, eosinophils)", "Tubulitis (lymphocytes infiltrating tubular epithelium — Banff criterion)", "Tubular injury: flattened epithelium, brush border loss, vacuolation", "Non-caseating granulomas: TINU syndrome, sarcoidosis, drug reaction"],
-    if_: ["Negative (no immune deposits)", "Linear IgG along TBM: anti-TBM disease (rare, drug-induced)"],
-    em: ["No immune deposits; tubular injury; interstitial oedema"],
-    clinical: ["Drug-induced (most common): NSAIDs, antibiotics (especially methicillin, rifampicin, penicillins), PPIs", "Infection: Leptospirosis, EBV, CMV, BK virus (transplant)", "TINU syndrome: TIN + uveitis (anterior); elevated β2-microglobulin in urine; treat with steroids + ophthalmology"], 
-    tx: "STOP causative drug; prednisolone 1 mg/kg/day × 4–8 weeks then taper; monitor eGFR; renal recovery incomplete if fibrosis present",
-    ref: "KDIGO GN 2021 · IPNA",
+  NPHP: {
+    title: "Nephronophthisis / Chronic Tubulointerstitial Nephritis",
+    lm: "Tubular atrophy (small atrophic tubules); interstitial fibrosis (collagen deposition replacing tubules); corticomedullary cysts; tubular basement membrane thickening + irregularity (lamellation). Normal glomeruli until late.",
+    if: "Negative IF (no immune-complex deposits). May see non-specific IgM in sclerotic areas.",
+    em: "Tubular basement membrane thickening + lamellation/splitting. Normal GBM (early). No deposits.",
+    key_pearl: "Tubular atrophy + interstitial fibrosis OUT OF PROPORTION to glomerular changes = NPHP/TIN pattern. Ciliopathy gene panel (NPHP1–20+) if clinical features match. Distinguish from reflux nephropathy (unilateral or bilateral? VUR?). NPHP: bilateral, no obstructive features.",
+    patterns: ["NPHP biopsy: TBM changes + IF + corticomedullary cysts (if present on USS)", "Drug-induced TIN (NSAIDs, antibiotics, PPIs): eosinophilic infiltrate + no TBM changes", "Sarcoid TIN: non-caseating granulomas + eosinophils + elevated ACE", "IgG4-related TIN: storiform fibrosis + IgG4+ plasma cell infiltration"],
+    stains: ["PAS: TBM thickening; tubular atrophy", "Masson trichrome: interstitial fibrosis (blue)", "CD68 + CD3: mononuclear infiltrate characterisation"],
+    grades: "No formal NPHP grading; Banff criteria for TIN (semi-quantitative).",
+    refs: "NPHP/Ciliopathy Consortium · Hildebrandt F, KI 2009 · Wolf MT, JASN 2013",
+    analyserLink: "/imaging-viewer",
   },
-  transplant: {
-    headline: "Transplant Rejection — Banff Classification",
-    lm: ["Acute T-cell mediated rejection (TCMR): tubulitis (Banff t score) + interstitial inflammation (i score)", "Acute antibody-mediated rejection (ABMR): microvascular inflammation — glomerulitis (g) + peritubular capillaritis (ptc)", "Chronic active ABMR: double contour GBM (transplant glomerulopathy = cg score)", "Borderline change: some tubulitis + inflammation but not meeting full TCMR criteria"],
-    if_: ["C4d in peritubular capillaries: POSITIVE in ABMR (C4d+ ABMR); can be C4d- in non-classical ABMR"],
-    em: ["ABMR: multilayered peritubular capillary BM (PTCBM) >6 layers = chronic microvascular injury (cg pattern)"],
-    clinical: ["Rising creatinine + proteinuria + DSA (donor-specific antibodies) → ABMR workup", "Banff scores: guide treatment intensity", "BK nephropathy (BKVN): intranuclear inclusions, SV40+ on IHC — mimics rejection"],
-    tx: "TCMR: pulse methylprednisolone ± thymoglobulin; ABMR: IVIG + rituximab + plasmapheresis + IVIG; Chronic ABMR: optimize CNI/MMF, belimumab trial",
-    ref: "Banff 2022 · KDIGO Transplant 2020",
+  ALPORT: {
+    title: "Alport Syndrome — GBM Biopsy Findings",
+    lm: "Early: Normal or minimal mesangial expansion. Late: FSGS pattern (podocyte dropout → segmental sclerosis). Tubular atrophy in proportion to GBM damage. Foam cells (lipid-laden tubular cells) — non-specific.",
+    if: "KEY: ABSENT or mosaic staining for COL4A3/4/5 antibodies on GBM — diagnostic. Normal kidneys stain uniformly for COL4A3 (Goodpasture antigen). X-linked Alport (COLA4A5): absent in males; mosaic/interrupted in carrier females. AR Alport (COL4A3/A4): absent in affected, mosaic in parents.",
+    em: "BASKET-WEAVE GBM (irregular GBM with multilamellated splitting of lamina densa) — PATHOGNOMONIC of Alport syndrome. May show thinning first (thin GBM disease in carriers). Foot process effacement proportional to proteinuria.",
+    key_pearl: "Thin GBM disease: thin uniform GBM without basket-weave pattern — carrier state or TBMN (HIVAN vs Alport spectrum). COL4A IF can be diagnostic: if negative for COL4A5 on kidney biopsy → X-linked Alport confirmed without genetic testing in males.",
+    patterns: ["X-linked Alport (COL4A5): most common (85%); males affected; females carriers", "AR Alport (COL4A3/A4): both sexes equally affected; 15%", "Digenic Alport: COL4A3 + COL4A4 heterozygous double mutation", "Thin GBM disease: heterozygous COL4A3/4 → 10% progress to CKD", "Progressive: hearing loss + proteinuria + haematuria → ESKD 2nd–3rd decade in X-linked males"],
+    stains: ["COL4A3 IF antibody: absent/mosaic (Alport) vs uniform (normal)", "COL4A5 IF antibody: absent in X-linked males (diagnostic)", "PAS: FSGS lesions in advanced disease", "Silver: GBM irregularity"],
+    grades: "No formal histological grading. Molecular genetics + COL4A IF classification guides prognosis.",
+    refs: "KDIGO 2021 Alport · Savige J, JASN 2013 · Rheault MN, Pediatr Nephrol 2012",
+    analyserLink: "/imaging-viewer",
   },
-  thrombotic: {
-    headline: "Thrombotic Microangiopathy (TMA/HUS)",
-    lm: ["Glomerular microthrombi (capillary lumina occluded by platelet-fibrin thrombi)", "Double contour GBM ('train-track') = chronic TMA", "Arteriolar onion-skin lesion (hypertensive/chronic TMA)", "Mesangiolysis (expansion of mesangial matrix, capillary collapse)"],
-    if_: ["Fibrin in capillary thrombi; minimal Ig/complement deposits", "Negative for IgA, IgG — helps distinguish from immune-complex GN"],
-    em: ["Subendothelial widening (fibrin + electron-lucent material between endothelium and GBM)", "Mesangiolysis"],
-    clinical: ["STEC-HUS (Shiga toxin): diarrhoea prodrome, children; Stx O157:H7; supportive treatment only", "aHUS (CFH mutation): no prodrome; 50% ESRD; treat with ECULIZUMAB", "TTP (ADAMTS13 deficiency): neurological + TMA; PLEX first-line"],
-    tx: "STEC-HUS: supportive (no antibiotics, no antidiarrhoeals, no antiplatelets); aHUS: Eculizumab (C5 inhibitor) URGENTLY; TTP: plasma exchange + steroids",
-    ref: "KDIGO AKI 2012 · SHARE aHUS Guidelines 2022 · IPNA",
+  DM_NEPHRO: {
+    title: "Diabetic Nephropathy",
+    lm: "Early: Glomerular hypertrophy + GBM thickening + mesangial expansion. Advanced: Kimmelstiel-Wilson (KW) nodules (nodular glomerulosclerosis) — PATHOGNOMONIC. Diffuse mesangial sclerosis. Hyalinosis (Armanni-Ebstein). Arteriolar hyalinosis (afferent + efferent).",
+    if: "Linear IgG + albumin in GBM (non-specific, due to trapping). No immune-complex deposits. Sometimes IgG4.",
+    em: "GBM thickening + mesangial matrix expansion. No immune complex deposits. Foot process effacement if nephrotic-range proteinuria.",
+    key_pearl: "Biopsy is NOT routinely done for diabetic nephropathy. Biopsy when: atypical features (haematuria, rapid decline, other autoimmune features, young onset without diabetes duration correlating with severity). Kimmelstiel-Wilson nodules may be seen in light-chain deposition disease (LCDD) — check for monoclonal light chains.",
+    patterns: ["Diffuse glomerulosclerosis: most common", "Nodular glomerulosclerosis (KW): pathognomonic; associated with ≥10y diabetes duration", "Exudative lesions: hyalinosis caps, microaneurysms", "Arteriolar hyalinosis: both afferent + efferent (vs HT: afferent only)"],
+    stains: ["PAS: mesangial expansion, KW nodules", "Silver: GBM thickening, mesangial matrix", "Masson trichrome: fibrosis"],
+    grades: "Tervaert Classification: Class I–IV (Tervaert TW, JASN 2010). Clinical staging (albuminuria + eGFR decline) more commonly used.",
+    refs: "Tervaert TW JASN 2010 (DN classification) · KDIGO 2022 Diabetes CKD · ADA 2023 microvascular complications",
+    analyserLink: "/imaging-viewer",
   },
-  diabetic: {
-    headline: "Diabetic Nephropathy",
-    lm: ["Kimmelstiel-Wilson nodular lesion (nodular glomerulosclerosis) — PATHOGNOMONIC: PAS+ acellular nodules in periphery of glomerulus", "Diffuse glomerulosclerosis (more common; mesangial matrix expansion)", "Capsular drop lesion (hyaline deposition at urinary pole)", "GBM thickening; arteriolar hyalinosis (afferent > efferent)"],
-    if_: ["Linear IgG + albumin along GBM (non-immune; trapping)", "No complement"],
-    em: ["GBM thickening (>430 nm female; >395 nm male)", "Mesangial matrix expansion; podocyte foot process effacement"],
-    clinical: ["Usually biopsied when: atypical course (rapid GFR decline, active sediment, no retinopathy in diabetes)", "Progression correlates with mesangial fraction, GFR at biopsy, BP control"],
-    tx: "SGLT2 inhibitors (dapagliflozin/canagliflozin) — evidence for slowing progression; RAAS blockade; BP <130/80; HbA1c <7%",
-    ref: "KDIGO Diabetes 2020 · EMPA-REG · CREDENCE trial",
+  TIN: {
+    title: "Acute Tubulointerstitial Nephritis (TIN)",
+    lm: "Oedematous interstitium; mononuclear infiltrate (lymphocytes + monocytes + plasma cells). Tubulitis (lymphocytes within tubular epithelium). Eosinophils prominent in drug-induced TIN (NSAIDs, beta-lactams, PPIs, sulphonamides). No glomerular changes (unless TINU syndrome).",
+    if: "Non-specific or negative. IgG4-related TIN: IgG4+ plasma cells (>10/HPF + IgG4:IgG ratio >40%). Linear IgM or C3 in TBM (non-specific in some cases).",
+    em: "No deposits. Interstitial oedema. Lymphocytic tubulitis. TBM normal (vs NPHP where TBM thickened/split).",
+    key_pearl: "TINU syndrome (tubulointerstitial nephritis + uveitis): young girls; AKI + anterior uveitis; urinary beta-2-microglobulin elevated; responds well to steroids. Drug-induced TIN: stop offending drug → spontaneous resolution in 2–4 weeks. Steroids (prednisolone 1 mg/kg/day × 2–4 weeks) if no improvement.",
+    patterns: ["Drug-induced (most common): PPIs, NSAIDs, penicillins, cephalosporins, sulphonamides, allopurinol", "Infectious TIN: CMV, EBV, hantavirus (viral); leptospirosis (bacterial)", "TINU: bilateral uveitis + TIN; elevated urinary beta-2-microglobulin", "IgG4-TIN: storiform fibrosis + IgG4 plasma cells + elevated serum IgG4", "Sarcoid TIN: non-caseating granulomas + elevated ACE + hypercalcaemia"],
+    stains: ["H&E: infiltrate characterisation", "Eosinophil stain (Giemsa/eosinophil-specific): drug-induced TIN", "IgG4 IHC: IgG4-related TIN", "AFB + GMS: if TB or fungal TIN suspected"],
+    grades: "No formal grading; activity (eosinophils, neutrophils, necrosis) vs chronicity (fibrosis, TBM changes) assessment",
+    refs: "KDIGO 2021 TIN · Praga M, Semin Nephrol 2010 · Dumas K, JASN 2023",
+    analyserLink: "/imaging-viewer",
   },
 };
 
 export default function RenalBiopsyEngine() {
   const [selected, setSelected] = useState(null);
   const [tab, setTab] = useState("lm");
+  const [search, setSearch] = useState("");
 
-  if (selected && BIOPSY_DATA[selected]) {
-    const d = BIOPSY_DATA[selected];
-    const tabs = [
-      { id: "lm", label: "Light Microscopy", items: d.lm, color: "blue" },
-      { id: "if", label: "Immunofluorescence", items: d.if_, color: "green" },
-      { id: "em", label: "Electron Microscopy", items: d.em, color: "violet" },
-      { id: "clinical", label: "Clinical", items: d.clinical, color: "amber" },
-      { id: "tx", label: "Treatment", items: [d.tx], color: "red" },
-    ];
-    const activeTab = tabs.find(t => t.id === tab);
-    const tc = { blue: "border-blue-200 bg-blue-50", green: "border-green-200 bg-green-50", violet: "border-violet-200 bg-violet-50", amber: "border-amber-200 bg-amber-50", red: "border-red-200 bg-red-50" };
-    const tt = { blue: "text-blue-900", green: "text-green-900", violet: "text-violet-900", amber: "text-amber-900", red: "text-red-900" };
+  const filtered = CONDITIONS.filter(c =>
+    !search || c.label.toLowerCase().includes(search.toLowerCase()) ||
+    c.tags.some(t => t.toLowerCase().includes(search.toLowerCase()))
+  );
 
+  const TABS = [
+    { id: "lm", label: "Light Microscopy" },
+    { id: "if", label: "Immunofluorescence" },
+    { id: "em", label: "Electron Microscopy" },
+    { id: "patterns", label: "Patterns" },
+    { id: "stains", label: "Stains" },
+    { id: "grades", label: "Grading" },
+  ];
+
+  if (selected) {
+    const data = BIOPSY_DATA[selected];
+    const cond = CONDITIONS.find(c => c.id === selected);
     return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <Badge className="bg-slate-700 text-white text-xs px-2">{d.headline}</Badge>
-          <button onClick={() => { setSelected(null); setTab("lm"); }} className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1"><ArrowLeft className="w-3.5 h-3.5" />Back</button>
+      <div className="space-y-4">
+        <div className="rounded-xl bg-gradient-to-r from-slate-700 to-slate-900 p-4 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Microscope className="w-5 h-5" />
+              <div>
+                <p className="text-xs opacity-70 uppercase tracking-wide">Biopsy Engine →</p>
+                <h3 className="font-bold text-sm">{data.title}</h3>
+              </div>
+            </div>
+            <button onClick={() => { setSelected(null); setTab("lm"); }} className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full border border-white/20 flex-shrink-0">← All Conditions</button>
+          </div>
         </div>
 
-        {/* Tab bar */}
+        {/* Key Pearl */}
+        <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-3">
+          <p className="text-xs font-bold text-amber-900 mb-1">🔑 Key Clinical Pearl</p>
+          <p className="text-xs text-amber-800">{data.key_pearl}</p>
+        </div>
+
+        {/* Tabs */}
         <div className="flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {tabs.map(t => (
+          {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all ${tab === t.id ? "bg-slate-800 text-white border-slate-800" : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"}`}>
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${tab === t.id ? "bg-slate-800 text-white border-slate-800" : "bg-white text-slate-600 border-slate-200"}`}>
               {t.label}
             </button>
           ))}
         </div>
 
-        {activeTab && (
-          <div className={`rounded-xl border-2 p-3 ${tc[activeTab.color]}`}>
-            <p className={`font-bold text-sm mb-2 ${tt[activeTab.color]}`}>{activeTab.label}</p>
-            {activeTab.items.map((it, i) => (
-              <div key={i} className="text-xs text-slate-700 flex gap-1.5 mb-1">
-                <span className="text-slate-400 flex-shrink-0 mt-0.5">→</span>
-                <span>{it}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        <Card className="border-slate-200"><CardContent className="p-3">
+          {tab === "lm" && <><p className="text-xs font-bold text-slate-700 mb-2">Light Microscopy Findings</p><p className="text-xs text-slate-700 leading-relaxed">{data.lm}</p></>}
+          {tab === "if" && <><p className="text-xs font-bold text-slate-700 mb-2">Immunofluorescence Findings</p><p className="text-xs text-slate-700 leading-relaxed">{data.if}</p></>}
+          {tab === "em" && <><p className="text-xs font-bold text-slate-700 mb-2">Electron Microscopy Findings</p><p className="text-xs text-slate-700 leading-relaxed">{data.em}</p></>}
+          {tab === "patterns" && <><p className="text-xs font-bold text-slate-700 mb-2">Key Patterns & Variants</p>{data.patterns.map((p, i) => <div key={i} className="flex items-start gap-1.5 text-xs text-slate-700 mb-1"><ChevronRight className="w-3.5 h-3.5 mt-0.5 text-slate-500 flex-shrink-0" />{p}</div>)}</>}
+          {tab === "stains" && <><p className="text-xs font-bold text-slate-700 mb-2">Special Stains & Techniques</p>{data.stains.map((s, i) => <div key={i} className="flex items-start gap-1.5 text-xs text-slate-700 mb-1"><ChevronRight className="w-3.5 h-3.5 mt-0.5 text-blue-500 flex-shrink-0" />{s}</div>)}</>}
+          {tab === "grades" && <><p className="text-xs font-bold text-slate-700 mb-2">Classification / Grading</p><p className="text-xs text-slate-700">{data.grades}</p><div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg"><p className="text-xs font-bold text-blue-800">References</p><p className="text-xs text-blue-700">{data.refs}</p></div></>}
+        </CardContent></Card>
 
-        <div className="rounded-xl bg-slate-50 border border-slate-200 p-2 text-xs text-slate-700">
-          <span className="font-bold">Reference: </span>{d.ref}
-        </div>
-
-        <div className="rounded-xl bg-blue-50 border border-blue-200 p-2 text-xs text-blue-900 flex items-center gap-2">
+        {/* AI Analyser Link */}
+        <a href={data.analyserLink}
+          className="flex items-center gap-2 p-3 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-slate-700 transition-colors">
           <Microscope className="w-4 h-4 flex-shrink-0" />
-          <span>Link to <strong>Biopsy AI Analyser</strong> → upload your biopsy report for AI-assisted correlation</span>
-        </div>
+          <span>Open AI Biopsy Analyser — analyse biopsy images with AI</span>
+          <ExternalLink className="w-3.5 h-3.5 ml-auto flex-shrink-0" />
+        </a>
+
+        <Button variant="outline" className="w-full" onClick={() => { setSelected(null); setTab("lm"); }}><ArrowLeft className="w-4 h-4 mr-2" />Back to All Conditions</Button>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl bg-gradient-to-r from-slate-700 to-zinc-700 p-4 text-white">
+      <div className="rounded-xl bg-gradient-to-r from-slate-700 to-slate-900 p-4 text-white">
         <div className="flex items-center gap-2 mb-1">
           <Microscope className="w-5 h-5" />
           <h3 className="text-sm font-bold">Renal Biopsy Findings Engine</h3>
-          <Badge className="bg-white/20 text-white text-xs border-white/30">{CONDITIONS.length} Conditions</Badge>
+          <Badge className="bg-white/20 text-white text-xs border-white/30">{CONDITIONS.length} conditions</Badge>
         </div>
-        <p className="text-xs text-slate-300">LM → IF → EM → Clinical Correlation → Treatment · KDIGO · ISN · Banff</p>
+        <p className="text-xs text-slate-300">LM · IF · EM · Patterns · Grading — linked to AI Biopsy Analyser</p>
       </div>
 
-      <div className="rounded-xl bg-amber-50 border border-amber-200 p-2 text-xs text-amber-900">
-        💡 Select a condition to see Light Microscopy, Immunofluorescence, Electron Microscopy findings, clinical correlation, and treatment.
-      </div>
+      <input
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Search: IgA, FSGS, lupus, ANCA, GBM…"
+        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300"
+      />
 
       <div className="space-y-2">
-        {CONDITIONS.map(c => (
+        {filtered.map(c => (
           <button key={c.id} onClick={() => { setSelected(c.id); setTab("lm"); }}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all text-left ${c.color} hover:shadow-sm`}>
-            <div className="flex items-center gap-2">
-              <Microscope className="w-4 h-4 flex-shrink-0 opacity-60" />
-              <span className="font-semibold text-sm">{c.label}</span>
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50 transition-all text-left">
+            <div className="flex items-center gap-3">
+              <span className={`w-9 h-9 rounded-lg ${c.badge} text-white flex items-center justify-center flex-shrink-0`}>
+                <Microscope className="w-4 h-4" />
+              </span>
+              <div>
+                <p className="font-semibold text-sm text-slate-900">{c.label}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{c.tags.slice(0, 3).join(" · ")}</p>
+              </div>
             </div>
-            <ChevronRight className="w-4 h-4 flex-shrink-0 ml-2 opacity-60" />
+            <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
           </button>
         ))}
       </div>
 
-      <div className="text-xs text-slate-400 text-center">KDIGO GN 2021 · ISN/RPS Lupus · Banff 2022 · Oxford MEST-C · IPNA</div>
+      <a href="/imaging-viewer"
+        className="flex items-center gap-2 p-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors">
+        <Microscope className="w-4 h-4" />
+        <span>Open AI Biopsy Analyser — upload biopsy images for AI analysis</span>
+        <ExternalLink className="w-3.5 h-3.5 ml-auto" />
+      </a>
     </div>
   );
 }

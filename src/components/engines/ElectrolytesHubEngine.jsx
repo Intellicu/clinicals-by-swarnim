@@ -1,408 +1,405 @@
 /**
  * Electrolytes Hub Engine
- * Master entry → select disorder → dedicated sub-engine
- * Covers: Hyperkalemia, Hypokalemia, Hypernatremia, Hyponatremia,
- *         Hypercalcemia, Hypocalcemia, Metabolic Acidosis, Metabolic Alkalosis
+ * Master selector → individual electrolyte disorder engines
+ * Covers: Hyperkalemia, Hypokalemia, Hypernatremia, Hyponatremia, Hypercalcemia, Hypocalcemia, Hypomagnesemia
  */
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ChevronRight, Zap } from "lucide-react";
+import HyperkalemiaDeepEngine from "./HyperkalemiaDeepEngine";
+import HyponatremiaEngine from "./HyponatremiaEngine";
 
 const DISORDERS = [
-  { id: "hyperkalemia", label: "Hyperkalaemia", desc: "K⁺ >5.5 mEq/L — ECG changes, cause, treatment", color: "bg-red-50 border-red-300 text-red-900", badge: "bg-red-600", scenario: "hyperkalemia-deep-engine" },
-  { id: "hypokalemia", label: "Hypokalaemia", desc: "K⁺ <3.5 mEq/L — causes, correction, monitoring", color: "bg-orange-50 border-orange-300 text-orange-900", badge: "bg-orange-500", scenario: "hypokalemia-engine" },
-  { id: "hypernatremia", label: "Hypernatraemia", desc: "Na⁺ >145 mEq/L — DI / dehydration / salt excess", color: "bg-amber-50 border-amber-300 text-amber-900", badge: "bg-amber-500", scenario: "hypernatremia-engine" },
-  { id: "hyponatremia", label: "Hyponatraemia", desc: "Na⁺ <135 mEq/L — SIADH / hypovolaemic / correction", color: "bg-blue-50 border-blue-300 text-blue-900", badge: "bg-blue-600", scenario: "hyponatremia-engine" },
-  { id: "hypercalcemia", label: "Hypercalcaemia", desc: "Ca²⁺ >2.7 mmol/L — PTH, malignancy, vitamin D", color: "bg-violet-50 border-violet-300 text-violet-900", badge: "bg-violet-600", scenario: "hypercalcemia-engine" },
-  { id: "hypocalcemia", label: "Hypocalcaemia", desc: "Ca²⁺ <2.1 mmol/L — tetany, seizures, correction", color: "bg-teal-50 border-teal-300 text-teal-900", badge: "bg-teal-600", scenario: "hypocalcemia-engine" },
-  { id: "met_acidosis", label: "Metabolic Acidosis", desc: "pH <7.35, HCO₃⁻ low — AG vs normal AG", color: "bg-rose-50 border-rose-300 text-rose-900", badge: "bg-rose-600", scenario: "metabolic-acidosis-engine" },
-  { id: "met_alkalosis", label: "Metabolic Alkalosis", desc: "pH >7.45, HCO₃⁻ high — chloride-responsive vs resistant", color: "bg-green-50 border-green-300 text-green-900", badge: "bg-green-600", scenario: "metabolic-alkalosis-engine" },
+  { id: "hyperkalemia", label: "Hyperkalemia", icon: "K⁺↑", desc: "K+ >5.5 mEq/L — ECG → severity → causes → Tx", color: "bg-red-50 border-red-300 text-red-900", badge: "bg-red-600", emergency: true },
+  { id: "hypokalemia", label: "Hypokalemia", icon: "K⁺↓", desc: "K+ <3.5 mEq/L — causes → renal vs GI vs shift → Tx", color: "bg-amber-50 border-amber-300 text-amber-900", badge: "bg-amber-600" },
+  { id: "hypernatremia", label: "Hypernatremia", icon: "Na⁺↑", desc: "Na+ >145 — water deficit → DI vs GI loss → correction", color: "bg-orange-50 border-orange-300 text-orange-900", badge: "bg-orange-600", emergency: true },
+  { id: "hyponatremia", label: "Hyponatremia", icon: "Na⁺↓", desc: "Na+ <135 — osmolality → volume → SIADH/CSW/GI", color: "bg-cyan-50 border-cyan-300 text-cyan-900", badge: "bg-cyan-600", emergency: true },
+  { id: "hypercalcemia", label: "Hypercalcemia", icon: "Ca²⁺↑", desc: "Ca >2.75 mmol/L — PTH-mediated vs malignancy vs others", color: "bg-yellow-50 border-yellow-300 text-yellow-900", badge: "bg-yellow-600" },
+  { id: "hypocalcemia", label: "Hypocalcemia", icon: "Ca²⁺↓", desc: "Ca <2.1 mmol/L — neonatal → PTH → Vit D → Tx", color: "bg-blue-50 border-blue-300 text-blue-900", badge: "bg-blue-600", emergency: true },
+  { id: "hypomagnesemia", label: "Hypomagnesemia", icon: "Mg²⁺↓", desc: "Mg <0.7 mmol/L — GI loss vs renal wasting → Tx", color: "bg-purple-50 border-purple-300 text-purple-900", badge: "bg-purple-600" },
+  { id: "metabolic_alkalosis", label: "Metabolic Alkalosis", icon: "HCO₃⁺↑", desc: "HCO₃ >26 — generation vs maintenance → Cl-responsive vs resistant", color: "bg-green-50 border-green-300 text-green-900", badge: "bg-green-600" },
 ];
 
-// --- Inline sub-engines for new disorders ---
-
-function HypernatremiaEngine({ onBack }) {
+// Individual engine content for disorders not yet having a dedicated file
+const HypokalemiaEngine = () => {
   const [step, setStep] = useState(0);
+  const [k, setK] = useState(""); const [wt, setWt] = useState("");
   const [history, setHistory] = useState([]);
   const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
-  const back = () => { const p = history[history.length-1]; if (p !== undefined) { setHistory(h => h.slice(0,-1)); setStep(p); } else onBack(); };
+  const back = () => { const p = history[history.length - 1]; if (p !== undefined) { setHistory(h => h.slice(0, -1)); setStep(p); } };
 
-  const Section = ({ title, color, items, children }) => {
-    const c = { blue: "border-blue-200 bg-blue-50", amber: "border-amber-200 bg-amber-50", red: "border-red-200 bg-red-50", green: "border-green-200 bg-green-50", violet: "border-violet-200 bg-violet-50", slate: "border-slate-200 bg-slate-50" };
-    const t = { blue: "text-blue-900", amber: "text-amber-900", red: "text-red-900", green: "text-green-900", violet: "text-violet-900", slate: "text-slate-800" };
-    return (
-      <div className={`rounded-xl border-2 p-3 ${c[color]}`}>
-        <p className={`font-bold text-sm mb-2 ${t[color]}`}>{title}</p>
-        {items && items.map((it, i) => <div key={i} className="text-xs text-slate-700 flex gap-1.5 mb-1"><span className="text-slate-400 flex-shrink-0">→</span>{it}</div>)}
-        {children}
-      </div>
-    );
-  };
+  const kVal = parseFloat(k) || 0;
+  const wtVal = parseFloat(wt) || 0;
+  const severity = kVal > 0 ? (kVal < 2.5 ? "severe" : kVal < 3.0 ? "moderate" : kVal < 3.5 ? "mild" : "normal") : null;
+  const sevColors = { severe: "border-red-500 bg-red-50 text-red-900", moderate: "border-orange-400 bg-orange-50 text-orange-900", mild: "border-amber-400 bg-amber-50 text-amber-900", normal: "border-green-400 bg-green-50 text-green-900" };
 
-  if (step === 0) return (
+  const ivKDose = wtVal > 0 ? `${(wtVal * 0.3).toFixed(1)} mEq (0.3 mEq/kg) IV over 1h — monitor ECG` : "0.3 mEq/kg IV over 1h";
+  const oralKDose = wtVal > 0 ? `${(wtVal * 2).toFixed(0)}–${(wtVal * 4).toFixed(0)} mg KCl (2–4 mEq/kg/day) oral divided BD–TID` : "2–4 mEq/kg/day oral";
+
+  return (
     <div className="space-y-3">
-      <p className="font-semibold text-sm text-slate-800">Hypernatraemia Approach — What do you need?</p>
-      {[
-        { label: "Diagnosis & Classification (causes)", next: 1 },
-        { label: "Clinical Assessment & Investigations", next: 2 },
-        { label: "Treatment & Correction Protocol", next: 3 },
-        { label: "Monitoring & Complications", next: 4 },
-      ].map((o, i) => (
-        <button key={i} onClick={() => go(o.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50 transition-all text-left">
-          <span className="text-sm font-medium text-slate-700">{o.label}</span>
-          <ChevronRight className="w-4 h-4 text-slate-400" />
-        </button>
-      ))}
-      <Button variant="outline" size="sm" className="w-full" onClick={onBack}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back to Electrolytes Hub</Button>
-    </div>
-  );
-
-  if (step === 1) return (
-    <div className="space-y-3">
-      <Section title="Diagnosis: Hypernatraemia Classification" color="amber"
-        items={["Na⁺ >145 mEq/L: Mild 145–149 | Moderate 150–159 | Severe ≥160 mEq/L", "STEP 1: Assess volume status (skin turgor, mucous membranes, weight, UO, CVP)", "STEP 2: Check urine osmolality + urine sodium"]} >
-        <div className="mt-2 space-y-1.5">
-          {[
-            { t: "Hypovolaemic Hypernatraemia (most common in paediatrics)", items: ["Free water loss > sodium loss", "Causes: Diarrhoea/vomiting (GI losses), fever, skin losses (burns), inadequate breastfeeding in neonates", "Urine: high osmolality (>600 mOsm/kg), low Na (<20 mEq/L) = appropriate renal conservation", "Signs: dry mucous membranes, sunken fontanelle, decreased skin turgor, tachycardia"] },
-            { t: "Euvolaemic Hypernatraemia", items: ["Pure water deficit without sodium loss", "Causes: Central DI (AVP deficiency — trauma, tumour, post-op), Nephrogenic DI, excessive insensible losses (prematurity, open incubator)", "Urine: inappropriately dilute (Osm <300 mOsm/kg in face of high plasma Osm) = DI", "↳ See Polyuria Engine for full DI classification"] },
-            { t: "Hypervolaemic Hypernatraemia (less common)", items: ["Sodium excess with volume overload", "Causes: Hypertonic saline admin, excessive NaHCO₃, mineralocorticoid excess (Conn's syndrome, Cushing's), salt poisoning", "Urine: high Na (>20 mEq/L), high osmolality"] },
-          ].map((s, i) => (
-            <div key={i} className="p-2 bg-white rounded-lg border border-amber-100">
-              <p className="text-xs font-bold text-amber-900">{s.t}</p>
-              {s.items.map((it, j) => <p key={j} className="text-xs text-slate-700 mt-0.5">• {it}</p>)}
-            </div>
-          ))}
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-
-  if (step === 2) return (
-    <div className="space-y-3">
-      <Section title="Clinical Assessment & Investigations" color="blue"
-        items={["Clinical: weight loss (% = water deficit), signs of dehydration vs overload, neuro status (irritability, hypotonia, seizures in severe/rapid correction)", "CNS risk: cerebral oedema (rapid correction) vs cerebral shrinkage (chronic hypernatraemia)"]} >
-        <div className="mt-2 space-y-1.5">
-          <p className="text-xs font-bold text-slate-700">Investigations:</p>
-          {["Serum: Na, K, Cr, urea, glucose, Ca, Mg, osmolality", "Urine: osmolality + Na + Cr (spot) — essential pair", "If DI suspected: plasma ADH (paired with plasma osmolality)", "DDAVP test: 1 µg SC/IV → urine Osm at 1 and 2h (see Polyuria Engine)", "Imaging: cranial MRI if central DI suspected (exclude hypothalamic/pituitary lesion)"].map((it, i) => (
-            <p key={i} className="text-xs text-slate-700">• {it}</p>
-          ))}
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-
-  if (step === 3) return (
-    <div className="space-y-3">
-      <Section title="Treatment Protocol" color="red"
-        items={["KEY PRINCIPLE: Correct Na⁺ SLOWLY — max 0.5 mEq/L/h (12 mEq/L in 24h) to prevent cerebral oedema"]} >
-        <div className="mt-2 space-y-1.5">
-          {[
-            { t: "Step 1: Haemodynamic Resuscitation (if shocked)", items: ["NS 10–20 mL/kg bolus to restore perfusion (even in hypernatraemia — volume first)", "Then switch to hypotonic fluid for correction"] },
-            { t: "Step 2: Calculate Water Deficit", items: ["Water deficit (L) = 0.6 × weight (kg) × [(current Na / target Na) − 1]", "Target Na: reduce by max 10–12 mEq/L per day (NOT per hour)", "Replace deficit over 48–72h (chronic hypernatraemia >48h: replace over ≥72h)"] },
-            { t: "Step 3: Fluid Choice", items: ["Hypovolaemic: 0.45% saline or 0.9% saline (dextrose-saline) to replace deficit + maintenance", "Euvolaemic (DI — Central): DDAVP 0.1–0.4 µg intranasally or 0.05–0.2 µg SQ/IV BID; oral hypotonic fluids", "Euvolaemic (DI — Nephrogenic): low-solute diet + HCTZ 1–2 mg/kg/day + amiloride + indomethacin", "Hypervolaemic: D5W or 0.2% NaCl + furosemide 1–2 mg/kg IV (remove excess Na)", "Neonates: exclusively breastfed — supplemental expressed breast milk / formula; maternal lactation support"] },
-          ].map((s, i) => (
-            <div key={i} className="p-2 bg-white border border-red-100 rounded-lg">
-              <p className="text-xs font-bold text-red-900">{s.t}</p>
-              {s.items.map((it, j) => <p key={j} className="text-xs text-slate-700 mt-0.5">• {it}</p>)}
-            </div>
-          ))}
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-
-  if (step === 4) return (
-    <div className="space-y-3">
-      <Section title="Monitoring & Complications" color="green"
-        items={["Na⁺ every 2–4h during active correction", "Target: Na reduction ≤0.5 mEq/L/h and ≤12 mEq/L/24h", "Neurological assessment: hourly GCS during rapid correction phase", "Weight: every 6–8h (fluid balance)"]} >
-        <div className="mt-2 space-y-1.5">
-          {[
-            { t: "Complication: Cerebral Oedema (too rapid correction)", items: ["Risk highest when Na corrected >12 mEq/L/24h", "Signs: headache, seizures, deteriorating GCS after initial improvement", "Treat: mannitol 0.5–1 g/kg IV + raise Na back slowly + restrict free water"] },
-            { t: "Complication: Seizures from Hypernatraemia", items: ["Paradoxical cell shrinkage → idiogenic osmoles → seizure threshold reduced", "IV diazepam 0.3 mg/kg for acute seizure; correct Na correction rate (too fast)"] },
-          ].map((s, i) => (
-            <div key={i} className="p-2 bg-white border border-green-100 rounded-lg">
-              <p className="text-xs font-bold text-green-900">{s.t}</p>
-              {s.items.map((it, j) => <p key={j} className="text-xs text-slate-700 mt-0.5">• {it}</p>)}
-            </div>
-          ))}
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-}
-
-function HypercalcemiaEngine({ onBack }) {
-  const [step, setStep] = useState(0);
-  const [history, setHistory] = useState([]);
-  const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
-  const back = () => { const p = history[history.length-1]; if (p !== undefined) { setHistory(h => h.slice(0,-1)); setStep(p); } else onBack(); };
-
-  const Section = ({ title, color, items, children }) => {
-    const c = { violet: "border-violet-200 bg-violet-50", blue: "border-blue-200 bg-blue-50", amber: "border-amber-200 bg-amber-50", red: "border-red-200 bg-red-50", green: "border-green-200 bg-green-50", slate: "border-slate-200 bg-slate-50" };
-    const t = { violet: "text-violet-900", blue: "text-blue-900", amber: "text-amber-900", red: "text-red-900", green: "text-green-900", slate: "text-slate-800" };
-    return (
-      <div className={`rounded-xl border-2 p-3 ${c[color]}`}>
-        <p className={`font-bold text-sm mb-2 ${t[color]}`}>{title}</p>
-        {items && items.map((it, i) => <div key={i} className="text-xs text-slate-700 flex gap-1.5 mb-1"><span className="text-slate-400 flex-shrink-0">→</span>{it}</div>)}
-        {children}
-      </div>
-    );
-  };
-
-  if (step === 0) return (
-    <div className="space-y-3">
-      <p className="font-semibold text-sm text-slate-800">Hypercalcaemia Approach</p>
-      {[
-        { label: "Diagnosis & Causes", next: 1 },
-        { label: "Investigations & Classification", next: 2 },
-        { label: "Treatment Protocol (mild / severe)", next: 3 },
-        { label: "Monitoring & Long-term", next: 4 },
-      ].map((o, i) => (
-        <button key={i} onClick={() => go(o.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-violet-400 hover:bg-violet-50 transition-all text-left">
-          <span className="text-sm font-medium text-slate-700">{o.label}</span>
-          <ChevronRight className="w-4 h-4 text-slate-400" />
-        </button>
-      ))}
-      <Button variant="outline" size="sm" className="w-full" onClick={onBack}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back to Electrolytes Hub</Button>
-    </div>
-  );
-
-  if (step === 1) return (
-    <div className="space-y-3">
-      <Section title="Diagnosis: Hypercalcaemia Causes in Children" color="violet"
-        items={["Total Ca >2.7 mmol/L (corrected for albumin) or ionised Ca >1.35 mmol/L", "Always correct for albumin: corrected Ca = measured Ca + 0.02 × (40 − albumin g/L)", "Severity: Mild 2.7–3.0 | Moderate 3.0–3.5 | Severe >3.5 mmol/L (hypercalcaemic crisis)"]} >
-        <div className="mt-2 space-y-1">
-          {[
-            { t: "PTH-dependent (↑ or inappropriately normal PTH)", items: ["Primary hyperparathyroidism (adenoma/hyperplasia — MEN1/MEN2A)", "Familial Hypocalciuric Hypercalcaemia (FHH) — benign, autosomal dominant (CASR mutation)", "Neonatal severe hyperparathyroidism (NSHPT)"] },
-            { t: "PTH-independent (↓ PTH — suppressed)", items: ["Vitamin D toxicity (excess supplementation — common in India)", "Granulomatous disease (TB, sarcoidosis — macrophage 1α-hydroxylase)", "Malignancy: PTHrP secretion (rare in children), bony metastases", "Immobilisation hypercalcaemia (long-term bed rest → bone resorption)", "Williams syndrome (CFC1 mutation — neonatal hypercalcaemia)", "Subcutaneous fat necrosis of newborn (1,25-OH₂ vitamin D production)", "Thyrotoxicosis, Addison's disease, thiazide diuretics"] },
-          ].map((s, i) => (
-            <div key={i} className="p-2 bg-white rounded-lg border border-violet-100">
-              <p className="text-xs font-bold text-violet-900">{s.t}</p>
-              {s.items.map((it, j) => <p key={j} className="text-xs text-slate-700 mt-0.5">• {it}</p>)}
-            </div>
-          ))}
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-
-  if (step === 2) return (
-    <div className="space-y-3">
-      <Section title="Investigations" color="blue"
-        items={["Serum: Ca (ionised + total), albumin, phosphate, Mg, alkaline phosphatase, creatinine", "PTH (intact, 1st line — CRITICAL for classification)", "Vitamin D: 25-OH-D + 1,25-(OH)₂-D (calcitriol)", "PTHrP if malignancy suspected", "Urine: 24h calcium + creatinine (or spot Ca:Cr ratio)", "24h urine Ca:Cr <0.01 → FHH (benign — no surgery needed)", "DEXA scan if prolonged hypercalcaemia", "Renal USS (nephrocalcinosis, stones)", "Genetic: CASR mutation for FHH; MEN1 gene for PHPT"]} />
-      <Section title="Key Diagnostic Algorithm" color="slate">
-        <div className="space-y-1 text-xs mt-1">
-          <p className="font-bold text-slate-800">High Ca → check PTH:</p>
-          <p className="text-slate-700">↑ PTH → Primary hyperparathyroidism or FHH (check urine Ca:Cr ratio)</p>
-          <p className="text-slate-700">↓ PTH → PTH-independent: check 25-OH-D and 1,25-D, PTHrP, granulomas</p>
-          <p className="text-slate-700">Normal PTH (inappropriately high) → also primary HPT or FHH</p>
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-
-  if (step === 3) return (
-    <div className="space-y-3">
-      <Section title="Treatment" color="red">
-        <div className="space-y-1.5 mt-1">
-          {[
-            { t: "All Symptomatic / Moderate-Severe Hypercalcaemia", items: ["IV hydration: 0.9% NaCl 10–20 mL/kg bolus then 1.5× maintenance to promote calciuresis", "Furosemide 1 mg/kg IV after adequate hydration (enhances Ca excretion)", "Avoid thiazides (impair Ca excretion)"] },
-            { t: "Hypercalcaemic Crisis (Ca >3.5 or symptomatic: confusion, seizures, vomiting)", items: ["Aggressive IV NS: 3–4 L/m²/day + furosemide (monitor Na, K)", "Calcitonin (salmon): 4 IU/kg SC q12h — rapid onset (hours), tachyphylaxis at 48h", "Bisphosphonates: Pamidronate 0.5–1 mg/kg IV over 4h (max 60 mg) — for malignancy, granuloma, immobilisation", "Zoledronic acid: 0.025–0.05 mg/kg IV over 15 min (older children only)", "Hydrocortisone 2 mg/kg/day: for Vit D toxicity, granulomatous, sarcoidosis, lymphoma"] },
-            { t: "Cause-specific", items: ["Vit D toxicity: STOP Vit D; glucocorticoids 1–2 mg/kg/day", "Primary HPT: parathyroidectomy (definitive); cincalcet if not operable", "FHH: NO treatment needed (urine Ca:Cr <0.01; benign)"] },
-          ].map((s, i) => (
-            <div key={i} className="p-2 bg-white border border-red-100 rounded-lg">
-              <p className="text-xs font-bold text-red-900">{s.t}</p>
-              {s.items.map((it, j) => <p key={j} className="text-xs text-slate-700 mt-0.5">• {it}</p>)}
-            </div>
-          ))}
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-
-  if (step === 4) return (
-    <div className="space-y-3">
-      <Section title="Monitoring" color="green"
-        items={["Serum Ca every 6–12h during acute treatment", "Renal USS: look for nephrocalcinosis/stones", "DEXA scan if chronic hypercalcaemia", "Ophthalmology: band keratopathy in severe/chronic", "Bone age + height velocity if prolonged", "Genetic counselling if CASR mutation / MEN1"]} />
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-}
-
-function MetabolicAlkalosisEngine({ onBack }) {
-  const [step, setStep] = useState(0);
-  const [history, setHistory] = useState([]);
-  const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
-  const back = () => { const p = history[history.length-1]; if (p !== undefined) { setHistory(h => h.slice(0,-1)); setStep(p); } else onBack(); };
-
-  const Section = ({ title, color, items, children }) => {
-    const c = { green: "border-green-200 bg-green-50", blue: "border-blue-200 bg-blue-50", amber: "border-amber-200 bg-amber-50", red: "border-red-200 bg-red-50", violet: "border-violet-200 bg-violet-50" };
-    const t = { green: "text-green-900", blue: "text-blue-900", amber: "text-amber-900", red: "text-red-900", violet: "text-violet-900" };
-    return (
-      <div className={`rounded-xl border-2 p-3 ${c[color]}`}>
-        <p className={`font-bold text-sm mb-2 ${t[color]}`}>{title}</p>
-        {items && items.map((it, i) => <div key={i} className="text-xs text-slate-700 flex gap-1.5 mb-1"><span className="text-slate-400 flex-shrink-0">→</span>{it}</div>)}
-        {children}
-      </div>
-    );
-  };
-
-  if (step === 0) return (
-    <div className="space-y-3">
-      <p className="font-semibold text-sm text-slate-800">Metabolic Alkalosis Approach</p>
-      {[
-        { label: "Diagnosis & Classification", next: 1 },
-        { label: "Causes & Pathophysiology", next: 2 },
-        { label: "Treatment", next: 3 },
-      ].map((o, i) => (
-        <button key={i} onClick={() => go(o.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-green-400 hover:bg-green-50 transition-all text-left">
-          <span className="text-sm font-medium text-slate-700">{o.label}</span>
-          <ChevronRight className="w-4 h-4 text-slate-400" />
-        </button>
-      ))}
-      <Button variant="outline" size="sm" className="w-full" onClick={onBack}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back to Electrolytes Hub</Button>
-    </div>
-  );
-
-  if (step === 1) return (
-    <div className="space-y-3">
-      <Section title="Diagnosis: Metabolic Alkalosis" color="green"
-        items={["pH >7.45 + HCO₃⁻ >26 mEq/L + pCO₂ normal or ↑ (compensatory)", "Confirm: Arterial/venous blood gas; calculate expected compensation: pCO₂ = 40 + 0.7 × (HCO₃⁻ − 24) ± 5", "KEY STEP: Check urine Cl⁻ (spot) — this is the CARDINAL test"]} >
-        <div className="mt-2 space-y-1">
-          <div className="p-2 bg-white border border-green-100 rounded-lg">
-            <p className="text-xs font-bold text-green-900">Urine Cl⁻ Classification</p>
-            <p className="text-xs text-slate-700 mt-0.5"><strong>Urine Cl⁻ &lt;20 mEq/L (Chloride-Responsive)</strong> → NaCl/HCl deficient; responds to saline: Vomiting, NG suctioning, diuretic rebound, post-hypercapnia</p>
-            <p className="text-xs text-slate-700 mt-0.5"><strong>Urine Cl⁻ &gt;20 mEq/L (Chloride-Resistant)</strong> → Mineralocorticoid excess or K⁺ depletion: Bartter/Gitelman, Conn's, Cushing's, current diuretic use, Liddle syndrome</p>
+      {step === 0 && (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <div><label className="text-xs font-semibold text-slate-600">Serum K+ (mEq/L)</label>
+              <input type="number" step="0.1" value={k} onChange={e => setK(e.target.value)} placeholder="e.g. 2.8" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-amber-400" /></div>
+            <div><label className="text-xs font-semibold text-slate-600">Weight (kg)</label>
+              <input type="number" value={wt} onChange={e => setWt(e.target.value)} placeholder="e.g. 20" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-amber-400" /></div>
           </div>
-        </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
-    </div>
-  );
-
-  if (step === 2) return (
-    <div className="space-y-3">
-      <Section title="Causes in Children" color="blue">
-        <div className="space-y-1.5 mt-1">
+          {severity && severity !== "normal" && <div className={`rounded-xl border-2 p-3 ${sevColors[severity]}`}><p className="font-bold text-lg">K+ = {kVal} — {severity.toUpperCase()}</p>{severity === "severe" && <p className="text-xs font-bold mt-1">⚡ ECG MANDATORY — risk of paralysis, arrhythmia, respiratory failure</p>}</div>}
+          {kVal > 0 && kVal < 3.5 && <button onClick={() => go(1)} className="w-full py-2.5 rounded-xl bg-amber-600 text-white text-sm font-bold">Confirm Hypokalemia → Find Cause</button>}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs">
+            <p className="font-bold text-amber-800 mb-1">ECG changes in Hypokalemia:</p>
+            {["2.5–3.5: Flattening of T waves; prominent U waves (after T wave)", "2.0–2.5: ST depression; biphasic T waves; wide QRS", "<2.0: Fusion of T and U waves; torsades de pointes risk; VT/VF"].map((p, i) => <p key={i} className="text-amber-900">• {p}</p>)}
+          </div>
+        </>
+      )}
+      {step === 1 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">What is the likely cause?</p>
           {[
-            { t: "Chloride-Responsive (Urine Cl <20)", items: ["Vomiting / NG suction — HCl loss → paradoxical aciduria", "Diuretic rebound (loop diuretics: furosemide) — Cl loss + volume contraction", "Post-hypercapnic alkalosis (ventilated patient: PCO₂ rapidly normalised but HCO₃ still high)", "Congenital chloride-losing diarrhoea"] },
-            { t: "Chloride-Resistant (Urine Cl >20)", items: ["Bartter syndrome: Loop of Henle defect — hypoK, metabolic alkalosis, normal BP, nephrocalcinosis", "Gitelman syndrome: Distal tubule defect — hypoK, hypoMg, metabolic alkalosis; milder", "Primary hyperaldosteronism (Conn's): ↑ aldosterone, hypertension, hypoK, alkalosis", "Cushing's syndrome: ↑ cortisol → mineralocorticoid effect", "Liddle syndrome: ENaC gain-of-function → hypertension, suppressed renin/aldo", "Severe K⁺ depletion (any cause) → HCO₃ reabsorption increased"] },
-          ].map((s, i) => (
-            <div key={i} className="p-2 bg-white rounded-lg border border-blue-100">
-              <p className="text-xs font-bold text-blue-900">{s.t}</p>
-              {s.items.map((it, j) => <p key={j} className="text-xs text-slate-700 mt-0.5">• {it}</p>)}
-            </div>
+            { label: "GI losses — vomiting, diarrhoea, ileostomy, laxative abuse", next: 2 },
+            { label: "Renal wasting — diuretics, RTA, Bartter/Gitelman, Fanconi", next: 3 },
+            { label: "Transcellular shift — insulin, alkalosis, β2-agonists, refeeding", next: 4 },
+            { label: "Inadequate intake / poor nutrition", next: 5 },
+          ].map(opt => (
+            <button key={opt.label} onClick={() => go(opt.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-400 text-left text-sm">
+              {opt.label} <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+            </button>
           ))}
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
         </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+      )}
+      {[2, 3, 4, 5].includes(step) && (
+        <div className="space-y-3">
+          <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-3 text-xs space-y-2">
+            <p className="font-bold text-amber-900">{["GI Loss Hypokalemia", "Renal Wasting Hypokalemia", "Transcellular Shift Hypokalemia", "Inadequate Intake"][step - 2]}</p>
+            {step === 2 && [["Urine K <20 mEq/day or UK:UCr <1.5 — confirms extrarenal loss", "Correct underlying GI cause", "Oral KCl solution preferred: 2–4 mEq/kg/day in divided doses", "Monitor Mg (hypomagnesemia inhibits K repletion — check Mg first)", "Vomiting → also consider metabolic alkalosis (H⁺ loss)"]].map((arr) => arr.map((it, i) => <p key={i} className="text-amber-800">• {it}</p>))}
+            {step === 3 && [["Urine K >20 mEq/day or UK:UCr >1.5 — renal wasting", "Diuretics: withhold if possible; add K-sparing (amiloride, spironolactone)", "dRTA (type 1 RTA): urine pH >5.5 + non-AG acidosis; potassium citrate", "Bartter: loop diuretic-like (Na-K-2Cl) → indomethacin + KCl + Mg", "Gitelman: thiazide-like (NaCl cotransporter) → Mg replacement first; amiloride + KCl", "Fanconi: generalised tubular wasting — treat underlying cause"]].map((arr) => arr.map((it, i) => <p key={i} className="text-amber-800">• {it}</p>))}
+            {step === 4 && [["Identify and treat underlying trigger", "Insulin excess: reduce insulin; monitor K every 1–2h", "Alkalosis-induced: treat alkalosis; K will redistribute", "Refeeding: introduce nutrition gradually; supplement K (3–5 mEq/kg/day during refeeding)", "Usually transient — does NOT require IV K bolus unless symptomatic"]].map((arr) => arr.map((it, i) => <p key={i} className="text-amber-800">• {it}</p>))}
+            {step === 5 && [["Check serum Mg (low Mg → refractory hypokalemia)", "Increase dietary K: bananas, oranges, avocado, lentils, potatoes", "Oral KCl supplement: 2–4 mEq/kg/day"]].map((arr) => arr.map((it, i) => <p key={i} className="text-amber-800">• {it}</p>))}
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs space-y-1">
+            <p className="font-bold text-slate-700">Replacement Protocol (weight {wtVal || "?"} kg)</p>
+            <p className="text-slate-700"><span className="font-semibold">Mild (3.0–3.5):</span> {oralKDose}</p>
+            <p className="text-slate-700"><span className="font-semibold">Moderate (2.5–3.0):</span> IV + oral — {ivKDose}; max 0.5 mEq/kg/h via central line</p>
+            <p className="text-red-700 font-semibold"><span className="font-bold">Severe (&lt;2.5):</span> IV ONLY — {ivKDose} with continuous cardiac monitoring; replace Mg simultaneously</p>
+            <p className="text-slate-600">⚠ Never give K+ IV push. Max peripheral IV: 40 mEq/L; Central: 80–100 mEq/L. Rate ≤0.3 mEq/kg/h.</p>
+          </div>
+          <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-xs">
+            <p className="font-bold text-green-800 mb-1">Monitoring</p>
+            {["Repeat K+ after 2–4h of IV replacement", "Check Mg (low Mg = refractory hypokalemia — replace Mg first)", "ECG at baseline and after replacement if K <2.5", "Urine K/Cr ratio to distinguish renal vs extrarenal cause"].map((m, i) => <p key={i} className="text-green-800">• {m}</p>)}
+          </div>
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
     </div>
   );
+};
 
-  if (step === 3) return (
+const HypernatremiaEngine = () => {
+  const [step, setStep] = useState(0);
+  const [na, setNa] = useState(""); const [wt, setWt] = useState("");
+  const [history, setHistory] = useState([]);
+  const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
+  const back = () => { const p = history[history.length - 1]; if (p !== undefined) { setHistory(h => h.slice(0, -1)); setStep(p); } };
+  const naVal = parseFloat(na) || 0; const wtVal = parseFloat(wt) || 0;
+  const waterDeficit = (naVal > 145 && wtVal > 0) ? ((naVal / 145 - 1) * wtVal * 0.6).toFixed(1) : null;
+
+  return (
     <div className="space-y-3">
-      <Section title="Treatment" color="amber">
-        <div className="space-y-1.5 mt-1">
+      {step === 0 && (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <div><label className="text-xs font-semibold text-slate-600">Serum Na (mEq/L)</label>
+              <input type="number" value={na} onChange={e => setNa(e.target.value)} placeholder="e.g. 152" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-orange-400" /></div>
+            <div><label className="text-xs font-semibold text-slate-600">Weight (kg)</label>
+              <input type="number" value={wt} onChange={e => setWt(e.target.value)} placeholder="e.g. 20" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-orange-400" /></div>
+          </div>
+          {naVal >= 145 && <div className={`rounded-xl border-2 p-3 ${naVal >= 160 ? "border-red-500 bg-red-50 text-red-900" : naVal >= 150 ? "border-orange-400 bg-orange-50 text-orange-900" : "border-amber-400 bg-amber-50 text-amber-900"}`}>
+            <p className="font-bold">Na = {naVal} — {naVal >= 160 ? "SEVERE" : naVal >= 150 ? "MODERATE" : "MILD"} Hypernatremia</p>
+            {waterDeficit && <p className="text-xs mt-1">Estimated water deficit: <strong>{waterDeficit} L</strong> (TBW formula: (Na/145 − 1) × 0.6 × weight)</p>}
+            {naVal >= 160 && <p className="text-xs font-bold mt-1 text-red-700">⚡ SEVERE — rapid correction risks cerebral oedema; max 10–12 mEq/L/24h</p>}
+          </div>}
+          {naVal >= 145 && <button onClick={() => go(1)} className="w-full py-2.5 rounded-xl bg-orange-600 text-white text-sm font-bold">Classify Cause →</button>}
+        </>
+      )}
+      {step === 1 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">Clinical classification of hypernatremia:</p>
           {[
-            { t: "Chloride-Responsive", items: ["0.9% NaCl IV (replace Cl and volume) — cornerstone; 10–20 mL/kg bolus if dehydrated, then maintenance", "KCl supplementation (PO or IV) — correct hypoK (coexists frequently)", "Stop diuretics if possible; treat underlying cause (vomiting → ondansetron, stop NG losses)"] },
-            { t: "Chloride-Resistant — Bartter/Gitelman", items: ["Indomethacin 2–3 mg/kg/day (Bartter type 1–3 — prostaglandin dependent)", "KCl + Mg supplementation (especially Gitelman)", "Spironolactone (aldosterone antagonism — adjunct)", "Amiloride for Liddle syndrome (ENaC blocker)"] },
-            { t: "Severe Alkalosis (pH >7.7)", items: ["Acetazolamide 5 mg/kg/day (carbonic anhydrase inhibitor → bicarbonaturia)", "IV HCl 0.1 M (central line only — ICU setting, life-threatening alkalosis)", "Arginine HCl (older paediatric data — rarely used)"] },
-          ].map((s, i) => (
-            <div key={i} className="p-2 bg-white border border-amber-100 rounded-lg">
-              <p className="text-xs font-bold text-amber-900">{s.t}</p>
-              {s.items.map((it, j) => <p key={j} className="text-xs text-slate-700 mt-0.5">• {it}</p>)}
-            </div>
+            { label: "Hypovolaemic — signs of dehydration (tachycardia, dry mucosa, oliguria)", next: 2 },
+            { label: "Hypervolaemic — iatrogenic (excess NaHCO₃, NaCl, mineralocorticoid excess)", next: 3 },
+            { label: "Euvolaemic — Diabetes Insipidus (polyuria + dilute urine)", next: 4 },
+          ].map(opt => (
+            <button key={opt.label} onClick={() => go(opt.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-orange-400 text-left text-sm">
+              {opt.label} <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+            </button>
           ))}
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
         </div>
-      </Section>
-      <Button variant="outline" size="sm" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+      )}
+      {[2, 3, 4].includes(step) && (
+        <div className="space-y-3">
+          {step === 2 && (
+            <div className="space-y-2 text-xs">
+              <div className="rounded-xl border-2 border-orange-200 bg-orange-50 p-3">
+                <p className="font-bold text-orange-900">Hypovolaemic Hypernatremia — Water + sodium deficit (water loss exceeds Na)</p>
+                {["Causes: gastroenteritis (GE most common in children), insensible losses (fever, tachypnoea, heat), osmotic diuresis (hyperglycaemia), burns", "Urine Na <20: extrarenal loss (GE, skin) | Urine Na >20: osmotic diuresis", "Neonatal: insufficient breastfeeding, hypernatraemic dehydration — common; may present Na >160"].map((c, i) => <p key={i} className="text-orange-800 mt-1">• {c}</p>)}
+              </div>
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                <p className="font-bold text-blue-900">Correction Protocol (ESPNIC / Paediatric Consensus)</p>
+                {["Phase 1 (if shocked): 0.9% NaCl 10–20 mL/kg bolus (correct circulatory failure first)", "Phase 2 (correction): 0.45% NaCl (or 0.9% NaCl if Na >170) SLOWLY", `Total fluid needed = water deficit (${waterDeficit || "calculate"} L) + maintenance over 48h`, "MAX correction rate: 10 mEq/L per 24h (risk of cerebral oedema if too fast)", "Monitor Na every 4–6h during correction", "Oral/NG rehydration if conscious and tolerating: lower risk of over-rapid correction"].map((c, i) => <p key={i} className="text-blue-800">• {c}</p>)}
+              </div>
+            </div>
+          )}
+          {step === 3 && (
+            <div className="rounded-xl border-2 border-orange-200 bg-orange-50 p-3 text-xs space-y-1">
+              <p className="font-bold text-orange-900">Hypervolaemic Hypernatremia — Excess Sodium</p>
+              {["Causes: excess NaHCO₃ (CPR, neonatal resuscitation), hypertonic saline overinfusion, hyperaldosteronism, Cushing's", "Treatment: furosemide (remove Na faster than water if renal function adequate)", "Dialysis if refractory or renal failure (hyperosmolar CRRT/HD)", "Identify and stop iatrogenic source"].map((c, i) => <p key={i} className="text-orange-800">• {c}</p>)}
+            </div>
+          )}
+          {step === 4 && (
+            <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-3 text-xs space-y-1">
+              <p className="font-bold text-amber-900">Euvolaemic Hypernatremia — Diabetes Insipidus (DI)</p>
+              {["Urine osmolality <300 mOsm/kg despite plasma hyperosmolality = DI", "Proceed to Polyuria Engine for DDAVP test (Central DI vs Nephrogenic DI)", "Central DI: DDAVP intranasal/SC/oral; monitor for hyponatraemia", "Nephrogenic DI: low-solute diet + HCTZ + amiloride + indomethacin", "Correct hypernatraemia: 0.45% NaCl or 5% dextrose (free water) at max 10 mEq/L/24h correction rate"].map((c, i) => <p key={i} className="text-amber-800">• {c}</p>)}
+              <button onClick={() => {}} className="mt-2 text-blue-600 underline text-xs font-semibold">→ See Polyuria/DI Engine for full DDAVP protocol</button>
+            </div>
+          )}
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
     </div>
   );
-}
+};
 
-export default function ElectrolytesHubEngine({ onBack }) {
+const HypercalcemiaEngine = () => {
+  const [step, setStep] = useState(0);
+  const [ca, setCa] = useState("");
+  const [history, setHistory] = useState([]);
+  const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
+  const back = () => { const p = history[history.length - 1]; if (p !== undefined) { setHistory(h => h.slice(0, -1)); setStep(p); } };
+  const caVal = parseFloat(ca) || 0;
+  const severity = caVal >= 3.5 ? "severe" : caVal >= 3.0 ? "moderate" : caVal > 2.75 ? "mild" : null;
+
+  return (
+    <div className="space-y-3">
+      {step === 0 && (
+        <>
+          <div><label className="text-xs font-semibold text-slate-600">Corrected Serum Calcium (mmol/L) — [or ionised Ca if available]</label>
+            <input type="number" step="0.01" value={ca} onChange={e => setCa(e.target.value)} placeholder="Normal: 2.2–2.6" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+            <p className="text-xs text-slate-500 mt-1">Corrected Ca = Measured Ca + 0.02 × (40 − albumin g/L)</p></div>
+          {severity && <div className={`rounded-xl border-2 p-3 ${severity === "severe" ? "border-red-500 bg-red-50 text-red-900" : severity === "moderate" ? "border-orange-400 bg-orange-50 text-orange-900" : "border-amber-400 bg-amber-50 text-amber-900"}`}>
+            <p className="font-bold">Ca = {caVal} mmol/L — {severity.toUpperCase()} Hypercalcemia</p>
+            {severity === "severe" && <p className="text-xs font-bold mt-1">⚡ SEVERE — hypercalcaemic crisis; IV fluids + furosemide + bisphosphonate URGENTLY</p>}
+          </div>}
+          {caVal > 2.75 && <button onClick={() => go(1)} className="w-full py-2.5 rounded-xl bg-yellow-600 text-white text-sm font-bold">Classify Cause →</button>}
+        </>
+      )}
+      {step === 1 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">PTH level result:</p>
+          {[
+            { label: "PTH elevated or inappropriately normal — Primary/Tertiary Hyperparathyroidism", next: 2 },
+            { label: "PTH suppressed — PTH-independent hypercalcemia (malignancy / Vit D / granuloma)", next: 3 },
+            { label: "Neonatal hypercalcemia — suspected (PTH/PTHrP related)", next: 4 },
+          ].map(opt => (
+            <button key={opt.label} onClick={() => go(opt.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-yellow-400 text-left text-sm">
+              {opt.label} <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+            </button>
+          ))}
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
+      {[2, 3, 4].includes(step) && (
+        <div className="space-y-2 text-xs">
+          {step === 2 && <div className="rounded-xl border-2 border-yellow-200 bg-yellow-50 p-3 space-y-1">
+            <p className="font-bold text-yellow-900">PTH-dependent Hypercalcemia</p>
+            {["Primary HPT: adenoma (sporadic most common); MEN1/2A if familial — PTH adenoma; parathyroid hyperplasia", "Neonatal severe HPT: CaSR gene mutation (homozygous) — life-threatening; total parathyroidectomy", "Familial Hypocalciuric Hypercalcemia (FHH): CaSR heterozygous loss-of-function → mild asymptomatic Ca↑; urine Ca:Cr <0.01; NO treatment needed (benign)", "Tertiary HPT: in CKD — autonomous PTH secretion", "Investigations: 24h urine Ca, PTH, USS neck ± Sestamibi scan, MEN screening", "Treatment: Surgical parathyroidectomy (primary/tertiary). Cinacalcet (calcimimetic) as bridge."].map((c, i) => <p key={i} className="text-yellow-800">• {c}</p>)}
+          </div>}
+          {step === 3 && <div className="rounded-xl border-2 border-orange-200 bg-orange-50 p-3 space-y-1">
+            <p className="font-bold text-orange-900">PTH-Independent Hypercalcemia</p>
+            {["Vitamin D toxicity: excess supplementation; check 25-OH-Vit D level; stop Vit D; glucocorticoids 1–2 mg/kg/day", "Granulomatous disease: sarcoidosis, TB, fungal — 1-alpha hydroxylase in macrophages → calcitriol↑; check ACE level, CXR/CT", "Malignancy: PTHrP secretion (rare in children); check PTHrP if Ca>3.0 + PTH suppressed", "Williams syndrome: idiopathic infantile hypercalcaemia (CYP24A1 or GPC3) — low Ca diet, avoid Vit D", "Immobilisation: bone resorption → Ca↑ (paralysed patient, recovery from illness)", "Acute: IV saline hydration (3–4 L/m²/day); furosemide 1 mg/kg IV q6h once hydrated; pamidronate 0.5–1 mg/kg IV over 4h (severe); glucocorticoids (Vit D/granuloma)"].map((c, i) => <p key={i} className="text-orange-800">• {c}</p>)}
+          </div>}
+          {step === 4 && <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-3 space-y-1">
+            <p className="font-bold text-amber-900">Neonatal Hypercalcemia</p>
+            {["Maternal hypoparathyroidism (transient neonatal HPT)", "Neonatal severe HPT (CaSR hom mutation) — urgent parathyroidectomy", "Williams syndrome — FISH/CMA for 7q11.23 deletion; restrict Vit D", "Subcutaneous fat necrosis — after perinatal asphyxia; Vit D mediated; may be delayed 2–6 weeks; prednisolone + hydration", "Treatment: IV hydration; furosemide; prednisolone 2 mg/kg/day (Vit D mediated); pamidronate (severe)"].map((c, i) => <p key={i} className="text-amber-800">• {c}</p>)}
+          </div>}
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const HypocalcemiaEngine = () => {
+  const [step, setStep] = useState(0);
+  const [ca, setCa] = useState(""); const [wt, setWt] = useState("");
+  const [history, setHistory] = useState([]);
+  const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
+  const back = () => { const p = history[history.length - 1]; if (p !== undefined) { setHistory(h => h.slice(0, -1)); setStep(p); } };
+  const caVal = parseFloat(ca) || 0; const wtVal = parseFloat(wt) || 0;
+  const caGluc = wtVal > 0 ? `${(wtVal * 0.5).toFixed(1)} mL 10% Ca-gluconate (0.5 mL/kg) IV over 10 min` : "0.5 mL/kg 10% Ca-gluconate IV over 10 min";
+
+  return (
+    <div className="space-y-3">
+      {step === 0 && (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <div><label className="text-xs font-semibold text-slate-600">Corrected Serum Ca (mmol/L)</label>
+              <input type="number" step="0.01" value={ca} onChange={e => setCa(e.target.value)} placeholder="Normal 2.2–2.6" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-400" /></div>
+            <div><label className="text-xs font-semibold text-slate-600">Weight (kg)</label>
+              <input type="number" value={wt} onChange={e => setWt(e.target.value)} placeholder="e.g. 12" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-400" /></div>
+          </div>
+          {caVal > 0 && caVal < 2.1 && <div className={`rounded-xl border-2 p-3 ${caVal < 1.75 ? "border-red-500 bg-red-50 text-red-900" : "border-blue-400 bg-blue-50 text-blue-900"}`}>
+            <p className="font-bold">Ca = {caVal} mmol/L — {caVal < 1.75 ? "SEVERE — seizure/tetany risk" : "Mild–Moderate"} Hypocalcemia</p>
+            {caVal < 1.75 && <p className="text-xs font-bold mt-1">⚡ EMERGENCY: IV Calcium-gluconate NOW</p>}
+            <p className="text-xs mt-1">Emergency dose: {caGluc} — on ECG monitor (bradycardia risk)</p>
+          </div>}
+          {caVal > 0 && caVal < 2.1 && <button onClick={() => go(1)} className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold">Find Cause →</button>}
+        </>
+      )}
+      {step === 1 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">Age group / clinical context:</p>
+          {[
+            { label: "Neonatal (<28 days) — early (&lt;72h) or late (>72h)", next: 2 },
+            { label: "PTH low or absent — Hypoparathyroidism", next: 3 },
+            { label: "Vitamin D deficiency / Rickets", next: 4 },
+            { label: "CKD-related hypocalcemia (low calcitriol)", next: 5 },
+            { label: "Other: Pancreatitis, Hyperphosphataemia, Chelation", next: 6 },
+          ].map(opt => (
+            <button key={opt.label} onClick={() => go(opt.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-blue-400 text-left text-sm">
+              {opt.label} <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+            </button>
+          ))}
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
+      {[2, 3, 4, 5, 6].includes(step) && (
+        <div className="space-y-2 text-xs">
+          <div className="rounded-xl border-2 border-blue-200 bg-blue-50 p-3 space-y-1">
+            {step === 2 && <><p className="font-bold text-blue-900">Neonatal Hypocalcemia</p>
+              {["Early (<72h): Prematurity, IDM (maternal diabetes), asphyxia, hypomagnesemia, DiGeorge", "Late (>72h): Cow's milk feeding (high PO₄), Vit D deficiency, maternal HPT, DiGeorge", "DiGeorge (22q11.2 del): check FISH/CMA; cardiac malformations + PTH absent; Calcitriol + Ca", "IDM: resolves within days; IV Ca-gluconate + Mg if hypomagnesemic", "Treatment: Oral Ca carbonate 50–100 mg/kg/day Ca; IV if symptomatic (as above)"].map((c, i) => <p key={i} className="text-blue-800">• {c}</p>)}</>}
+            {step === 3 && <><p className="font-bold text-blue-900">Hypoparathyroidism</p>
+              {["Causes: post-thyroid/parathyroid surgery, autoimmune, DiGeorge (22q11.2), CHARGE, Kenny-Caffey", "Autoimmune HPT: check APS1 (AIRE gene) — candidiasis + adrenal insufficiency + HPT", "Investigations: PTH (very low), serum Ca, Mg, PO₄, 25-OH-Vit D, 1,25-OH-Vit D, urine Ca", "Treatment: Calcitriol (1,25-OH-VitD3) 15–20 ng/kg/day (DO NOT use plain VitD — need 1-alpha hydroxylation which requires PTH)", "Calcium supplements: Ca carbonate 50 mg/kg/day elemental Ca", "Aim: serum Ca low-normal (2.0–2.1) to avoid hypercalciuria (no PTH-mediated tubular reabsorption)", "Recombinant PTH (rhPTH 1–84): approved for chronic HPT in adults; trials in children"].map((c, i) => <p key={i} className="text-blue-800">• {c}</p>)}</>}
+            {step === 4 && <><p className="font-bold text-blue-900">Vitamin D Deficiency / Rickets</p>
+              {["Nutritional VitD deficiency (most common): 25-OH-VitD <20 nmol/L", "X-linked Hypophosphataemia (XLH): PHEX mutation; phosphate wasting; calcitriol + phosphate + burosumab", "Vit D Dependent Rickets type 1 (CYP27B1): low calcitriol → 1-alpha hydroxylase deficiency; treat with calcitriol", "Vit D Dependent Rickets type 2 (VDR mutation): calcitriol resistant; high-dose calcium infusions", "Nutritional: Cholecalciferol 60,000 IU/week × 6 weeks (stoss therapy) then maintenance 1000–2000 IU/day", "Recheck 25-OH-VitD at 6–8 weeks"].map((c, i) => <p key={i} className="text-blue-800">• {c}</p>)}</>}
+            {step === 5 && <><p className="font-bold text-blue-900">CKD-Related Hypocalcemia</p>
+              {["Reduced 1-alpha hydroxylation of Vit D → low calcitriol", "Rising PTH compensates (secondary HPT) — Ca may be low-normal", "Treatment: Calcitriol 0.01–0.05 µg/kg/day (max 0.25–0.5 µg/day); phosphate binders", "Target Ca: low-normal; avoid hypercalcaemia (calcification risk)", "Monitor PTH, Ca, PO₄, ALP every 3 months (G4–G5 CKD)"].map((c, i) => <p key={i} className="text-blue-800">• {c}</p>)}</>}
+            {step === 6 && <><p className="font-bold text-blue-900">Other Causes</p>
+              {["Pancreatitis: Ca saponification in peripancreatic fat; IV Ca-gluconate; monitor", "Hyperphosphataemia (AKI, tumour lysis): Ca-PO₄ precipitation; restrict PO₄; IV Ca cautiously (risk of calcification)", "EDTA/citrate chelation (massive transfusion): ionised Ca ↓; replace ionised Ca", "Hypomagnesemia: Mg deficiency → PTH resistance; MUST correct Mg first — give MgSO₄ IV"].map((c, i) => <p key={i} className="text-blue-800">• {c}</p>)}</>}
+          </div>
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MetabolicAlkalosisEngine = () => {
+  const [step, setStep] = useState(0);
+  const [history, setHistory] = useState([]);
+  const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
+  const back = () => { const p = history[history.length - 1]; if (p !== undefined) { setHistory(h => h.slice(0, -1)); setStep(p); } };
+  return (
+    <div className="space-y-3">
+      {step === 0 && <>
+        <div className="rounded-xl bg-green-50 border border-green-200 p-3 text-xs space-y-1">
+          <p className="font-bold text-green-900">Metabolic Alkalosis — Definition & Generation</p>
+          {["pH >7.45 + HCO₃ >26 mEq/L + PaCO₂ rises 0.7 mmHg per 1 mEq/L HCO₃ rise (compensation)", "Generation: H⁺ loss (vomiting, NG suction) OR HCO₃ gain (NaHCO₃ excess) OR Cl⁻ depletion", "Maintenance: kidney retains HCO₃ — due to ECF contraction, Cl⁻ deficiency, or hyperaldosteronism", "Key: distinguish CHLORIDE-RESPONSIVE vs CHLORIDE-RESISTANT"].map((c, i) => <p key={i} className="text-green-800">• {c}</p>)}
+        </div>
+        <button onClick={() => go(1)} className="w-full py-2.5 rounded-xl bg-green-600 text-white text-sm font-bold">Classify: Cl-Responsive vs Cl-Resistant →</button>
+      </>}
+      {step === 1 && <div className="space-y-2">
+        <p className="text-sm font-semibold">Urine Chloride (mEq/L):</p>
+        {[
+          { label: "Urine Cl < 20 — CHLORIDE-RESPONSIVE (volume depleted)", next: 2 },
+          { label: "Urine Cl > 20 — CHLORIDE-RESISTANT (primary aldosteronism / Bartter)", next: 3 },
+        ].map(opt => <button key={opt.label} onClick={() => go(opt.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-green-400 text-left text-sm">{opt.label} <ChevronRight className="w-4 h-4 text-slate-400 ml-2" /></button>)}
+        <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+      </div>}
+      {step === 2 && <div className="space-y-2 text-xs">
+        <div className="rounded-xl border-2 border-green-200 bg-green-50 p-3 space-y-1">
+          <p className="font-bold text-green-900">Chloride-Responsive Metabolic Alkalosis (Urine Cl &lt;20)</p>
+          {["Causes: Vomiting / NG suction (H⁺ + Cl⁻ loss → secondary HCO₃ retention), Diuretic-induced (loop/thiazide — Cl loss), Post-hypercapnia (chronic respiratory acidosis corrected — 'contraction alkalosis'), Congenital chloride diarrhoea (rare)", "Treatment: IV 0.9% NaCl (Cl replacement = key!); KCl supplementation", "Stop NG drainage losses; antiemetics; H2-blockers/PPI (reduce gastric acid generation)", "Correct K+ (hypokalaemia perpetuates alkalosis — K leaves cells, H enters → intracellular acidosis → renal H excretion continues)", "In CHF/cirrhosis: acetazolamide 5 mg/kg/day (promotes HCO₃ excretion) — use cautiously"].map((c, i) => <p key={i} className="text-green-800">• {c}</p>)}
+        </div>
+        <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+      </div>}
+      {step === 3 && <div className="space-y-2 text-xs">
+        <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-3 space-y-1">
+          <p className="font-bold text-amber-900">Chloride-Resistant Metabolic Alkalosis (Urine Cl &gt;20)</p>
+          {["Causes: Primary hyperaldosteronism (Conn's — aldosterone-secreting adenoma); Bilateral adrenal hyperplasia; Bartter syndrome (loop diuretic-like); Gitelman syndrome (thiazide-like); Liddle syndrome (gain-of-function ENaC)", "Check: Renin + Aldosterone ratio; plasma aldosterone >15 ng/dL + suppressed renin = primary hyperaldosteronism", "Bartter: hypokalaemia + normal/low BP + polyuria + no hypertension; mutation SLC12A1, KCNJ1, CLCNKB, BSND, CASR", "Gitelman: milder, hypomagnesemia prominent, NCC (thiazide-sensitive transporter) mutation", "Liddle: hypertension + low renin + low aldosterone; ENaC — treat with amiloride", "Primary HPT treatment: unilateral adrenalectomy (adenoma) or spironolactone (medical Rx hyperplasia)", "Bartter: indomethacin + KCl + Mg; Gitelman: MgSO₄ + KCl + amiloride"].map((c, i) => <p key={i} className="text-amber-800">• {c}</p>)}
+        </div>
+        <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+      </div>}
+    </div>
+  );
+};
+
+const ENGINE_MAP = {
+  hyperkalemia: HyperkalemiaDeepEngine,
+  hyponatremia: HyponatremiaEngine,
+  hypokalemia: HypokalemiaEngine,
+  hypernatremia: HypernatremiaEngine,
+  hypercalcemia: HypercalcemiaEngine,
+  hypocalcemia: HypocalcemiaEngine,
+  metabolic_alkalosis: MetabolicAlkalosisEngine,
+};
+
+export default function ElectrolytesHubEngine() {
   const [selected, setSelected] = useState(null);
 
-  if (selected === "hypernatremia-engine") return (
-    <div className="space-y-4">
-      <div className="rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 p-3 text-white">
-        <h3 className="font-bold text-sm">Hypernatraemia Engine</h3>
-        <p className="text-xs text-amber-100">Diagnosis → Classification → Treatment → Monitoring · KDIGO 2012 · ESPGHAN</p>
-      </div>
-      <Card><CardContent className="p-4"><HypernatremiaEngine onBack={() => setSelected(null)} /></CardContent></Card>
-    </div>
-  );
-
-  if (selected === "hypercalcemia-engine") return (
-    <div className="space-y-4">
-      <div className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 p-3 text-white">
-        <h3 className="font-bold text-sm">Hypercalcaemia Engine</h3>
-        <p className="text-xs text-violet-100">PTH-dependent vs independent → Investigations → Treatment · ESPN · ESPE</p>
-      </div>
-      <Card><CardContent className="p-4"><HypercalcemiaEngine onBack={() => setSelected(null)} /></CardContent></Card>
-    </div>
-  );
-
-  if (selected === "metabolic-alkalosis-engine") return (
-    <div className="space-y-4">
-      <div className="rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 p-3 text-white">
-        <h3 className="font-bold text-sm">Metabolic Alkalosis Engine</h3>
-        <p className="text-xs text-green-100">Urine Cl⁻ classification → Causes → Treatment · IPNA · KDIGO</p>
-      </div>
-      <Card><CardContent className="p-4"><MetabolicAlkalosisEngine onBack={() => setSelected(null)} /></CardContent></Card>
-    </div>
-  );
-
-  // For existing engines, parent should route to their scenario
   if (selected) {
+    const EngineComp = ENGINE_MAP[selected];
+    const dis = DISORDERS.find(d => d.id === selected);
     return (
-      <div className="p-4 text-center text-slate-500">
-        <p className="text-sm">Routing to engine: {selected}</p>
-        <Button variant="outline" size="sm" className="mt-2" onClick={() => setSelected(null)}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+      <div className="space-y-4">
+        <div className={`rounded-xl p-4 text-white ${dis?.badge || "bg-slate-700"}`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold opacity-80 uppercase tracking-wide">Electrolytes Hub → {dis?.label}</p>
+              <h3 className="font-bold text-base mt-0.5">{dis?.label} Engine</h3>
+            </div>
+            <button onClick={() => setSelected(null)} className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full border border-white/20">← All Disorders</button>
+          </div>
+        </div>
+        {EngineComp && <EngineComp />}
+        <div className="text-xs text-slate-400 text-center">KDIGO · ISPN · Paediatric Nephrology Consensus</div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl bg-gradient-to-r from-blue-700 to-cyan-600 p-4 text-white">
+      <div className="rounded-xl bg-gradient-to-r from-purple-700 to-indigo-700 p-4 text-white">
         <div className="flex items-center gap-2 mb-1">
           <Zap className="w-5 h-5" />
-          <h3 className="text-sm font-bold">Electrolytes & Acid-Base Hub</h3>
-          <Badge className="bg-white/20 text-white text-xs border-white/30">{DISORDERS.length} Engines</Badge>
+          <h3 className="text-sm font-bold">Electrolyte Disorders Hub</h3>
+          <Badge className="bg-white/20 text-white text-xs border-white/30">{DISORDERS.length} disorders</Badge>
         </div>
-        <p className="text-xs text-blue-100">Select a disorder → Diagnosis → Management · KDIGO · IPNA · KDOQI</p>
+        <p className="text-xs text-purple-100">Select an electrolyte disorder — Diagnosis + Management engine</p>
       </div>
-
       <div className="space-y-2">
         {DISORDERS.map(d => (
-          <button key={d.id} onClick={() => setSelected(d.scenario)}
-            className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all text-left ${d.color} hover:shadow-sm`}>
-            <div>
-              <p className="font-semibold text-sm">{d.label}</p>
-              <p className="text-xs opacity-75 mt-0.5">{d.desc}</p>
+          <button key={d.id} onClick={() => setSelected(d.id)}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all text-left ${d.color}`}>
+            <div className="flex items-center gap-3">
+              <span className={`w-10 h-10 rounded-xl ${d.badge} text-white flex items-center justify-center text-xs font-bold flex-shrink-0`}>{d.icon}</span>
+              <div>
+                <p className="font-bold text-sm">{d.label}</p>
+                <p className="text-xs opacity-75 mt-0.5">{d.desc}</p>
+              </div>
             </div>
-            <ChevronRight className="w-4 h-4 flex-shrink-0 ml-2 opacity-60" />
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {d.emergency && <Badge className="bg-red-600 text-white text-xs">Emergency</Badge>}
+              <ChevronRight className="w-4 h-4 opacity-50" />
+            </div>
           </button>
         ))}
       </div>
-
-      {onBack && (
-        <button onClick={onBack} className="w-full py-2.5 text-xs font-semibold text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1">
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Engines
-        </button>
-      )}
-
-      <div className="text-xs text-slate-400 text-center">KDIGO · IPNA · ESPN · ESPGHAN · Paediatric Nephrology Consensus</div>
     </div>
   );
 }
