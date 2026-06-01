@@ -13,6 +13,8 @@ import {
   BookMarked, Clock, Star, RefreshCw, Beaker, Wind,
   Syringe, Radio, FileSearch, Edit3, Database
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
 
 // ── Workspace definitions ─────────────────────────────────────────────────
@@ -151,6 +153,7 @@ const CLINIC_NAV = [
       { title: "Patient Charts", url: createPageUrl("PatientCockpit"), icon: Stethoscope },
       { title: "Patient Manager", url: createPageUrl("PatientManager"), icon: Users },
       { title: "OPD Cockpit", url: createPageUrl("ClinicOPDCockpit"), icon: BarChart2 },
+      { title: "Alert Inbox", url: createPageUrl("KidneyCarealertInbox"), icon: Bell },
     ]
   },
   {
@@ -214,8 +217,9 @@ function NavItem({ item, onClick, depth = 0 }) {
       }`}
     >
       <item.icon className={`flex-shrink-0 ${depth > 0 ? "w-3.5 h-3.5" : "w-4 h-4"}`} aria-hidden="true" />
-      <span className="truncate text-sm">{item.title}</span>
-      {!isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto opacity-20" aria-hidden="true" />}
+      <span className="truncate text-sm flex-1">{item.title}</span>
+      {item.title === "Alert Inbox" && <AlertInboxBadge />}
+      {!isActive && item.title !== "Alert Inbox" && <ChevronRight className="w-3.5 h-3.5 ml-auto opacity-20" aria-hidden="true" />}
     </Link>
   );
 }
@@ -324,6 +328,22 @@ function WorkspaceSwitcher({ activeWorkspace, onSwitch, user }) {
         </button>
       ))}
     </div>
+  );
+}
+
+// ── Alert Badge for Inbox ─────────────────────────────────────────────────
+function AlertInboxBadge() {
+  const { data: alerts = [] } = useQuery({
+    queryKey: ["sidebar-alert-count"],
+    queryFn: () => base44.entities.MonitoringAlert.filter({ acknowledged: false }, "-generated_at", 20),
+    refetchInterval: 60000,
+    staleTime: 30000,
+  });
+  if (alerts.length === 0) return null;
+  return (
+    <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+      {alerts.length > 9 ? "9+" : alerts.length}
+    </span>
   );
 }
 

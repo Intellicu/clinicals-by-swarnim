@@ -20,9 +20,11 @@ import PatientContextBar from "@/components/clinic/PatientContextBar";
 import QuickVitalsCapture from "@/components/clinic/QuickVitalsCapture";
 import ContextualClinicalIntelligence from "@/components/clinic/ContextualClinicalIntelligence";
 import EnhancedDigitalPrescriptionPad from "@/components/clinic/EnhancedDigitalPrescriptionPad";
+import HomeMonitoringTab from "@/components/kidneycare/HomeMonitoringTab";
 
 const TABS = [
   { id: "summary", label: "Summary", icon: Activity },
+  { id: "monitoring", label: "घर निगरानी", icon: Heart },
   { id: "vitals", label: "Vitals", icon: Stethoscope },
   { id: "disease", label: "Disease Activity", icon: TrendingUp },
   { id: "medications", label: "Medications", icon: Pill },
@@ -61,7 +63,9 @@ export default function PatientCockpit() {
   const appointment = location.state?.appointment;
   const initialMode = location.state?.mode || "overview";
 
-  const [activeTab, setActiveTab] = useState(initialMode === "consult" ? "vitals" : "summary");
+  const [activeTab, setActiveTab] = useState(
+    location.state?.tab === "monitoring" ? "monitoring" : initialMode === "consult" ? "vitals" : "summary"
+  );
   const [vitals, setVitals] = useState({});
   const [bpStage, setBpStage] = useState(null);
   const [notes, setNotes] = useState("");
@@ -213,6 +217,11 @@ Be concise. Show source guideline.`,
       </div>
 
       <div className="px-3 py-3 space-y-3 pb-28 max-w-2xl mx-auto">
+
+        {/* ── HOME MONITORING TAB ── */}
+        {activeTab === "monitoring" && (
+          <HomeMonitoringTab patient={patient} />
+        )}
 
         {/* ── SUMMARY TAB ── */}
         {activeTab === "summary" && (
