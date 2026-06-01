@@ -91,6 +91,7 @@ import BladderDiaryEngine from "../engines/BladderDiaryEngine";
 import RenalBiopsyEngine from "../engines/RenalBiopsyEngine";
 import RenalDietEngine from "../engines/RenalDietEngine";
 import RheumatologyEngine from "../engines/RheumatologyEngine";
+import RicketsEngine from "../engines/RicketsEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -118,7 +119,7 @@ const HANDLED_IDS = new Set([
   "rrt-engine","ckd-engine","polyuria-full-engine",
   "electrolytes-hub","acid-base-hub","neurogenic-bladder-engine",
   "bladder-diary-engine","renal-biopsy-engine",
-  "diet-engine","rheumatology-engine",
+  "diet-engine","rheumatology-engine","rickets-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -205,7 +206,7 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "eculizumab-engine") return <EculizumabEngine />;
   if (id === "hypokalemia-engine") return <HypokalemiaEngine />;
   if (id === "metabolic-acidosis-engine") return <MetabolicAcidosisEngine />;
-  if (id === "polyuria-engine") return <PolyuriaEngine />;
+  if (id === "polyuria-engine") return <PolyuriaFullEngine />;
   if (id === "hyperkalemia-engine") return <HyperkalemiaEngine />;
   // ── Deep LEILA Engines ────────────────────────────────────────────────────
   if (id === "ns-engine") return <NephroticSyndromeEngine />;
@@ -236,6 +237,7 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "renal-biopsy-engine") return <RenalBiopsyEngine />;
   if (id === "renal-diet-engine" || id === "diet-engine") return <RenalDietEngine />;
   if (id === "rheumatology-engine") return <RheumatologyEngine />;
+  if (id === "rickets-engine") return <RicketsEngine />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

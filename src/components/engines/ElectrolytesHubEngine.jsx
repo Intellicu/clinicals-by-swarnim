@@ -339,6 +339,73 @@ const MetabolicAlkalosisEngine = () => {
   );
 };
 
+const HypomagnesemiaEngine = () => {
+  const [step, setStep] = useState(0);
+  const [mg, setMg] = useState(""); const [wt, setWt] = useState("");
+  const [history, setHistory] = useState([]);
+  const go = (s) => { setHistory(h => [...h, step]); setStep(s); };
+  const back = () => { const p = history[history.length - 1]; if (p !== undefined) { setHistory(h => h.slice(0, -1)); setStep(p); } };
+  const mgVal = parseFloat(mg) || 0; const wtVal = parseFloat(wt) || 0;
+  const severity = mgVal > 0 ? (mgVal < 0.4 ? "severe" : mgVal < 0.6 ? "moderate" : mgVal < 0.7 ? "mild" : "normal") : null;
+  const sevColors = { severe: "border-red-500 bg-red-50 text-red-900", moderate: "border-orange-400 bg-orange-50 text-orange-900", mild: "border-amber-400 bg-amber-50 text-amber-900", normal: "border-green-400 bg-green-50 text-green-900" };
+
+  return (
+    <div className="space-y-3">
+      {step === 0 && (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <div><label className="text-xs font-semibold text-slate-600">Serum Mg (mmol/L)</label>
+              <input type="number" step="0.01" value={mg} onChange={e => setMg(e.target.value)} placeholder="Normal 0.7–1.0" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-purple-400" /></div>
+            <div><label className="text-xs font-semibold text-slate-600">Weight (kg)</label>
+              <input type="number" value={wt} onChange={e => setWt(e.target.value)} placeholder="e.g. 20" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-purple-400" /></div>
+          </div>
+          {severity && severity !== "normal" && <div className={`rounded-xl border-2 p-3 ${sevColors[severity]}`}>
+            <p className="font-bold">Mg = {mgVal} mmol/L — {severity.toUpperCase()} Hypomagnesaemia</p>
+            {severity === "severe" && <p className="text-xs font-bold mt-1">⚡ SEVERE — risk of refractory hypoK+, hypoCa, ventricular arrhythmia, seizures</p>}
+          </div>}
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 text-xs">
+            <p className="font-bold text-purple-800 mb-1">Why Mg matters clinically:</p>
+            {["Hypomagnesaemia → refractory hypokalaemia (Mg required for K renal retention) — always check Mg in refractory hypoK!", "Hypomagnesaemia → hypocalcaemia (PTH resistance + ↓ PTH secretion at low Mg)", "ECG: prolonged QTc, torsades de pointes, VT — high risk with concurrent hypoK"].map((c, i) => <p key={i} className="text-purple-800">• {c}</p>)}
+          </div>
+          {mgVal > 0 && mgVal < 0.7 && <button onClick={() => go(1)} className="w-full py-2.5 rounded-xl bg-purple-600 text-white text-sm font-bold">Find Cause →</button>}
+        </>
+      )}
+      {step === 1 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">Likely cause of hypomagnesaemia:</p>
+          {[
+            { label: "GI losses — diarrhoea, malabsorption, PPI use, NG suction, short bowel", next: 2 },
+            { label: "Renal wasting — diuretics, aminoglycosides, cisplatin, calcineurin inhibitors", next: 3 },
+            { label: "Genetic renal Mg wasting — FHHNC (CLDN16/19), Gitelman, Bartter, EAST", next: 4 },
+            { label: "Inadequate intake / TPN without Mg / alcoholism (older child)", next: 5 },
+          ].map(opt => (
+            <button key={opt.label} onClick={() => go(opt.next)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-purple-400 text-left text-sm">
+              {opt.label} <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+            </button>
+          ))}
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
+      {[2, 3, 4, 5].includes(step) && (
+        <div className="space-y-3">
+          <div className="rounded-xl border-2 border-purple-200 bg-purple-50 p-3 text-xs space-y-1">
+            <p className="font-bold text-purple-900">{["GI Loss", "Drug/Renal Wasting", "Genetic Renal Mg Wasting", "Inadequate Intake"][step - 2]}</p>
+            {step === 2 && ["Urine Mg <0.5 mmol/day (FEMg <2%) confirms GI loss", "Diarrhoea, malabsorption (Crohn's, celiac, short bowel)", "PPIs: reduce intestinal Mg absorption — check Mg in ALL patients on long-term PPIs", "Treatment: oral Mg oxide/citrate/glycinate 10–20 mg/kg/day elemental Mg in divided doses", "IV if severe: MgSO₄ 25–50 mg/kg (max 2g) over 15–60 min; follow with infusion"].map((c, i) => <p key={i} className="text-purple-800">• {c}</p>)}
+            {step === 3 && ["Urine Mg >0.5 mmol/day (FEMg >4%) despite low serum = renal wasting", "Diuretics (loop/thiazide) — most common drug cause", "Aminoglycosides (gentamicin, tobramycin) — tubular injury", "Cisplatin — permanent tubular damage (weeks to months after therapy)", "Calcineurin inhibitors (tacrolimus, ciclosporin) — renal Mg wasting in transplant", "Amphotericin B — tubular damage", "Treatment: correct the offending drug if possible; IV then oral Mg supplementation; amiloride helps preserve Mg in diuretic-induced wasting"].map((c, i) => <p key={i} className="text-purple-800">• {c}</p>)}
+            {step === 4 && ["FHHNC (Familial Hypomagnesaemia with Hypercalciuria and Nephrocalcinosis): CLDN16 (claudin-16) or CLDN19 (claudin-19) mutation; loss of paracellular Mg reabsorption in thick ascending limb; nephrocalcinosis → progressive CKD; ± ocular defects (CLDN19)", "Gitelman syndrome (SLC12A3): hypoMg is KEY feature; thiazide-like; treat with MgSO₄ + amiloride", "Bartter syndrome: variable; some subtypes with Mg wasting (BSND mutation)", "EAST/SeSAME syndrome (KCNJ10 — Kir4.1): Epilepsy + Ataxia + Sensorineural deafness + Tubulopathy (Gitelman-like)", "TRPM6 mutation: isolated recessive hypoMg with secondary hypoCa; treat with high-dose Mg supplementation", "Genetic testing: targeted panel (CLDN16/19, SLC12A3, TRPM6, KCNJ10)"].map((c, i) => <p key={i} className="text-purple-800">• {c}</p>)}
+            {step === 5 && ["Ensure Mg in TPN/parenteral nutrition (2–3 mmol/kg/day infants; 0.4–0.5 mmol/kg/day older)", "Refeeding syndrome: Mg redistribution into cells — supplement prophylactically during refeeding", "Oral: Mg glycinate or citrate preferred (better absorbed than oxide)", "Dose: 10–20 mg/kg/day elemental Mg in 2–3 divided doses (oral); titrate to normal serum Mg"].map((c, i) => <p key={i} className="text-purple-800">• {c}</p>)}
+          </div>
+          <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-xs">
+            <p className="font-bold text-green-800 mb-1">Replacement Protocol (weight {wtVal || "?"} kg)</p>
+            {["Mild–Moderate (0.5–0.7 mmol/L): Oral Mg glycinate/citrate 10–20 mg/kg/day elemental Mg", `Severe (<0.5): IV MgSO₄ — ${wtVal > 0 ? `${(wtVal * 50).toFixed(0)} mg` : "50 mg/kg"} (max 2g) over 30–60 min on ECG monitor; then infusion`, "ALWAYS check and replace K⁺ simultaneously (refractory hypoK will not correct until Mg replaced)", "Monitor serum Mg every 6–12h during IV replacement"].map((c, i) => <p key={i} className="text-green-800">• {c}</p>)}
+          </div>
+          <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ENGINE_MAP = {
   hyperkalemia: HyperkalemiaDeepEngine,
   hyponatremia: HyponatremiaEngine,
@@ -346,6 +413,7 @@ const ENGINE_MAP = {
   hypernatremia: HypernatremiaEngine,
   hypercalcemia: HypercalcemiaEngine,
   hypocalcemia: HypocalcemiaEngine,
+  hypomagnesemia: HypomagnesemiaEngine,
   metabolic_alkalosis: MetabolicAlkalosisEngine,
 };
 

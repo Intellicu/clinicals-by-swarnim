@@ -518,7 +518,7 @@ export default function Hub() {
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
-              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">36</span>
+              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">37</span>
             </div>
             <Link to={createPageUrl("ClinicalSupport") + "?tab=engines"}>
               <span className="text-xs text-violet-600 font-semibold">All →</span>
@@ -553,6 +553,7 @@ export default function Hub() {
               { label: "HTN Engine",         desc: "Pediatric HTN",          color: "bg-pink-700",   scenario: "htn-engine" },
               { label: "Tubular Engine",     desc: "Fanconi/XLH/NDI",        color: "bg-amber-800",  scenario: "tubular-engine" },
               { label: "Stone Engine",       desc: "Renal stones full",      color: "bg-yellow-700", scenario: "stone-engine" },
+              { label: "Rickets Engine",      desc: "Calcipenic/Phosphopenic", color: "bg-amber-600",  scenario: "rickets-engine" },
             ].map((eng) => (
               <Link key={eng.scenario} to={createPageUrl("ClinicalSupport") + `?tab=pathways&scenario=${eng.scenario}`} className="flex-shrink-0">
                 <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-violet-50 active:bg-violet-100 transition-colors w-20">
