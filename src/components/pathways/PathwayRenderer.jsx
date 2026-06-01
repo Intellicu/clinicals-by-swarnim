@@ -89,7 +89,7 @@ import AcidBaseHubEngine from "../engines/AcidBaseHubEngine";
 import NeurogenicBladderEngine from "../engines/NeurogenicBladderEngine";
 import BladderDiaryEngine from "../engines/BladderDiaryEngine";
 import RenalBiopsyEngine from "../engines/RenalBiopsyEngine";
-import PediatricDietEngine from "../engines/PediatricDietEngine";
+import RenalDietEngine from "../engines/RenalDietEngine";
 import RheumatologyEngine from "../engines/RheumatologyEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
@@ -234,7 +234,7 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "neurogenic-bladder-engine") return <NeurogenicBladderEngine />;
   if (id === "bladder-diary-engine") return <BladderDiaryEngine />;
   if (id === "renal-biopsy-engine") return <RenalBiopsyEngine />;
-  if (id === "diet-engine") return <PediatricDietEngine />;
+  if (id === "renal-diet-engine" || id === "diet-engine") return <RenalDietEngine />;
   if (id === "rheumatology-engine") return <RheumatologyEngine />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">

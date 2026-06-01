@@ -1,436 +1,396 @@
-/**
- * Pediatric Rheumatology Diagnostic & Management Engine
- * JIA, SLE, Vasculitis, ANCA-AAV, Periodic Fevers, Myositis, Overlap syndromes
- */
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Shield, ChevronRight, ArrowRight, CheckCircle2, AlertTriangle, BookOpen, ExternalLink, Activity } from "lucide-react";
+import { Shield, ChevronRight, RotateCcw, AlertTriangle, CheckCircle2, BookOpen, ExternalLink, Zap, FlaskConical } from "lucide-react";
 
 const CONDITIONS = [
-  { id: "jia", label: "JIA — Juvenile Idiopathic Arthritis", color: "blue", desc: "JIA subtypes, ACR criteria, DMARD approach" },
-  { id: "sle", label: "SLE / Lupus Nephritis", color: "violet", desc: "EULAR/ACR 2019 criteria, organ involvement, SLE-specific treatment" },
-  { id: "anca", label: "ANCA-Associated Vasculitis", color: "red", desc: "GPA · MPA · EGPA — induction and maintenance" },
-  { id: "igav", label: "IgA Vasculitis (HSP)", color: "orange", desc: "Henoch-Schönlein Purpura — diagnosis and nephritis monitoring" },
-  { id: "pf", label: "Periodic Fever Syndromes", color: "amber", desc: "FMF, TRAPS, CAPS, MKD, PFAPA — autoinflammatory" },
-  { id: "jdm", label: "Juvenile Dermatomyositis", color: "pink", desc: "Myositis — muscle, skin, MSA panels, treatment" },
-  { id: "poly", label: "Overlap / CTD (MCTD, SSc)", color: "teal", desc: "Mixed CTD, scleroderma, anti-centromere, anti-Scl-70" },
-  { id: "kd", label: "Kawasaki Disease", color: "rose", desc: "Classic + incomplete KD, coronary artery aneurysm, IVIG" },
-  { id: "macro", label: "Macrophage Activation Syndrome", color: "crimson", desc: "MAS / HLH — 2016 criteria, triggers, cyclosporin" },
+  { id: "jia", label: "JIA — Juvenile Idiopathic Arthritis", color: "blue", desc: "Classification · Subtypes · DMARDs · Biologics" },
+  { id: "sle", label: "SLE — Systemic Lupus Erythematosus", color: "violet", desc: "ACR/EULAR criteria · SLEDAI · Organ involvement · Treatment" },
+  { id: "anca", label: "ANCA-Associated Vasculitis (GPA/MPA/EGPA)", color: "red", desc: "Classification · Induction · Rituximab vs CYC · Renal involvement" },
+  { id: "periodic", label: "Periodic Fever Syndromes (Autoinflammatory)", color: "orange", desc: "FMF · PFAPA · CAPS · TRAPS · MKD — fever pattern diagnosis" },
+  { id: "kawasaki", label: "Kawasaki Disease", color: "rose", desc: "Diagnosis criteria · IVIG · Coronary artery risk stratification" },
+  { id: "hsv", label: "IgA Vasculitis (HSP)", color: "amber", desc: "Skin/joints/gut/kidney triad · Nephritis management" },
+  { id: "jdm", label: "Juvenile Dermatomyositis (JDM)", color: "teal", desc: "Gottron · Heliotrope · CK · Myositis-specific Ab · Treatment" },
+  { id: "mctd", label: "Mixed CTD / Overlap Syndromes", color: "purple", desc: "Undifferentiated CTD · MCTD · SSc overlap · Anti-U1RNP" },
+  { id: "septic-arthritis", label: "Septic vs Inflammatory Arthritis", color: "red", desc: "Emergency differentiation · Kocher criteria · Drainage" },
 ];
 
-const RHEUM_DATA = {
+const COLOR_MAP = {
+  blue: "from-blue-700 to-indigo-700",
+  violet: "from-violet-700 to-purple-700",
+  red: "from-red-700 to-rose-700",
+  orange: "from-orange-600 to-amber-600",
+  rose: "from-rose-600 to-pink-600",
+  amber: "from-amber-600 to-orange-600",
+  teal: "from-teal-700 to-cyan-700",
+  purple: "from-purple-700 to-violet-700",
+};
+
+const DATA = {
   jia: {
     title: "Juvenile Idiopathic Arthritis (JIA)",
-    guideline: "ACR JIA 2019 · ILAR 2001 Classification · EULAR 2018",
+    subtitle: "ILAR Classification 2001 · ACR Peds 2022",
+    intro: "JIA: arthritis ≥1 joint for ≥6 weeks in child <16 years with no identifiable cause. Umbrella of 7 subtypes with distinct genetics, serology, and treatment.",
+    tabs: [
+      {
+        label: "Subtypes",
+        content: [
+          { h: "Oligoarticular JIA (≤4 joints, ANA+)", b: "Most common. F > M. ANA+ → uveitis risk (slit-lamp every 3 months!). Rarely progresses to systemic disease. Target: NSAID → intraarticular steroid → MTX if extended." },
+          { h: "Polyarticular RF+ JIA (≥5 joints, RF+)", b: "Mimics adult RA. Erosive, destructive. F > M, adolescents. RF+ twice 3 months apart. Target: MTX early + consider biologics if inadequate response." },
+          { h: "Polyarticular RF− JIA (≥5 joints, RF−)", b: "Heterogeneous group. Often ANA+. Some overlap with systemic features. Treatment: NSAIDs → MTX → TNFi (etanercept, adalimumab)." },
+          { h: "Systemic JIA (sJIA) — Still's Disease", b: "Quotidian fever (daily spike ≥39°C), salmon-coloured rash during fever, arthritis, lymphadenopathy, serositis. IL-1/IL-6 driven. Check ferritin (>10,000 → MAS risk). Treatment: IL-1 blocker (anakinra/canakinumab) or IL-6 blocker (tocilizumab). Steroids bridge." },
+          { h: "Psoriatic JIA", b: "Arthritis + psoriasis (or ≥2: dactylitis, nail pitting, first-degree relative with psoriasis). Often asymmetric. Dactylitis hallmark. NSAIDs + MTX + TNFi for refractory." },
+          { h: "Enthesitis-Related JIA (ERA)", b: "M > F, HLA-B27+. Peripheral arthritis + enthesitis. Axial disease develops later (juvenile SpA). Sacroiliac involvement. NSAIDs → TNFi (risk of anterior uveitis — HLA-B27 associated)." },
+          { h: "Undifferentiated JIA", b: "Does not fit any category OR fits ≥2 categories. Requires careful monitoring and individualised treatment." },
+        ]
+      },
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "Key Diagnostic Criteria", b: "Age <16y · Arthritis (swelling OR 2 of: warmth, limited ROM, tenderness, pain on movement) · Duration ≥6 weeks · Exclude other causes." },
+          { h: "Investigations", b: "CBC, ESR, CRP (may be normal in oligo); RF (×2, 3 months apart); ANA (uveitis risk); HLA-B27 (ERA); Ferritin (sJIA/MAS); Echo (sJIA); Slit-lamp (all JIA, especially ANA+)." },
+          { h: "Differentials to Exclude", b: "Reactive arthritis (post-strep, post-viral) · Septic arthritis (emergency — fever + acute single joint) · Leukaemia (night pain, bone pain, low WBC) · Lyme arthritis · IBD arthropathy · SLE · viral arthritis (Parvovirus, Chikungunya)" },
+          { h: "MAS (Macrophage Activation Syndrome)", b: "EMERGENCY complication of sJIA. Sustained fever + falling ESR (unusual) + rising ferritin (>500 rapidly, >10,000 diagnostic) + cytopenias + elevated LFT + coagulopathy. Treat: high-dose IV steroids + cyclosporin + anakinra." },
+        ]
+      },
+      {
+        label: "Treatment",
+        content: [
+          { h: "Step 1: NSAIDs", b: "Naproxen 10–15 mg/kg/day BD or Ibuprofen 30–40 mg/kg/day TID. Use for 4–6 weeks as monotherapy for mild oligo." },
+          { h: "Step 2: Intraarticular Steroids", b: "Triamcinolone acetonide: large joints 1 mg/kg (max 40 mg); small joints 0.5 mg/kg (max 20 mg). Effect: 3–24 months. Preferred in oligoarthritis." },
+          { h: "Step 3: DMARDs", b: "Methotrexate (MTX): 10–15 mg/m²/week oral or SC. Add folic acid. Hydroxychloroquine: 5–6.5 mg/kg/day (max 400 mg). Sulfasalazine (ERA, psoriatic). Monitor LFT." },
+          { h: "Step 4: Biologics", b: "TNFi: Etanercept (0.8 mg/kg/week SC, max 50 mg) · Adalimumab (20–40 mg Q2W SC). IL-1: Anakinra (1–2 mg/kg/day SC) · Canakinumab (4 mg/kg Q4W SC) — for sJIA. IL-6: Tocilizumab (8–12 mg/kg IV Q2W) — sJIA and polyJIA." },
+          { h: "Uveitis Management", b: "Slit-lamp every 3 months (ANA+ oligo) · Topical steroids + mydriatics · Oral MTX for chronic uveitis · Adalimumab for MTX-refractory uveitis." },
+        ]
+      },
+    ],
     links: [
+      { label: "IgA Vasculitis (HSP) Pathway", to: "/ClinicalSupport?scenario=iga-vasculitis" },
+      { label: "ANCA Vasculitis Pathway", to: "/ClinicalSupport?scenario=anca-vasculitis" },
       { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
-      { label: "Drug Database", to: "/DrugsDosing" },
-      { label: "Uveitis Screening", to: "/PediatricRheumatology" },
+      { label: "Guidelines Library", to: "/GuidelinesLibrary" },
     ],
-    diagnosis: [
-      "Arthritis in ≥1 joint × ≥6 weeks in child <16 years, with exclusion of other causes",
-      "ILAR subtypes: (1) Oligoarticular (<5 joints, 6 months), (2) Polyarticular RF−, (3) Polyarticular RF+, (4) Systemic JIA (sJIA), (5) Psoriatic, (6) Enthesitis-related (ERA), (7) Undifferentiated",
-      "sJIA: quotidian fever ≥2 weeks + arthritis + ≥1 of: rash, lymphadenopathy, serositis, hepatosplenomegaly — exclude infections/malignancy",
-      "ERA: older males, HLA-B27+, sacroiliac tenderness, enthesitis — precursor to AS",
-    ],
-    workup: [
-      "ANA (positive in 65% oligoarticular JIA — uveitis risk marker)",
-      "RF (IgM) + anti-CCP (polyarticular RF+ worst prognosis)",
-      "ESR, CRP, CBC, LFTs, ferritin",
-      "Ferritin >10,000 ng/mL → MAS screen (fibrinogen, triglycerides, NK cell function)",
-      "HLA-B27 (ERA subtype)",
-      "X-ray involved joints (baseline); MRI if sacroiliitis suspected",
-      "Slit-lamp exam: ANA+ oligoJIA → uveitis every 3–6 months",
-    ],
-    management: [
-      "NSAIDs: first-line all subtypes — naproxen 10–15 mg/kg/day BD or ibuprofen 30–40 mg/kg/day",
-      "Intraarticular corticosteroids: triamcinolone hexacetonide — oligoJIA most effective",
-      "Methotrexate (MTX): 10–15 mg/m² weekly (po or SC) — mainstay DMARD for polyarticular, ANA+ oligo",
-      "Leflunomide: alternative to MTX if intolerant",
-      "TNF inhibitors: etanercept (25 mg SC weekly) or adalimumab — MTX-refractory polyarticular/ERA",
-      "IL-6 inhibitor (tocilizumab): sJIA with polyarthritis + poor response",
-      "IL-1 inhibitor (anakinra/canakinumab): sJIA especially — rapid fever control",
-      "JAK inhibitors (baricitinib/tofacitinib): RF+ polyJIA, ERA refractory",
-      "Abatacept (CTLA4-Ig): RF+ polyJIA failing biologics",
-      "Uveitis: topical steroids → MTX → adalimumab (most evidence for uveitis)",
-    ],
-    monitoring: [
-      "JADAS-27 or JADAS-71 score at each visit (joint count + ESR + physician/patient global)",
-      "LFTs every 3 months on MTX; folate supplementation",
-      "Drug holiday in remission (usually ≥6 months inactive disease on medication)",
-      "MAS: ferritin, CBC, fibrinogen, triglycerides, LDH weekly if sJIA active",
-    ],
-    color: "blue"
   },
+
   sle: {
-    title: "Systemic Lupus Erythematosus (SLE / LN)",
-    guideline: "EULAR/ACR SLE 2019 · ACR LN 2021 · KDIGO LN 2021",
+    title: "Systemic Lupus Erythematosus (SLE)",
+    subtitle: "EULAR/ACR 2019 Classification · SLEDAI-2K · SLICC",
+    intro: "Multisystem autoimmune disease. Diagnosis: ≥1 clinical domain + ANA ≥1:80 + cumulative score ≥10 (EULAR/ACR 2019). Renal involvement in 50–80% pSLE.",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "EULAR/ACR 2019 Entry Criterion", b: "ANA ≥1:80 (HEp-2 or equivalent) — if negative, SLE diagnosis very unlikely. Then score clinical + immunological domains." },
+          { h: "Clinical Domains (selected key)", b: "Constitutional (fever ≠ infection: +2) · Haematological (AIHA, leucopenia <4000, lymphopenia <1000, thrombocytopenia <100k) · Neuropsychiatric (seizures, psychosis, mononeuritis multiplex) · Mucocutaneous (acute cutaneous lupus/malar rash +6, discoid +4, oral ulcers, non-scarring alopecia) · Serosal (pleuritis, pericarditis) · Musculoskeletal (synovitis ≥2 joints) · Renal (proteinuria >0.5g/g UPCR, biopsy-proven LN)." },
+          { h: "Immunological Domains", b: "Anti-dsDNA ≥2× lab normal (+6) · Anti-Sm (+6) · Anti-phospholipid Ab (anti-cardiolipin, anti-β2GP1, lupus anticoagulant) · Low C3 or C4 (+3 each) · Direct Coombs." },
+          { h: "Lupus Nephritis — ISN/RPS Class", b: "Class I/II: Mesangial — mild; treat underlying SLE only. Class III/IV: Focal/Diffuse proliferative — HIGH risk; induction required (MMF + steroids). Class V: Membranous — proteinuria ± combined III/IV. Class VI: Sclerosing — ESRD pathway." },
+          { h: "SLEDAI-2K", b: "Disease activity score. Mild: 1–4, Moderate: 5–12, Severe: >12. Monitor monthly during active disease, 3-monthly in remission." },
+        ]
+      },
+      {
+        label: "Management",
+        content: [
+          { h: "ALL SLE: Hydroxychloroquine (HCQ)", b: "5 mg/kg/day (max 400 mg). Reduces flares, damage accrual, mortality. Continue even in remission. Monitor annual slit-lamp (retinal toxicity, rare)." },
+          { h: "Mild SLE", b: "NSAIDs (short-term for joint/serositis) + HCQ. Low-dose prednisolone if needed." },
+          { h: "Moderate SLE", b: "HCQ + prednisolone 0.5 mg/kg/day + add DMARD: Azathioprine (1–3 mg/kg/day) or MMF (600 mg/m²/dose BD)." },
+          { h: "Severe / Renal LN (Class III/IV)", b: "Induction: Pulse MP (30 mg/kg, max 1g × 3 days) → Prednisolone 1–2 mg/kg/day + MMF (600 mg/m²/dose BD) OR NIH-CYC (750 mg/m² IV monthly × 6). Maintenance: MMF + low-dose steroid + HCQ." },
+          { h: "Refractory / Severe SLE", b: "Belimumab (BLyS inhibitor) · Rituximab (anti-CD20: 375 mg/m² × 4 doses or 2 × 1000 mg) for refractory LN or haematological SLE. Calcineurin inhibitors (tacrolimus/cyclosporin) for membranous LN." },
+          { h: "Monitoring", b: "CBC, renal panel, urine UPCR monthly (active) → 3-monthly (stable). Anti-dsDNA + C3/C4 every 3 months. BP (HCQ + steroid). Bone health (Vit D + Ca with steroids). Eye exam annually." },
+        ]
+      },
+      {
+        label: "Emergency",
+        content: [
+          { h: "Lupus Crisis / Severe Flare", b: "IV methylprednisolone 500–1000 mg (30 mg/kg, max 1g) × 3 days. Assess for infection before steroids. Sepsis mimics lupus flare." },
+          { h: "Antiphospholipid Syndrome (APS)", b: "Thrombosis + positive APLA (×2, 12 weeks apart). Arterial/venous thrombosis → anticoagulation (warfarin, INR 2–3). Catastrophic APS: PLEX + heparin + steroids." },
+          { h: "Macrophage Activation Syndrome (MAS)", b: "Sustained fever + ferritin >500 (rapidly rising) + cytopenias + coagulopathy. Treat with high-dose steroids + cyclosporin. Overlap with HLH." },
+          { h: "CNS Lupus", b: "Seizures, psychosis, transverse myelitis, stroke. Pulse steroids. Rule out APLA (need anticoagulation). EEG, MRI brain." },
+        ]
+      },
+    ],
     links: [
-      { label: "Lupus Nephritis Pathway", to: "/Hub", scenario: "lupus-nephritis" },
-      { label: "GN Engine", to: "/Hub", scenario: "gn-engine" },
-      { label: "RPGN Engine", to: "/Hub", scenario: "rpgn-deep-engine" },
+      { label: "Lupus Nephritis Pathway", to: "/ClinicalSupport?scenario=lupus-nephritis" },
+      { label: "ANCA Vasculitis Pathway", to: "/ClinicalSupport?scenario=anca-vasculitis" },
       { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
+      { label: "Plasmapheresis Module", to: "/ProcedureHub" },
+      { label: "Guidelines Library", to: "/GuidelinesLibrary" },
     ],
-    diagnosis: [
-      "EULAR/ACR 2019: ≥10 points = SLE (ANA ≥1:80 mandatory entry criterion)",
-      "Domains: constitutional (2), haematology (0–4), neuropsychiatric (2–4), mucocutaneous (2–6), serosal (1–6), musculoskeletal (0–6), renal (4–10), antiphospholipid Abs (2), complement proteins (3), highly specific antibodies — anti-dsDNA/anti-Sm (6 each)",
-      "Renal involvement: proteinuria >500 mg/24h OR UPCR >0.5 OR active urinary sediment (RBC casts, granular casts)",
-      "Biopsy ALL children with LN for ISN/RPS class — critical for induction choice",
-    ],
-    workup: [
-      "ANA (≥1:80 mandatory), anti-dsDNA, anti-Sm, anti-SSA/Ro, anti-SSB/La, anti-ribosomal P, anti-phospholipid panel",
-      "C3, C4, CH50 (low = active disease); ANCA (overlap)",
-      "CBC (lymphopenia, thrombocytopenia, anaemia), Coombs",
-      "Urinalysis + UPCR, 24h urine protein if UPCR equivocal",
-      "Renal biopsy: ISN/RPS class I–VI — class III/IV/V + renal biopsy mandatory",
-      "Echocardiogram (Libman-Sacks endocarditis, pericarditis), CT chest if pleuritis",
-      "Ophthalmology (retinal vasculitis)",
-      "SLEDAI-2K at each visit (activity score)",
-    ],
-    management: [
-      "Hydroxychloroquine (HCQ): ALL SLE patients — 5 mg/kg/day (max 400 mg/day); anti-flare, reduces mortality",
-      "Prednisolone: 1 mg/kg/day (max 60 mg) initial induction; taper over 3–6 months",
-      "Class III/IV LN (proliferative): EUROLUPUS low-dose CYC (500 mg IV × 6 doses) or high-dose CYC (NIH protocol) THEN MMF maintenance",
-      "Class V LN (membranous): MMF 1.5–3 g/day + steroids; add voclosporin if proteinuria persists",
-      "MMF maintenance: 600 mg/m²/dose BD (1–3 g/day) × 3 years minimum",
-      "Azathioprine: alternative maintenance, especially if pregnancy planned",
-      "Belimumab (anti-BLyS): SLEDAI >8, serologically active — approved ≥5 years in paediatric SLE",
-      "Anifrolumab (anti-IFNaR1): new, approved for adult SLE — paediatric trials ongoing",
-      "Rituximab: refractory LN, refractory cytopenias, CNS lupus",
-      "APS: hydroxychloroquine + aspirin ± anticoagulation if thrombosis",
-      "Nephritis: RAAS blockade (ACEi/ARB) mandatory + BP target <75th percentile",
-    ],
-    monitoring: [
-      "SLEDAI-2K at every visit; BILAG for organ-specific activity",
-      "Anti-dsDNA, C3, C4 every 3 months (flare marker)",
-      "UPCR monthly during induction, 3-monthly in remission",
-      "HCQ eye screening: annual from 5 years of use",
-      "Bone density (DXA): steroid-treated patients — annual",
-      "Vaccinations: influenza annually, pneumococcal, HPV, avoid live vaccines during immunosuppression",
-    ],
-    color: "violet"
   },
+
   anca: {
-    title: "ANCA-Associated Vasculitis (GPA · MPA · EGPA)",
-    guideline: "ACR/EULAR ANCA Vasculitis 2022 · KDIGO GN 2021",
+    title: "ANCA-Associated Vasculitis (AAV)",
+    subtitle: "GPA · MPA · EGPA · EULAR 2022 · ACR/EULAR 2022",
+    intro: "Small-vessel vasculitis affecting kidneys, lungs, ENT, nerves. GPA: granulomatous (upper + lower airway + kidney). MPA: microscopic (kidney + lung). EGPA: eosinophilic + asthma.",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "ANCA Serology", b: "cANCA (anti-PR3): mainly GPA. pANCA (anti-MPO): mainly MPA and EGPA. ANCA-negative AAV: 10–20% (biopsy essential)." },
+          { h: "GPA Features", b: "Saddle-nose deformity, chronic sinusitis, otitis, subglottic stenosis (ENT). Haemoptysis, nodules, cavities (lung). Pauci-immune GN (kidney). Scleritis." },
+          { h: "MPA Features", b: "Rapidly progressive GN (most common cause of RPGN + ANCA). Pulmonary haemorrhage (DAH). No granulomas. No significant ENT disease." },
+          { h: "EGPA Features", b: "Asthma (precedes vasculitis by years) + eosinophilia (>1.5 × 10⁹/L) + small-vessel vasculitis. Cardiac involvement (major cause of death). pANCA/MPO+." },
+          { h: "Key Investigations", b: "ANCA (cANCA/pANCA + anti-PR3/MPO by ELISA). Renal biopsy: pauci-immune RPGN (no/scant immune deposits). Urinalysis (haematuria + RBC casts). CXR/HRCT (nodules, cavities, infiltrates). ENT evaluation (GPA). Nerve conduction (mononeuritis multiplex)." },
+          { h: "BVAS (Birmingham Vasculitis Activity Score)", b: "Quantifies disease activity across 9 organ systems. Used to guide treatment intensity." },
+        ]
+      },
+      {
+        label: "Treatment",
+        content: [
+          { h: "Induction — Severe (organ-threatening / RPGN / DAH)", b: "IV Methylprednisolone 500–1000 mg × 3 days → Prednisolone 1 mg/kg/day (max 80 mg). PLUS: Rituximab 375 mg/m² × 4 weekly (PREFERRED) OR CYC IV 15 mg/kg Q2–3W × 6 pulses. PLEX: if Cr >500 µmol/L or DAH." },
+          { h: "Induction — Non-Severe", b: "Prednisolone + Rituximab (preferred over CYC for children to reduce gonadotoxicity). Or CYC oral 2 mg/kg/day × 3–6 months for non-severe." },
+          { h: "Maintenance", b: "Rituximab 500 mg Q6 monthly (preferred) OR Azathioprine 2 mg/kg/day + low-dose prednisolone. Duration: 24 months minimum (GPA prone to relapse). Monitor PR3/MPO titre to predict relapse." },
+          { h: "EGPA-Specific", b: "Mepolizumab (anti-IL-5): reduces eosinophil burden + steroid-sparing (cardiac monitoring). Steroids are mainstay. Rituximab if refractory." },
+          { h: "Renal Monitoring in AAV", b: "eGFR + UPCR every 1–3 months (active), 3-monthly (remission). ANCA titre (rising PR3/MPO often precedes relapse). Repeat biopsy if rapid deterioration." },
+        ]
+      },
+      {
+        label: "Emergency",
+        content: [
+          { h: "DAH (Diffuse Alveolar Haemorrhage)", b: "Haemoptysis + bilateral infiltrates + dropping Hb. EMERGENCY: IV MP + PLEX (if Cr >500 or severe hypoxia) + RTX/CYC. ICU support." },
+          { h: "RPGN in ANCA Vasculitis", b: "Rising Cr + haematuria + RBC casts. Urgent biopsy. PLEX if Cr >500 µmol/L or dialysis-dependent. Do not delay treatment for biopsy." },
+          { h: "Monitoring Rituximab", b: "CD19/CD20 B-cell count post-RTX. Check immunoglobulins (IVIG if IgG <4 g/L + recurrent infections). PCP prophylaxis (cotrimoxazole) during induction." },
+        ]
+      },
+    ],
     links: [
-      { label: "ANCA Vasculitis Pathway", to: "/Hub", scenario: "anca-vasculitis" },
-      { label: "RPGN Engine", to: "/Hub", scenario: "rpgn-deep-engine" },
-      { label: "GN Engine", to: "/Hub", scenario: "gn-engine" },
+      { label: "ANCA Vasculitis Pathway", to: "/ClinicalSupport?scenario=anca-vasculitis" },
+      { label: "RPGN Engine", to: "/ClinicalSupport?scenario=rpgn-deep-engine" },
+      { label: "Plasmapheresis Module", to: "/ProcedureHub" },
+      { label: "Lupus Nephritis Pathway", to: "/ClinicalSupport?scenario=lupus-nephritis" },
       { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
     ],
-    diagnosis: [
-      "GPA (Wegener): C-ANCA/PR3-ANCA+ — upper/lower respiratory + renal; saddle nose, nasal septal perforation",
-      "MPA: P-ANCA/MPO-ANCA+ — predominantly renal ± pulmonary haemorrhage, without upper respiratory",
-      "EGPA (Churg-Strauss): MPO-ANCA 40% — asthma + eosinophilia + vasculitis (rare in children)",
-      "Paediatric GPA/MPA: renal RPGN + haematuria + proteinuria is most common presentation",
-      "Biopsy: pauci-immune crescentic GN on IF (no Ig deposits) — hallmark",
-      "BVAS (Birmingham Vasculitis Activity Score) for disease activity",
-    ],
-    workup: [
-      "ANCA (IIF), PR3-ANCA (ELISA), MPO-ANCA (ELISA) — PR3 = GPA, MPO = MPA/EGPA",
-      "CBC (eosinophilia in EGPA), CRP, ESR, creatinine",
-      "Urinalysis with microscopy (RBC casts, granular casts), UPCR",
-      "Chest XR/HRCT (nodules, cavities in GPA; ground glass in DAH)",
-      "Sinuses CT (GPA — sinusitis, nasal destruction)",
-      "BAL (bronchoalveolar lavage) if DAH suspected: haemosiderin-laden macrophages",
-      "Renal biopsy (% crescents = prognostic; pauci-immune IF pattern)",
-      "Anti-GBM Ab (double-positive ANCA + anti-GBM = worse outcome)",
-    ],
-    management: [
-      "INDUCTION: Rituximab (RTX) 375 mg/m²/dose weekly × 4 weeks — now FIRST-LINE (equal to CYC, less gonadotoxic)",
-      "Alternative induction: IV cyclophosphamide (CYC) 500 mg/m² q2W × 3–6 doses (Euro-Lupus modified)",
-      "High-dose steroids: pulse methylprednisolone 500 mg/m² × 3 days THEN prednisolone 1 mg/kg/day",
-      "PLEX (plasma exchange): Cr >500 µmol/L OR dialysis-dependent OR DAH — PLEX × 7 sessions (ADVOCATE trial did NOT support routine PLEX — use for DAH/anti-GBM double positive)",
-      "MAINTENANCE: RTX 500 mg every 6 months × 2 years (RITAZAREM trial) OR azathioprine 2 mg/kg/day",
-      "Avacopan (C5a receptor blocker): steroid-sparing — approved adults, paediatric trials ongoing",
-      "Trimethoprim-sulfamethoxazole (TMP-SMX): long-term PJP prophylaxis + reduces GPA relapse risk",
-      "Monitor ANCA titres (PR3-ANCA rise = relapse predictor — but not 100%)",
-    ],
-    monitoring: [
-      "BVAS or PVAS (Paediatric Vasculitis Activity Score) every visit",
-      "UPCR, eGFR monthly during induction, quarterly thereafter",
-      "PR3/MPO-ANCA every 3 months",
-      "Immunoglobulins before RTX doses (IgG >5 g/L required)",
-      "Annual influenza; pneumococcal vaccination",
-      "Bone density, PJP prophylaxis on immunosuppression",
-    ],
-    color: "red"
   },
-  igav: {
-    title: "IgA Vasculitis (Henoch-Schönlein Purpura)",
-    guideline: "EULAR/PReS 2012 · SHARE 2019",
-    links: [
-      { label: "HSP/HSPN Pathway", to: "/Hub", scenario: "hspn" },
-      { label: "IgA Vasculitis Pathway", to: "/Hub", scenario: "iga-vasculitis" },
-      { label: "GN Engine", to: "/Hub", scenario: "gn-engine" },
-    ],
-    diagnosis: [
-      "Mandatory: purpura/petechiae (predominantly lower limbs) OR petechial rash + ≥1 of:",
-      "(1) Diffuse abdominal pain; (2) Arthritis/arthralgia; (3) Renal involvement (haematuria/proteinuria); (4) Histopathology: IgA deposits on skin biopsy",
-      "Must exclude thrombocytopenic purpura (platelet count normal in IgAV)",
-      "Nephritis (HSPN): occurs in 30–50%, usually within 6–8 weeks of onset",
-      "HSPN grades: I (haematuria), II (proteinuria <500 mg/day), III (500 mg–nephrotic range), IV (nephrotic), V (nephrotic+nephritic), VI (RPGN pattern)",
-    ],
-    workup: [
-      "CBC (normal platelets, exclude thrombocytopenia), CRP, ESR",
-      "Urinalysis weekly for 6 months (catch HSPN)",
-      "UPCR if proteinuria detected",
-      "IgA level (elevated in ~50%); C3/C4 (usually normal)",
-      "ANA, ANCA, anti-GBM (to exclude ANCA vasculitis / lupus)",
-      "Skin biopsy (if atypical): IgA dominant perivascular deposits",
-      "Renal biopsy: if UPCR >500 mg/g, nephrotic syndrome, RPGN, or declining eGFR",
-      "Biopsy — Oxford MEST-C score: M (mesangial), E (endocapillary), S (segmental sclerosis), T (tubular atrophy), C (crescents)",
-    ],
-    management: [
-      "Mild uncomplicated IgAV: supportive — analgesia, hydration, ambulatory care",
-      "NSAIDs for arthralgia (avoid if renal involvement or GI bleeding)",
-      "Prednisolone: abdominal pain, severe arthritis, orchitis — 1 mg/kg/day × 2 weeks then taper (does NOT prevent HSPN)",
-      "HSPN Grade III–V (proteinuria, nephrotic): prednisolone + RAAS blockade (ACEi/ARB)",
-      "HSPN Grade IV–VI (nephrotic/RPGN): ACEi + prednisolone + cyclophosphamide or MMF (per crescentic biopsy score)",
-      "Pulse steroids for RPGN pattern: methylprednisolone 500 mg/m² × 3 days",
-      "PLEX: severe crescentic HSPN with rapidly rising creatinine — adjunct",
-    ],
-    monitoring: [
-      "Urinalysis + BP WEEKLY × 6–8 weeks post-rash (HSPN window)",
-      "If proteinuria resolves: monthly × 6 months, then annual for 2 years (delayed nephritis can occur)",
-      "Recheck UPCR/eGFR at every clinic visit if HSPN present",
-    ],
-    color: "orange"
-  },
-  pf: {
+
+  periodic: {
     title: "Periodic Fever Syndromes (Autoinflammatory)",
-    guideline: "PRINTO Eurofever 2019 · EULAR Autoinflammatory 2022",
+    subtitle: "Eurofever / PRINTO 2019 Classification Criteria",
+    intro: "Monogenic autoinflammatory disorders with periodic fever episodes without infection or autoimmunity. Pattern recognition is key — fever duration, interval, associated features.",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "PFAPA (Periodic Fever, Aphthous Ulcers, Pharyngitis, Adenitis)", b: "Most common. Onset <5 years. Episodes every 3–8 weeks. Duration 3–6 days. Clockwork regularity. Normal between episodes. No genetic mutation. Treatment: single dose prednisolone 1–2 mg/kg (aborts episode in hours). Tonsillectomy curative in 60–90%." },
+          { h: "FMF (Familial Mediterranean Fever) — MEFV gene", b: "Autosomal recessive. Commonest in Middle East, Turkey, Armenia. Attacks: 12–72h. Fever + peritonitis (abdomen) ± pleuritis ± arthritis. AA amyloidosis (most feared complication). Treatment: COLCHICINE 0.5–1 mg/day (lifelong) — prevents attacks and amyloid. Add anakinra if resistant." },
+          { h: "TRAPS (TNF Receptor-Associated Periodic Syndrome) — TNFRSF1A gene", b: "Autosomal dominant. Longer attacks (days–weeks). Migratory myalgia with overlying erythema. Periorbital oedema. High SAA/CRP. Treatment: IL-1 blockers (anakinra/canakinumab — first-line); etanercept (partial). NSAIDs for mild." },
+          { h: "CAPS (Cryopyrin-Associated Periodic Syndromes) — NLRP3 gene", b: "Spectrum: FCAS (cold-triggered urticaria) → MWS (urticaria, sensorineural deafness) → NOMID (most severe: neonatal onset, CNS, destructive arthropathy). Continuous IL-1β excess. Treatment: IL-1 blockers (canakinumab 2–4 mg/kg Q8W — highly effective in CAPS)." },
+          { h: "MKD/HIDS (Mevalonate Kinase Deficiency) — MVK gene", b: "Autosomal recessive. Attacks 3–7 days every 4–8 weeks. High IgD. Lymphadenopathy, abdominal pain, aphthous ulcers. Mevalonic aciduria in crisis. Treatment: IL-1 blockers (canakinumab); IL-6 (tocilizumab). NSAIDs. Steroids bridge." },
+        ]
+      },
+      {
+        label: "Approach",
+        content: [
+          { h: "Fever Pattern — Clinical Clues", b: "Episode frequency and duration (PFAPA: 3–8W, FMF: 1–4W, TRAPS: every few months). Attack triggers (cold → FCAS/CAPS). Regularity (PFAPA: clockwork). Age of onset (NOMID: neonatal; PFAPA: preschool)." },
+          { h: "Which Test to Order?", b: "All: CBC, ESR, CRP, SAA (serum amyloid A — elevated in attacks). During attack: blood culture to exclude infection. Genetic panel: MEFV, TNFRSF1A, NLRP3, MVK — Eurofever Panel. Urine mevalonic acid (MVK during attack). IgD level (HIDS — often elevated, not specific)." },
+          { h: "Red Flags — Consider Alternatives", b: "Continuous symptoms (consider infection, IBD, malignancy). Night sweats + weight loss (lymphoma). ANA/ANCA positive (autoimmunity, not autoinflammation). Very high WBC (leukaemia)." },
+          { h: "Scoring Tools", b: "Eurofever/PRINTO classification criteria: validated criteria for FMF, TRAPS, CAPS, MKD, PFAPA. Available online. MAS risk: ferritin >10,000, cytopenias, coagulopathy." },
+        ]
+      },
+      {
+        label: "Treatment",
+        content: [
+          { h: "PFAPA", b: "Attack: prednisolone 1–2 mg/kg (single dose) — aborts attack within hours. Prevention: cimetidine (limited evidence). Definitive: tonsillectomy (60–90% cure rate)." },
+          { h: "FMF", b: "Colchicine: 0.5 mg/day (<5y), 1 mg/day (5–10y), 1.5 mg/day (>10y). Max 2 mg/day. Take daily (not just during attacks). If inadequate: add anakinra 1–2 mg/kg/day SC." },
+          { h: "CAPS Spectrum", b: "Canakinumab 2–4 mg/kg Q8W (most effective for CAPS). Anakinra 1–2 mg/kg/day SC (effective but daily injection). Rilonacept (IL-1 trap) — available in some regions." },
+          { h: "TRAPS", b: "Canakinumab: preferred for frequent/severe attacks. Anakinra: breakthrough attacks. Etanercept: partial effect. Avoid infliximab/adalimumab (may worsen TRAPS)." },
+          { h: "MKD/HIDS", b: "Canakinumab: most evidence. Tocilizumab: alternative. Simvastatin (theoretical — incomplete mevalonate pathway): limited benefit. Gene therapy/enzyme replacement: investigational." },
+        ]
+      },
+    ],
     links: [
       { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
       { label: "Rare Disease Module", to: "/RareDiseaseModule" },
+      { label: "Guidelines Library", to: "/GuidelinesLibrary" },
     ],
-    diagnosis: [
-      "Key: recurrent episodes of fever + specific pattern — rule out infection, malignancy, JIA/SLE first",
-      "FMF (Familial Mediterranean Fever): AR MEFV; 6–96h fever + serositis (peritonitis, pleuritis, arthritis, erysipelas-like rash); Mediterranean origin; responds dramatically to colchicine",
-      "TRAPS (TNF receptor-associated periodic syndrome): AD TNFRSF1A; 1–3 week fever episodes, migratory rash (centrifugal), conjunctivitis, myalgia, serositis",
-      "CAPS (Cryopyrin-associated periodic syndromes): AD NLRP3; (mild→severe): FCAS → MWS → NOMID/CINCA — cold-induced urticaria, SNHL, papilledema, arthropathy",
-      "MKD (Mevalonate Kinase Deficiency/HIDS): AR MVK; 3–7 day episodes with lymphadenopathy, abdominal pain, aphthous ulcers, high IgD",
-      "PFAPA (Periodic Fever Aphthous Pharyngitis Adenitis): most common; regular 3–6 week cycle; NOT genetic; responds to single-dose prednisolone during episode; may spontaneously remit",
-    ],
-    workup: [
-      "Fever diary (document: duration, interval, triggers, associated symptoms)",
-      "ESR, CRP, SAA during attack AND between attacks (elevated during attack, normalise between = supports periodic fever syndrome)",
-      "CBC, ferritin, LFTs, LDH (during attack)",
-      "Serum IgD (elevated in MKD >100 IU/mL)",
-      "Urine mevalonic acid (elevated in MKD attack)",
-      "Genetic panel: MEFV (FMF), TNFRSF1A (TRAPS), NLRP3 (CAPS), MVK (MKD) — Eurofever registry criteria first",
-      "Intravenous immunoglobulin trial if PFAPA suspected",
-    ],
-    management: [
-      "FMF: colchicine 0.5–1.5 mg/day (lifelong) — prevents attacks AND AA amyloidosis; IL-1 blocker (anakinra/canakinumab) if refractory",
-      "TRAPS: NSAIDs for episodes; etanercept reduces frequency; anakinra for acute attacks; IL-1 blockade for TRAPS with systemic amyloidosis",
-      "CAPS: canakinumab (anti-IL-1β) or anakinra — all CAPS subtypes; dramatic response expected within 24–48h",
-      "MKD: simvastatin (modest); IL-1 blockade (anakinra/canakinumab) for severe; geranylgeraniol supplements experimental",
-      "PFAPA: prednisolone 1 mg/kg single dose at fever onset (aborts episode); tonsillectomy curative in many; colchicine prophylaxis reduces episodes",
-    ],
-    monitoring: [
-      "Amyloidosis screening: urinary albumin annually (FMF, TRAPS, MKD — AA amyloid risk)",
-      "Ophthalmology (CAPS: papilledema, retinal changes)",
-      "Audiometry (CAPS: SNHL — arrange annually)",
-      "ESR/SAA normalisation between attacks (treatment goal — eliminate subclinical inflammation)",
-    ],
-    color: "amber"
   },
+
+  kawasaki: {
+    title: "Kawasaki Disease",
+    subtitle: "AHA 2017 Scientific Statement",
+    intro: "Acute febrile vasculitis of medium vessels. Most common cause of acquired heart disease in children in developed countries. Coronary artery aneurysm (CAA) is the main complication.",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "Classic Criteria (≥5 days fever + 4 of 5)", b: "1) Conjunctival injection (bilateral, non-purulent, limbic sparing). 2) Oral changes (cracked lips, strawberry tongue, diffuse erythema). 3) Rash (polymorphous, non-vesicular, truncal). 4) Extremity changes (erythema palms/soles, periungual desquamation in sub-acute). 5) Cervical lymphadenopathy (≥1 node >1.5 cm, usually unilateral)." },
+          { h: "Incomplete Kawasaki", b: "Fever ≥5 days + 2–3 clinical features + elevated CRP (≥30) or ESR (≥40) → Echo: if ≥3 echocardiographic criteria OR z-score ≥2.5 in any coronary → treat as KD. Algorithm: AHA 2017 incomplete KD flowchart." },
+          { h: "Infants <6 months: EXTRA vigilance", b: "Classic features often absent. Highest risk for CAA. Echo at diagnosis regardless of criteria met. Low threshold to treat." },
+          { h: "Lab Findings", b: "Elevated: CRP, ESR, WBC (left shift), platelets (thrombocytosis in sub-acute phase — risk of thrombosis). Elevated ALT/GGT (hepatic involvement). Low albumin, low sodium (poor prognosis markers). UA: sterile pyuria." },
+          { h: "Differentials", b: "PFAPA, viral exanthem (measles, adenovirus — viral serology), toxic shock syndrome (blood culture), scarlet fever (ASOT), reactive arthritis, SJS, drug reaction, adult Still's/MAS." },
+        ]
+      },
+      {
+        label: "Treatment",
+        content: [
+          { h: "URGENT: IVIG + Aspirin", b: "IVIG 2 g/kg over 10–12 hours (single dose) — must give within 10 days of fever onset (ideally day 5–9). Aspirin 80–100 mg/kg/day in 4 doses during febrile phase → 3–5 mg/kg/day once afebrile (anti-platelet effect)." },
+          { h: "IVIG-Resistant KD (fever persists 36h after IVIG)", b: "Second IVIG 2 g/kg OR Infliximab 5 mg/kg IV (TNFi — equivalent to 2nd IVIG, faster response). OR Prednisolone 2 mg/kg/day (Kobayashi-predicted high-risk: Japanese scoring)." },
+          { h: "Refractory KD / Giant CAA", b: "IV Methylprednisolone 30 mg/kg × 3 + IVIG. Anakinra (IL-1 blocker) for refractory. Low-molecular-weight heparin if z-score ≥10 (giant aneurysm — thrombosis risk)." },
+          { h: "Aspirin Duration", b: "No CAA: stop aspirin 4–6 weeks post-KD. CAA z-score 2.5–5: aspirin for ≥1 year. z-score >5: long-term aspirin + consider anticoagulation (warfarin)." },
+        ]
+      },
+      {
+        label: "Coronary Monitoring",
+        content: [
+          { h: "Echo Schedule", b: "At diagnosis · 2 weeks · 6 weeks · 3 months (if CAA). Then annually if persistent CAA." },
+          { h: "CAA Classification (z-score)", b: "Normal: <2.5. Dilation: 2.5–4.9. Small aneurysm: 5–6.9. Medium: 7–9.9. Giant (highest risk): ≥10." },
+          { h: "Long-term Risk", b: "Most small-medium aneurysms regress in 1–2 years. Giant aneurysm: lifelong cardiac follow-up, anticoagulation, possible intervention." },
+        ]
+      },
+    ],
+    links: [
+      { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
+      { label: "Guidelines Library", to: "/GuidelinesLibrary" },
+    ],
+  },
+
+  hsv: {
+    title: "IgA Vasculitis (Henoch-Schönlein Purpura)",
+    subtitle: "EULAR/PRINTO/PRES 2010 Criteria · ISPN Nephritis Guidelines",
+    intro: "Most common systemic vasculitis in children. IgA-dominant immune deposits in small vessels. Tetrad: palpable purpura, arthritis, abdominal pain, renal involvement (IgAV-N).",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "EULAR/PRINTO Criteria", b: "Mandatory: Palpable purpura (or petechiae), predominantly on legs, not thrombocytopenic. Plus ≥1: abdominal pain, histopathology (IgA deposits), arthritis/arthralgia, renal involvement (proteinuria/haematuria)." },
+          { h: "Renal Involvement (IgAV-N)", b: "Occurs in 20–50% within 4–6 weeks. Microscopic haematuria (most common). Proteinuria (UPCR >0.2 = concerning). Nephrotic range (>2 g/day). Biopsy indication: UPCR >0.5, declining eGFR, hypertension, nephrotic syndrome — shows mesangial IgA deposits (same as IgAN)." },
+          { h: "Severity Grading", b: "Mild: purpura only. Moderate: arthritis + abdominal pain. Severe: gut ischaemia (urgent) + nephrotic/nephritic renal disease + scrotal oedema." },
+          { h: "Investigations", b: "CBC, CRP. IgA level (elevated in 50% — not diagnostic). Renal panel, UPCR (every 2 weeks for 6 months). US abdomen (if severe pain — intussusception?). Skin biopsy (IgA IF) if atypical." },
+        ]
+      },
+      {
+        label: "Management",
+        content: [
+          { h: "Mild IgAV (skin + joints)", b: "Supportive: NSAIDs for arthralgia (short course). No steroids needed for uncomplicated skin + joints. Monitor urine weekly × 4–6 weeks." },
+          { h: "GI involvement", b: "Prednisolone 1–2 mg/kg/day for severe abdominal pain (reduces duration). IV hydration. Nil by mouth if intussusception risk. Surgical consultation for bowel ischaemia." },
+          { h: "IgAV Nephritis — Mild (UPCR 0.2–0.5, normal eGFR)", b: "ACEi/ARB if persistent proteinuria. Monitor UPCR every 1–3 months for 1 year." },
+          { h: "IgAV Nephritis — Moderate/Severe (UPCR >0.5 / nephrotic / declining eGFR)", b: "Biopsy if UPCR >0.5. Prednisolone 1–2 mg/kg/day + MMF (600 mg/m²/dose BD) for ISKDC grade III/IV. Pulse steroids for crescentic nephritis. PLEX rarely needed." },
+          { h: "Monitoring", b: "Urine dip weekly × 4 weeks → monthly × 6 months. BP. If renal involved: monitor for 1 year (late-onset renal involvement can occur). Adolescent girls: follow-up in pregnancy planning (HTN/proteinuria risk)." },
+        ]
+      },
+    ],
+    links: [
+      { label: "IgA Vasculitis Pathway", to: "/ClinicalSupport?scenario=iga-vasculitis" },
+      { label: "HSPN Pathway", to: "/ClinicalSupport?scenario=hspn" },
+      { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
+    ],
+  },
+
   jdm: {
     title: "Juvenile Dermatomyositis (JDM)",
-    guideline: "CARRA JDM Guidelines 2020 · EULAR/PReS 2018",
+    subtitle: "CARRA 2017 · Bohan & Peter Criteria · Myositis-Specific Ab",
+    intro: "Inflammatory myopathy with characteristic skin findings. Childhood onset. Calcinosis is a major morbidity. Interstitial lung disease in some subtypes. No malignancy association in children (unlike adult DM).",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "Pathognomonic Skin Findings", b: "Gottron's papules (over knuckles MCP/PIP): scaly erythematous papules — virtually diagnostic. Heliotrope rash: periorbital oedema + violaceous discolouration. Shawl sign, V-sign, holster sign." },
+          { h: "Muscle Involvement", b: "Proximal muscle weakness: Gowers' sign (rising from floor), difficulty climbing stairs, raising arms. Neck flexor weakness. Normal distal strength." },
+          { h: "Myositis-Specific Antibodies (MSA)", b: "Anti-Jo-1 (anti-ARS): ILD risk. Anti-MDA5: rapidly progressive ILD, amyopathic DM. Anti-NXP2: calcinosis risk. Anti-TIF1-γ: photosensitivity. Anti-Mi-2: good steroid response. Test full myositis panel." },
+          { h: "Investigations", b: "CK (may be normal in JDM — unlike adult PM). LDH, aldolase. MRI muscle (STIR: oedema — more sensitive than EMG in children). EMG (abnormal if active myositis). Muscle biopsy (if diagnosis uncertain). Echo (myocarditis). PFTs (ILD screen). Nailfold capillaroscopy (dilated capillary loops = active vasculopathy)." },
+          { h: "Calcinosis", b: "Deposits of calcium in skin, muscle, fascia. Occurs in 20–40% of JDM. Risk: delayed diagnosis, prolonged active disease. Prevention: early aggressive treatment. Treatment: limited — diltiazem, bisphosphonates (uncertain benefit)." },
+        ]
+      },
+      {
+        label: "Treatment",
+        content: [
+          { h: "First-line: Steroids + MTX", b: "IV Methylprednisolone 30 mg/kg/day (max 1g) × 3 days → Prednisolone 1–2 mg/kg/day + Methotrexate 15 mg/m²/week (oral or SC). Hydroxychloroquine 5 mg/kg/day (skin-predominant). Sunscreen + sun avoidance." },
+          { h: "Refractory / Rapid-onset ILD", b: "IVIG 2 g/kg monthly (effective for skin + muscle). Rituximab 375 mg/m² × 4 (for refractory or anti-Jo1/MDA5). Cyclosporin (calcineurin inhibitor — helpful for ILD in MDA5+). Tacrolimus." },
+          { h: "ILD (Anti-MDA5)", b: "Rapidly progressive — can be fatal. Early aggressive: high-dose steroids + tacrolimus + CYC. Monitor PFTs + HRCT." },
+          { h: "Calcinosis Management", b: "Aggressive early treatment prevents calcinosis. Established: diltiazem 5 mg/kg/day. Probenecid. Infliximab (selected refractory). Surgical excision for large/painful deposits." },
+          { h: "Monitoring", b: "CK + LDH monthly. MRI muscle (disease activity). Manual muscle testing score (MMT8). Skin activity score (CMAS). HRCT + PFT annually if MSA+. Ophthalmology (HCQ)." },
+        ]
+      },
+    ],
     links: [
       { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
-      { label: "Drug Database", to: "/DrugsDosing" },
+      { label: "Guidelines Library", to: "/GuidelinesLibrary" },
     ],
-    diagnosis: [
-      "Gottron's papules (pathognomonic): purple papules over MCPJs, PIPs, knees, elbows",
-      "Heliotrope rash: periorbital violaceous erythema + oedema",
-      "Proximal muscle weakness: difficulty climbing stairs, raising arms, Gowers' sign",
-      "EMG: myopathic pattern; MRI: muscle oedema (T2/STIR hyperintensity) — most sensitive",
-      "Muscle enzymes: CK, LDH, AST, ALT, aldolase — elevated (CK normal in 20%!)",
-      "Myositis-specific autoantibodies (MSA): TIF1γ (cancer risk in adults, chronic course in children), NXP2 (calcinosis risk), MDA5 (anti-MDA5 — rapidly progressive ILD in Asian JDM), Mi-2 (classic dermatomyositis, steroid responsive), SAE, SRP (necrotising myopathy)",
-      "Calcinosis: occurs in 30–70% of JDM — calcium deposits in muscles/skin",
-    ],
-    workup: [
-      "CK, LDH, AST, ALT, aldolase",
-      "MSA panel (myositis-specific Ab): TIF1γ, NXP2, MDA5, Mi-2, Jo-1, SAE, SRP, HMGCR",
-      "ANA, anti-SSA/SSB (overlap)",
-      "MRI thigh/shoulder (whole-body STIR for muscle oedema pattern)",
-      "EMG (may be omitted if clinical + MRI + serology diagnostic)",
-      "Muscle biopsy: only if diagnosis uncertain after MSA + MRI",
-      "Echo + PFTs (overlap syndromes, MDA5 — ILD, cardiac involvement)",
-      "Swallow assessment (pharyngeal muscle weakness → aspiration risk)",
-      "Nailfold capillaroscopy: dilated/bushy capillaries, avascular areas",
-    ],
-    management: [
-      "Pulse methylprednisolone 30 mg/kg (max 1g) × 3 days THEN prednisolone 2 mg/kg/day (max 60 mg)",
-      "Methotrexate 10–15 mg/m²/week SC — first-line steroid-sparing agent",
-      "IVIG 2 g/kg monthly: rapid improvement, skin, weakness — adjunct or steroid-sparing",
-      "Hydroxychloroquine: skin-predominant JDM, steroid reduction",
-      "Cyclosporin A: refractory disease, calcinosis",
-      "MMF: skin, mild muscle; overlap with ILD",
-      "Rituximab: refractory JDM, anti-MDA5 (ILD), anti-SRP (necrotising myopathy)",
-      "Calcinosis: diltiazem, probenecid, IVIG + rituximab (limited evidence); surgical excision for limited large deposits",
-      "Physiotherapy: crucial from diagnosis — graded exercise as tolerated",
-    ],
-    monitoring: [
-      "CK, LDH, AST every 4–8 weeks during induction",
-      "CMAS (Childhood Myositis Assessment Scale) at each visit",
-      "MRI for inactive disease confirmation before steroid taper",
-      "PFTs annually if MSA+ or any respiratory symptoms (MDA5 — high ILD risk)",
-      "Bone density (DXA) — high-dose prolonged steroids",
-      "Ophthamology for HCQ (annual after 5 years) and calcinosis (periorbital)",
-    ],
-    color: "pink"
   },
-  poly: {
-    title: "Overlap CTD — MCTD · Scleroderma",
-    guideline: "EULAR SSc 2017 · ACR MCTD · PReS Scleroderma",
+
+  mctd: {
+    title: "Mixed CTD / Undifferentiated CTD / Overlap",
+    subtitle: "Sharp Criteria 1987 · EULAR Undifferentiated CTD",
+    intro: "Overlap of features from SLE, SSc, PM/DM, and RA. Key serological marker: anti-U1RNP. Many children have 'undifferentiated CTD' initially that evolve into defined disease.",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "MCTD — Sharp Criteria", b: "High titre anti-U1RNP + 3 of: swollen hands, synovitis, myositis, Raynaud's, acrosclerosis. Absence of: anti-dsDNA (SLE), anti-Sm (SLE), anti-centromere (limited SSc)." },
+          { h: "Features Overlapping", b: "SLE features: malar rash, serositis, cytopenias. SSc features: Raynaud's (most common), sclerodactyly, puffy hands, oesophageal dysmotility, ILD. PM/DM features: proximal weakness, elevated CK. RA features: symmetric synovitis." },
+          { h: "Undifferentiated CTD (UCTD)", b: "Features of CTD but does not meet criteria for any specific disease. ANA positive. Monitor: 20–30% evolve into SLE, SSc, or other defined CTD over years. HCQ for all while undifferentiated." },
+          { h: "Investigations", b: "ANA (high titre), anti-U1RNP (high titre → MCTD), anti-dsDNA (SLE?), anti-Sm, anti-Scl70, anti-centromere, anti-Jo1, anti-MDA5. Complement C3/C4. CBC, renal, urine." },
+        ]
+      },
+      {
+        label: "Management",
+        content: [
+          { h: "HCQ — All Patients", b: "5 mg/kg/day. Foundation of MCTD management. Reduces flares and damage." },
+          { h: "Raynaud's Phenomenon", b: "Calcium channel blockers: nifedipine 0.5 mg/kg/day. Amlodipine. Sildenafil for digital ulcers (SSc-overlap). Keep warm, avoid cold exposure." },
+          { h: "Inflammatory Features (synovitis, serositis)", b: "NSAIDs short-term. Prednisolone for significant flares. MTX or AZA for persistent arthritis." },
+          { h: "ILD", b: "Mycophenolate mofetil (preferred over CYC now). Nintedanib (investigational in children). Monitor: annual PFTs + HRCT." },
+          { h: "Pulmonary Arterial Hypertension (PAH)", b: "Echo annually. If PAH: endothelin receptor antagonists (bosentan), PDE5 inhibitors (sildenafil), prostacyclins. Refer to PAH centre." },
+        ]
+      },
+    ],
     links: [
+      { label: "SLE Engine", to: null },
       { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
+      { label: "Guidelines Library", to: "/GuidelinesLibrary" },
     ],
-    diagnosis: [
-      "MCTD (Mixed CTD): high-titre anti-U1-RNP + features of SLE + PM/DM + SSc; Raynaud's phenomenon universal",
-      "Juvenile SSc (Scleroderma): skin thickening (sclerodactyly/puffy fingers) ± internal organ involvement",
-      "Limited SSc (lcSSc): skin limited to hands/face; anti-centromere Ab; CREST features (Calcinosis, Raynaud, Esophageal dysmotility, Sclerodactyly, Telangiectasia)",
-      "Diffuse SSc (dcSSc): truncal skin involvement; anti-Scl-70/anti-topoisomerase-I; ILD + PAH + renal crisis risk",
-      "Scleroderma renal crisis (SRC): abrupt HTN + AKI — ACEi is treatment of choice (NOT contraindicated)",
-    ],
-    workup: [
-      "ANA (high titre), anti-U1-RNP (MCTD), anti-Scl-70/anti-topoisomerase-I (dcSSc ILD), anti-centromere (lcSSc)",
-      "Anti-RNA polymerase III (renal crisis risk in SSc — scleroderma renal crisis)",
-      "CBC, creatinine, UPCR (renal crisis monitoring)",
-      "PFTs + HRCT chest (ILD detection — ground glass → fibrosis)",
-      "Echo (PAH screening: RVSP >40 mmHg → RHC for confirmation)",
-      "Echocardiogram every 2 years in SSc",
-      "Nailfold capillaroscopy (SSc pattern: loss of capillaries, giant loops, haemorrhages)",
-      "Modified Rodnan Skin Score (mRSS) at each visit",
-    ],
-    management: [
-      "Raynaud: CCB (nifedipine XL 0.25–0.5 mg/kg/day) first-line; IV iloprost for severe digital ischaemia",
-      "ILD: mycophenolate mofetil (MMF) first-line (SENSCIS trial); nintedanib (antifibrotic, approved ≥18y); cyclophosphamide alternative",
-      "PAH: endothelin antagonist (bosentan/macitentan) + PDE5i (sildenafil) if PAH confirmed",
-      "GI dysmotility: proton pump inhibitor (esophageal disease), prokinetics (gastric emptying), octreotide (diarrhoea from SIBO)",
-      "Scleroderma renal crisis: ACEi URGENTLY (captopril, enalapril — do not avoid) ± dialysis if renal failure",
-      "MCTD: hydroxychloroquine for SLE features; MTX or MMF for overlap myositis; steroids cautiously (SSc renal crisis trigger at high doses)",
-      "Calcinosis: as per JDM section",
-    ],
-    monitoring: [
-      "PFTs every 6–12 months (ILD surveillance)",
-      "Echo annually (PAH screening)",
-      "Creatinine + BP monthly (SSc renal crisis vigilance — especially RNA Pol III+)",
-      "mRSS every visit (disease progression skin score)",
-      "Nailfold capillaroscopy annually",
-    ],
-    color: "teal"
   },
-  kd: {
-    title: "Kawasaki Disease",
-    guideline: "AHA KD 2017 · JCS 2020 · AAP 2021",
+
+  "septic-arthritis": {
+    title: "Septic vs Inflammatory Arthritis",
+    subtitle: "Emergency Differentiation · Kocher Criteria",
+    intro: "Septic arthritis is a joint emergency — delay causes permanent damage. Must be distinguished rapidly from JIA, reactive arthritis, transient synovitis.",
+    tabs: [
+      {
+        label: "Diagnosis",
+        content: [
+          { h: "Kocher Criteria (Hip)", b: "1) Fever >38.5°C. 2) Non-weight-bearing. 3) ESR >40 mm/hr. 4) WBC >12,000. Score: 0→ 0.2%, 1→ 3%, 2→ 40%, 3→ 93%, 4→ 99.6% probability of septic arthritis." },
+          { h: "Modified Kocher (adds CRP >2 mg/dL)", b: "Adding CRP improves sensitivity: 3/4 Kocher criteria + CRP >2 → >95% probability." },
+          { h: "Joint Aspiration — MANDATORY for diagnosis", b: "WBC >50,000/µL (> 50×10⁹/L) with >90% neutrophils = septic. Culture + sensitivity. Gram stain (low sensitivity). Glucose (low), protein (high). Send simultaneously: blood culture." },
+          { h: "Imaging", b: "Plain XR (soft tissue swelling, effusion — late changes). USS: effusion (helps aspiration — not diagnostic). MRI: gold standard for osteomyelitis extension, AVN, early changes. Bone scan: if multifocal." },
+          { h: "Differentials — Septic vs Others", b: "Transient synovitis: afebrile, normal CRP, settles in 7–10 days. Reactive arthritis: post-infection (URTI, GI), migratory, culture negative. JIA: subacute, bilateral, systemic features. Leukaemia: bone pain at night, blast cells. Parvovirus: symmetric small joints." },
+        ]
+      },
+      {
+        label: "Treatment",
+        content: [
+          { h: "URGENT: Surgical Washout", b: "Hip: ALWAYS surgical washout (blood supply from femoral head at risk → AVN). Other large joints: arthroscopic washout or aspiration-irrigation if urgent." },
+          { h: "Empirical Antibiotics (before cultures)", b: "Neonate (<3 months): Flucloxacillin + Gentamicin (Staph + Gram-neg). Children: Flucloxacillin 50 mg/kg Q6H IV (Staph aureus). If MRSA risk: Vancomycin 15 mg/kg Q6H. If salmonella risk (sickle cell): Ceftriaxone. Immunocompromised: broader spectrum." },
+          { h: "Duration", b: "IV antibiotics until afebrile + CRP falling + improved ROM: 3–5 days. Then step down to oral: flucloxacillin or co-amoxiclav × 3–4 weeks total. Osteomyelitis: extend total to 4–6 weeks." },
+          { h: "Monitor for Complications", b: "AVN (avascular necrosis): hip — serial XR at 6 weeks, 3 months, 1 year. Growth disturbance (physis damage). Chronic osteomyelitis. Functional assessment of range of motion at discharge and follow-up." },
+        ]
+      },
+    ],
     links: [
       { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
-      { label: "Drug Database", to: "/DrugsDosing" },
+      { label: "Guidelines Library", to: "/GuidelinesLibrary" },
     ],
-    diagnosis: [
-      "Classic KD: fever ≥5 days + ≥4 of 5: (1) bilateral non-exudative conjunctival injection; (2) oral changes (strawberry tongue, red cracked lips, pharyngeal erythema); (3) rash (polymorphous, mainly trunk); (4) extremity changes (erythema/oedema hands-feet → periungual desquamation); (5) cervical lymphadenopathy (≥1.5 cm, unilateral)",
-      "Incomplete KD: fever ≥5 days + 2–3 features + echo showing coronary artery Z-score ≥2.5 OR CRP ≥3 + ALT elevated + platelets ≥450,000 + anaemia + albumin <3 g/dL + urine ≥10 WBC/hpf",
-      "Coronary artery aneurysm (CAA): Z-score ≥2.5 = dilated; ≥10 mm = giant aneurysm — worst prognosis",
-      "KD shock syndrome (KDSS): systolic hypotension requiring fluid/vasopressors — consider IVIG resistance",
-    ],
-    workup: [
-      "CBC (thrombocytosis after day 7 — diagnostic but late), CRP, ESR, ferritin, ALT, albumin",
-      "Urinalysis (sterile pyuria typical)",
-      "Echo at diagnosis, 2 weeks, 6 weeks (coronary artery Z-scores)",
-      "BNP/NT-proBNP (myocarditis)",
-      "Blood culture (exclude bacterial mimics)",
-      "Coronary CT angiography: giant aneurysms, stenosis assessment in older children",
-    ],
-    management: [
-      "IVIG 2 g/kg single infusion over 10–12 hours — within 10 days of fever onset (reduces CAA from 25% to <5%)",
-      "Aspirin 30–50 mg/kg/day (anti-inflammatory dose) UNTIL AFEBRILE × 48h THEN 3–5 mg/kg/day (antiplatelet) for 6–8 weeks",
-      "IVIG resistance (fever persists/recurs >36h after IVIG): 2nd IVIG dose (2 g/kg) OR infliximab (5 mg/kg single dose)",
-      "Methylprednisolone (30 mg/kg × 3 days): for IVIG resistance, KDSS, predicted IVIG non-response",
-      "Giant aneurysms (Z>10): low-molecular-weight heparin + warfarin (INR 2–2.5) + aspirin — anticoagulation to prevent thrombosis",
-      "Anakinra: IVIG-refractory cases, especially with MAS features",
-    ],
-    monitoring: [
-      "Echo: diagnosis → 2 weeks → 6 weeks; if CAA: every 3–6 months long-term",
-      "Aspirin: until echo confirms no CAA at 6 weeks (if no CAA — stop aspirin); giant CAA → lifelong anticoagulation",
-      "Exercise restriction: Z-score ≥4 — avoid contact sports until cardiologist review",
-      "Varicella + influenza vaccination: avoid live vaccines within 11 months of IVIG",
-    ],
-    color: "rose"
   },
-  macro: {
-    title: "Macrophage Activation Syndrome (MAS / sHLH)",
-    guideline: "ACR/EULAR MAS 2016 · HLH-2004 · CARRA",
-    links: [
-      { label: "Rheumatology Hub", to: "/PediatricRheumatology" },
-      { label: "Drug Database", to: "/DrugsDosing" },
-    ],
-    diagnosis: [
-      "2016 MAS-in-sJIA criteria: fever + ferritin >684 ng/mL + ≥2 of: platelets <181×10⁹/L, AST >48 IU/L, triglycerides >156 mg/dL, fibrinogen <360 mg/dL",
-      "HLH 2004 diagnostic criteria (5/8): fever, splenomegaly, cytopenia ≥2 lineages, hypertriglyceridaemia/hypofibrinogenaemia, haemophagocytosis on BM/LN/spleen, low/absent NK cell activity, ferritin ≥500 µg/L, elevated soluble CD25 (sIL-2R)",
-      "Triggers: viral infection (EBV most common), malignancy, drugs, rheumatic disease flare",
-      "Distinguish primary HLH (genetic: PRF1, UNC13D, STX11, STXBP2 mutations — early-onset) from reactive sHLH/MAS",
-    ],
-    workup: [
-      "CBC (pancytopenia — falling counts hallmark), CRP, ESR, ferritin (>10,000 ng/mL = high specificity for MAS)",
-      "LFTs, triglycerides, fibrinogen (low), LDH, coagulation screen",
-      "Soluble CD25 (sIL-2R): >2400 U/mL supports HLH",
-      "NK cell activity (functional assay)",
-      "Bone marrow aspirate: haemophagocytosis (not always present early)",
-      "EBV, CMV, HSV, parvovirus B19 PCR (triggers)",
-      "Genetic panel (primary HLH): PRF1, UNC13D, STX11, STXBP2",
-      "Echocardiogram (myocardial depression)",
-    ],
-    management: [
-      "TREAT URGENTLY: escalate to ICU if organ failure, coagulopathy, encephalopathy",
-      "Treat underlying rheumatic trigger: IV methylprednisolone 30 mg/kg/day × 3 days",
-      "Cyclosporin A 3–5 mg/kg/day IV (MAS/sJIA first-line after steroids)",
-      "IL-1 blockade: anakinra 2–10 mg/kg/day SC — for sJIA-MAS — often dramatic response",
-      "Emapalumab (anti-IFNγ): approved for primary/refractory HLH in USA — reduces hyperinflammatory cytokine storm",
-      "Etoposide (HLH-2004 protocol): primary HLH, refractory sHLH — 150 mg/m² IV × 2/week",
-      "IVIG: adjunct, empirical for viral trigger",
-      "Dexamethasone (0.1–0.6 mg/kg/day) for CNS HLH penetration",
-      "Haematopoietic stem cell transplant (HSCT): primary HLH or refractory MAS after control",
-    ],
-    monitoring: [
-      "Ferritin daily/every 2 days (treatment response — falling ferritin = responding)",
-      "CBC, coagulation, LFTs, triglycerides every 2–3 days during acute phase",
-      "CNS: daily neuro assessment; MRI brain if encephalopathy",
-      "Cyclosporin levels (target 150–200 ng/mL)",
-    ],
-    color: "crimson"
-  }
 };
 
-const COLOR_MAP = {
-  blue: { header: "from-blue-700 to-indigo-700", border: "border-blue-300 bg-blue-50", badge: "bg-blue-600", text: "text-blue-900" },
-  violet: { header: "from-violet-700 to-purple-700", border: "border-violet-300 bg-violet-50", badge: "bg-violet-600", text: "text-violet-900" },
-  red: { header: "from-red-700 to-rose-700", border: "border-red-300 bg-red-50", badge: "bg-red-600", text: "text-red-900" },
-  orange: { header: "from-orange-600 to-amber-600", border: "border-orange-300 bg-orange-50", badge: "bg-orange-500", text: "text-orange-900" },
-  amber: { header: "from-amber-600 to-yellow-600", border: "border-amber-300 bg-amber-50", badge: "bg-amber-600", text: "text-amber-900" },
-  pink: { header: "from-pink-600 to-rose-600", border: "border-pink-300 bg-pink-50", badge: "bg-pink-600", text: "text-pink-900" },
-  teal: { header: "from-teal-700 to-cyan-600", border: "border-teal-300 bg-teal-50", badge: "bg-teal-600", text: "text-teal-900" },
-  rose: { header: "from-rose-600 to-pink-600", border: "border-rose-300 bg-rose-50", badge: "bg-rose-500", text: "text-rose-900" },
-  crimson: { header: "from-red-800 to-rose-800", border: "border-red-300 bg-red-50", badge: "bg-red-800", text: "text-red-900" },
-  green: { header: "from-green-700 to-teal-600", border: "border-green-300 bg-green-50", badge: "bg-green-600", text: "text-green-900" },
-};
+function TabView({ data, color }) {
+  const [activeTab, setActiveTab] = useState(0);
+  const grad = COLOR_MAP[color] || "from-slate-700 to-slate-600";
 
-function InfoSection({ title, items, icon: Icon, colorClass }) {
   return (
-    <div className={`rounded-xl border-2 p-3 ${colorClass}`}>
-      <p className="text-xs font-bold mb-2 text-slate-800">{title}</p>
-      <div className="space-y-1">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-start gap-1.5 text-xs text-slate-800">
-            <ArrowRight className="w-3 h-3 flex-shrink-0 mt-0.5 text-slate-500" />
-            <span>{item}</span>
+    <div className="space-y-3">
+      <div className="flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        {data.tabs.map((tab, i) => (
+          <button key={i} onClick={() => setActiveTab(i)}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all
+              ${activeTab === i ? "bg-slate-800 text-white border-slate-800" : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"}`}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div className="space-y-2">
+        {data.tabs[activeTab].content.map((item, i) => (
+          <div key={i} className="rounded-lg border border-slate-200 bg-white p-3">
+            <p className="text-xs font-bold text-slate-800 mb-1">{item.h}</p>
+            <p className="text-xs text-slate-700 leading-relaxed">{item.b}</p>
           </div>
         ))}
       </div>
@@ -440,127 +400,82 @@ function InfoSection({ title, items, icon: Icon, colorClass }) {
 
 export default function RheumatologyEngine() {
   const [selected, setSelected] = useState(null);
-  const [activeTab, setActiveTab] = useState("diagnosis");
-  const data = selected ? RHEUM_DATA[selected] : null;
+
   const cond = selected ? CONDITIONS.find(c => c.id === selected) : null;
-  const colors = cond ? (COLOR_MAP[cond.color] || COLOR_MAP.blue) : COLOR_MAP.blue;
+  const data = selected ? DATA[selected] : null;
+  const grad = cond ? (COLOR_MAP[cond.color] || "from-slate-700 to-slate-600") : "";
 
-  const TABS = ["diagnosis", "workup", "management", "monitoring"];
-  const TAB_LABEL = { diagnosis: "🔍 Diagnosis", workup: "🔬 Workup", management: "💊 Management", monitoring: "📊 Monitoring" };
+  if (selected && data) {
+    return (
+      <div className="space-y-4">
+        <div className={`rounded-xl bg-gradient-to-r ${grad} p-4 text-white`}>
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            <div>
+              <h3 className="font-bold text-sm">{data.title}</h3>
+              <p className="text-xs opacity-80">{data.subtitle}</p>
+            </div>
+          </div>
+        </div>
 
-  const tabData = data ? {
-    diagnosis: data.diagnosis,
-    workup: data.workup,
-    management: data.management,
-    monitoring: data.monitoring,
-  } : {};
+        <p className="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-3">{data.intro}</p>
+
+        <TabView data={data} color={cond.color} />
+
+        {/* Links */}
+        {data.links?.filter(l => l.to).length > 0 && (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+            <div className="flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+              <p className="text-xs font-bold text-slate-700">Related Pathways, Engines & Hubs</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {data.links.filter(l => l.to).map((lnk, i) => (
+                <Link key={i} to={lnk.to}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition-colors">
+                  {lnk.label} <ExternalLink className="w-3 h-3 text-slate-400" />
+                </Link>
+              ))}
+              <Link to="/GuidelinesLibrary"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 hover:border-slate-400 transition-colors">
+                <BookOpen className="w-3 h-3" /> Guidelines Library
+              </Link>
+            </div>
+          </div>
+        )}
+
+        <button onClick={() => setSelected(null)}
+          className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50">
+          <RotateCcw className="w-3.5 h-3.5" /> Choose Another Condition
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="rounded-xl bg-gradient-to-r from-violet-700 to-indigo-700 p-4 text-white">
+      <div className="rounded-xl bg-gradient-to-r from-rose-700 to-pink-700 p-4 text-white">
         <div className="flex items-center gap-2">
           <Shield className="w-5 h-5" />
           <div>
-            <h3 className="font-bold text-sm">Pediatric Rheumatology Diagnostic Engine</h3>
-            <p className="text-xs text-violet-200">JIA · SLE · AAV · HSP · Autoinflammatory · JDM · KD · MAS</p>
+            <h3 className="font-bold text-sm">Paediatric Rheumatology Engine</h3>
+            <p className="text-xs text-rose-200">Diagnosis · Management · Emergency · Connected to Pathways</p>
           </div>
         </div>
       </div>
-
-      {/* Condition selector */}
-      {!selected && (
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-slate-600">Select Condition:</p>
-          {CONDITIONS.map(c => {
-            const col = COLOR_MAP[c.color] || COLOR_MAP.blue;
-            return (
-              <button key={c.id} onClick={() => { setSelected(c.id); setActiveTab("diagnosis"); }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-violet-400 hover:bg-violet-50 text-left transition-all">
-                <div>
-                  <Badge className={`text-xs ${col.badge} text-white`}>{c.label}</Badge>
-                  <p className="text-xs text-slate-500 mt-0.5">{c.desc}</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Detail view */}
-      {selected && data && (
-        <div className="space-y-3">
-          {/* Title bar */}
-          <div className={`rounded-xl bg-gradient-to-r ${colors.header} p-3 text-white`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-bold text-sm">{data.title}</p>
-                <p className="text-xs opacity-80">{data.guideline}</p>
-              </div>
-              <button onClick={() => setSelected(null)}
-                className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg">
-                ← Back
-              </button>
+      <p className="text-xs text-slate-600">Select a rheumatological condition to access evidence-based diagnostic criteria, management protocols, and emergency guidance — all connected to relevant clinical pathways.</p>
+      <div className="space-y-2">
+        {CONDITIONS.map(c => (
+          <button key={c.id} onClick={() => setSelected(c.id)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-rose-400 hover:bg-rose-50 text-left transition-all">
+            <div>
+              <p className="font-semibold text-sm text-slate-900">{c.label}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{c.desc}</p>
             </div>
-          </div>
-
-          {/* Linked resources */}
-          {data.links?.length > 0 && (
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-              <div className="flex items-center gap-1.5 mb-2">
-                <BookOpen className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-xs font-bold text-slate-700">Linked Pathways, Engines & Guidelines</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {data.links.map((l, i) => (
-                  <Link key={i} to={l.to || "/Hub"}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors">
-                    <ExternalLink className="w-3 h-3 text-violet-500" />
-                    {l.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Tabs */}
-          <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-            {TABS.map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all
-                  ${activeTab === tab ? "bg-violet-700 text-white border-violet-700" : "bg-white text-slate-600 border-slate-200 hover:border-violet-300"}`}>
-                {TAB_LABEL[tab]}
-              </button>
-            ))}
-          </div>
-
-          {/* Tab content */}
-          {tabData[activeTab] && (
-            <InfoSection
-              title={TAB_LABEL[activeTab]}
-              items={tabData[activeTab]}
-              colorClass={
-                activeTab === "diagnosis" ? "border-blue-200 bg-blue-50" :
-                activeTab === "workup" ? "border-violet-200 bg-violet-50" :
-                activeTab === "management" ? "border-green-200 bg-green-50" :
-                "border-amber-200 bg-amber-50"
-              }
-            />
-          )}
-
-          {/* Drug calculator link */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-            <p className="text-xs font-bold text-slate-700 mb-2">🔗 Quick Links</p>
-            <div className="flex flex-wrap gap-2">
-              <Link to="/DrugsDosing" className="text-xs text-violet-700 underline">Drug Database</Link>
-              <Link to="/PediatricRheumatology" className="text-xs text-violet-700 underline">Rheumatology Hub</Link>
-              <Link to="/GuidelinesLibrary" className="text-xs text-violet-700 underline">Guidelines Library</Link>
-              <Link to="/DifferentialEngine" className="text-xs text-violet-700 underline">Differential Engine</Link>
-            </div>
-          </div>
-        </div>
-      )}
+            <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
