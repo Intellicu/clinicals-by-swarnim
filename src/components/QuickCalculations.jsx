@@ -331,51 +331,81 @@ export default function QuickCalculations() {
   };
 
   const calculateBPPercentiles = (sysBP, diaBP, age, gender, height) => {
-    let sbp50th, sbp90th, sbp95th, sbp99th;
-    let dbp50th, dbp90th, dbp95th, dbp99th;
+    const a = Math.round(Math.min(17, Math.max(1, age)));
+    const sexKey = (gender === "Female" || gender === "female" || gender === "F") ? "F" : "M";
 
-    if (age <= 5) {
-      sbp50th = 95; sbp90th = 105; sbp95th = 109; sbp99th = 113;
-      dbp50th = 55; dbp90th = 65; dbp95th = 69; dbp99th = 73;
-    } else if (age <= 10) {
-      sbp50th = 100; sbp90th = 110; sbp95th = 114; sbp99th = 118;
-      dbp50th = 60; dbp90th = 70; dbp95th = 74; dbp99th = 78;
-    } else {
-      sbp50th = 115; sbp90th = 125; sbp95th = 130; sbp99th = 135;
-      dbp50th = 70; dbp90th = 78; dbp95th = 82; dbp99th = 86;
+    // ── AAP 2017: ≥13y → fixed adult thresholds ──────────────────────────────
+    if (a >= 13) {
+      let sysStage = sysBP >= 140 ? "Stage 2 HTN" : sysBP >= 130 ? "Stage 1 HTN" : sysBP >= 120 ? "Elevated BP" : "Normal BP";
+      let diaStage = diaBP >= 90 ? "Stage 2 HTN" : diaBP >= 80 ? "Stage 1 HTN" : "Normal BP";
+      const stageRank = { "Normal BP": 0, "Elevated BP": 1, "Stage 1 HTN": 2, "Stage 2 HTN": 3 };
+      const category = stageRank[sysStage] >= stageRank[diaStage] ? sysStage : diaStage;
+      const color = category === "Stage 2 HTN" ? "red" : category === "Stage 1 HTN" ? "red" : category === "Elevated BP" ? "amber" : "green";
+      return {
+        category, color,
+        details: `AAP 2017 (≥13y fixed thresholds): BP ${sysBP}/${diaBP}. Normal <120/80; Elevated 120–129/<80; Stage 1 = 130–139/80–89; Stage 2 ≥140/90.`,
+        percentiles: { "50th": "—/—", "90th": "120/80 (Elevated)", "95th": "130/80 (Stage 1)", "99th": "140/90 (Stage 2)" },
+        current: `${sysBP}/${diaBP}`
+      };
     }
 
-    let category = "";
-    let color = "green";
-    let details = "";
+    // ── AAP 2017: <13y → hardcoded percentile table (50th height percentile) ──
+    // Source: AAP Pediatrics 2017;140(3):e20171904, Table 3/Appendix B
+    const BP_TABLE = {
+      1:  { M: { p50s:85, p90s:98,  p95s:102, p99s:109, p50d:40, p90d:52, p95d:54, p99d:61 },
+            F: { p50s:83, p90s:97,  p95s:100, p99s:108, p50d:38, p90d:52, p95d:54, p99d:61 } },
+      2:  { M: { p50s:87, p90s:101, p95s:104, p99s:112, p50d:43, p90d:55, p95d:58, p99d:65 },
+            F: { p50s:85, p90s:99,  p95s:102, p99s:110, p50d:43, p90d:56, p95d:59, p99d:66 } },
+      3:  { M: { p50s:88, p90s:101, p95s:105, p99s:113, p50d:46, p90d:58, p95d:61, p99d:68 },
+            F: { p50s:86, p90s:100, p95s:104, p99s:111, p50d:45, p90d:58, p95d:60, p99d:67 } },
+      4:  { M: { p50s:89, p90s:103, p95s:106, p99s:114, p50d:48, p90d:60, p95d:63, p99d:70 },
+            F: { p50s:88, p90s:101, p95s:105, p99s:112, p50d:47, p90d:60, p95d:62, p99d:69 } },
+      5:  { M: { p50s:90, p90s:104, p95s:107, p99s:115, p50d:49, p90d:62, p95d:65, p99d:72 },
+            F: { p50s:89, p90s:103, p95s:106, p99s:114, p50d:48, p90d:61, p95d:64, p99d:71 } },
+      6:  { M: { p50s:91, p90s:105, p95s:108, p99s:116, p50d:50, p90d:63, p95d:66, p99d:74 },
+            F: { p50s:91, p90s:104, p95s:108, p99s:115, p50d:50, p90d:63, p95d:66, p99d:73 } },
+      7:  { M: { p50s:92, p90s:106, p95s:109, p99s:117, p50d:52, p90d:65, p95d:68, p99d:75 },
+            F: { p50s:92, p90s:106, p95s:109, p99s:117, p50d:51, p90d:64, p95d:67, p99d:74 } },
+      8:  { M: { p50s:94, p90s:107, p95s:111, p99s:119, p50d:53, p90d:66, p95d:69, p99d:77 },
+            F: { p50s:94, p90s:107, p95s:111, p99s:118, p50d:53, p90d:66, p95d:69, p99d:76 } },
+      9:  { M: { p50s:95, p90s:109, p95s:112, p99s:120, p50d:54, p90d:67, p95d:70, p99d:78 },
+            F: { p50s:96, p90s:109, p95s:113, p99s:120, p50d:55, p90d:68, p95d:71, p99d:78 } },
+      10: { M: { p50s:97, p90s:110, p95s:114, p99s:121, p50d:55, p90d:68, p95d:72, p99d:79 },
+            F: { p50s:98, p90s:111, p95s:115, p99s:122, p50d:57, p90d:70, p95d:73, p99d:80 } },
+      11: { M: { p50s:99, p90s:113, p95s:116, p99s:124, p50d:57, p90d:70, p95d:73, p99d:81 },
+            F: { p50s:100,p90s:114, p95s:117, p99s:125, p50d:59, p90d:72, p95d:74, p99d:82 } },
+      12: { M: { p50s:101,p90s:115, p95s:119, p99s:126, p50d:59, p90d:72, p95d:75, p99d:82 },
+            F: { p50s:102,p90s:116, p95s:119, p99s:127, p50d:61, p90d:74, p95d:76, p99d:84 } },
+    };
 
-    if (sysBP >= sbp95th + 12 || diaBP >= dbp95th + 12) {
-      category = "Stage 2 HTN";
-      color = "red";
-      details = `Severe hypertension. BP ${sysBP}/${diaBP} is ≥95th percentile + 12 mmHg for age ${age}. Requires immediate evaluation and treatment.`;
-    } else if (sysBP >= sbp95th || diaBP >= dbp95th) {
-      category = "Stage 1 HTN";
-      color = "red";
-      details = `Hypertension confirmed. BP ${sysBP}/${diaBP} is ≥95th percentile for age ${age}. Requires treatment and workup.`;
-    } else if (sysBP >= sbp90th || diaBP >= dbp90th) {
-      category = "Elevated BP";
-      color = "amber";
-      details = `Elevated blood pressure. BP ${sysBP}/${diaBP} is 90th-95th percentile for age ${age}. Lifestyle modifications and monitoring recommended.`;
+    const ref = BP_TABLE[a]?.[sexKey] || BP_TABLE[a]?.["M"];
+    const { p50s, p90s, p95s, p99s, p50d, p90d, p95d, p99d } = ref;
+
+    // AAP 2017: Stage 2 = ≥95th+12 mmHg; Stage 1 = 95th–<95th+12; Elevated = 90th–<95th OR ≥120/<80; Normal = <90th
+    let category, color, details;
+    const sys2 = p95s + 12, dia2 = p95d + 12;
+
+    if (sysBP >= sys2 || diaBP >= dia2) {
+      category = "Stage 2 HTN"; color = "red";
+      details = `Stage 2 HTN (AAP 2017): BP ${sysBP}/${diaBP} ≥95th+12 mmHg (95th+12 = ${sys2}/${dia2}) for age ${a}y. Immediate evaluation required.`;
+    } else if (sysBP >= p95s || diaBP >= p95d) {
+      category = "Stage 1 HTN"; color = "red";
+      details = `Stage 1 HTN (AAP 2017): BP ${sysBP}/${diaBP} ≥95th percentile (${p95s}/${p95d}) for age ${a}y. Workup and treatment needed.`;
+    } else if (sysBP >= p90s || diaBP >= p90d || sysBP >= 120 || diaBP >= 80) {
+      category = "Elevated BP"; color = "amber";
+      details = `Elevated BP (AAP 2017): BP ${sysBP}/${diaBP} is 90th–<95th percentile (90th: ${p90s}/${p90d}; 95th: ${p95s}/${p95d}) for age ${a}y${sysBP >= 120 || diaBP >= 80 ? " or ≥120/80 absolute threshold" : ""}. Lifestyle modification + recheck in 6 months.`;
     } else {
-      category = "Normal BP";
-      color = "green";
-      details = `Normal blood pressure. BP ${sysBP}/${diaBP} is <90th percentile for age ${age}.`;
+      category = "Normal BP"; color = "green";
+      details = `Normal BP (AAP 2017): BP ${sysBP}/${diaBP} is <90th percentile (90th: ${p90s}/${p90d}) for age ${a}y. Routine monitoring.`;
     }
 
     return {
-      category,
-      color,
-      details,
+      category, color, details,
       percentiles: {
-        "50th": `${sbp50th}/${dbp50th}`,
-        "90th": `${sbp90th}/${dbp90th}`,
-        "95th": `${sbp95th}/${dbp95th}`,
-        "99th": `${sbp99th}/${dbp99th}`
+        "50th": `${p50s}/${p50d}`,
+        "90th": `${p90s}/${p90d}`,
+        "95th": `${p95s}/${p95d}`,
+        "99th": `${p99s}/${p99d}`
       },
       current: `${sysBP}/${diaBP}`
     };

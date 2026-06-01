@@ -20,90 +20,77 @@ export default function BPPercentiles() {
   const [diastolic, setDiastolic] = useState(patientData.diastolicBP || "");
   const [results, setResults] = useState(null);
 
-  // AAP 2017 Simplified BP Percentiles (90th and 95th for age)
-  const getBPThresholds = (ageYears) => {
-    // Simplified thresholds based on AAP 2017 guidelines
-    if (ageYears < 1) return { sys90: 105, sys95: 110, dia90: 70, dia95: 75 };
-    if (ageYears < 3) return { sys90: 110, sys95: 115, dia90: 70, dia95: 75 };
-    if (ageYears < 6) return { sys90: 115, sys95: 120, dia90: 75, dia95: 80 };
-    if (ageYears < 10) return { sys90: 120, sys95: 125, dia90: 80, dia95: 85 };
-    if (ageYears < 13) return { sys90: 125, sys95: 130, dia90: 80, dia95: 85 };
-    return { sys90: 130, sys95: 140, dia90: 85, dia95: 90 };
+  // AAP 2017 hardcoded BP table — 50th height percentile, sex-specific
+  // Source: AAP Pediatrics 2017;140(3):e20171904, Appendix B
+  const AAP_BP_TABLE = {
+    1:  { M:{p90s:98,p95s:102,p99s:109,p90d:52,p95d:54,p99d:61}, F:{p90s:97,p95s:100,p99s:108,p90d:52,p95d:54,p99d:61} },
+    2:  { M:{p90s:101,p95s:104,p99s:112,p90d:55,p95d:58,p99d:65}, F:{p90s:99,p95s:102,p99s:110,p90d:56,p95d:59,p99d:66} },
+    3:  { M:{p90s:101,p95s:105,p99s:113,p90d:58,p95d:61,p99d:68}, F:{p90s:100,p95s:104,p99s:111,p90d:58,p95d:60,p99d:67} },
+    4:  { M:{p90s:103,p95s:106,p99s:114,p90d:60,p95d:63,p99d:70}, F:{p90s:101,p95s:105,p99s:112,p90d:60,p95d:62,p99d:69} },
+    5:  { M:{p90s:104,p95s:107,p99s:115,p90d:62,p95d:65,p99d:72}, F:{p90s:103,p95s:106,p99s:114,p90d:61,p95d:64,p99d:71} },
+    6:  { M:{p90s:105,p95s:108,p99s:116,p90d:63,p95d:66,p99d:74}, F:{p90s:104,p95s:108,p99s:115,p90d:63,p95d:66,p99d:73} },
+    7:  { M:{p90s:106,p95s:109,p99s:117,p90d:65,p95d:68,p99d:75}, F:{p90s:106,p95s:109,p99s:117,p90d:64,p95d:67,p99d:74} },
+    8:  { M:{p90s:107,p95s:111,p99s:119,p90d:66,p95d:69,p99d:77}, F:{p90s:107,p95s:111,p99s:118,p90d:66,p95d:69,p99d:76} },
+    9:  { M:{p90s:109,p95s:112,p99s:120,p90d:67,p95d:70,p99d:78}, F:{p90s:109,p95s:113,p99s:120,p90d:68,p95d:71,p99d:78} },
+    10: { M:{p90s:110,p95s:114,p99s:121,p90d:68,p95d:72,p99d:79}, F:{p90s:111,p95s:115,p99s:122,p90d:70,p95d:73,p99d:80} },
+    11: { M:{p90s:113,p95s:116,p99s:124,p90d:70,p95d:73,p99d:81}, F:{p90s:114,p95s:117,p99s:125,p90d:72,p95d:74,p99d:82} },
+    12: { M:{p90s:115,p95s:119,p99s:126,p90d:72,p95d:75,p99d:82}, F:{p90s:116,p95s:119,p99s:127,p90d:74,p95d:76,p99d:84} },
   };
 
   const handleCalculate = () => {
-    if (!age || !systolic || !diastolic || !sex) {
-      return;
-    }
+    if (!age || !systolic || !diastolic || !sex) return;
 
     const ageYears = parseFloat(age);
     const sys = parseFloat(systolic);
     const dia = parseFloat(diastolic);
-    const thresholds = getBPThresholds(ageYears);
+    const a = Math.round(Math.min(12, Math.max(1, ageYears)));
+    const sexKey = sex === "Female" ? "F" : "M";
 
-    let category = "";
-    let interpretation = "";
-    let recommendations = [];
-    let severity = "normal";
+    let category, interpretation, recommendations, severity, thresholds;
 
-    // AAP 2017 Classification
-    if (sys < thresholds.sys90 && dia < thresholds.dia90) {
-      category = "Normal BP";
-      interpretation = "Blood pressure is within normal range for age.";
-      recommendations = [
-        "Continue healthy lifestyle habits",
-        "Routine BP monitoring at well-child visits",
-        "Encourage regular physical activity",
-        "Maintain healthy diet (low salt)"
-      ];
-      severity = "normal";
-    } else if (sys >= thresholds.sys90 && sys < thresholds.sys95 && dia < thresholds.dia95) {
-      category = "Elevated BP";
-      interpretation = "Blood pressure is elevated (≥90th percentile but <95th percentile). Lifestyle modifications recommended.";
-      recommendations = [
-        "Repeat BP measurement in 6 months",
-        "Dietary counseling (reduce sodium, increase fruits/vegetables)",
-        "Weight management if overweight (BMI ≥85th percentile)",
-        "Increase physical activity to ≥60 min/day",
-        "Screen for other cardiovascular risk factors"
-      ];
-      severity = "warning";
-    } else if (sys >= thresholds.sys95 && sys < thresholds.sys95 + 12) {
-      category = "Stage 1 Hypertension";
-      interpretation = "Blood pressure is ≥95th percentile. Requires evaluation and treatment.";
-      recommendations = [
-        "Repeat BP on 3 separate occasions to confirm diagnosis",
-        "Ambulatory BP monitoring (ABPM) recommended",
-        "Screen for secondary causes (renal, cardiac, endocrine)",
-        "Lifestyle modifications (diet, exercise, weight)",
-        "Consider pharmacotherapy if persistent after 3-6 months",
-        "Target organ damage screening (echo, fundoscopy, microalbuminuria)"
-      ];
-      severity = "elevated";
+    // ── AAP 2017: ≥13y → fixed adult thresholds ──────────────────────────────
+    if (ageYears >= 13) {
+      const sysRank = sys >= 140 ? 3 : sys >= 130 ? 2 : sys >= 120 ? 1 : 0;
+      const diaRank = dia >= 90 ? 3 : dia >= 80 ? 2 : 0;
+      const rank = Math.max(sysRank, diaRank);
+      category = rank === 3 ? "Stage 2 Hypertension" : rank === 2 ? "Stage 1 Hypertension" : rank === 1 ? "Elevated BP" : "Normal BP";
+      severity = rank >= 3 ? "critical" : rank === 2 ? "elevated" : rank === 1 ? "warning" : "normal";
+      interpretation = `AAP 2017 (≥13y fixed thresholds): ${category}. Normal <120/80; Elevated SBP 120–129/<80; Stage 1 = 130–139/80–89; Stage 2 ≥140/90.`;
+      thresholds = { sys90: 120, sys95: 130, dia90: 80, dia95: 80 };
+      recommendations = rank >= 3
+        ? ["⚠️ Evaluate within 1 week", "Antihypertensive therapy indicated", "Secondary cause workup", "Nephrology referral"]
+        : rank === 2
+        ? ["ABPM recommended", "Lifestyle modification 3–6 months", "Secondary cause screen", "Start medication if CKD/DM/organ damage"]
+        : rank === 1
+        ? ["Lifestyle modification 6 months", "Recheck every 3–6 months", "ABPM if white-coat HTN suspected"]
+        : ["Annual BP check", "Healthy lifestyle promotion"];
     } else {
-      category = "Stage 2 Hypertension";
-      interpretation = "Blood pressure is ≥95th percentile + 12 mmHg. Immediate evaluation and treatment required.";
-      recommendations = [
-        "⚠️ START TREATMENT WITHIN 1 WEEK",
-        "Immediate workup for secondary hypertension",
-        "Renal ultrasound with Doppler, echocardiogram",
-        "Labs: BMP, CBC, urinalysis, lipid panel, renin/aldosterone",
-        "Start antihypertensive medication (ACE-I/ARB first-line)",
-        "Nephrology referral",
-        "If symptomatic (headache, vision changes, chest pain) → Emergency evaluation"
-      ];
-      severity = "critical";
+      // ── <13y: percentile-based ─────────────────────────────────────────────
+      const ref = AAP_BP_TABLE[a]?.[sexKey] || AAP_BP_TABLE[a]?.["M"];
+      const { p90s, p95s, p99s, p90d, p95d, p99d } = ref;
+      thresholds = { sys90: p90s, sys95: p95s, dia90: p90d, dia95: p95d };
+      const sys2 = p95s + 12, dia2 = p95d + 12;
+
+      if (sys >= sys2 || dia >= dia2) {
+        category = "Stage 2 Hypertension"; severity = "critical";
+        interpretation = `Stage 2 HTN (AAP 2017): BP ${sys}/${dia} ≥95th+12 mmHg (threshold: ${sys2}/${dia2}) for age ${a}y. Immediate evaluation required.`;
+        recommendations = ["⚠️ START TREATMENT WITHIN 1 WEEK", "Immediate secondary HTN workup", "Renal USS + Doppler, echocardiogram", "Antihypertensive medication", "Nephrology referral", "If symptomatic → Emergency evaluation"];
+      } else if (sys >= p95s || dia >= p95d) {
+        category = "Stage 1 Hypertension"; severity = "elevated";
+        interpretation = `Stage 1 HTN (AAP 2017): BP ${sys}/${dia} ≥95th percentile (95th: ${p95s}/${p95d}) for age ${a}y.`;
+        recommendations = ["Confirm on 3 separate occasions", "ABPM recommended", "Secondary cause screen (renal, cardiac, endocrine)", "Lifestyle modification", "Consider pharmacotherapy if persistent 3–6 months", "Target organ damage screen (echo, fundoscopy, microalbuminuria)"];
+      } else if (sys >= p90s || dia >= p90d || sys >= 120 || dia >= 80) {
+        category = "Elevated BP"; severity = "warning";
+        interpretation = `Elevated BP (AAP 2017): BP ${sys}/${dia} is 90th–<95th percentile (90th: ${p90s}/${p90d}; 95th: ${p95s}/${p95d}) for age ${a}y${sys >= 120 || dia >= 80 ? " or meets ≥120/80 absolute criterion" : ""}.`;
+        recommendations = ["Repeat BP in 6 months", "Dietary counseling (low sodium)", "Weight management if BMI ≥85th %ile", "Physical activity ≥60 min/day", "Cardiovascular risk factor screen"];
+      } else {
+        category = "Normal BP"; severity = "normal";
+        interpretation = `Normal BP (AAP 2017): BP ${sys}/${dia} is <90th percentile (90th: ${p90s}/${p90d}) for age ${a}y.`;
+        recommendations = ["Continue healthy lifestyle", "Routine BP monitoring at well-child visits", "Regular physical activity", "Low-salt diet"];
+      }
     }
 
-    setResults({
-      category,
-      interpretation,
-      recommendations,
-      severity,
-      thresholds,
-      systolic: sys,
-      diastolic: dia
-    });
+    setResults({ category, interpretation, recommendations, severity, thresholds, systolic: sys, diastolic: dia });
   };
 
   return (
@@ -241,12 +228,15 @@ export default function BPPercentiles() {
                   </div>
 
                   <div className="bg-white/50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-sm mb-2">BP Thresholds for Age {age}y:</h4>
+                    <h4 className="font-semibold text-sm mb-2">
+                      BP Thresholds for Age {age}y {parseFloat(age) >= 13 ? "(≥13y: Fixed AAP 2017)" : "(＜13y: Percentile-based AAP 2017, 50th height %ile)"}:
+                    </h4>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>90th %ile SBP: {results.thresholds.sys90} mmHg</div>
-                      <div>95th %ile SBP: {results.thresholds.sys95} mmHg</div>
-                      <div>90th %ile DBP: {results.thresholds.dia90} mmHg</div>
-                      <div>95th %ile DBP: {results.thresholds.dia95} mmHg</div>
+                      <div>90th %ile SBP: <strong>{results.thresholds.sys90} mmHg</strong></div>
+                      <div>95th %ile SBP: <strong>{results.thresholds.sys95} mmHg</strong></div>
+                      <div>90th %ile DBP: <strong>{results.thresholds.dia90} mmHg</strong></div>
+                      <div>95th %ile DBP: <strong>{results.thresholds.dia95} mmHg</strong></div>
+                      {parseFloat(age) < 13 && <div className="col-span-2 text-amber-700 font-semibold mt-1">Stage 2 threshold: SBP ≥{results.thresholds.sys95 + 12} or DBP ≥{results.thresholds.dia95 + 12} mmHg</div>}
                     </div>
                   </div>
 
