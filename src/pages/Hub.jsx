@@ -456,6 +456,7 @@ export default function Hub() {
         <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 shadow">
           <div>
             <h1 className="text-base font-bold text-white leading-tight">CliniCals Hub</h1>
+            <p className="text-blue-100 text-xs font-semibold">by Swarnim</p>
             <p className="text-blue-200 text-xs">Pediatric Nephrology Bedside Assistant</p>
           </div>
           <div className="flex items-center gap-1.5">

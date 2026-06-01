@@ -5,6 +5,7 @@ import { Home, Sparkles, Pill, BookOpen, Dna, Droplet, Baby, GraduationCap, Brai
 
 const NAV_ITEMS = [
   { label: "Hub", icon: Home, page: "Hub", activeCheck: ["/Hub", "/"] },
+  { label: "Engines", icon: Brain, page: "ClinicalSupport", activeCheck: ["/ClinicalSupport?tab=engines"], extraParams: "?tab=engines" },
   { label: "Guidelines", icon: BookOpen, page: "Guidelines", activeCheck: ["/GuidelinesLibrary", "/Guidelines"] },
   { label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", activeCheck: ["/DrugsDosing", "/DrugCalculator"] },
   { label: "Nephrology & Urology", icon: Droplet, page: "UrologyNephrologyHub", activeCheck: ["/ClinicalSupport", "/UrologyNephrologyHub"] },
@@ -26,10 +27,12 @@ export default function TopQuickAccessBar() {
       <div className="flex items-center gap-1 h-10 min-w-max">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = item.activeCheck.some(path =>
-            path === "/" ? p === "/" || p === "/Hub" : p.startsWith(path)
-          );
-          const href = item.path || createPageUrl(item.page);
+          const isActive = item.activeCheck.some(path => {
+            if (path === "/") return p === "/" || p === "/Hub";
+            const [basePath] = path.split("?");
+            return p.startsWith(basePath);
+          });
+          const href = (item.path || createPageUrl(item.page)) + (item.extraParams || "");
           return (
             <Link key={item.label} to={href}>
               <button
