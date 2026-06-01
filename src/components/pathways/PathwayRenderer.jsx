@@ -58,7 +58,7 @@ import NephrocalcinosisNephrolithiasisPathway from "./NephrocalcinosisNephrolith
 import {
   TMADecisionEngine, GeneticTestingEngine, CKDProgressionEngine,
   BiopsyTriggerEngine, EculizumabEngine, HypokalemiaEngine, MetabolicAcidosisEngine,
-  PolyuriaEngine, HyperkalemiaEngine
+  HyperkalemiaEngine
 } from "./DecisionEngines";
 import HematuriaEngine from "../engines/HematuriaEngine";
 import ProteinuriaEngine from "../engines/ProteinuriaEngine";

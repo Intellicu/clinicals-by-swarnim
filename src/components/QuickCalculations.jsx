@@ -343,8 +343,8 @@ export default function QuickCalculations() {
       const color = category === "Stage 2 HTN" ? "red" : category === "Stage 1 HTN" ? "red" : category === "Elevated BP" ? "amber" : "green";
       return {
         category, color,
-        details: `AAP 2017 (≥13y fixed thresholds): BP ${sysBP}/${diaBP}. Normal <120/80; Elevated 120–129/<80; Stage 1 = 130–139/80–89; Stage 2 ≥140/90.`,
-        percentiles: { "50th": "—/—", "90th": "120/80 (Elevated)", "95th": "130/80 (Stage 1)", "99th": "140/90 (Stage 2)" },
+        details: `AAP 2017 (≥13y fixed thresholds): BP ${sysBP}/${diaBP}. Normal <120/80; Elevated 120–129/<80; Stage 1 HTN = 130–139/80–89; Stage 2 HTN ≥140/90.`,
+        percentiles: { "50th": "—/—", "90th": "120/80", "95th": "130/80 (Stage 1)", "stage2": "140/90 (Stage 2)" },
         current: `${sysBP}/${diaBP}`
       };
     }
@@ -400,15 +400,15 @@ export default function QuickCalculations() {
     }
 
     return {
-      category, color, details,
-      percentiles: {
-        "50th": `${p50s}/${p50d}`,
-        "90th": `${p90s}/${p90d}`,
-        "95th": `${p95s}/${p95d}`,
-        "99th": `${p99s}/${p99d}`
-      },
-      current: `${sysBP}/${diaBP}`
-    };
+        category, color, details,
+        percentiles: {
+          "50th": `${p50s}/${p50d}`,
+          "90th": `${p90s}/${p90d}`,
+          "95th": `${p95s}/${p95d}`,
+          "stage2": `${sys2}/${dia2}`
+        },
+        current: `${sysBP}/${diaBP}`
+      };
   };
 
   if (!calculations || calculations.length === 0) {
@@ -632,7 +632,10 @@ export default function QuickCalculations() {
 
               <Card className="border-2 border-slate-200">
                 <CardHeader className="bg-slate-50 border-b">
-                  <CardTitle className="text-base">BP Reference Values for Age {patientData.age} years</CardTitle>
+                  <CardTitle className="text-base">
+                    BP Reference Values for Age {patientData.age} years
+                    {patientData.age < 13 ? ` (${patientData.gender === "Female" || patientData.gender === "female" ? "Female" : "Male"}, 50th height percentile)` : " (fixed adult thresholds ≥13y)"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
                   <table className="w-full text-sm">
@@ -647,22 +650,22 @@ export default function QuickCalculations() {
                       <tr className="border-b">
                         <td className="py-2">50th</td>
                         <td className="font-mono">{bpDetails.percentiles["50th"]}</td>
-                        <td>Normal</td>
+                        <td className="text-xs text-slate-500">Normal</td>
                       </tr>
                       <tr className="border-b">
                         <td className="py-2">90th</td>
                         <td className="font-mono">{bpDetails.percentiles["90th"]}</td>
-                        <td>Upper Normal</td>
+                        <td className="text-xs">Elevated BP threshold</td>
                       </tr>
                       <tr className="border-b bg-amber-50">
                         <td className="py-2 font-semibold">95th</td>
                         <td className="font-mono font-semibold">{bpDetails.percentiles["95th"]}</td>
-                        <td className="font-semibold text-amber-700">HTN Threshold</td>
+                        <td className="font-semibold text-amber-700 text-xs">Stage 1 HTN threshold</td>
                       </tr>
-                      <tr className="bg-red-50">
-                        <td className="py-2 font-semibold">99th</td>
-                        <td className="font-mono font-semibold">{bpDetails.percentiles["99th"]}</td>
-                        <td className="font-semibold text-red-700">Severe HTN</td>
+                      <tr className="border-b bg-red-50">
+                        <td className="py-2 font-semibold text-xs">95th+12 mmHg</td>
+                        <td className="font-mono font-semibold text-xs">{bpDetails.percentiles["stage2"]}</td>
+                        <td className="font-semibold text-red-700 text-xs">Stage 2 HTN threshold</td>
                       </tr>
                       <tr className="border-t-2 bg-blue-50">
                         <td className="py-3 font-bold">Patient's BP</td>
@@ -671,6 +674,7 @@ export default function QuickCalculations() {
                       </tr>
                     </tbody>
                   </table>
+                  <p className="text-xs text-slate-400 mt-2">Source: AAP Clinical Practice Guideline 2017 (Pediatrics 140:e20171904). &lt;13y: percentile-based; ≥13y: fixed thresholds.</p>
                 </CardContent>
               </Card>
             </div>
