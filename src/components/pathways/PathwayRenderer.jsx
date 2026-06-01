@@ -84,6 +84,11 @@ import KidneyStoneEngine from "../engines/KidneyStoneEngine";
 import RRTEngine from "../engines/RRTEngine";
 import CKDEngine from "../engines/CKDEngine";
 import PolyuriaFullEngine from "../engines/PolyuriaEngine";
+import ElectrolytesHubEngine from "../engines/ElectrolytesHubEngine";
+import AcidBaseHubEngine from "../engines/AcidBaseHubEngine";
+import NeurogenicBladderEngine from "../engines/NeurogenicBladderEngine";
+import BladderDiaryUDSEngine from "../engines/BladderDiaryUDSEngine";
+import RenalBiopsyEngine from "../engines/RenalBiopsyEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -109,6 +114,7 @@ const HANDLED_IDS = new Set([
   "alport-hnf1b-engine","stone-ph-engine","tubular-disorder-engine",
   "proteinuria-engine","nephrocalcinosis-stone-engine","gn-engine",
   "rrt-engine","ckd-engine","polyuria-full-engine",
+  "electrolytes-hub","acid-base-hub","neurogenic-bladder-engine","bladder-diary-uds-engine","renal-biopsy-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -219,6 +225,11 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "rrt-engine") return <RRTEngine />;
   if (id === "ckd-engine") return <CKDEngine />;
   if (id === "polyuria-full-engine") return <PolyuriaFullEngine />;
+  if (id === "electrolytes-hub") return <ElectrolytesHubEngine />;
+  if (id === "acid-base-hub") return <AcidBaseHubEngine />;
+  if (id === "neurogenic-bladder-engine") return <NeurogenicBladderEngine />;
+  if (id === "bladder-diary-uds-engine") return <BladderDiaryUDSEngine />;
+  if (id === "renal-biopsy-engine") return <RenalBiopsyEngine />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

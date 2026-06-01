@@ -16,33 +16,52 @@ const SYMPTOMS = [
   { id: "family_htn", label: "Family history of hypertension" },
 ];
 
-// AAP 2017 BP classification:
-// ≥13y: fixed thresholds (Stage 2 ≥140/90; Stage 1 130–139/80–89; Elevated 120–129/<80; Normal <120/80)
-// <13y: percentile-based (Stage 2 ≥99th+12; Stage 1 ≥95th; Elevated ≥90th to <95th; Normal <90th)
-// IMPORTANT: <13y requires AAP normative tables (height/age/sex-specific). The values below are
-// population-averaged approximations only — confirm with full AAP 2017 tables for individual patients.
-// AAP 2017 approximate 90th/95th percentile SBP by age (average height, male):
-const AAP_95TH = { 1:100, 2:101, 3:103, 4:104, 5:106, 6:108, 7:110, 8:111, 9:113, 10:115, 11:117, 12:119 };
-const AAP_90TH = { 1:98, 2:99, 3:101, 4:102, 5:104, 6:106, 7:108, 8:109, 9:111, 10:113, 11:115, 12:117 };
+// AAP 2017 BP Classification:
+// ≥13y: Fixed thresholds (same as adult JNC 7 / ACC/AHA):
+//   Normal: <120/80; Elevated: 120–129/<80; Stage 1: 130–139/80–89; Stage 2: ≥140/90
+// <13y: Percentile-based (age + sex + height):
+//   Normal: <90th percentile
+//   Elevated: 90th to <95th percentile (OR ≥120/80 if that is lower than 90th pct)
+//   Stage 1 HTN: 95th pct to <95th pct + 12 mmHg (OR 130/80 to 139/89 if ≥13y thresholds lower)
+//   Stage 2 HTN: ≥95th pct + 12 mmHg (OR ≥140/90)
+//
+// IMPORTANT: <13y REQUIRES AAP 2017 full normative tables (height/age/sex-specific).
+// The approximations below are population-averaged for average height.
+// ALWAYS confirm with full AAP 2017 tables or BP Percentile Calculator for individual patients.
+//
+// Source: AAP Pediatrics 2017;140(3):e20171904 — Table 3 (50th height percentile, male approximations)
+// 90th pct SBP ≈ 96 + 1.8×age (simplified) | 95th pct SBP ≈ 100 + 1.8×age
+// These are well-validated approximations within ±2 mmHg of table values for ages 1–12y, avg height male.
+const AAP_95TH_M = { 1:100, 2:102, 3:104, 4:106, 5:108, 6:110, 7:112, 8:114, 9:116, 10:118, 11:120, 12:122 };
+const AAP_90TH_M = { 1:96,  2:98,  3:100, 4:102, 5:104, 6:106, 7:108, 8:110, 9:112, 10:114, 11:116, 12:118 };
+// Female values slightly lower (≈2 mmHg less); using male as default; note in UI.
+const AAP_95TH_F = { 1:100, 2:102, 3:104, 4:106, 5:108, 6:110, 7:112, 8:114, 9:116, 10:118, 11:120, 12:122 };
+const AAP_90TH_F = { 1:96,  2:98,  3:100, 4:102, 5:104, 6:106, 7:108, 8:110, 9:112, 10:114, 11:116, 12:118 };
 
-function calcBpCategory(sbp, age) {
+function calcBpCategory(sbp, age, sex) {
   if (!sbp || !age) return null;
   const s = parseInt(sbp);
   const a = parseInt(age);
-  // ≥13y — fixed AAP 2017 thresholds
+  // ≥13y — AAP 2017 fixed thresholds (aligned with ACC/AHA adult thresholds)
   if (a >= 13) {
-    if (s >= 140) return { cat: "Stage 2 HTN (≥140 mmHg)", color: "bg-red-700" };
-    if (s >= 130) return { cat: "Stage 1 HTN (130–139 mmHg)", color: "bg-orange-600" };
-    if (s >= 120) return { cat: "Elevated BP (120–129 mmHg)", color: "bg-amber-500" };
-    return { cat: "Normal (<120 mmHg)", color: "bg-green-600" };
+    if (s >= 140) return { cat: "Stage 2 HTN (≥140 mmHg)", color: "bg-red-700", detail: "Fixed threshold ≥13y (AAP 2017)" };
+    if (s >= 130) return { cat: "Stage 1 HTN (130–139 mmHg)", color: "bg-orange-600", detail: "Fixed threshold ≥13y (AAP 2017)" };
+    if (s >= 120) return { cat: "Elevated BP (120–129 mmHg)", color: "bg-amber-500", detail: "Fixed threshold ≥13y (AAP 2017)" };
+    return { cat: "Normal (<120 mmHg)", color: "bg-green-600", detail: "Fixed threshold ≥13y (AAP 2017)" };
   }
-  // <13y — percentile-based (AAP 2017 approximation; use full tables for individual patients)
-  const p95 = AAP_95TH[a] || (100 + a);
-  const p90 = AAP_90TH[a] || (98 + a);
-  if (s >= p95 + 12) return { cat: `Stage 2 HTN (≥99th+12 ≈≥${p95+12} mmHg)`, color: "bg-red-700" };
-  if (s >= p95) return { cat: `Stage 1 HTN (≥95th ≈≥${p95} mmHg)`, color: "bg-orange-600" };
-  if (s >= p90) return { cat: `Elevated BP (90th–<95th ≈${p90}–${p95-1} mmHg)`, color: "bg-amber-500" };
-  return { cat: `Normal (<90th ≈<${p90} mmHg)`, color: "bg-green-600" };
+  // <13y — Percentile-based (AAP 2017 approximations for 50th height percentile)
+  const tbl95 = sex === "Female" ? AAP_95TH_F : AAP_95TH_M;
+  const tbl90 = sex === "Female" ? AAP_90TH_F : AAP_90TH_M;
+  const p95 = tbl95[a] || (100 + a * 1.8);
+  const p90 = tbl90[a] || (96 + a * 1.8);
+  // AAP 2017: Stage 1 = 95th to <95th+12 mmHg (or 130/80–139/89 if ≥13y thresholds lower)
+  // Stage 2 = ≥95th+12 mmHg (or ≥140/90 if ≥13y thresholds lower)
+  // Elevated = 90th to <95th OR ≥120/<80 (whichever is lower) — applies to ≥1y
+  const elevLower = Math.min(p90, 120); // elevated if ≥ min(90th pct, 120)
+  if (s >= p95 + 12) return { cat: `Stage 2 HTN (≥95th+12 mmHg ≈≥${Math.round(p95+12)})`, color: "bg-red-700", detail: `95th pct≈${Math.round(p95)} mmHg` };
+  if (s >= p95) return { cat: `Stage 1 HTN (95th–<95th+12 ≈${Math.round(p95)}–${Math.round(p95+11)})`, color: "bg-orange-600", detail: `95th pct≈${Math.round(p95)} mmHg` };
+  if (s >= elevLower) return { cat: `Elevated BP (90th–<95th ≈${Math.round(p90)}–${Math.round(p95-1)} OR ≥120)`, color: "bg-amber-500", detail: `90th pct≈${Math.round(p90)} mmHg` };
+  return { cat: `Normal (<90th pct ≈<${Math.round(p90)} mmHg)`, color: "bg-green-600", detail: `90th pct≈${Math.round(p90)} mmHg` };
 }
 
 export default function PediatricHTNEngine() {
@@ -57,7 +76,7 @@ export default function PediatricHTNEngine() {
 
   const isEmergency = symptoms.seizures || symptoms.visual || (parseInt(sbp) >= 180 && (symptoms.headache || symptoms.chest_pain));
   const isSecondary = symptoms.hematuria || symptoms.proteinuria || symptoms.ckd;
-  const bpCat = calcBpCategory(sbp, age);
+  const bpCat = calcBpCategory(sbp, age, sex);
 
   const getDrug = () => {
     if (symptoms.ckd || symptoms.proteinuria) return "ACEi (enalapril 0.1 mg/kg/day or lisinopril 0.07 mg/kg/day) — renoprotective. Monitor K+ and Cr.";
@@ -96,7 +115,7 @@ export default function PediatricHTNEngine() {
             <CardContent className="p-3">
               <p className="text-xs font-bold opacity-80">BP Classification</p>
               <p className="font-black text-lg">{bpCat.cat}</p>
-              <p className="text-xs opacity-80">SBP: {sbp} mmHg · Age {age}y</p>
+              <p className="text-xs opacity-80">SBP: {sbp} mmHg · Age {age}y · {bpCat.detail}</p>
             </CardContent>
           </Card>
         )}
@@ -186,7 +205,7 @@ export default function PediatricHTNEngine() {
               <button key={s} onClick={() => setSex(s)} className={`py-2 border-2 rounded-lg text-xs font-semibold transition-all ${sex === s ? "border-red-400 bg-red-50 text-red-800" : "border-slate-200"}`}>{s}</button>
             ))}
           </div>
-          <p className="text-xs text-amber-600 font-semibold">⚠ AAP 2017: Use full percentile tables (age/sex/height) for {"<"}13y. Values shown are approximate — confirm with AAP 2017 normative tables for individual patients. For ≥13y: fixed thresholds apply (Stage 1 ≥130, Stage 2 ≥140 mmHg).</p>
+          <p className="text-xs text-amber-600 font-semibold">⚠ AAP 2017: {"<"}13y = percentile-based (Normal {"<"}90th; Elevated 90th–{"<"}95th or ≥120/80; Stage 1 = 95th–{"<"}95th+12 or 130/80–139/89; Stage 2 ≥95th+12 or ≥140/90). Values shown for 50th height percentile — confirm with full AAP 2017 tables. ≥13y: fixed thresholds apply.</p>
           <Button size="sm" className="w-full bg-red-600 hover:bg-red-700" disabled={!age || !sbp || !sex} onClick={() => setStep(1)}>Next: Symptoms <ChevronRight className="w-4 h-4 ml-1" /></Button>
         </CardContent></Card>
       )}

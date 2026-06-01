@@ -15,6 +15,9 @@ const STEPS = {
   CATHETER: "catheter",
   MONITORING: "monitoring",
   ADEQUACY: "adequacy",
+  TROUBLESHOOT_PD: "troubleshoot_pd",
+  TROUBLESHOOT_HD: "troubleshoot_hd",
+  TROUBLESHOOT_CRRT: "troubleshoot_crrt",
 };
 
 const InfoBox = ({ title, color = "blue", items, children, referral }) => {
@@ -72,6 +75,9 @@ export default function RRTEngine() {
             { label: "Write SLED Prescription", next: STEPS.SLED_RX },
             { label: "Access Selection — Catheter by age/weight", next: STEPS.CATHETER },
             { label: "Monitoring Plan — adequacy + complications", next: STEPS.MONITORING },
+            { label: "Troubleshooting — PD complications", next: STEPS.TROUBLESHOOT_PD },
+            { label: "Troubleshooting — HD complications", next: STEPS.TROUBLESHOOT_HD },
+            { label: "Troubleshooting — CRRT complications", next: STEPS.TROUBLESHOOT_CRRT },
           ]} />
         );
 
@@ -396,6 +402,77 @@ export default function RRTEngine() {
                   <p className="font-bold text-amber-900">Drug Dosing on RRT</p>
                   {["Antibiotics: adjust for modality (vancomycin by level; aminoglycosides — avoid if possible)", "Antifungals: fluconazole requires dose reduction; echinocandins — no adjustment needed", "Antiepileptics: levetiracetam cleared by HD; give after session or supplement dose", "Immunosuppressants: tacrolimus/CsA not significantly removed by RRT; monitor levels", "Use renal drug dosing reference (KDIGO 2012 / BNF for Children / Micromedex for RRT dosing)"].map((c, i) => <p key={i} className="text-amber-800">• {c}</p>)}
                 </div>
+              </div>
+            </InfoBox>
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.TROUBLESHOOT_PD:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="PD Troubleshooting" color="blue">
+              <div className="mt-2 space-y-2 text-xs">
+                {[
+                  { t: "Peritonitis", color: "bg-red-50 border-red-100", items: ["Turbid effluent + WBC >100/mm³ (≥50% neutrophils) = peritonitis", "Empirical: Vancomycin IP 15–30 mg/kg/exchange + Ceftazidime IP 125 mg/L maintenance", "Culture: tailor antibiotics; GPC → vancomycin; GNR → pip-tazo or ceftazidime", "Refractory (>5 days no response): remove catheter; switch to HD temporarily", "Fungal peritonitis: remove catheter IMMEDIATELY; fluconazole or echinocandin"] },
+                  { t: "Catheter Outflow Failure (poor drainage)", color: "bg-amber-50 border-amber-100", items: ["Omentum wrapping (most common): try flushing with heparinised saline, prone positioning, enema (constipation)", "Fibrin occlusion: heparin 500 U/L per bag; tPA 1 mg in 10 mL instilled for 2h (if persistent)", "Catheter tip migration: X-ray confirm position → repositioning (stiff wire or surgical)", "Full bladder/rectum: catheterise bladder; treat constipation (macrogol)"] },
+                  { t: "Exit-Site / Tunnel Infection", color: "bg-orange-50 border-orange-100", items: ["Exit-site infection: erythema/swelling/discharge at exit — treat with oral antibiotics (mupirocin/co-amoxiclav × 2w)", "Tunnel infection: tender cuff on palpation → IV antibiotics; may need cuff shaving or catheter removal", "Prevention: mupirocin ointment at exit site daily (proven to reduce S. aureus peritonitis by 70%)"] },
+                  { t: "Ultrafiltration Failure (inadequate fluid removal)", color: "bg-blue-50 border-blue-100", items: ["Type 1 (high transport): switch to shorter dwell APD or icodextrin for long daytime dwell", "Type 2 (peritoneal scarring): reassess membrane function with PET; may need modality change", "Type 3 (aquaporin failure): rare; ultrafiltration with water only fails (test with hypertonic glucose)", "Practical: increase osmolality (higher glucose concentration bag), reduce dwell time"] },
+                  { t: "Dialysis Inadequacy", color: "bg-green-50 border-green-100", items: ["Kt/V <1.7 (ISPD target): increase number of exchanges or fill volume", "Increase dwell frequency (CAPD → APD with more cycles)", "Reassess residual renal function contribution (measure urine Kt/V)"] },
+                ].map((s, i) => (
+                  <div key={i} className={`p-2 rounded-lg border ${s.color}`}>
+                    <p className="font-bold text-slate-800 mb-1">{s.t}</p>
+                    {s.items.map((it, j) => <p key={j} className="text-slate-700">• {it}</p>)}
+                  </div>
+                ))}
+              </div>
+            </InfoBox>
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.TROUBLESHOOT_HD:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="HD Troubleshooting" color="indigo">
+              <div className="mt-2 space-y-2 text-xs">
+                {[
+                  { t: "Intradialytic Hypotension (IDH) — most common complication", color: "bg-indigo-50 border-indigo-100", items: ["Definition: SBP drop >20 mmHg or MAP drop >10 mmHg with symptoms", "Immediate: lay flat (Trendelenburg), reduce/stop UF, 0.9% saline bolus 10 mL/kg IV", "If recurrent: reassess dry weight (over-estimated), reduce UFR (<10 mL/kg/h target)", "Pharmacological: fludrocortisone (CKD patients); midodrine 2.5–10 mg pre-HD; cool dialysate (35.5°C)", "Rule out: cardiac cause (tamponade, arrhythmia), sepsis, access recirculation"] },
+                  { t: "Muscle Cramps", color: "bg-blue-50 border-blue-100", items: ["Reduce UF rate, normal saline bolus 5 mL/kg; quinine (limited evidence)", "Reassess dry weight, sodium profiling, stretch/massage", "Carnitine deficiency: L-carnitine 15–20 mg/kg IV post-HD (evidence limited)"] },
+                  { t: "Dialyser Reaction / First Use Syndrome", color: "bg-red-50 border-red-100", items: ["Type A (anaphylactic): hypotension, urticaria, bronchospasm within 5–30 min — STOP HD, adrenaline, antihistamine, steroids. Do NOT return blood.", "Type B (non-specific): chest/back pain, no hypotension — reduce blood flow, continue monitoring. Return blood.", "Prevention: use biocompatible membrane; rinse dialyser with saline; switch to different membrane type"] },
+                  { t: "Clotted Access (CVC)", color: "bg-amber-50 border-amber-100", items: ["CVC thrombosis: tPA lock (alteplase 2 mg/2 mL per lumen; dwell 30 min)", "Poor flow: repositioning, arm elevation; check for kinking", "AVF thrombosis: urgent surgical thrombectomy within 24h (or percutaneous declot)"] },
+                  { t: "Haemolysis", color: "bg-red-50 border-red-100", items: ["Causes: chloramine in water, overheated dialysate, kinked lines, contaminated dialysate", "Signs: bright red/pink dialysis tubing (free Hb), dark post-dialysis blood, cherry-red plasma", "STOP HD IMMEDIATELY — do NOT return blood (life-threatening hyperkalaemia from lysed RBCs)", "Urgent: K+ level, CBC; treat hyperkalaemia emergently; urgent water quality check"] },
+                  { t: "Air Embolism", color: "bg-rose-50 border-rose-100", items: ["Clinical: sudden dyspnoea/cyanosis/death during HD if air enters venous line", "Immediate: clamp venous line, turn patient LEFT lateral decubitus + Trendelenburg (traps air in RV)", "100% O₂; call resuscitation team; hyperbaric O₂ if available"] },
+                ].map((s, i) => (
+                  <div key={i} className={`p-2 rounded-lg border ${s.color}`}>
+                    <p className="font-bold text-slate-800 mb-1">{s.t}</p>
+                    {s.items.map((it, j) => <p key={j} className="text-slate-700">• {it}</p>)}
+                  </div>
+                ))}
+              </div>
+            </InfoBox>
+            <NavBtns />
+          </div>
+        );
+
+      case STEPS.TROUBLESHOOT_CRRT:
+        return (
+          <div className="space-y-3">
+            <InfoBox title="CRRT Troubleshooting" color="red">
+              <div className="mt-2 space-y-2 text-xs">
+                {[
+                  { t: "Filter Clotting (most common CRRT problem)", color: "bg-red-50 border-red-100", items: ["Early clotting (<12h): check filtration fraction (FF — should be <25%)", "Increase pre-dilution ratio (50–75% replacement pre-filter reduces clotting)", "Optimise citrate dosing (post-filter iCa target 0.25–0.40 mmol/L)", "Check for heparin dosing (if using heparin — target PTT 45–60s)", "Air in circuit: purge; inspect for fibrin strands in header"] },
+                  { t: "Citrate Accumulation (regional citrate anticoagulation)", color: "bg-amber-50 border-amber-100", items: ["Definition: total Ca:ionised Ca ratio >2.5 (citrate chelates Ca)", "Risk: liver failure (impaired citrate metabolism), high citrate doses, severe shock", "Management: reduce citrate rate by 20%; increase systemic Ca replacement; if ratio >3.0 — switch to heparin or no anticoagulation", "Monitor: ionised Ca every 4h systemic + post-filter"] },
+                  { t: "Hypophosphataemia", color: "bg-violet-50 border-violet-100", items: ["CRRT removes phosphate rapidly — universal complication", "Monitor phosphate every 6h on CRRT", "Replace: K₂HPO₄ or Na₂HPO₄ IV infusion; or add to replacement fluid (phosphate-containing CRRT fluids)", "Target phosphate >0.8 mmol/L"] },
+                  { t: "Hypothermia", color: "bg-blue-50 border-blue-100", items: ["CRRT causes significant heat loss (large extracorporeal circuit)", "Use in-line blood warmer on return limb", "Monitor temperature hourly; target 36–37.5°C", "Warming blankets for patient"] },
+                  { t: "Drug Dosing in CRRT", color: "bg-green-50 border-green-100", items: ["Antibiotics: vancomycin by level (target 15–20 µg/mL trough or AUC-guided); meropenem 2g q8h in CRRT; pip-tazo 4.5g q8h", "Anticonvulsants: levetiracetam — significantly cleared by CRRT; supplement dose", "Immunosuppressants: tacrolimus/ciclosporin not significantly cleared; monitor levels", "Antifungals: fluconazole dose increase in CRRT; echinocandins — no adjustment", "Resource: KDIGO 2012 Drug Dosing in RRT Table; Micromedex CRRT dosing"] },
+                  { t: "Access / Circuit Alarms", color: "bg-orange-50 border-orange-100", items: ["Access pressure alarm (high negative): catheter positioning — reposition patient/catheter; flush lumen", "Return pressure alarm (high): circuit clotting — inspect for fibrin; prepare replacement circuit", "Transmembrane pressure (TMP) rising: filter clotting — change circuit if TMP >400 mmHg", "Blood leak alarm: inspect filter; if confirmed haemolysis/leak — change filter, do NOT return blood"] },
+                ].map((s, i) => (
+                  <div key={i} className={`p-2 rounded-lg border ${s.color}`}>
+                    <p className="font-bold text-slate-800 mb-1">{s.t}</p>
+                    {s.items.map((it, j) => <p key={j} className="text-slate-700">• {it}</p>)}
+                  </div>
+                ))}
               </div>
             </InfoBox>
             <NavBtns />

@@ -5,13 +5,19 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 
 const ENGINES = [
-  // ── Emergency / Electrolyte ──
-  { label: "AKI Engine", desc: "KDIGO + RRT triggers", scenario: "aki-engine", tags: ["AKI", "renal failure", "emergency", "creatinine"], group: "Emergency & Electrolytes" },
-  { label: "Hyperkalaemia", desc: "K+ emergency full engine", scenario: "hyperkalemia-deep-engine", tags: ["hyperkalemia", "potassium", "arrhythmia", "emergency"], group: "Emergency & Electrolytes" },
-  { label: "Hyponatraemia", desc: "Na correction engine", scenario: "hyponatremia-engine", tags: ["hyponatremia", "sodium", "SIADH", "fluid"], group: "Emergency & Electrolytes" },
-  { label: "Hypokalemia", desc: "K+ deficiency pathway", scenario: "hypokalemia-engine", tags: ["hypokalemia", "potassium", "weakness"], group: "Emergency & Electrolytes" },
-  { label: "Met. Acidosis", desc: "AG / RTA Engine", scenario: "metabolic-acidosis-engine", tags: ["acidosis", "anion gap", "RTA", "bicarbonate"], group: "Emergency & Electrolytes" },
-  { label: "Polyuria / DI", desc: "Central vs Nephrogenic DI", scenario: "polyuria-engine", tags: ["polyuria", "diabetes insipidus", "NDI", "polydipsia"], group: "Emergency & Electrolytes" },
+  // ── Emergency ──
+  { label: "AKI Engine", desc: "KDIGO + RRT triggers", scenario: "aki-engine", tags: ["AKI", "renal failure", "emergency", "creatinine"], group: "Emergency" },
+
+  // ── Electrolytes Hub ──
+  { label: "Electrolytes Hub", desc: "Select disorder: HyperK, HypoK, HyperNa, HypoNa, HyperCa, HypoCa, Met Acidosis, Met Alkalosis", scenario: "electrolytes-hub", tags: ["electrolytes", "sodium", "potassium", "calcium", "hyperkalemia", "hyponatremia", "hypocalcemia", "hypercalcemia", "metabolic alkalosis", "hypernatremia", "hypokalemia"], group: "Electrolytes" },
+  { label: "Hyperkalaemia", desc: "K+ emergency full engine", scenario: "hyperkalemia-deep-engine", tags: ["hyperkalemia", "potassium", "arrhythmia", "emergency"], group: "Electrolytes" },
+  { label: "Hyponatraemia", desc: "Na correction engine", scenario: "hyponatremia-engine", tags: ["hyponatremia", "sodium", "SIADH", "fluid"], group: "Electrolytes" },
+  { label: "Hypokalemia", desc: "K+ deficiency pathway", scenario: "hypokalemia-engine", tags: ["hypokalemia", "potassium", "weakness"], group: "Electrolytes" },
+  { label: "Polyuria / DI", desc: "Central vs Nephrogenic DI", scenario: "polyuria-engine", tags: ["polyuria", "diabetes insipidus", "NDI", "polydipsia"], group: "Electrolytes" },
+
+  // ── Acid-Base Hub ──
+  { label: "Acid-Base Hub", desc: "Classify disorder → Metabolic Acidosis / Alkalosis / Respiratory Acidosis / Alkalosis / ABG Analyser", scenario: "acid-base-hub", tags: ["acid base", "acidosis", "alkalosis", "ABG", "pH", "bicarbonate", "respiratory", "metabolic", "anion gap"], group: "Acid-Base" },
+  { label: "Met. Acidosis", desc: "AG / normal AG / RTA Engine", scenario: "metabolic-acidosis-engine", tags: ["acidosis", "anion gap", "RTA", "bicarbonate"], group: "Acid-Base" },
 
   // ── Glomerular ──
   { label: "GN Engine", desc: "IgAN · LN · MN · FSGS · PSGN · ANCA · Alport · C3G · IgAVN", scenario: "gn-engine", tags: ["glomerulonephritis", "IgA", "lupus nephritis", "membranous", "FSGS", "PSGN", "ANCA", "Alport", "C3G", "HSP"], group: "Glomerular Disease" },
@@ -37,8 +43,10 @@ const ENGINES = [
   // ── CAKUT & Urology ──
   { label: "CAKUT Engine", desc: "Antenatal HN, UPJ, Duplex, MCDK", scenario: "cakut-engine", tags: ["CAKUT", "hydronephrosis", "UPJ", "duplex", "MCDK", "antenatal"], group: "CAKUT & Urology" },
   { label: "PUV Engine", desc: "Posterior urethral valves", scenario: "puv-engine", tags: ["PUV", "posterior urethral valve", "bladder", "MCU", "ESRD risk"], group: "CAKUT & Urology" },
-  { label: "VUR/UTI Engine", desc: "Recurrent UTI + VUR grading", scenario: "vur-uti-engine", tags: ["VUR", "reflux", "UTI", "DMSA", "VCUG", "recurrent UTI"], group: "CAKUT & Urology" },
+  { label: "VUR/UTI Engine", desc: "Recurrent UTI + VUR grading (ISPN 2021)", scenario: "vur-uti-engine", tags: ["VUR", "reflux", "UTI", "DMSA", "VCUG", "recurrent UTI", "ISPN", "CAP"], group: "CAKUT & Urology" },
   { label: "Voiding Dx", desc: "BBD + Uroflow + OAB", scenario: "voiding-engine", tags: ["voiding dysfunction", "BBD", "uroflow", "OAB", "enuresis", "incontinence"], group: "CAKUT & Urology" },
+  { label: "Neurogenic Bladder", desc: "Spina bifida · ICCS classification · CIC · Botox · Surgery (ICCS/EAU/NICE)", scenario: "neurogenic-bladder-engine", tags: ["neurogenic bladder", "spina bifida", "MMC", "CIC", "detrusor", "DSD", "oxybutynin", "botox", "Mitrofanoff"], group: "CAKUT & Urology" },
+  { label: "Bladder Diary / UDS", desc: "Diary analysis · Uroflowmetry patterns · UDS interpretation · Imaging selection", scenario: "bladder-diary-uds-engine", tags: ["bladder diary", "uroflowmetry", "urodynamics", "UDS", "OAB", "enuresis", "VCUG", "DMSA", "MAG3"], group: "CAKUT & Urology" },
 
   // ── Tubular & Metabolic ──
   { label: "Tubular Engine", desc: "Fanconi / XLH / NDI", scenario: "tubular-engine", tags: ["Fanconi", "rickets", "XLH", "NDI", "tubular", "phosphate"], group: "Tubular & Metabolic" },
@@ -49,32 +57,41 @@ const ENGINES = [
   { label: "RRT Engine", desc: "Indications · PD/HD/CRRT/SLED prescriptions · Access · Monitoring", scenario: "rrt-engine", tags: ["RRT", "dialysis", "CRRT", "peritoneal dialysis", "haemodialysis", "SLED", "access", "catheter"], group: "RRT & Dialysis" },
 
   // ── Polyuria ──
-  { label: "Polyuria Engine", desc: "Water deprivation → Central DI vs Nephrogenic DI", scenario: "polyuria-full-engine", tags: ["polyuria", "diabetes insipidus", "NDI", "central DI", "DDAVP", "polydipsia"], group: "Emergency & Electrolytes" },
+  { label: "Polyuria Engine", desc: "Water deprivation → Central DI vs Nephrogenic DI", scenario: "polyuria-full-engine", tags: ["polyuria", "diabetes insipidus", "NDI", "central DI", "DDAVP", "polydipsia"], group: "Electrolytes" },
 
   // ── Hypertension ──
-  { label: "HTN Engine", desc: "AAP 2017 + secondary workup", scenario: "htn-engine", tags: ["hypertension", "BP", "AAP 2017", "secondary HTN", "stage 2"], group: "Hypertension" },
+  { label: "HTN Engine", desc: "AAP 2017 percentile-based (<13y) + fixed thresholds (≥13y)", scenario: "htn-engine", tags: ["hypertension", "BP", "AAP 2017", "secondary HTN", "stage 2", "percentile"], group: "Hypertension" },
+
+  // ── Histopathology ──
+  { label: "Renal Biopsy Engine", desc: "LM · IF · EM findings for 12 conditions — MCD, FSGS, MN, IgAN, Lupus, C3G, ANCA, Alport, TIN, TMA, Transplant, Diabetic", scenario: "renal-biopsy-engine", tags: ["biopsy", "histology", "LM", "IF", "EM", "MCD", "FSGS", "IgA", "lupus", "alport", "C3G", "ANCA", "TIN", "membranous", "transplant", "TMA", "diabetic nephropathy"], group: "Histopathology" },
 ];
 
 const GROUPS = [...new Set(ENGINES.map(e => e.group))];
 
 const GROUP_STYLE = {
-  "Emergency & Electrolytes": "bg-red-50 border-red-200 text-red-900",
+  "Emergency": "bg-red-50 border-red-200 text-red-900",
+  "Electrolytes": "bg-cyan-50 border-cyan-200 text-cyan-900",
+  "Acid-Base": "bg-violet-50 border-violet-200 text-violet-900",
   "Glomerular Disease": "bg-blue-50 border-blue-200 text-blue-900",
   "CKD & Genetics": "bg-violet-50 border-violet-200 text-violet-900",
   "CAKUT & Urology": "bg-teal-50 border-teal-200 text-teal-900",
   "Tubular & Metabolic": "bg-amber-50 border-amber-200 text-amber-900",
   "Hypertension": "bg-rose-50 border-rose-200 text-rose-900",
   "RRT & Dialysis": "bg-indigo-50 border-indigo-200 text-indigo-900",
+  "Histopathology": "bg-slate-100 border-slate-300 text-slate-900",
 };
 
 const GROUP_BADGE = {
-  "Emergency & Electrolytes": "bg-red-600",
+  "Emergency": "bg-red-600",
+  "Electrolytes": "bg-cyan-600",
+  "Acid-Base": "bg-violet-600",
   "Glomerular Disease": "bg-blue-600",
-  "CKD & Genetics": "bg-violet-600",
+  "CKD & Genetics": "bg-violet-700",
   "CAKUT & Urology": "bg-teal-600",
   "Tubular & Metabolic": "bg-amber-600",
   "Hypertension": "bg-rose-600",
   "RRT & Dialysis": "bg-indigo-600",
+  "Histopathology": "bg-slate-600",
 };
 
 // Keyword → guideline title fragments for matching from DB
@@ -94,8 +111,13 @@ const ENGINE_GUIDELINE_KEYS = {
   "fabry-engine": ["Fabry"],
   "cystic-kidney-engine": ["ADPKD", "ARPKD", "Cystic Kidney", "Nephronophthisis"],
   "cakut-engine": ["CAKUT", "Hydronephrosis"],
-  "vur-uti-engine": ["VUR", "UTI", "Vesicoureteral"],
+  "vur-uti-engine": ["VUR", "UTI", "Vesicoureteral", "ISPN"],
   "voiding-engine": ["Voiding", "Bladder"],
+  "neurogenic-bladder-engine": ["Neurogenic Bladder", "Spina Bifida", "MMC", "Bladder"],
+  "bladder-diary-uds-engine": ["Voiding", "Urodynamics", "Bladder"],
+  "renal-biopsy-engine": ["Biopsy", "Histology", "Glomerulonephritis"],
+  "electrolytes-hub": ["Electrolytes", "Sodium", "Potassium", "Calcium"],
+  "acid-base-hub": ["Acid-Base", "Metabolic Acidosis", "Alkalosis"],
   "hyperoxaluria-engine": ["Hyperoxaluria", "Primary Hyperoxaluria"],
   "cystinosis-engine": ["Cystinosis"],
   "stone-engine": ["Stone", "Urolithiasis", "Nephrolithiasis"],

@@ -5,15 +5,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, ChevronRight, ArrowLeft, Activity, AlertCircle, Microscope } from "lucide-react";
 
+// ISPN 2021 Recurrent UTI Risk Factors
 const RISK_FACTORS = [
-  { id: "age_lt2", label: "Age < 2 years" },
-  { id: "male", label: "Male (especially uncircumcised)" },
-  { id: "febrile", label: "Febrile UTI (temp >38°C)" },
-  { id: "recurrent", label: "≥2 febrile UTIs or ≥3 any UTIs" },
-  { id: "antenatal_hdn", label: "Antenatal hydronephrosis" },
-  { id: "bbd", label: "Bladder-bowel dysfunction (BBD)" },
-  { id: "family_hx_vur", label: "Family history of VUR" },
-  { id: "abnormal_usg", label: "Abnormal USG (dilation, scarring)" },
+  { id: "age_lt2", label: "Age < 2 years (highest risk group — ISPN 2021)" },
+  { id: "male_uncircumcised", label: "Uncircumcised male <1 year" },
+  { id: "febrile", label: "Febrile UTI (temp >38°C) — upper tract involvement" },
+  { id: "recurrent", label: "≥2 febrile UTIs in 12 months or ≥3 any UTIs" },
+  { id: "antenatal_hdn", label: "Antenatal hydronephrosis (SFU grade ≥2)" },
+  { id: "bbd", label: "Bladder-bowel dysfunction (BBD) — ISPN key risk factor" },
+  { id: "family_hx_vur", label: "Family history of VUR (1st-degree relative)" },
+  { id: "abnormal_usg", label: "Abnormal renal USS (hydroureteronephrosis, scarring, parenchymal thinning)" },
+  { id: "dmsa_scar", label: "DMSA-confirmed renal scar (permanent cortical defect)" },
+  { id: "single_kidney", label: "Solitary / duplex kidney" },
 ];
 
 const VUR_GRADES = [
@@ -43,9 +46,9 @@ export default function VURRecurrentUTIEngine() {
         <div className="flex items-center gap-2 mb-1">
           <Activity className="w-5 h-5" />
           <h3 className="text-sm font-bold">Recurrent UTI / VUR Intelligence Engine</h3>
-          <Badge className="bg-white/20 text-white text-xs border-white/30">NICE · AAP · EAU Guidelines</Badge>
+          <Badge className="bg-white/20 text-white text-xs border-white/30">ISPN 2021 · IPNA · EAU Guidelines</Badge>
         </div>
-        <p className="text-xs text-teal-100">Risk stratification → Imaging → VUR grading → Management → Follow-up</p>
+        <p className="text-xs text-teal-100">ISPN 2021: Risk stratification → Imaging → VUR grading → Management → Follow-up</p>
       </div>
 
       {step === 0 && (
@@ -111,11 +114,13 @@ export default function VURRecurrentUTIEngine() {
       {step === 3 && vurGrade && (
         <div className="space-y-3">
           {[
-            { title: "CAP (Continuous Antibiotic Prophylaxis)", color: "bg-blue-50 border-blue-200", items: [
-              "Trimethoprim 2 mg/kg OD (preferred age >3 months)",
-              "Nitrofurantoin 1 mg/kg OD (age >3 months, NOT neonates)",
-              "Duration: Until VUR resolves on surveillance VCUG or puberty reached",
-              "Indications: VUR grade ≥III, recurrent febrile UTI, renal scarring, single kidney",
+            { title: "CAP (Continuous Antibiotic Prophylaxis) — ISPN 2021", color: "bg-blue-50 border-blue-200", items: [
+              "Trimethoprim 2 mg/kg OD (max 100 mg) — preferred first-line ≥3 months",
+              "Nitrofurantoin 1–2 mg/kg OD (≥3 months, ≥40 weeks corrected gestation; avoid in G6PD deficiency)",
+              "Cefalexin 10 mg/kg OD — first-line in neonates <3 months and if TMP/NFM contraindicated",
+              "ISPN 2021 Indications: VUR grade III–V; recurrent febrile UTI (≥2); DMSA scar; age <1y with dilating VUR; BBD with recurrent UTI",
+              "Duration: Until VUR resolves on imaging OR age 5y (re-evaluate) OR puberty; re-VCUG at 18–24m on CAP",
+              "ISPN position: BBD MUST be treated concurrently — CAP alone fails if bladder dysfunction untreated",
             ]},
             { title: "Endoscopic (STING/HIT) Procedure", color: "bg-amber-50 border-amber-200", items: [
               "Subureteric injection of Deflux (dextranomer/hyaluronic acid)",

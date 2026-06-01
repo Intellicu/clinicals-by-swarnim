@@ -1812,10 +1812,10 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
             </div>
             <Button variant="outline" onClick={() => {
               setSelectedScenario(null);
-              setActiveTab("scenarios");
+              setActiveTab("engines");
             }}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Change
+              Back to Engines
             </Button>
           </div>
         </div>
@@ -1839,9 +1839,9 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
       <div className="max-w-7xl mx-auto">
         {selectedScenario ? (
           <Button variant="outline" size="sm" className="mb-4"
-            onClick={() => { setSelectedScenario(null); setActiveTab("scenarios"); }}>
+            onClick={() => { setSelectedScenario(null); setActiveTab("engines"); }}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Pathways
+            Back to Engines
           </Button>
         ) : (
           <Link to={createPageUrl("Hub")}>
@@ -1983,6 +1983,8 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               onBack={() => setActiveTab("scenarios")}
             />
           </TabsContent>
+
+          {/* Engine back button handler — when inside a pathway launched from engines tab, back should return to engines */}
         </Tabs>
 
         <Alert className="mt-6 bg-purple-50 border-purple-200">
