@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
-import { Utensils, CheckCircle2, XCircle, AlertTriangle, ChevronRight, RotateCcw, ExternalLink, Calculator, BookOpen } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Utensils, CheckCircle2, XCircle, AlertTriangle, ChevronRight, RotateCcw, ExternalLink, Calculator, BookOpen, Printer, FileText } from "lucide-react";
 
 const SCENARIOS = [
   { id: "ckd", label: "CKD (Stage 1–5)", color: "violet", desc: "Protein · K · Phosphorus · Fluid restriction" },
@@ -526,6 +526,78 @@ export default function RenalDietEngine() {
             </div>
           </div>
         )}
+
+        {/* Diet Chart Generator link */}
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold text-emerald-900">Build a Full Patient Diet Chart</p>
+            <p className="text-xs text-emerald-700 mt-0.5">Use the Diet Chart Generator to create a customised meal plan for your patient</p>
+          </div>
+          <Link to="/DietChartGenerator" className="flex-shrink-0 px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 flex items-center gap-1">
+            <FileText className="w-3.5 h-3.5" /> Diet Chart →
+          </Link>
+        </div>
+
+        {/* PDF Export button */}
+        <button
+          onClick={() => {
+            const content = `
+RENAL NUTRITION PLAN — ${data.title}
+Generated: ${new Date().toLocaleDateString('en-IN')}
+
+INTRODUCTION:
+${data.intro}
+
+NUTRITIONAL TARGETS:
+${data.targets.map(t => `• ${t.label}: ${t.value}`).join('\n')}
+
+ENCOURAGE / EAT MORE:
+${data.eat.map(i => `✓ ${i}`).join('\n')}
+
+AVOID / RESTRICT:
+${data.avoid.map(i => `✗ ${i}`).join('\n')}
+
+CLINICAL PEARLS & CAUTIONS:
+${data.caution.map(i => `⚠ ${i}`).join('\n')}
+
+---
+Always involve a renal dietitian for individual meal planning.
+CliniCals Hub by Swarnim | Evidence-Based Pediatric Nephrology
+            `.trim();
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+              <html><head><title>${data.title} — Diet Plan</title>
+              <style>
+                body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; color: #1e293b; line-height: 1.6; }
+                h1 { color: #065f46; border-bottom: 2px solid #065f46; padding-bottom: 8px; }
+                h2 { color: #1e3a5f; margin-top: 20px; font-size: 15px; }
+                .green { color: #15803d; } .red { color: #dc2626; } .amber { color: #d97706; }
+                ul { padding-left: 20px; } li { margin-bottom: 4px; font-size: 13px; }
+                .footer { margin-top: 30px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+                .targets { background: #eff6ff; padding: 12px; border-radius: 8px; }
+                .target-row { display: flex; gap: 10px; font-size: 13px; margin-bottom: 4px; }
+                .target-label { font-weight: bold; min-width: 140px; }
+              </style></head><body>
+              <h1>🍽️ ${data.title}</h1>
+              <p style="font-size:13px;color:#475569">${data.intro}</p>
+              <h2>📊 Nutritional Targets</h2>
+              <div class="targets">${data.targets.map(t => `<div class="target-row"><span class="target-label">${t.label}:</span><span>${t.value}</span></div>`).join('')}</div>
+              <h2 class="green">✅ Encourage / Eat More</h2>
+              <ul class="green">${data.eat.map(i => `<li>${i}</li>`).join('')}</ul>
+              <h2 class="red">🚫 Avoid / Restrict</h2>
+              <ul class="red">${data.avoid.map(i => `<li>${i}</li>`).join('')}</ul>
+              <h2 class="amber">⚠️ Cautions & Clinical Pearls</h2>
+              <ul class="amber">${data.caution.map(i => `<li>${i}</li>`).join('')}</ul>
+              <div class="footer">Always involve a renal dietitian for individual meal planning. CliniCals Hub by Swarnim — Pediatric Clinical Intelligence.</div>
+              </body></html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+          }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors">
+          <Printer className="w-3.5 h-3.5" /> Export as PDF / Print for Patient
+        </button>
 
         <button onClick={() => setSelected(null)}
           className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50">

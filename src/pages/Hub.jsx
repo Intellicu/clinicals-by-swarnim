@@ -478,6 +478,12 @@ export default function Hub() {
                 <span className="hidden sm:inline">Workspace</span>
               </Button>
             </Link>
+            <Link to={createPageUrl("GuidelinesLibrary")}>
+              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
+                <BookOpen className="w-3 h-3" />
+                <span className="hidden sm:inline">Guidelines</span>
+              </Button>
+            </Link>
             <Link to={createPageUrl("ClinicalSupport")}>
               <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
                 <GitBranch className="w-3 h-3" />
@@ -511,7 +517,7 @@ export default function Hub() {
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
-              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">27</span>
+              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">36</span>
             </div>
             <Link to={createPageUrl("ClinicalSupport") + "?tab=engines"}>
               <span className="text-xs text-violet-600 font-semibold">All →</span>

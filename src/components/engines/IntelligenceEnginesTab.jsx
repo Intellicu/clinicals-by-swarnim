@@ -175,11 +175,22 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
   const [activeGroup, setActiveGroup] = useState("All");
   const [activeEngine, setActiveEngine] = useState(null);
 
-  // Fetch guidelines from DB (offline-safe — cached by react-query)
+  // Fetch guidelines from DB — cached in localStorage for offline use
   const { data: guidelines = [], isLoading: guidelinesLoading } = useQuery({
     queryKey: ["guidelines-for-engines"],
-    queryFn: () => base44.entities.Guideline.list("-year", 200),
-    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const data = await base44.entities.Guideline.list("-year", 200);
+      try { localStorage.setItem("cached_guidelines_for_engines", JSON.stringify(data)); } catch {}
+      return data;
+    },
+    initialData: () => {
+      try {
+        const cached = localStorage.getItem("cached_guidelines_for_engines");
+        return cached ? JSON.parse(cached) : undefined;
+      } catch { return undefined; }
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 24 * 60 * 60 * 1000, // keep in memory 24h
     retry: false,
   });
 

@@ -111,11 +111,11 @@ export default function PediatricHTNEngine() {
         )}
 
         {!isEmergency && bpCat && (
-          <Card className={`border-2 text-white`} style={{ background: bpCat.color.replace("bg-", "#") }}>
+          <Card className={`border-2 text-white ${bpCat.color}`}>
             <CardContent className="p-3">
-              <p className="text-xs font-bold opacity-80">BP Classification</p>
+              <p className="text-xs font-bold opacity-80">BP Classification (AAP 2017)</p>
               <p className="font-black text-lg">{bpCat.cat}</p>
-              <p className="text-xs opacity-80">SBP: {sbp} mmHg · Age {age}y · {bpCat.detail}</p>
+              <p className="text-xs opacity-80">SBP: {sbp} mmHg · Age {age}y · {sex} · {bpCat.detail}</p>
             </CardContent>
           </Card>
         )}
