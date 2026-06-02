@@ -122,6 +122,9 @@
           "created_by": "{{user.email}}"
         },
         {
+          "data.given_by": "{{user.email}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }

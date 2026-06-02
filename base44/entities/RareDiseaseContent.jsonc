@@ -48,6 +48,10 @@
       },
       "description": "Further reading links for pathways"
     },
+    "linked_guideline_id": {
+      "type": "string",
+      "description": "Optional pointer to the canonical Guideline record that holds the full detailed content for this topic. Used to render an 'Open full pathway' link instead of duplicating content."
+    },
     "last_synced": {
       "type": "string",
       "format": "date-time",

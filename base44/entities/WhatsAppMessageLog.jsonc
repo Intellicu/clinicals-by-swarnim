@@ -1,0 +1,140 @@
+{
+  "description": "Logs every WhatsApp message exchanged between the KidneyCare voice/text agent and a patient caregiver. Provides a full audit trail of the monitoring conversation visible to the clinician in CliniCals. One record per message (inbound or outbound).",
+  "name": "WhatsAppMessageLog",
+  "properties": {
+    "agent_session_id": {
+      "description": "VoiceAgentSession ID in KidneyCare if this message was part of a structured workflow session",
+      "type": "string"
+    },
+    "caregiver_name": {
+      "description": "Caregiver name for quick display",
+      "type": "string"
+    },
+    "caregiver_phone": {
+      "description": "WhatsApp number of caregiver (91XXXXXXXXXX format)",
+      "type": "string"
+    },
+    "clinician_reviewed": {
+      "default": false,
+      "description": "True once a clinician has read this message thread",
+      "type": "boolean"
+    },
+    "data_extracted": {
+      "description": "Structured data extracted from this message by the agent (e.g. protein result, dose taken, weight)",
+      "properties": {
+        "bp_diastolic": {
+          "type": "number"
+        },
+        "bp_systolic": {
+          "type": "number"
+        },
+        "dose_taken_mg": {
+          "type": "number"
+        },
+        "medication_taken": {
+          "type": "boolean"
+        },
+        "protein_result": {
+          "type": "string"
+        },
+        "symptoms": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "weight_kg": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "direction": {
+      "description": "Message direction",
+      "enum": [
+        "Inbound",
+        "Outbound"
+      ],
+      "type": "string"
+    },
+    "entity_written": {
+      "description": "Entity name of the record created from this message (if any)",
+      "type": "string"
+    },
+    "entity_written_id": {
+      "description": "ID of the record created in the database from this message content",
+      "type": "string"
+    },
+    "image_url": {
+      "description": "URL of image sent by caregiver (dipstick photo, swelling photo, lab report photo)",
+      "type": "string"
+    },
+    "inbound_queue_id": {
+      "description": "KidneyCareInboundQueue record ID if this message triggered a data ingestion",
+      "type": "string"
+    },
+    "message_text": {
+      "description": "Full text content of the message (voice note transcription or text message)",
+      "type": "string"
+    },
+    "message_timestamp": {
+      "description": "Timestamp of the original WhatsApp message",
+      "format": "date-time",
+      "type": "string"
+    },
+    "message_type": {
+      "description": "Type of WhatsApp message",
+      "enum": [
+        "Text",
+        "Voice_Note",
+        "Image",
+        "Document",
+        "Template_Message",
+        "System"
+      ],
+      "type": "string"
+    },
+    "patient_id": {
+      "description": "Reference to Patient entity in CliniCals (populated once CR number matched)",
+      "type": "string"
+    },
+    "patient_name": {
+      "description": "Patient name for quick display",
+      "type": "string"
+    },
+    "received_in_clinicals_at": {
+      "description": "Timestamp when CliniCals received this message log from KidneyCare",
+      "format": "date-time",
+      "type": "string"
+    },
+    "requires_clinician_action": {
+      "default": false,
+      "description": "True if agent flagged this message as needing clinician review (e.g. emergency escalation, unclear response, patient distress)",
+      "type": "string"
+    },
+    "source_app": {
+      "default": "KidneyCare_WhatsApp_Agent",
+      "description": "Which app/agent sent this log",
+      "type": "string"
+    },
+    "transcription": {
+      "description": "Transcribed text if message_type is Voice_Note (from ElevenLabs STT)",
+      "type": "string"
+    },
+    "whatsapp_message_id": {
+      "description": "WhatsApp message ID from the provider (Gupshup/Twilio) for deduplication",
+      "type": "string"
+    },
+    "workflow_step": {
+      "description": "Which step of the VoiceAgentConfig conversation_flow this message belongs to",
+      "type": "string"
+    }
+  },
+  "required": [
+    "caregiver_phone",
+    "direction",
+    "message_timestamp",
+    "message_type"
+  ],
+  "type": "object"
+}

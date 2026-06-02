@@ -78,14 +78,7 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.workspace_id": {
-            "$in": {
-              "base44_entity": "Workspace",
-              "query": {
-                "data.members.email": "{{user.email}}"
-              }
-            }
-          }
+          "data.doctor_name": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -100,14 +93,7 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.workspace_id": {
-            "$in": {
-              "base44_entity": "Workspace",
-              "query": {
-                "data.members.email": "{{user.email}}"
-              }
-            }
-          }
+          "data.doctor_name": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -122,14 +108,7 @@
           "created_by": "{{user.email}}"
         },
         {
-          "data.workspace_id": {
-            "$in": {
-              "base44_entity": "Workspace",
-              "query": {
-                "data.members.email": "{{user.email}}"
-              }
-            }
-          }
+          "data.doctor_name": "{{user.email}}"
         },
         {
           "user_condition": {

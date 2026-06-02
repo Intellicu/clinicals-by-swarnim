@@ -1,0 +1,176 @@
+{
+  "name": "KidneyCareInboundQueue",
+  "type": "object",
+  "description": "Staging queue for raw data POSTed from KidneyCare AI app before matching to a CliniCals patient record. Records are matched by cr_number, written to KidneyCareAIResult and PatientDailyLog, then marked processed. Unmatched records remain here for manual review.",
+  "properties": {
+    "raw_cr_number": {
+      "type": "string",
+      "description": "CR number as sent by KidneyCare AI \u2014 may not match any Patient yet"
+    },
+    "matched_patient_id": {
+      "type": "string",
+      "description": "CliniCals Patient entity ID once matched. Null until matching succeeds."
+    },
+    "match_status": {
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Matched",
+        "Unmatched",
+        "Duplicate",
+        "Error"
+      ],
+      "default": "Pending",
+      "description": "Matching status against the Patient entity"
+    },
+    "match_error": {
+      "type": "string",
+      "description": "Error message if matching failed (e.g. CR number not found, multiple matches)"
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of capture as reported by KidneyCare AI"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when CliniCals received this POST"
+    },
+    "predicted_result": {
+      "type": "string",
+      "enum": [
+        "Negative",
+        "Trace",
+        "1+",
+        "2+",
+        "3+",
+        "4+"
+      ],
+      "description": "AI-predicted dipstick protein result"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Model confidence 0-100"
+    },
+    "image_quality": {
+      "type": "string",
+      "enum": [
+        "Good",
+        "Acceptable",
+        "Poor - retake advised"
+      ],
+      "description": "Image quality as assessed by KidneyCare AI model"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL of the dipstick photo from KidneyCare AI storage"
+    },
+    "model_version": {
+      "type": "string",
+      "description": "KidneyCare AI model version that processed this image"
+    },
+    "medication_logged": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether patient also logged medication compliance for this day"
+    },
+    "prednisolone_dose_mg": {
+      "type": "number",
+      "description": "Prednisolone dose in mg logged by patient/caregiver on this day"
+    },
+    "prescribed_dose_mg": {
+      "type": "number",
+      "description": "Expected dose from current prescription (populated at match time)"
+    },
+    "dose_compliance": {
+      "type": "string",
+      "enum": [
+        "Compliant",
+        "Missed",
+        "Partial",
+        "Excess",
+        "Unknown"
+      ],
+      "description": "Derived compliance status (populated at match time)"
+    },
+    "weight_kg": {
+      "type": "number",
+      "description": "Weight in kg if patient logged it today"
+    },
+    "bp_systolic": {
+      "type": "number",
+      "description": "Systolic BP if patient logged it today"
+    },
+    "bp_diastolic": {
+      "type": "number",
+      "description": "Diastolic BP if patient logged it today"
+    },
+    "symptoms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Symptoms logged by patient (e.g. swelling, reduced urine)"
+    },
+    "patient_note": {
+      "type": "string",
+      "description": "Free text note from patient/caregiver"
+    },
+    "processed": {
+      "type": "boolean",
+      "default": false,
+      "description": "True once matched record written to KidneyCareAIResult and PatientDailyLog"
+    },
+    "processed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "kidneycareai_result_id": {
+      "type": "string",
+      "description": "KidneyCareAIResult entity ID created from this record after successful matching"
+    },
+    "daily_log_id": {
+      "type": "string",
+      "description": "PatientDailyLog entity ID created from this record after successful matching"
+    },
+    "source_app_version": {
+      "type": "string",
+      "description": "KidneyCare AI app version that sent this payload"
+    },
+    "request_signature": {
+      "type": "string",
+      "description": "HMAC signature from KidneyCare AI for request verification"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Clinician email who manually reviewed an unmatched or error record"
+    },
+    "review_notes": {
+      "type": "string",
+      "description": "Notes from manual review"
+    }
+  },
+  "required": [
+    "raw_cr_number",
+    "captured_at",
+    "predicted_result"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

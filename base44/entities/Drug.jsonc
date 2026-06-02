@@ -162,6 +162,11 @@
     "biosimilar_brands": {
       "type": "string",
       "description": "Indian biosimilar brand names"
+    },
+    "is_duplicate_hidden": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marked true for duplicate records superseded by a more detailed entry; UI should filter these out."
     }
   },
   "required": [

@@ -1,0 +1,110 @@
+{
+  "name": "BiopsyPattern",
+  "properties": {
+    "also_called": {
+      "description": "Synonyms or alternative names",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "associated_diseases": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "category": {
+      "enum": [
+        "Podocytopathy",
+        "Proliferative GN",
+        "Membranous",
+        "Crescentic GN",
+        "Vascular",
+        "Tubular",
+        "Interstitial",
+        "Metabolic/Deposit",
+        "Hereditary",
+        "Transplant",
+        "Miscellaneous"
+      ],
+      "type": "string"
+    },
+    "classification_tool": {
+      "description": "Classification system applicable",
+      "type": "string"
+    },
+    "clinical_presentation": {
+      "description": "Typical clinical syndrome(s)",
+      "type": "string"
+    },
+    "em_findings": {
+      "description": "Key electron microscopy features",
+      "type": "string"
+    },
+    "further_workup": {
+      "description": "Additional tests triggered by this pattern",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "genetic_causes": {
+      "description": "Known genetic causes relevant to paediatric nephrology",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "if_pattern": {
+      "description": "Immunofluorescence staining pattern",
+      "type": "string"
+    },
+    "lm_findings": {
+      "description": "Key light microscopy features",
+      "type": "string"
+    },
+    "management_pearls": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "name": {
+      "description": "Pattern name",
+      "type": "string"
+    },
+    "pattern_code": {
+      "description": "Short code for quick reference",
+      "type": "string"
+    },
+    "pitfalls": {
+      "description": "Common diagnostic pitfalls",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "prognosis": {
+      "description": "Prognosis in children",
+      "type": "string"
+    },
+    "references": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "typical_age_group": {
+      "description": "Most common age group in paediatric nephrology",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "lm_findings",
+    "if_pattern"
+  ],
+  "type": "object"
+}

@@ -25,7 +25,18 @@
         "General Pediatrics",
         "Neonatology",
         "Infection",
-        "General"
+        "General",
+        "Endocrinology",
+        "Neurology",
+        "Respiratory",
+        "Gastroenterology",
+        "Cardiology",
+        "Haematology",
+        "Nutrition & Growth",
+        "Developmental Pediatrics",
+        "Adolescent Health",
+        "Rheumatology",
+        "Rare Disease"
       ],
       "description": "Guideline category"
     },
@@ -34,8 +45,7 @@
       "description": "Guideline source (KDIGO, ISPN, IPNA, ISPD, AAP, etc.)"
     },
     "organization": {
-      "type": "string",
-      "description": "Full organization name"
+      "type": "string"
     },
     "region": {
       "type": "string",
@@ -49,8 +59,7 @@
       "default": "Global"
     },
     "year": {
-      "type": "number",
-      "description": "Year of publication"
+      "type": "number"
     },
     "summary": {
       "type": "string"
@@ -71,24 +80,10 @@
       }
     },
     "evidence_level": {
-      "type": "string",
-      "description": "Evidence level/grade"
+      "type": "string"
     },
     "linked_module": {
-      "type": "string",
-      "description": "Primary linked clinical module"
-    },
-    "population": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "clinical_scope": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "type": "string"
     },
     "related_drugs": {
       "type": "array",
@@ -115,83 +110,9 @@
       "type": "string",
       "format": "date"
     },
-    "multimedia": {
-      "type": "object",
-      "properties": {
-        "audio_overview_url": {
-          "type": "string"
-        },
-        "video_overview_url": {
-          "type": "string"
-        },
-        "slides_url": {
-          "type": "string"
-        },
-        "infographics": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "url": {
-                "type": "string"
-              },
-              "caption": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "podcast_episodes": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "title": {
-                "type": "string"
-              },
-              "audio_url": {
-                "type": "string"
-              },
-              "duration": {
-                "type": "string"
-              },
-              "language": {
-                "type": "string"
-              },
-              "transcript": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "images": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string"
-          },
-          "caption": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "table",
-              "flowchart",
-              "diagram",
-              "algorithm",
-              "figure"
-            ]
-          }
-        }
-      }
-    },
     "content": {
       "type": "object",
+      "description": "Full clinical content sections for detailed guideline view",
       "properties": {
         "sections": {
           "type": "array",
@@ -209,40 +130,126 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "tables": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "recommendations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "grade": {
+                      "type": "string"
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
     },
-    "references": {
+    "algorithm": {
+      "type": "object",
+      "description": "Decision algorithm / clinical pathway",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "start",
+                  "decision",
+                  "action",
+                  "outcome",
+                  "emergency",
+                  "end"
+                ]
+              },
+              "text": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string",
+                "enum": [
+                  "green",
+                  "red",
+                  "orange",
+                  "blue",
+                  "yellow",
+                  "grey"
+                ]
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "node_id": {
+                      "type": "string"
+                    },
+                    "condition": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "screening_tools": {
       "type": "array",
       "items": {
         "type": "object",
-        "additionalProperties": true
-      },
-      "description": "Structured academic citations"
-    },
-    "provenance": {
-      "type": "object",
-      "properties": {
-        "import_source": {
-          "type": "string"
-        },
-        "import_url": {
-          "type": "string"
-        },
-        "import_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "rights_confirmation": {
-          "type": "boolean"
-        },
-        "license": {
-          "type": "string"
+        "properties": {
+          "tool_name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "scoring": {
+            "type": "string"
+          },
+          "interpretation": {
+            "type": "string"
+          },
+          "app_calculator_id": {
+            "type": "string"
+          }
         }
       }
+    },
+    "iap_stg_chapter": {
+      "type": "string"
+    },
+    "iap_stg_number": {
+      "type": "string"
     },
     "status": {
       "type": "string",
@@ -254,24 +261,6 @@
       ],
       "default": "Draft"
     },
-    "version": {
-      "type": "string"
-    },
-    "is_editable": {
-      "type": "boolean",
-      "default": false
-    },
-    "usage_count": {
-      "type": "number",
-      "default": 0
-    },
-    "version_history": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": true
-      }
-    },
     "review_status": {
       "type": "string",
       "enum": [
@@ -281,63 +270,30 @@
         "AI_SUGGESTION",
         "DRAFT"
       ],
-      "default": "DRAFT",
-      "description": "Expert review governance status"
+      "default": "DRAFT"
     },
     "reviewed_by": {
-      "type": "string",
-      "description": "Expert reviewer name/email"
+      "type": "string"
     },
     "last_expert_update": {
       "type": "string",
-      "format": "date",
-      "description": "Date of last expert review/edit"
-    },
-    "audit_trail": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "action": {
-            "type": "string"
-          },
-          "by": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "note": {
-            "type": "string"
-          }
-        }
-      },
-      "description": "Full audit trail of reviews, approvals, and edits"
-    },
-    "ai_pending_sections": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "description": "AI-generated sections awaiting expert approval"
+      "format": "date"
     },
     "primary_guideline_org": {
-      "type": "string",
-      "description": "Primary operational guideline organisation (e.g. ISPN, AAP)"
+      "type": "string"
     },
     "supporting_guidelines": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Supporting guideline sources"
+      }
     },
-    "org_definition_notes": {
-      "type": "object",
-      "additionalProperties": true,
-      "description": "Organisation-specific definition differences"
+    "version": {
+      "type": "string"
+    },
+    "usage_count": {
+      "type": "number",
+      "default": 0
     }
   },
   "required": [
@@ -345,52 +301,5 @@
     "category",
     "source",
     "scope_and_population"
-  ],
-  "rls": {
-    "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
-      "$or": [
-        {
-          "data.is_editable": false
-        },
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "data.reviewed_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    }
-  }
+  ]
 }

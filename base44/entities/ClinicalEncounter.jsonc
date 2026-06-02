@@ -206,9 +206,6 @@
   ],
   "rls": {
     "create": {
-      "created_by": "{{user.email}}"
-    },
-    "read": {
       "$or": [
         {
           "created_by": "{{user.email}}"
@@ -217,14 +214,19 @@
           "data.clinician_id": "{{user.email}}"
         },
         {
-          "data.workspace_id": {
-            "$in": {
-              "base44_entity": "Workspace",
-              "query": {
-                "data.members.email": "{{user.email}}"
-              }
-            }
+          "user_condition": {
+            "role": "admin"
           }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.clinician_id": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -242,16 +244,6 @@
           "data.clinician_id": "{{user.email}}"
         },
         {
-          "data.workspace_id": {
-            "$in": {
-              "base44_entity": "Workspace",
-              "query": {
-                "data.members.email": "{{user.email}}"
-              }
-            }
-          }
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
@@ -265,16 +257,6 @@
         },
         {
           "data.clinician_id": "{{user.email}}"
-        },
-        {
-          "data.workspace_id": {
-            "$in": {
-              "base44_entity": "Workspace",
-              "query": {
-                "data.members.email": "{{user.email}}"
-              }
-            }
-          }
         },
         {
           "user_condition": {

@@ -1,0 +1,186 @@
+{
+  "description": "Clinical alert generated when a patient's monitoring data meets a threshold requiring clinician attention. Primary use case: nephrotic syndrome relapse detection (protein 2+ or higher for 3 or more consecutive days). Separate from the Notification entity which handles system emails/SMS.",
+  "name": "MonitoringAlert",
+  "properties": {
+    "acknowledged": {
+      "default": false,
+      "type": "boolean"
+    },
+    "acknowledged_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "acknowledged_by": {
+      "description": "Clinician email who acknowledged the alert",
+      "type": "string"
+    },
+    "action_taken": {
+      "description": "Free text documenting clinical action taken in response",
+      "type": "string"
+    },
+    "alert_type": {
+      "description": "Type of clinical alert",
+      "enum": [
+        "Relapse_Suspected",
+        "Relapse_Confirmed",
+        "Medication_Non_Compliance",
+        "Weight_Gain_Rapid",
+        "BP_High",
+        "Protein_Rising_Trend",
+        "Missed_Monitoring_3_Days",
+        "Missed_Monitoring_7_Days",
+        "Image_Quality_Repeated_Poor",
+        "Custom"
+      ],
+      "type": "string"
+    },
+    "consecutive_positive_days": {
+      "description": "Number of consecutive days with protein 2+ or higher (for relapse alerts)",
+      "type": "number"
+    },
+    "created_encounter_id": {
+      "description": "ClinicalEncounter ID if this alert prompted a clinic visit or contact",
+      "type": "string"
+    },
+    "dismissed": {
+      "default": false,
+      "description": "True if clinician reviewed and decided no action needed",
+      "type": "boolean"
+    },
+    "dismissed_reason": {
+      "description": "Reason for dismissal (e.g. false positive, patient unwell with fever, intercurrent infection)",
+      "type": "string"
+    },
+    "escalated": {
+      "default": false,
+      "description": "True if alert was escalated to a senior or led to admission",
+      "type": "boolean"
+    },
+    "follow_up_scheduled": {
+      "default": false,
+      "type": "boolean"
+    },
+    "follow_up_schedule_id": {
+      "description": "FollowUpSchedule entity ID if follow-up was booked from this alert",
+      "type": "string"
+    },
+    "generated_at": {
+      "description": "Timestamp when the alert was generated",
+      "format": "date-time",
+      "type": "string"
+    },
+    "generated_by": {
+      "description": "Source that generated this alert: system (auto) or clinician (manual)",
+      "enum": [
+        "System_Auto",
+        "Clinician_Manual"
+      ],
+      "type": "string"
+    },
+    "message": {
+      "description": "Human-readable alert message shown to clinician",
+      "type": "string"
+    },
+    "patient_contact_attempted": {
+      "default": false,
+      "type": "boolean"
+    },
+    "patient_contact_method": {
+      "description": "How patient was contacted",
+      "enum": [
+        "WhatsApp",
+        "Phone_Call",
+        "SMS",
+        "In_Person",
+        "No_Contact_Needed"
+      ],
+      "type": "string"
+    },
+    "patient_id": {
+      "description": "Reference to Patient entity",
+      "type": "string"
+    },
+    "patient_name": {
+      "description": "Patient name for quick display without join",
+      "type": "string"
+    },
+    "priority": {
+      "default": "High",
+      "description": "Alert priority level",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ],
+      "type": "string"
+    },
+    "relapse_episode_id": {
+      "description": "NSRelapseEpisode entity ID if a formal relapse was opened from this alert",
+      "type": "string"
+    },
+    "resolved": {
+      "default": false,
+      "type": "boolean"
+    },
+    "resolved_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "source_daily_log_ids": {
+      "description": "Array of PatientDailyLog IDs that triggered this alert",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source_kidneycareai_result_ids": {
+      "description": "Array of KidneyCareAIResult IDs that contributed to this alert",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "threshold_value": {
+      "description": "The threshold that was breached (e.g. protein result that triggered)",
+      "type": "string"
+    },
+    "urgency_window_hours": {
+      "description": "Within how many hours clinician should respond to this alert",
+      "type": "number"
+    }
+  },
+  "required": [
+    "patient_id",
+    "alert_type",
+    "generated_at",
+    "priority"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  },
+  "type": "object"
+}
