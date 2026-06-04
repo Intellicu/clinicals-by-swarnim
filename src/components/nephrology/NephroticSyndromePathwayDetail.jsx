@@ -27,8 +27,8 @@ function FirstEpisodeProtocol() {
       <Alert className="bg-indigo-50 border-indigo-300 border-2">
         <Info className="w-4 h-4 text-indigo-600" />
         <AlertDescription className="text-indigo-900 text-xs">
-          <strong>ISPN 2022 Protocol:</strong> Prednisolone 60 mg/m²/day (max 60 mg) × 6 weeks (daily), then 40 mg/m² on alternate days × 6 weeks, then taper. 
-          <span className="text-indigo-700 font-bold"> Longer initial treatment (12 weeks) significantly reduces relapse risk vs ISKDC 8-week.</span>
+          <strong>ISPN 2022 Protocol:</strong> Prednisolone 60 mg/m²/day (max 60 mg) × 6 weeks (daily), then 40 mg/m² on alternate days × 6 weeks, then <strong>STOP</strong> — no taper phase recommended.
+          <span className="text-indigo-700 font-bold"> Longer initial treatment (12 weeks total) significantly reduces relapse risk vs ISKDC 8-week.</span>
         </AlertDescription>
       </Alert>
 
@@ -55,8 +55,7 @@ function FirstEpisodeProtocol() {
               <p className="font-bold text-indigo-900">📊 ISPN Protocol for {dose.wt} kg child (BSA ≈ {(Math.sqrt((dose.wt * 110) / 3600)).toFixed(2)} m²)</p>
               {[
                 ["Phase 1 — Daily × 6 weeks", `${dose.daily_bsa_dose} mg OD (60 mg/m²/day, max 60 mg)`, "Induce remission"],
-                ["Phase 2 — Alt-day × 6 weeks", `${dose.altday_bsa_dose} mg EOD (40 mg/m²/alt-day, max 40 mg)`, "Consolidate remission"],
-                ["Phase 3 — Taper over 4-8 wks", "Reduce by 25% every 2 weeks", "Prevent adrenal suppression"],
+                ["Phase 2 — Alt-day × 6 weeks", `${dose.altday_bsa_dose} mg EOD (40 mg/m²/alt-day, max 40 mg)`, "Consolidate remission — then STOP"],
               ].map(([phase, d, goal]) => (
                 <div key={phase} className="flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded p-2 border border-indigo-100 gap-1">
                   <span className="font-semibold text-indigo-800">{phase}</span>
@@ -64,7 +63,7 @@ function FirstEpisodeProtocol() {
                   <span className="text-slate-500">{goal}</span>
                 </div>
               ))}
-              <p className="text-indigo-700 font-medium">⏱ Total: 16-20 weeks. ISPN evidence: extended initial Rx ↓ relapse risk by ~30% vs 8-week ISKDC regimen.</p>
+              <p className="text-indigo-700 font-medium">⏱ Total: 12 weeks (6+6). ISPN 2022: No taper phase recommended after Phase 2 — stop after alt-day completion. Extended initial Rx ↓ relapse risk by ~30% vs 8-week ISKDC.</p>
             </div>
           )}
 
@@ -81,8 +80,7 @@ function FirstEpisodeProtocol() {
                 <tbody>
                   {[
                     ["1 (Daily induction)", "6 weeks", "60 mg/m²/day (max 60 mg)", "Induce remission"],
-                    ["2 (Alt-day consolidation)", "6 weeks", "40 mg/m²/alt-day (max 40 mg)", "Maintain remission"],
-                    ["3 (Taper)", "4-8 weeks", "Reduce by 25% per 2 wks", "Prevent adrenal suppression"],
+                    ["2 (Alt-day consolidation)", "6 weeks", "40 mg/m²/alt-day (max 40 mg)", "Maintain remission — then STOP"],
                   ].map(([p, d, dose, goal]) => (
                     <tr key={p}>
                       <td className="border border-slate-300 p-1.5 font-medium">{p}</td>

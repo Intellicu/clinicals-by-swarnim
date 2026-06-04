@@ -518,7 +518,7 @@ export default function Hub() {
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
-              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">37</span>
+              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">38</span>
             </div>
             <Link to={createPageUrl("ClinicalSupport") + "?tab=engines"}>
               <span className="text-xs text-violet-600 font-semibold">All →</span>
@@ -526,6 +526,7 @@ export default function Hub() {
           </div>
           <div className="flex gap-2 overflow-x-auto p-2.5" style={{ scrollbarWidth: "none" }}>
             {[
+              { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
               { label: "Rickets Engine",      desc: "Calcipenic/Phosphopenic", color: "bg-amber-600",  scenario: "rickets-engine" },
               { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
               { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },

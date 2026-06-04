@@ -10,6 +10,10 @@ import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
 
 const PATHWAYS = [
   // ── New Deep Diagnostic Engines ───────────────────────────────────────────
+  { name: "Wilms Tumor Engine", tag: "Engine", color: "bg-blue-100 text-blue-900", emergency: false,
+    summary: "Nephroblastoma recognition → imaging → bilateral vs unilateral → NWTS staging → histology (FH vs Anaplasia) → COG/SIOP regimen → genetics (WAGR/BWS/Denys-Drash) → survivorship. AREN0532/0534 protocol.",
+    keys: ["Stage I–II FH: Actinomycin D + Vincristine × 18w (DD4A); NO radiotherapy → OS >95%", "Stage III–IV FH: Add Doxorubicin + Flank RT 10.8 Gy; Lung RT 12 Gy if pulmonary mets", "Bilateral (Stage V): Neoadjuvant chemo → nephron-sparing partial nephrectomies — DO NOT bilateral nephrectomise", "Predisposition syndromes: WAGR/Denys-Drash (WT1), BWS (11p15) → USS every 3 months × 7 years"],
+    scenario: "wilms-tumor-engine" },
   { name: "Rickets Diagnostic Engine", tag: "Engine", color: "bg-amber-100 text-amber-900", emergency: false,
     summary: "Full rickets algorithm: ALP low/high → Exclude renal/RTA → PTH+Ca+Pi → Calcipenic (VDDR 1A/1B/2) vs Phosphopenic (XLH/HHRH/Fanconi/HHRH). Burosumab decision built-in. Based on IAP STG 2022 + Haffner Pediatric Nephrology 2022.",
     keys: ["Calcipenic: PTH↑, Ca↓, Pi↓ → 25(OH)D → Nutritional VDD / VDDR 1A / VDDR 1B / VDDR 2A (alopecia)", "Phosphopenic: PTH N/↑, Pi↓, Ca NORMAL → TRP/TmP-GFR → FGF23 → XLH/ADHR/ARHR vs HHRH/Fanconi", "XLH: PHEX gene — Burosumab 0.8 mg/kg SC q2w preferred; alt: Pi + calcitriol", "Low ALP + rickets-like: Hypophosphatasia (ALPL gene) — asfotase alfa, NOT vit D"],
