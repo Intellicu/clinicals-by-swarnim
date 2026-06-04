@@ -102,13 +102,6 @@ const HUB_NAV = [
         ]
       },
       {
-        title: "Monitoring & Scores",
-        icon: BarChart2,
-        children: [
-          { title: "Monitoring Hub", url: createPageUrl("MonitoringHub"), icon: BarChart2 },
-        ]
-      },
-      {
         title: "Evidence Updates",
         icon: RefreshCw,
         children: [
@@ -128,6 +121,14 @@ const HUB_NAV = [
       { title: "BP Percentiles", url: createPageUrl("BPPercentiles"), icon: Heart },
       { title: "ABG Interpreter", url: createPageUrl("ABGInterpreter"), icon: Wind },
       { title: "AKI Stager", url: createPageUrl("AKIStager"), icon: AlertTriangle },
+    ]
+  },
+  {
+    label: "Admin Tools",
+    icon: Cpu,
+    adminOnly: true,
+    items: [
+      { title: "Engine Generator", url: createPageUrl("EngineGenerator"), icon: Cpu },
     ]
   },
   {
@@ -265,9 +266,10 @@ function CollapsibleGroup({ item, onClick }) {
 }
 
 // ── NavGroup ──────────────────────────────────────────────────────────────
-function NavGroup({ group, onClick }) {
+function NavGroup({ group, onClick, isAdmin }) {
   const [open, setOpen] = useState(true);
   const GroupIcon = group.icon;
+  if (group.adminOnly && !isAdmin) return null;
   return (
     <section>
       <button
@@ -412,7 +414,7 @@ export default function WorkspaceSidebar({ user, onClose, onLogout }) {
           : nav.map((group, gi) => (
             <React.Fragment key={group.label}>
               {gi > 0 && <Separator className="my-1" />}
-              <NavGroup group={group} onClick={onClose} />
+              <NavGroup group={group} onClick={onClose} isAdmin={isAdmin} />
             </React.Fragment>
           ))
         }
