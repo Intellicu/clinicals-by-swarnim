@@ -10,6 +10,10 @@ import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
 
 const PATHWAYS = [
   // ── New Deep Diagnostic Engines ───────────────────────────────────────────
+  { name: "Rickets Diagnostic Engine", tag: "Engine", color: "bg-amber-100 text-amber-900", emergency: false,
+    summary: "Full rickets algorithm: ALP low/high → Exclude renal/RTA → PTH+Ca+Pi → Calcipenic (VDDR 1A/1B/2) vs Phosphopenic (XLH/HHRH/Fanconi/HHRH). Burosumab decision built-in. Based on IAP STG 2022 + Haffner Pediatric Nephrology 2022.",
+    keys: ["Calcipenic: PTH↑, Ca↓, Pi↓ → 25(OH)D → Nutritional VDD / VDDR 1A / VDDR 1B / VDDR 2A (alopecia)", "Phosphopenic: PTH N/↑, Pi↓, Ca NORMAL → TRP/TmP-GFR → FGF23 → XLH/ADHR/ARHR vs HHRH/Fanconi", "XLH: PHEX gene — Burosumab 0.8 mg/kg SC q2w preferred; alt: Pi + calcitriol", "Low ALP + rickets-like: Hypophosphatasia (ALPL gene) — asfotase alfa, NOT vit D"],
+    scenario: "rickets-engine" },
   { name: "Fabry Disease Engine", tag: "Engine", color: "bg-violet-100 text-violet-900", emergency: false,
     summary: "Complete recognition → diagnosis → genetics → ERT/migalastat → family screening engine for Fabry disease.",
     keys: ["Alpha-Gal A enzyme (males) or GLA sequencing (females)", "Lyso-Gb3 biomarker", "ERT: Agalsidase alfa/beta; Migalastat for amenable variants", "Family cascade screening — X-linked inheritance"],

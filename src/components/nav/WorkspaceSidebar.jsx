@@ -11,7 +11,7 @@ import {
   ClipboardList, UtensilsCrossed, Dna, X, ChevronRight, ChevronDown,
   Settings, Shield, LogOut, Trash2, Microscope, Zap, BarChart2,
   BookMarked, Clock, Star, RefreshCw, Beaker, Wind,
-  Syringe, Radio, FileSearch, Edit3, Database
+  Syringe, Radio, FileSearch, Edit3, Database, Cpu
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -154,6 +154,7 @@ const CLINIC_NAV = [
       { title: "Patient Manager", url: createPageUrl("PatientManager"), icon: Users },
       { title: "OPD Cockpit", url: createPageUrl("ClinicOPDCockpit"), icon: BarChart2 },
       { title: "Alert Inbox", url: createPageUrl("KidneyCarealertInbox"), icon: Bell },
+      { title: "Engine Generator", url: createPageUrl("EngineGenerator"), icon: Cpu },
     ]
   },
   {

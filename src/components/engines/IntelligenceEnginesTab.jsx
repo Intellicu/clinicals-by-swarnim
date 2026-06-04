@@ -41,6 +41,7 @@ const ENGINES = [
   { label: "Voiding Dx", desc: "BBD + Uroflow + OAB", scenario: "voiding-engine", tags: ["voiding dysfunction", "BBD", "uroflow", "OAB", "enuresis", "incontinence"], group: "CAKUT & Urology" },
 
   // ── Tubular & Metabolic ──
+  { label: "Rickets Engine", desc: "Calcipenic vs Phosphopenic — VDDR 1A/1B/2 · XLH · HHRH · Fanconi · Burosumab", scenario: "rickets-engine", tags: ["rickets", "XLH", "VDDR", "phosphopenic", "calcipenic", "FGF23", "burosumab", "phosphate", "hypophosphatemia", "vitamin D"], group: "Tubular & Metabolic" },
   { label: "Tubular Engine", desc: "Fanconi / XLH / NDI", scenario: "tubular-engine", tags: ["Fanconi", "rickets", "XLH", "NDI", "tubular", "phosphate"], group: "Tubular & Metabolic" },
   { label: "Stone Engine", desc: "Renal stones full workup", scenario: "stone-engine", tags: ["stones", "urolithiasis", "calcium oxalate", "cystinuria", "uric acid"], group: "Tubular & Metabolic" },
   { label: "Nephrocalcinosis", desc: "Grading + metabolic workup + management", scenario: "nephrocalcinosis-stone-engine", tags: ["nephrocalcinosis", "stones", "hypercalciuria", "oxaluria", "dRTA", "Bartter", "cystinuria"], group: "Tubular & Metabolic" },

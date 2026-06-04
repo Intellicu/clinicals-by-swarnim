@@ -66,7 +66,7 @@ Format: ${format === "whatsapp" ? "WhatsApp-friendly text with emojis, short par
 DO NOT use markdown asterisks for bold. Use plain text with CAPS for headings.`;
 
       const response = await base44.integrations.Core.InvokeLLM({ prompt: fullPrompt });
-      setResult(response);
+      setResult(typeof response === "string" ? response : response?.result || response?.text || JSON.stringify(response));
     } catch (err) {
       toast.error("Failed to generate counseling content");
     } finally {
