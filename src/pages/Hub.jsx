@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import EmergencyAccessDrawer from "../components/EmergencyAccessDrawer";
 import EmergencyProtocolDrawer from "../components/hub/EmergencyProtocolDrawer";
 import { Link } from "react-router-dom";
@@ -428,6 +428,13 @@ export default function Hub() {
   const [showAllKnowledge, setShowAllKnowledge] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(null);
 
+  // Load DB-generated engines to append to the engine strip
+  const { data: dbEngineRecords = [] } = useQuery({
+    queryKey: ["hub_db_engines"],
+    queryFn: () => base44.entities.CustomSection.filter({ created_by_admin: true, section_type: "tool", status: "published" }),
+    staleTime: 30000,
+  });
+
   const filteredSections = useMemo(() => {
     if (!sectionQuery.trim()) return KNOWLEDGE_SECTIONS;
     const q = sectionQuery.toLowerCase();
@@ -526,7 +533,6 @@ export default function Hub() {
           </div>
           <div className="flex gap-2 overflow-x-auto p-2.5" style={{ scrollbarWidth: "none" }}>
             {[
-              { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
               { label: "Rickets Engine",      desc: "Calcipenic/Phosphopenic", color: "bg-amber-600",  scenario: "rickets-engine" },
               { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
               { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
@@ -555,6 +561,15 @@ export default function Hub() {
               { label: "HTN Engine",         desc: "Pediatric HTN",          color: "bg-pink-700",   scenario: "htn-engine" },
               { label: "Tubular Engine",     desc: "Fanconi/XLH/NDI",        color: "bg-amber-800",  scenario: "tubular-engine" },
               { label: "Stone Engine",       desc: "Renal stones full",      color: "bg-yellow-700", scenario: "stone-engine" },
+              { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
+              // DB-generated engines injected below
+              ...dbEngineRecords.map(rec => ({
+                label: rec.title || rec.content?.label || "Engine",
+                desc: rec.description || rec.content?.desc || "",
+                color: "bg-violet-700",
+                scenario: rec.content?.scenario || "",
+                _fromDb: true,
+              })).filter(e => e.scenario),
             ].map((eng) => (
               <Link key={eng.scenario} to={createPageUrl("ClinicalSupport") + `?tab=pathways&scenario=${eng.scenario}`} className="flex-shrink-0">
                 <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-violet-50 active:bg-violet-100 transition-colors w-20">

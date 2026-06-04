@@ -5,15 +5,13 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, AlertTriangle, Zap, Plus, Trash2, X, Check, GitBranch } from "lucide-react";
+import { Stethoscope, ChevronDown, ChevronUp, ArrowRight, ExternalLink, Pencil, AlertTriangle, Zap, Plus, Trash2, X, Check, GitBranch, Cpu } from "lucide-react";
 import AdminPathwayGenerator from "@/components/admin/AdminPathwayGenerator";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 
 const PATHWAYS = [
   // ── New Deep Diagnostic Engines ───────────────────────────────────────────
-  { name: "Wilms Tumor Engine", tag: "Engine", color: "bg-blue-100 text-blue-900", emergency: false,
-    summary: "Nephroblastoma recognition → imaging → bilateral vs unilateral → NWTS staging → histology (FH vs Anaplasia) → COG/SIOP regimen → genetics (WAGR/BWS/Denys-Drash) → survivorship. AREN0532/0534 protocol.",
-    keys: ["Stage I–II FH: Actinomycin D + Vincristine × 18w (DD4A); NO radiotherapy → OS >95%", "Stage III–IV FH: Add Doxorubicin + Flank RT 10.8 Gy; Lung RT 12 Gy if pulmonary mets", "Bilateral (Stage V): Neoadjuvant chemo → nephron-sparing partial nephrectomies — DO NOT bilateral nephrectomise", "Predisposition syndromes: WAGR/Denys-Drash (WT1), BWS (11p15) → USS every 3 months × 7 years"],
-    scenario: "wilms-tumor-engine" },
   { name: "Rickets Diagnostic Engine", tag: "Engine", color: "bg-amber-100 text-amber-900", emergency: false,
     summary: "Full rickets algorithm: ALP low/high → Exclude renal/RTA → PTH+Ca+Pi → Calcipenic (VDDR 1A/1B/2) vs Phosphopenic (XLH/HHRH/Fanconi/HHRH). Burosumab decision built-in. Based on IAP STG 2022 + Haffner Pediatric Nephrology 2022.",
     keys: ["Calcipenic: PTH↑, Ca↓, Pi↓ → 25(OH)D → Nutritional VDD / VDDR 1A / VDDR 1B / VDDR 2A (alopecia)", "Phosphopenic: PTH N/↑, Pi↓, Ca NORMAL → TRP/TmP-GFR → FGF23 → XLH/ADHR/ARHR vs HHRH/Fanconi", "XLH: PHEX gene — Burosumab 0.8 mg/kg SC q2w preferred; alt: Pi + calcitriol", "Low ALP + rickets-like: Hypophosphatasia (ALPL gene) — asfotase alfa, NOT vit D"],
@@ -244,6 +242,11 @@ const PATHWAYS = [
     summary: "24h urine metabolic workup. Identify hypercalciuria, hyperoxaluria, hypocitraturia.",
     keys: ["24h urine: Ca, oxalate, citrate, urate, cystine, volume", "Hypercalciuria: thiazide + low-Na diet + hydration", "PH1: lumasiran (RNAi) + combined liver-kidney Tx for ESRD; pyridoxine trial", "Nephrocalcinosis: dRTA, HPT, hypercalcaemia, Bartter, FHHNC"],
     scenario: "nephrocalcinosis" },
+  // ── Wilms Tumor — at end ─────────────────────────────────────────────────
+  { name: "Wilms Tumor Engine", tag: "Engine", color: "bg-blue-100 text-blue-900", emergency: false,
+    summary: "Nephroblastoma recognition → imaging → bilateral vs unilateral → NWTS staging → histology (FH vs Anaplasia) → COG/SIOP regimen → genetics (WAGR/BWS/Denys-Drash) → survivorship. AREN0532/0534 protocol.",
+    keys: ["Stage I–II FH: Actinomycin D + Vincristine × 18w (DD4A); NO radiotherapy → OS >95%", "Stage III–IV FH: Add Doxorubicin + Flank RT 10.8 Gy; Lung RT 12 Gy if pulmonary mets", "Bilateral (Stage V): Neoadjuvant chemo → nephron-sparing partial nephrectomies — DO NOT bilateral nephrectomise", "Predisposition syndromes: WAGR/Denys-Drash (WT1), BWS (11p15) → USS every 3 months × 7 years"],
+    scenario: "wilms-tumor-engine" },
 ];
 
 const TAGS = ["All", "Engine", "GN", "AKI", "CKD", "Electrolyte", "Tubular", "Dialysis", "Transplant", "HTN", "Diagnostic", "Urological", "Genetic"];
@@ -265,6 +268,30 @@ export default function HubNephrologyPathways() {
     staleTime: 60000,
   });
   const isAdmin = user?.role === "admin";
+
+  // ── Sync DB engines (from EngineGenerator / CustomSection) ────────────────
+  const { data: dbEngineRecords = [] } = useQuery({
+    queryKey: ["hub_db_engines"],
+    queryFn: () => base44.entities.CustomSection.filter({ created_by_admin: true, section_type: "tool", status: "published" }),
+    staleTime: 30000,
+    refetchInterval: 60000,
+  });
+
+  const dbEnginePathways = dbEngineRecords.map(rec => {
+    const c = rec.content || {};
+    return {
+      name: rec.title || c.label || "",
+      tag: "Engine",
+      color: "bg-violet-100 text-violet-900",
+      emergency: false,
+      summary: c.summary || rec.description || "",
+      keys: c.keys || [],
+      scenario: c.scenario || "",
+      references: c.references || "",
+      _fromDb: true,
+      _dbId: rec.id,
+    };
+  }).filter(e => e.name && e.scenario);
 
   const saveCustom = (updated) => {
     setCustomPathways(updated);
@@ -322,9 +349,14 @@ export default function HubNephrologyPathways() {
     setOpen(null);
   };
 
+  // Merge: built-ins → DB engines (de-dup by scenario) → custom localStorage
+  const builtinScenarios = new Set(PATHWAYS.map(p => p.scenario));
+  const filteredDbEngines = dbEnginePathways.filter(e => !builtinScenarios.has(e.scenario));
+
   const allPathways = [
     ...PATHWAYS.filter(p => !hiddenBuiltinIndices.includes(p.name))
       .map(p => builtinOverrides[p.name] ? { ...p, ...builtinOverrides[p.name] } : p),
+    ...filteredDbEngines,
     ...customPathways.map(p => ({ ...p, _isCustom: true }))
   ];
 
@@ -355,12 +387,16 @@ export default function HubNephrologyPathways() {
             </div>
           </div>
           {isAdmin && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap justify-end">
               <button onClick={openAdd}
                 className="flex items-center gap-1 text-xs bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded-full border border-white/30 transition-colors">
                 <Plus className="w-3.5 h-3.5" /> Add
               </button>
               <AdminPathwayGenerator specialty="Nephrology" onCreated={() => {}} />
+              <Link to={createPageUrl("EngineGenerator")}
+                className="flex items-center gap-1 text-xs bg-violet-500/80 hover:bg-violet-600 text-white px-2.5 py-1 rounded-full border border-violet-300/50 transition-colors font-semibold">
+                <Cpu className="w-3.5 h-3.5" /> Engine Generator
+              </Link>
             </div>
           )}
         </div>
@@ -505,6 +541,7 @@ function PathwayCard({ pathway, idx, open, setOpen, goToPathway, isAdmin, onEdit
             <span className="font-semibold text-sm text-slate-800">{pathway.name}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${pathway.color}`}>{pathway.tag}</span>
             {pathway.tag === "Engine" && <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-semibold border border-violet-300">AI Engine</span>}
+            {pathway._fromDb && <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold border border-indigo-300">Generated</span>}
             {pathway._isCustom && <span className="text-xs text-amber-600 font-medium">Custom</span>}
           </div>
           {open === idx ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-1" />}

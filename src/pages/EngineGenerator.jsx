@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Cpu, Plus, Trash2, Pencil, Sparkles, FileUp,
   CheckCircle, AlertCircle, Loader2, X, ChevronDown, ChevronUp,
-  Search, Eye, EyeOff, FlaskConical
+  Search, Eye, EyeOff, FlaskConical, FileText
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -268,15 +268,51 @@ Return ONLY valid JSON, no explanation.`;
     }
   };
 
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const [pdfFileName, setPdfFileName] = useState("");
+
   const handleDocUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    try {
-      const text = await file.text();
-      setAiDocText(text.substring(0, 5000));
-      toast.success("Document loaded");
-    } catch {
-      toast.error("Could not read file");
+
+    // For PDF files, upload and extract via AI
+    if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+      setPdfUploading(true);
+      setPdfFileName(file.name);
+      try {
+        toast.info("Uploading PDF and extracting content…");
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+          file_url,
+          json_schema: {
+            type: "object",
+            properties: {
+              extracted_text: { type: "string", description: "All meaningful clinical text from the document, including guidelines, protocols, dosing, diagnosis criteria, management steps" }
+            }
+          }
+        });
+        const text = result?.output?.extracted_text || result?.output?.[0]?.extracted_text || "";
+        if (text) {
+          setAiDocText(text.substring(0, 6000));
+          toast.success(`PDF extracted: ${file.name}`);
+        } else {
+          toast.error("Could not extract text from PDF");
+        }
+      } catch (err) {
+        toast.error("PDF extraction failed: " + err.message);
+      } finally {
+        setPdfUploading(false);
+      }
+    } else {
+      // Plain text / markdown / csv
+      try {
+        const text = await file.text();
+        setAiDocText(text.substring(0, 6000));
+        setPdfFileName(file.name);
+        toast.success("Document loaded: " + file.name);
+      } catch {
+        toast.error("Could not read file");
+      }
     }
     e.target.value = "";
   };
@@ -382,12 +418,21 @@ Return ONLY valid JSON, no explanation.`;
                   placeholder="Paste extracted text from a PDF guideline, abstract, or any clinical document..."
                   className="mt-1 bg-white border-violet-200 text-sm h-24 resize-none" />
               </div>
-              <div className="flex gap-2 items-center">
-                <label className="flex items-center gap-1.5 cursor-pointer px-3 py-2 border border-violet-300 rounded-lg bg-white text-xs font-medium text-violet-700 hover:bg-violet-50">
-                  <FileUp className="w-3.5 h-3.5" /> Upload Doc
-                  <input type="file" accept=".txt,.md,.csv" className="hidden" onChange={handleDocUpload} />
+              <div className="flex gap-2 items-center flex-wrap">
+                <label className={`flex items-center gap-1.5 cursor-pointer px-3 py-2 border rounded-lg text-xs font-medium transition-colors ${pdfUploading ? "border-violet-200 bg-violet-50 text-violet-400 cursor-not-allowed" : "border-violet-300 bg-white text-violet-700 hover:bg-violet-50"}`}>
+                  {pdfUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileUp className="w-3.5 h-3.5" />}
+                  {pdfUploading ? "Extracting PDF…" : "Upload PDF / Doc"}
+                  <input type="file" accept=".txt,.md,.csv,.pdf" className="hidden" onChange={handleDocUpload} disabled={pdfUploading} />
                 </label>
-                <span className="text-xs text-violet-500">or paste above</span>
+                {pdfFileName && !pdfUploading && (
+                  <div className="flex items-center gap-1 text-xs text-violet-700 bg-violet-100 px-2 py-1 rounded-full border border-violet-200">
+                    <FileText className="w-3 h-3" /> {pdfFileName}
+                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); }} className="ml-1 text-violet-400 hover:text-violet-700">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                {!pdfFileName && <span className="text-xs text-violet-500">or paste above · PDF, TXT, MD supported</span>}
               </div>
               <Button onClick={generateWithAI} disabled={aiLoading}
                 className="w-full bg-violet-700 hover:bg-violet-800 gap-2">
