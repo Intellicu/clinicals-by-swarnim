@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Cpu, Plus, Trash2, Pencil, Sparkles, Globe, FileUp,
-  CheckCircle, AlertCircle, Loader2, X, ChevronDown, ChevronUp, Search
+  Cpu, Plus, Trash2, Pencil, Sparkles, FileUp,
+  CheckCircle, AlertCircle, Loader2, X, ChevronDown, ChevronUp,
+  Search, Eye, EyeOff, FlaskConical
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -73,42 +74,111 @@ function EngineForm({ engine, onChange }) {
         <Input value={engine.references || ""} onChange={e => onChange({ ...engine, references: e.target.value })}
           placeholder="e.g. IAP STG 2022, KDIGO 2024" className="mt-1 text-sm" />
       </div>
+      <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <div>
+          <p className="text-xs font-semibold text-slate-700">Visible in Hub &amp; Pathways</p>
+          <p className="text-xs text-slate-400">Toggle off to hide from all clinical views</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onChange({ ...engine, is_active: !engine.is_active })}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            engine.is_active
+              ? "bg-green-100 text-green-700 border border-green-300"
+              : "bg-slate-100 text-slate-500 border border-slate-300"
+          }`}
+        >
+          {engine.is_active ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+          {engine.is_active ? "Active" : "Hidden"}
+        </button>
+      </div>
     </div>
   );
 }
 
+// Converts a CustomSection DB record → engine config object
+function recordToEngine(rec) {
+  const c = rec.content || {};
+  return {
+    _id: rec.id,
+    label: rec.title || c.label || "",
+    desc: rec.description || c.desc || "",
+    scenario: c.scenario || "",
+    group: c.group || "General Pediatrics",
+    tags: c.tags || [],
+    summary: c.summary || "",
+    keys: c.keys || [],
+    references: c.references || "",
+    is_active: rec.status === "published",
+  };
+}
+
+// Converts engine config → CustomSection fields for DB save
+function engineToRecord(engine) {
+  return {
+    title: engine.label,
+    description: engine.desc,
+    name: engine.scenario,
+    section_type: "tool",
+    created_by_admin: true,
+    status: engine.is_active ? "published" : "draft",
+    content: {
+      label: engine.label,
+      desc: engine.desc,
+      scenario: engine.scenario,
+      group: engine.group,
+      tags: engine.tags || [],
+      summary: engine.summary || "",
+      keys: engine.keys || [],
+      references: engine.references || "",
+    },
+  };
+}
+
 export default function EngineGenerator() {
-  const [engines, setEngines] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("custom_engines_registry") || "[]"); } catch { return []; }
-  });
-  const [modal, setModal] = useState(null); // null | { mode: "add"|"edit", idx?, engine }
+  const queryClient = useQueryClient();
+  const [modal, setModal] = useState(null);
   const [aiMode, setAiMode] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
   const [aiDocText, setAiDocText] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(null);
+  const [llmTestResult, setLlmTestResult] = useState(null);
+  const [llmTesting, setLlmTesting] = useState(false);
 
   const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60000 });
   const isAdmin = user?.role === "admin";
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <Card className="max-w-sm w-full border-red-200">
-          <CardContent className="p-6 text-center">
-            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-            <p className="font-semibold text-slate-800">Admin Access Required</p>
-            <p className="text-sm text-slate-500 mt-1">This page is restricted to admin users only.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Load engines from DB (CustomSection where created_by_admin = true and section_type = "tool")
+  const { data: dbRecords = [], isLoading } = useQuery({
+    queryKey: ["custom_engines_db"],
+    queryFn: () => base44.entities.CustomSection.filter({ created_by_admin: true, section_type: "tool" }),
+    enabled: isAdmin,
+  });
 
-  const save = (updated) => {
-    setEngines(updated);
-    localStorage.setItem("custom_engines_registry", JSON.stringify(updated));
+  const engines = dbRecords.map(recordToEngine);
+
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.CustomSection.create(engineToRecord(data)),
+    onSuccess: () => { queryClient.invalidateQueries(["custom_engines_db"]); toast.success("Engine saved to database"); setModal(null); },
+    onError: (e) => toast.error("Save failed: " + e.message),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.CustomSection.update(id, engineToRecord(data)),
+    onSuccess: () => { queryClient.invalidateQueries(["custom_engines_db"]); toast.success("Engine updated"); setModal(null); },
+    onError: (e) => toast.error("Update failed: " + e.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.CustomSection.delete(id),
+    onSuccess: () => { queryClient.invalidateQueries(["custom_engines_db"]); toast.success("Engine deleted"); },
+    onError: (e) => toast.error("Delete failed: " + e.message),
+  });
+
+  const toggleVisibility = (eng) => {
+    updateMutation.mutate({ id: eng._id, data: { ...eng, is_active: !eng.is_active } });
   };
 
   const handleSave = () => {
@@ -117,21 +187,15 @@ export default function EngineGenerator() {
       return;
     }
     if (modal.mode === "add") {
-      save([...engines, modal.engine]);
-      toast.success("Engine added successfully");
+      createMutation.mutate(modal.engine);
     } else {
-      const updated = [...engines];
-      updated[modal.idx] = modal.engine;
-      save(updated);
-      toast.success("Engine updated");
+      updateMutation.mutate({ id: modal.engine._id, data: modal.engine });
     }
-    setModal(null);
   };
 
-  const handleDelete = (idx) => {
-    if (!confirm("Delete this engine?")) return;
-    save(engines.filter((_, i) => i !== idx));
-    toast.success("Engine deleted");
+  const handleDelete = (eng) => {
+    if (!confirm("Delete this engine from the database?")) return;
+    deleteMutation.mutate(eng._id);
   };
 
   const generateWithAI = async () => {
@@ -180,13 +244,37 @@ Return ONLY valid JSON, no explanation.`;
     }
   };
 
+  const runLLMTest = async () => {
+    setLlmTesting(true);
+    setLlmTestResult(null);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: "In one sentence, confirm you are an active AI assistant for a pediatric nephrology clinical platform.",
+      });
+      let text = "";
+      if (typeof response === "string") text = response;
+      else if (response?.result) text = response.result;
+      else if (response?.text) text = response.text;
+      else if (response?.content) text = response.content;
+      else if (response?.choices?.[0]?.message?.content) text = response.choices[0].message.content;
+      else text = JSON.stringify(response);
+      setLlmTestResult({ ok: true, text });
+      toast.success("LLM service is active and responding");
+    } catch (err) {
+      setLlmTestResult({ ok: false, text: err.message });
+      toast.error("LLM service test failed: " + err.message);
+    } finally {
+      setLlmTesting(false);
+    }
+  };
+
   const handleDocUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
       const text = await file.text();
       setAiDocText(text.substring(0, 5000));
-      toast.success("Document loaded — AI will use it for context");
+      toast.success("Document loaded");
     } catch {
       toast.error("Could not read file");
     }
@@ -199,6 +287,22 @@ Return ONLY valid JSON, no explanation.`;
     (eng.tags || []).some(t => t.toLowerCase().includes(search.toLowerCase()))
   );
 
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <Card className="max-w-sm w-full border-red-200">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+            <p className="font-semibold text-slate-800">Admin Access Required</p>
+            <p className="text-sm text-slate-500 mt-1">This page is restricted to admin users only.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const activeCount = engines.filter(e => e.is_active).length;
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       <div className="max-w-3xl mx-auto px-4 py-5 space-y-5">
@@ -210,12 +314,40 @@ Return ONLY valid JSON, no explanation.`;
               <Cpu className="w-6 h-6" />
               <div>
                 <h1 className="text-lg font-bold">Engine Generator</h1>
-                <p className="text-violet-200 text-xs">Admin tool — Add, edit & delete clinical intelligence engines</p>
+                <p className="text-violet-200 text-xs">Admin tool — Add, edit, toggle &amp; delete clinical intelligence engines (saved to database)</p>
               </div>
             </div>
-            <Badge className="bg-white/20 text-white text-xs border border-white/30">{engines.length} Custom</Badge>
+            <div className="flex flex-col items-end gap-1">
+              <Badge className="bg-white/20 text-white text-xs border border-white/30">{engines.length} Total</Badge>
+              <Badge className="bg-green-400/30 text-green-100 text-xs border border-green-300/40">{activeCount} Active</Badge>
+            </div>
           </div>
         </div>
+
+        {/* LLM Test Panel */}
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <FlaskConical className="w-4 h-4 text-blue-600" />
+                <div>
+                  <p className="text-xs font-semibold text-blue-900">AI / LLM Service Health Check</p>
+                  <p className="text-xs text-blue-600">Verify the LLM integration is active and responding</p>
+                </div>
+              </div>
+              <Button size="sm" onClick={runLLMTest} disabled={llmTesting}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs shrink-0">
+                {llmTesting ? <><Loader2 className="w-3 h-3 mr-1 animate-spin" />Testing...</> : "Run Test"}
+              </Button>
+            </div>
+            {llmTestResult && (
+              <div className={`mt-2 p-2 rounded-lg text-xs flex items-start gap-2 ${llmTestResult.ok ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200"}`}>
+                {llmTestResult.ok ? <CheckCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" /> : <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
+                <span>{llmTestResult.text}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Action buttons */}
         <div className="flex gap-2 flex-wrap">
@@ -275,7 +407,9 @@ Return ONLY valid JSON, no explanation.`;
         )}
 
         {/* Engine List */}
-        {engines.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-violet-500" /></div>
+        ) : engines.length === 0 ? (
           <Card className="border-dashed border-2 border-slate-200">
             <CardContent className="p-8 text-center">
               <Cpu className="w-10 h-10 text-slate-300 mx-auto mb-3" />
@@ -287,12 +421,12 @@ Return ONLY valid JSON, no explanation.`;
           <div className="space-y-2">
             <p className="text-xs text-slate-500 font-medium">{filtered.length} engine{filtered.length !== 1 ? "s" : ""}</p>
             {filtered.map((eng, idx) => (
-              <Card key={idx} className="border-violet-200 border-l-4 border-l-violet-500">
+              <Card key={eng._id || idx} className={`border-l-4 ${eng.is_active ? "border-l-violet-500 border-violet-200" : "border-l-slate-300 border-slate-200 opacity-70"}`}>
                 <CardContent className="p-0">
                   <button onClick={() => setExpanded(expanded === idx ? null : idx)}
                     className="w-full flex items-center justify-between p-3 text-left">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <Cpu className="w-4 h-4 text-violet-600 flex-shrink-0" />
+                      <Cpu className={`w-4 h-4 flex-shrink-0 ${eng.is_active ? "text-violet-600" : "text-slate-400"}`} />
                       <div className="min-w-0">
                         <p className="font-semibold text-sm text-slate-800 truncate">{eng.label}</p>
                         <p className="text-xs text-slate-400 truncate">{eng.desc}</p>
@@ -300,6 +434,9 @@ Return ONLY valid JSON, no explanation.`;
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                       <Badge variant="outline" className="text-xs">{eng.group}</Badge>
+                      <Badge className={`text-xs ${eng.is_active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
+                        {eng.is_active ? "Active" : "Hidden"}
+                      </Badge>
                       {expanded === idx ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                     </div>
                   </button>
@@ -322,13 +459,19 @@ Return ONLY valid JSON, no explanation.`;
                           {eng.tags.map((t, j) => <Badge key={j} variant="outline" className="text-xs py-0">{t}</Badge>)}
                         </div>
                       )}
-                      <div className="flex gap-2 pt-1">
+                      <div className="flex gap-2 pt-1 flex-wrap">
+                        <Button size="sm" variant="outline"
+                          className={`text-xs h-7 ${eng.is_active ? "border-slate-200 text-slate-600 hover:bg-slate-50" : "border-green-200 text-green-700 hover:bg-green-50"}`}
+                          onClick={() => toggleVisibility(eng)}
+                          disabled={updateMutation.isPending}>
+                          {eng.is_active ? <><EyeOff className="w-3 h-3 mr-1" />Hide from Hub</> : <><Eye className="w-3 h-3 mr-1" />Show in Hub</>}
+                        </Button>
                         <Button size="sm" variant="outline" className="text-xs border-amber-200 text-amber-700 hover:bg-amber-50 h-7"
-                          onClick={() => setModal({ mode: "edit", idx, engine: { ...eng, keys: [...(eng.keys || [])], tags: [...(eng.tags || [])] } })}>
+                          onClick={() => setModal({ mode: "edit", engine: { ...eng } })}>
                           <Pencil className="w-3 h-3 mr-1" /> Edit
                         </Button>
                         <Button size="sm" variant="outline" className="text-xs border-red-200 text-red-600 hover:bg-red-50 h-7"
-                          onClick={() => handleDelete(idx)}>
+                          onClick={() => handleDelete(eng)} disabled={deleteMutation.isPending}>
                           <Trash2 className="w-3 h-3 mr-1" /> Delete
                         </Button>
                       </div>
@@ -345,10 +488,10 @@ Return ONLY valid JSON, no explanation.`;
           <CardContent className="p-3">
             <div className="flex gap-2">
               <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="text-xs text-blue-800 space-y-0.5">
-                <p className="font-semibold">How engines appear in the app</p>
-                <p>Custom engines are stored locally and appear in the Intelligence Engines tab (ClinicalSupport → Engines). The scenario ID links to the engine component via the URL parameter <span className="font-mono bg-blue-100 px-1 rounded">?scenario=your-id</span>.</p>
-                <p className="mt-1">To wire a custom engine to a full React component, add the scenario ID to the <span className="font-mono bg-blue-100 px-1 rounded">PathwayRenderer</span> component.</p>
+              <div className="text-xs text-blue-800 space-y-1">
+                <p className="font-semibold">How engines work</p>
+                <p>Engines are saved to the database (CustomSection entity) and visible to all users when set to <strong>Active</strong>. Hidden engines are stored as drafts and not shown in the Hub or pathways.</p>
+                <p>The <span className="font-mono bg-blue-100 px-1 rounded">scenario</span> ID links to the engine component via <span className="font-mono bg-blue-100 px-1 rounded">?scenario=your-id</span>. To wire a custom engine to a full React component, register its scenario ID in <span className="font-mono bg-blue-100 px-1 rounded">PathwayRenderer</span>.</p>
               </div>
             </div>
           </CardContent>
@@ -369,8 +512,11 @@ Return ONLY valid JSON, no explanation.`;
             <div className="p-4">
               <EngineForm engine={modal.engine} onChange={eng => setModal(m => ({ ...m, engine: eng }))} />
               <div className="flex gap-2 mt-4">
-                <Button onClick={handleSave} className="flex-1 bg-violet-600 hover:bg-violet-700 gap-1.5">
-                  <CheckCircle className="w-4 h-4" /> Save Engine
+                <Button onClick={handleSave} disabled={createMutation.isPending || updateMutation.isPending}
+                  className="flex-1 bg-violet-600 hover:bg-violet-700 gap-1.5">
+                  {(createMutation.isPending || updateMutation.isPending)
+                    ? <><Loader2 className="w-4 h-4 animate-spin" />Saving...</>
+                    : <><CheckCircle className="w-4 h-4" />Save to Database</>}
                 </Button>
                 <Button onClick={() => setModal(null)} variant="outline">Cancel</Button>
               </div>

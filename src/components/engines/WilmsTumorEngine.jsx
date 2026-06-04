@@ -357,7 +357,7 @@ export default function WilmsTumorEngine() {
                 ].map((c, i) => <p key={i} className="text-teal-800">• {c}</p>)}
                 <div className="p-2 bg-teal-100 rounded-lg mt-2">
                   <p className="font-bold text-teal-900">Relapse Treatment Options:</p>
-                  <p className="text-teal-800">• Standard-risk relapse (off chemo >6 months): Vincristine + Actinomycin + Dox + Cyclophosphamide + Etoposide (VDCE)</p>
+                  <p className="text-teal-800">• Standard-risk relapse (off chemo &gt;6 months): Vincristine + Actinomycin + Dox + Cyclophosphamide + Etoposide (VDCE)</p>
                   <p className="text-teal-800">• High-risk/early relapse: Carboplatin-based regimens + High-dose chemo + Auto-SCT</p>
                   <p className="text-teal-800">• Bilateral relapse / refractory: Clinical trial — consider irinotecan, temozolomide, anti-GD2</p>
                 </div>
