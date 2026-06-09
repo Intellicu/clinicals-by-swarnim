@@ -60,6 +60,11 @@
       "default": true,
       "description": "Remind about upcoming patient follow-ups"
     },
+    "daily_clinical_summary": {
+      "type": "boolean",
+      "default": true,
+      "description": "Receive daily morning clinical summary email (vignette + pearl + guideline update)"
+    },
     "reminder_sender_name": {
       "type": "string",
       "description": "Sender name shown on emails",

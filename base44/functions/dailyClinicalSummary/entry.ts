@@ -102,17 +102,27 @@ Respond in clean markdown. Be concise but clinically rich.`;
       });
     }
 
-    // Send email to all admin users
+    // Send email to all users who haven't opted out
     const allUsers = await base44.asServiceRole.entities.User.list('-created_date', 100);
     const adminUsers = allUsers.filter(u => u.role === 'admin' && u.email);
 
+    // Fetch notification preferences to respect opt-outs
+    const allPrefs = await base44.asServiceRole.entities.NotificationPreference.list('-created_date', 200);
+    const prefsByEmail = {};
+    for (const p of allPrefs) {
+      if (p.user_email) prefsByEmail[p.user_email] = p;
+    }
+
     let emailsSent = 0;
     for (const admin of adminUsers.slice(0, 10)) {
+      const pref = prefsByEmail[admin.email];
+      // If pref exists and daily_clinical_summary is explicitly false, skip
+      if (pref && pref.daily_clinical_summary === false) continue;
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: admin.email,
           subject: `📋 CliniCals Daily Summary — ${today}`,
-          body: `Dear Dr. ${admin.full_name || 'Colleague'},\n\nYour daily clinical summary is ready for ${today}.\n\n${summaryData.summary_markdown}\n\n---\nCliniCals Hub by Swarnim | Pediatric Clinical Intelligence\nThis is an automated daily summary. For informational purposes only.`,
+          body: `Dear Dr. ${admin.full_name || 'Colleague'},\n\nYour daily clinical summary is ready for ${today}.\n\n${summaryData.summary_markdown}\n\n---\nCliniCals Hub by Swarnim | Pediatric Clinical Intelligence\nThis is an automated daily summary. For informational purposes only.\nTo unsubscribe, go to Notification Center → Preferences and disable Daily Clinical Summary.`,
         });
         emailsSent++;
       } catch (emailErr) {

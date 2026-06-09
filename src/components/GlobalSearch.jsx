@@ -144,6 +144,16 @@ const SEARCH_INDEX = [
   { title: "Wilms Tumor Engine (Nephroblastoma)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=wilms-tumor-engine", tags: ["Wilms tumor", "nephroblastoma", "NWTS", "SIOP", "COG", "actinomycin vincristine", "WAGR", "BWS", "Denys-Drash", "WT1", "bilateral Wilms", "nephron sparing", "DD4A", "flank RT", "pediatric oncology nephrology"] },
   { title: "IgA Vasculitis (HSP) Intelligence Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=igav-hsp-engine", tags: ["IgAV engine", "HSP nephritis engine", "Henoch Schonlein", "purpura nephritis", "ISKDC classification", "SHARE guidelines", "EULAR PRES", "crescentic IgAV", "MMF HSP", "cyclophosphamide HSP", "rituximab HSP", "HSP management"] },
   { title: "Daily Clinical Summary", category: "Tool", page: "DailySummary", tags: ["daily summary", "clinical briefing", "vignette", "learning pearl", "morning report"] },
+  // ── Growth, Nutrition & Development Engines ──
+  { title: "Growth Assessment Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=growth-assessment-engine", tags: ["growth engine", "z-score", "stunting", "wasting", "growth failure CKD", "WHO growth", "IAP growth", "short stature engine"] },
+  { title: "Anthropometry Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=anthropometry-engine", tags: ["anthropometry engine", "SAM engine", "MAM", "BMI engine", "BSA", "MUAC", "ideal body weight", "catch-up growth"] },
+  { title: "Nutritional Assessment Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=nutritional-assessment-engine", tags: ["nutrition engine", "malnutrition engine", "SAM MAM", "PEM", "kwashiorkor", "marasmus", "micronutrient", "tube feeding", "TPN"] },
+  { title: "Renal Nutrition Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=renal-nutrition-engine", tags: ["renal nutrition engine", "CKD diet engine", "dialysis nutrition", "phosphorus diet", "potassium restriction CKD", "KDOQI nutrition"] },
+  { title: "Developmental Assessment Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=developmental-assessment-engine", tags: ["developmental engine", "milestones engine", "M-CHAT autism", "developmental delay", "gross motor fine motor", "ASD engine", "neurodevelopment"] },
+  { title: "Newborn Assessment Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=newborn-assessment-engine", tags: ["neonatal engine", "newborn engine", "jaundice engine", "NEC", "APGAR", "NBS", "neonatal sepsis", "phototherapy"] },
+  { title: "Vaccination Engine (IAP 2023)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=vaccination-engine", tags: ["vaccination engine", "immunization engine", "IAP schedule", "catch-up vaccine", "CKD vaccine", "transplant vaccine", "live vaccine rules"] },
+  { title: "Short Stature Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=short-stature-engine", tags: ["short stature engine", "GHD engine", "growth hormone deficiency", "Turner engine", "bone age", "IGF-1", "constitutional delay"] },
+  { title: "Obesity & Metabolic Syndrome Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=obesity-metabolic-engine", tags: ["obesity engine", "metabolic syndrome engine", "fatty liver NAFLD", "insulin resistance", "pediatric obesity", "GLP-1 metformin"] },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -301,7 +311,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     flatResults.current = Object.values(newGroups).flat();
 
     setGroups(newGroups);
-    setOpen(Object.keys(newGroups).length > 0 || true); // always open to show "no results"
+    setOpen(true); // always open to show results or "no results" message
     setFocused(0);
     setLoading(false);
   }, []);

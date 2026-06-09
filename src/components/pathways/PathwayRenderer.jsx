@@ -93,6 +93,7 @@ import RenalDietEngine from "../engines/RenalDietEngine";
 import RheumatologyEngine from "../engines/RheumatologyEngine";
 import RicketsEngine from "../engines/RicketsEngine";
 import WilmsTumorEngine from "../engines/WilmsTumorEngine";
+import GrowthNutritionDevEngine from "../engines/GrowthNutritionDevEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
@@ -121,6 +122,9 @@ const HANDLED_IDS = new Set([
   "electrolytes-hub","acid-base-hub","neurogenic-bladder-engine",
   "bladder-diary-engine","renal-biopsy-engine",
   "diet-engine","rheumatology-engine","rickets-engine","wilms-tumor-engine",
+  "growth-assessment-engine","anthropometry-engine","nutritional-assessment-engine",
+  "renal-nutrition-engine","developmental-assessment-engine","newborn-assessment-engine",
+  "vaccination-engine","short-stature-engine","obesity-metabolic-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -240,6 +244,12 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "rheumatology-engine") return <RheumatologyEngine />;
   if (id === "rickets-engine") return <RicketsEngine />;
   if (id === "wilms-tumor-engine") return <WilmsTumorEngine />;
+  // ── Growth, Nutrition & Development Engines ──────────────────────────────
+  if (["growth-assessment-engine","anthropometry-engine","nutritional-assessment-engine",
+       "renal-nutrition-engine","short-stature-engine","obesity-metabolic-engine",
+       "newborn-assessment-engine"].includes(id)) return <GrowthNutritionDevEngine scenario={id} />;
+  if (id === "developmental-assessment-engine") return <GrowthNutritionDevEngine scenario="developmental-assessment-engine" />;
+  if (id === "vaccination-engine") return <GrowthNutritionDevEngine scenario="vaccination-engine" />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

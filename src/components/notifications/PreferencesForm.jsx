@@ -34,6 +34,7 @@ export default function PreferencesForm({ onSaved }) {
     severe_diagnosis_alert: true,
     patient_education_reminders: true,
     follow_up_reminders: true,
+    daily_clinical_summary: true,
     reminder_sender_name: "CliniCals by Swarnim",
     clinic_name: "",
     clinic_phone: "",
@@ -160,6 +161,13 @@ export default function PreferencesForm({ onSaved }) {
               <p className="text-xs text-slate-500">Notify when patients complete assigned materials</p>
             </div>
             <Switch checked={prefs.patient_education_reminders} onCheckedChange={() => toggle("patient_education_reminders")} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-sm">📋 Daily Clinical Summary Email</p>
+              <p className="text-xs text-slate-500">Morning briefing with vignette, pearl & guideline update at 7 AM IST</p>
+            </div>
+            <Switch checked={prefs.daily_clinical_summary ?? true} onCheckedChange={() => toggle("daily_clinical_summary")} />
           </div>
         </CardContent>
       </Card>

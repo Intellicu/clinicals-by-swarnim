@@ -525,7 +525,7 @@ export default function Hub() {
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
-              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">38</span>
+              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">{41 + dbEngineRecords.length}</span>
             </div>
             <Link to={createPageUrl("ClinicalSupport") + "?tab=engines"}>
               <span className="text-xs text-violet-600 font-semibold">All →</span>
@@ -562,6 +562,15 @@ export default function Hub() {
               { label: "Tubular Engine",     desc: "Fanconi/XLH/NDI",        color: "bg-amber-800",  scenario: "tubular-engine" },
               { label: "Stone Engine",       desc: "Renal stones full",      color: "bg-yellow-700", scenario: "stone-engine" },
               { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
+              { label: "Growth Engine",      desc: "Z-scores/CKD growth",    color: "bg-emerald-700", scenario: "growth-assessment-engine" },
+              { label: "Anthropometry",      desc: "SAM/MAM/BMI/BSA",        color: "bg-emerald-600", scenario: "anthropometry-engine" },
+              { label: "Nutrition Engine",   desc: "PEM·SAM·Renal diet",     color: "bg-green-700",  scenario: "nutritional-assessment-engine" },
+              { label: "Dev Assessment",     desc: "Milestones+M-CHAT",      color: "bg-teal-700",   scenario: "developmental-assessment-engine" },
+              { label: "Vaccination",        desc: "IAP 2023+Special risk",  color: "bg-cyan-700",   scenario: "vaccination-engine" },
+              { label: "Short Stature",      desc: "GHD/Turner/delay",       color: "bg-green-800",  scenario: "short-stature-engine" },
+              { label: "Renal Nutrition",    desc: "CKD/HD/PD/Tx diet",      color: "bg-lime-700",   scenario: "renal-nutrition-engine" },
+              { label: "Newborn Engine",     desc: "APGAR/NBS/NEC/Jaundice", color: "bg-amber-700",  scenario: "newborn-assessment-engine" },
+              { label: "Obesity Engine",     desc: "Metabolic syndrome",     color: "bg-orange-700", scenario: "obesity-metabolic-engine" },
               // DB-generated engines injected below
               ...dbEngineRecords.map(rec => ({
                 label: rec.title || rec.content?.label || "Engine",
