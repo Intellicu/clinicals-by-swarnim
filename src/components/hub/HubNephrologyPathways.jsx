@@ -130,6 +130,18 @@ const PATHWAYS = [
     summary: "Most common primary GN. MEST-C scoring + HSP nephritis management combined.",
     keys: ["IgAN: haematuria ± proteinuria post-URTI; MEST-C biopsy classification", "IgAN treatment: ACEi/ARB if UPCR >0.5; steroids if GFR declining + UPCR >1", "IgAV: purpura + arthritis + abdominal pain + nephritis (non-thrombocytopenic)", "IgAV nephritis: biopsy if nephrotic/nephritic range; ACEi/ARB; steroids for severe"],
     scenario: "iga-nephropathy" },
+  { name: "IgA Vasculitis (HSP) Intelligence Engine", tag: "Engine", color: "bg-blue-100 text-blue-900", emergency: false,
+    summary: "Full IgAV/Henoch-Schönlein Purpura engine: Diagnostic criteria → nephritis classification → risk stratification → treatment pathway → monitoring. Based on EULAR/PRES/SHARE 2019 + ISPN.",
+    keys: [
+      "Diagnosis (ACR/EULAR 2022): Purpura/petechiae (mandatory) + ≥1 of: abdominal pain, arthritis/arthralgia, renal involvement, IgA deposits on biopsy",
+      "Nephritis classification: ISKDC I (haematuria only) → II (mild proteinuria) → III (nephrotic) → IV (nephrotic + nephritic) → V (nephritic, NS) → VI (crescents >50%)",
+      "Risk stratification: Low risk (ISKDC I–II) → ACEi/ARB + monitor; High risk (ISKDC III–VI, UPCR >1) → biopsy + immunosuppression",
+      "Biopsy histology: Oxford MEST-C + % crescents. Crescentic IgAV (>50%): pulse MP + CYC or RTX",
+      "Steroids: Reduce short-term abdominal symptoms but do NOT prevent nephritis. Use only if nephritis already established",
+      "Long-term: 20–30% develop persistent proteinuria; annual BP + UPCR monitoring × 5 years; CKD risk if ISKDC III–VI",
+      "SHARE 2022 induction (severe): IV methylprednisolone 30 mg/kg × 3d → oral pred + MMF; Cyclophosphamide or Rituximab for crescentic disease"
+    ],
+    scenario: "igav-hsp-engine" },
   { name: "Lupus Nephritis (LN)", tag: "GN", color: "bg-rose-100 text-rose-800", emergency: false,
     summary: "Class III/IV most common in children. ACR/EULAR 2019. Biopsy mandatory.",
     keys: ["ISN/RPS classes I–VI; biopsy guides induction", "Induction: pulse methylprednisolone + MMF (preferred) or IV CYC (severe)", "Maintenance: MMF + hydroxychloroquine + low-dose prednisolone", "Target: UPCR <500 mg/mg, normal C3/C4, anti-dsDNA declining"],

@@ -14,7 +14,7 @@ const SEARCH_INDEX = [
   { title: "FSGS – Focal Segmental Glomerulosclerosis", category: "GN Pathway", page: "GlomerularDiseases", tags: ["FSGS", "focal segmental", "podocin", "NPHS2", "tacrolimus", "cyclosporin", "sparsentan", "steroid resistant", "CNI"] },
   { title: "Membranous Nephropathy (MN)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["membranous", "MN", "PLA2R", "THSD7A", "rituximab", "spontaneous remission", "anticoagulation", "cyclophosphamide", "Ponticelli", "nephrotic"] },
   { title: "IgA Nephropathy (IgAN)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["IgAN", "IgA nephropathy", "Oxford MEST", "MEST-C", "SGLT2", "dapagliflozin", "budesonide", "nefecon", "sparsentan", "haematuria", "atrasentan"] },
-  { title: "IgA Vasculitis Nephritis (HSP)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["IgAV", "HSP", "Henoch Schonlein", "purpura", "IgA vasculitis", "ISKDC", "proteinuria"] },
+  { title: "IgA Vasculitis Nephritis (HSP Nephritis)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=igav-hsp-engine", tags: ["IgAV", "HSP", "Henoch Schonlein", "purpura", "IgA vasculitis", "ISKDC", "proteinuria", "HSP nephritis", "SHARE", "EULAR PRES", "crescentic", "immunosuppression HSP"] },
   { title: "Post-Streptococcal GN (PSGN)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["PSGN", "post-streptococcal", "streptococcal", "ASO", "anti-DNase", "low C3", "complement", "self-limiting", "haematuria"] },
   { title: "MPGN – Membranoproliferative GN", category: "GN Pathway", page: "GlomerularDiseases", tags: ["MPGN", "membranoproliferative", "tram-track", "complement", "cryoglobulin", "hepatitis C", "immune complex"] },
   { title: "C3 Glomerulopathy (C3GN / DDD)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["C3G", "C3 glomerulopathy", "C3GN", "DDD", "dense deposit", "complement", "CFH", "factor H", "eculizumab", "iptacopan", "C3NeF", "alternative pathway"] },
@@ -141,6 +141,9 @@ const SEARCH_INDEX = [
   { title: "Hypokalemia Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hypokalemia-engine", tags: ["hypokalemia engine", "Bartter engine", "Gitelman engine", "Liddle", "renin aldosterone low K"] },
   { title: "CKD Progression Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-progression-engine", tags: ["CKD progression engine", "risk stratification CKD", "eGFR decline", "monitoring interval"] },
   { title: "All Intelligence Engines", category: "Engine", page: "ClinicalSupport", params: "?tab=engines", tags: ["engines", "intelligence engines", "clinical engines", "diagnostic engines", "all engines"] },
+  { title: "Wilms Tumor Engine (Nephroblastoma)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=wilms-tumor-engine", tags: ["Wilms tumor", "nephroblastoma", "NWTS", "SIOP", "COG", "actinomycin vincristine", "WAGR", "BWS", "Denys-Drash", "WT1", "bilateral Wilms", "nephron sparing", "DD4A", "flank RT", "pediatric oncology nephrology"] },
+  { title: "IgA Vasculitis (HSP) Intelligence Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=igav-hsp-engine", tags: ["IgAV engine", "HSP nephritis engine", "Henoch Schonlein", "purpura nephritis", "ISKDC classification", "SHARE guidelines", "EULAR PRES", "crescentic IgAV", "MMF HSP", "cyclophosphamide HSP", "rituximab HSP", "HSP management"] },
+  { title: "Daily Clinical Summary", category: "Tool", page: "DailySummary", tags: ["daily summary", "clinical briefing", "vignette", "learning pearl", "morning report"] },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -323,7 +326,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         badgeText: d.category || "Drug",
         badgeClass: "bg-violet-100 text-violet-700",
         _score: scoreEntityItem(d.generic_name + " " + (d.brands_indian || ""), d.description + " " + (d.indications || ""), ql),
-        navigate: () => createPageUrl("DrugsDosing"),
+        navigate: () => createPageUrl("DrugsDosing") + `?search=${encodeURIComponent(d.generic_name)}`,
       }))
       .sort((a, b) => b._score - a._score)
       .slice(0, 5);
@@ -347,7 +350,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         badgeText: `${g.source || "Guideline"} ${g.year || ""}`.trim(),
         badgeClass: "bg-amber-100 text-amber-700",
         _score: scoreEntityItem(g.title, g.summary, ql),
-        navigate: () => createPageUrl("Guidelines"),
+        navigate: () => createPageUrl("GuidelinesLibrary") + `?search=${encodeURIComponent(g.title)}&id=${g.id}`,
       }))
       .sort((a, b) => b._score - a._score)
       .slice(0, 5);
@@ -369,7 +372,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         badgeText: t.specialty || "Protocol",
         badgeClass: "bg-blue-100 text-blue-700",
         _score: scoreEntityItem(t.name + " " + (t.diagnosis || ""), t.description, ql),
-        navigate: () => createPageUrl("ClinicalSupport"),
+        navigate: () => createPageUrl("ClinicalSupport") + `?tab=pathways&search=${encodeURIComponent(t.name)}`,
       }))
       .sort((a, b) => b._score - a._score)
       .slice(0, 4);
@@ -390,7 +393,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         badgeText: m.category || "Module",
         badgeClass: "bg-teal-100 text-teal-700",
         _score: scoreEntityItem(m.title, m.content?.overview, ql),
-        navigate: () => createPageUrl("TeachingHub"),
+        navigate: () => createPageUrl("TeachingHub") + `?search=${encodeURIComponent(m.title)}&id=${m.id}`,
       }))
       .sort((a, b) => b._score - a._score)
       .slice(0, 4);
@@ -412,7 +415,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         badgeText: b.pattern_code || "Biopsy",
         badgeClass: "bg-rose-100 text-rose-700",
         _score: scoreEntityItem(b.name + " " + (b.also_called || ""), b.clinical_presentation, ql),
-        navigate: () => createPageUrl("GlomerularDiseases"),
+        navigate: () => createPageUrl("GlomerularDiseases") + `?search=${encodeURIComponent(b.name)}`,
       }))
       .sort((a, b) => b._score - a._score)
       .slice(0, 4);

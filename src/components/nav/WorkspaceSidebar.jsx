@@ -129,6 +129,7 @@ const HUB_NAV = [
     adminOnly: true,
     items: [
       { title: "Engine Generator", url: createPageUrl("EngineGenerator"), icon: Cpu },
+      { title: "Daily Summary", url: createPageUrl("DailySummary"), icon: BookOpen },
     ]
   },
   {
