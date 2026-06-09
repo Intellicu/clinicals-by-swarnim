@@ -154,6 +154,14 @@ const SEARCH_INDEX = [
   { title: "Vaccination Engine (IAP 2023)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=vaccination-engine", tags: ["vaccination engine", "immunization engine", "IAP schedule", "catch-up vaccine", "CKD vaccine", "transplant vaccine", "live vaccine rules"] },
   { title: "Short Stature Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=short-stature-engine", tags: ["short stature engine", "GHD engine", "growth hormone deficiency", "Turner engine", "bone age", "IGF-1", "constitutional delay"] },
   { title: "Obesity & Metabolic Syndrome Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=obesity-metabolic-engine", tags: ["obesity engine", "metabolic syndrome engine", "fatty liver NAFLD", "insulin resistance", "pediatric obesity", "GLP-1 metformin"] },
+  // ── Oncology ──
+  { title: "Paediatric Oncology Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["oncology", "cancer", "ALL", "AML", "leukaemia", "Wilms", "neuroblastoma", "lymphoma", "TLS", "febrile neutropenia", "chemotherapy", "BFM", "SIOP", "COG", "UKALL", "paediatric oncology", "actinomycin", "vincristine"] },
+  { title: "ALL – Acute Lymphoblastic Leukaemia Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["ALL", "acute lymphoblastic leukaemia", "UKALL", "BFM", "prednisolone VCR asparaginase", "6-MP MTX maintenance", "MRD ALL", "NUDT15", "induction ALL"] },
+  { title: "AML – Acute Myeloid Leukaemia Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["AML", "acute myeloid leukaemia", "AML-BFM", "cytarabine idarubicin", "APL ATRA", "ATO arsenic", "FLT3", "autologous SCT", "induction AML", "APL differentiation syndrome"] },
+  { title: "Wilms Tumour (Nephroblastoma) Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["Wilms tumor", "nephroblastoma", "SIOP", "COG NWTS", "actinomycin vincristine", "blastemal type", "bilateral Wilms", "NSS", "nephrectomy", "flank RT", "Wilms staging"] },
+  { title: "Neuroblastoma Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["neuroblastoma", "MYCN", "COJEC", "SIOPEN", "MIBG scan", "autologous SCT BuMel", "isotretinoin", "dinutuximab", "OMS opsoclonus", "adrenal tumour children"] },
+  { title: "Tumour Lysis Syndrome (TLS)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["TLS", "tumour lysis", "rasburicase", "allopurinol", "hyperuricaemia", "Cairo Bishop", "hyperhydration", "G6PD rasburicase", "TLS prevention"] },
+  { title: "Febrile Neutropenia Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["febrile neutropenia", "FN", "ANC <500", "pip-taz piperacillin", "meropenem", "vancomycin", "liposomal amphotericin", "G-CSF", "MASCC score", "oncology emergency"] },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -263,6 +271,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
       setGroups({});
       setOpen(false);
       flatResults.current = [];
+      setLoading(false);
       return;
     }
     runSearch(debouncedQuery);
@@ -311,7 +320,10 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     flatResults.current = Object.values(newGroups).flat();
 
     setGroups(newGroups);
-    setOpen(true); // always open to show results or "no results" message
+    // Only open if there's an active query (guard against stale async)
+    if (q === query.trim() || q === debouncedQuery) {
+      setOpen(true);
+    }
     setFocused(0);
     setLoading(false);
   }, []);
@@ -475,7 +487,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => debouncedQuery && setOpen(true)}
+          onFocus={() => { if (debouncedQuery && Object.keys(groups).length > 0) setOpen(true); }}
           placeholder={placeholder}
           className="pl-9 pr-16 text-sm h-9"
         />

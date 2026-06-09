@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { PatientProvider } from "./components/PatientContext";
 import FloatingAIAssistant from "./components/FloatingAIAssistant";
+import BetaDisclaimer from "./components/BetaDisclaimer";
 import IOSCompatibility from "./components/iOSCompatibility";
 import PullToRefresh from "./components/PullToRefresh";
 import NotificationEngine from "./components/notifications/NotificationEngine";
@@ -266,6 +267,9 @@ export default function Layout({ children, currentPageName }) {
               )}
             </div>
           </header>
+
+          {/* Beta disclaimer */}
+          <BetaDisclaimer />
 
           {/* Quick Access Bar */}
           <TopQuickAccessBar />

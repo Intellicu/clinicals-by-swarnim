@@ -1,8 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { Cpu, ChevronRight, Search, X, BookOpen, ExternalLink } from "lucide-react";
+import { Cpu, ChevronRight, Search, X, BookOpen, ExternalLink, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
+
+// Engines marked adminOnly: true are hidden from non-admins until approved
+// To make an engine visible to all users, set adminOnly: false (default)
 
 const ENGINES = [
   // ── Emergency / Electrolyte ──
@@ -84,6 +87,9 @@ const ENGINES = [
   { label: "Vaccination Engine", desc: "IAP 2023 schedule · Catch-up · Special risk groups (CKD/transplant/immunocompromised) · Live vaccine rules", scenario: "vaccination-engine", tags: ["vaccination", "immunization", "IAP schedule", "catch-up immunization", "live vaccine", "transplant vaccine", "CKD vaccine", "immunocompromised vaccine", "AEFI", "BCG", "pentavalent", "PCV", "MMR", "varicella", "HPV"], group: "Growth, Nutrition & Development" },
   { label: "Short Stature Engine", desc: "Height SDS · Growth velocity · Bone age · GH stimulation tests · Turner syndrome · Hypothyroidism · Constitutional delay vs GHD", scenario: "short-stature-engine", tags: ["short stature", "growth hormone deficiency", "GHD", "IGF-1", "bone age", "Turner syndrome", "Noonan", "constitutional delay", "familial short stature", "hypothyroidism", "GH stimulation test", "growth velocity"], group: "Growth, Nutrition & Development" },
   { label: "Obesity & Metabolic Engine", desc: "Pediatric obesity — BMI ≥95th · Metabolic syndrome · Fatty liver · Insulin resistance · Lifestyle + pharmacotherapy", scenario: "obesity-metabolic-engine", tags: ["obesity", "overweight", "metabolic syndrome", "fatty liver", "NAFLD", "insulin resistance", "waist circumference", "dyslipidemia", "pre-diabetes", "metformin", "GLP-1", "lifestyle", "pediatric obesity"], group: "Growth, Nutrition & Development" },
+
+  // ── Oncology ──
+  { label: "Paediatric Oncology Engine", desc: "ALL · AML · Wilms · Neuroblastoma · NHL · TLS · Febrile Neutropenia · Drug toxicity — Indian protocols (SIOP/COG/BFM/UKALL)", scenario: "oncology-engine", tags: ["oncology", "ALL", "AML", "leukaemia", "Wilms tumour", "neuroblastoma", "lymphoma", "TLS", "febrile neutropenia", "chemotherapy", "vincristine", "6-MP", "asparaginase", "BFM", "SIOP", "COG", "UKALL", "paediatric cancer", "actinomycin", "doxorubicin", "cisplatin", "carboplatin", "etoposide", "antifungal", "MIBG"], group: "Oncology", adminOnly: false },
 ];
 
 const GROUP_STYLE = {
@@ -97,6 +103,7 @@ const GROUP_STYLE = {
   "Nutrition & Diet": "bg-green-50 border-green-200 text-green-900",
   "Rheumatology": "bg-violet-50 border-violet-200 text-violet-900",
   "Growth, Nutrition & Development": "bg-emerald-50 border-emerald-200 text-emerald-900",
+  "Oncology": "bg-red-50 border-red-200 text-red-900",
 };
 
 const GROUP_BADGE = {
@@ -110,6 +117,7 @@ const GROUP_BADGE = {
   "Nutrition & Diet": "bg-green-600",
   "Rheumatology": "bg-violet-700",
   "Growth, Nutrition & Development": "bg-emerald-600",
+  "Oncology": "bg-red-700",
 };
 
 const GROUPS = [...new Set(ENGINES.map(e => e.group))];
@@ -198,6 +206,15 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
   const [activeGroup, setActiveGroup] = useState("All");
   const [activeEngine, setActiveEngine] = useState(null);
 
+  // Fetch current user role for admin-only engine visibility
+  const { data: currentUser } = useQuery({
+    queryKey: ["current-user-engines"],
+    queryFn: () => base44.auth.me(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const isAdmin = currentUser?.role === "admin";
+
   // Fetch guidelines from DB — cached in localStorage for offline use
   const { data: guidelines = [], isLoading: guidelinesLoading } = useQuery({
     queryKey: ["guidelines-for-engines"],
@@ -220,13 +237,14 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return ENGINES.filter(e => {
+      if (e.adminOnly && !isAdmin) return false; // hide admin-only engines from regular users
       const matchGroup = activeGroup === "All" || e.group === activeGroup;
       const matchSearch = !q || e.label.toLowerCase().includes(q) ||
         e.desc.toLowerCase().includes(q) ||
         e.tags.some(t => t.toLowerCase().includes(q));
       return matchGroup && matchSearch;
     });
-  }, [search, activeGroup]);
+  }, [search, activeGroup, isAdmin]);
 
   const grouped = useMemo(() => {
     const g = {};
