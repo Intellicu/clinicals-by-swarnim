@@ -49,8 +49,7 @@ export default function Layout({ children, currentPageName }) {
       try {
         const u = await base44.auth.me();
         setUser(u);
-        // Show onboarding consent if user hasn't completed it yet
-        if (u && !u.onboarding_consent?.consentAccepted) {
+        if (u && !u.beta_consent_given) {
           setShowConsent(true);
         }
       } catch {

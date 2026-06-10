@@ -806,10 +806,9 @@ export default function Hub() {
           }
         </div>
 
-        {/* ── Minimal footer disclaimer ── */}
-        <p className="text-center text-xs text-slate-400 pb-2">
-          CliniCals is currently in beta and is intended to support—not replace—professional clinical judgment.{" "}
-          <Link to={createPageUrl("About")} className="underline hover:text-slate-600">Learn More</Link>
+        {/* ── Hub disclaimer footer ── */}
+        <p className="text-center text-xs text-slate-500 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
+          CliniCals is in beta. Clinical decision-support only — not a substitute for professional judgment. Verify all doses against your institutional protocol.
         </p>
       </div>
     </div>);
