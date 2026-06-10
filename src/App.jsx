@@ -55,6 +55,7 @@ import EngineGenerator from './pages/EngineGenerator';
 import DailySummary from './pages/DailySummary';
 import OncologyHub from './pages/OncologyHub';
 import OncologyAdmin from './pages/OncologyAdmin';
+import OncologyPathway from './pages/OncologyPathway';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -133,6 +134,7 @@ const AuthenticatedApp = () => {
         <Route path="/DailySummary" element={<LayoutWrapper currentPageName="DailySummary"><DailySummary /></LayoutWrapper>} />
         <Route path="/OncologyHub" element={<LayoutWrapper currentPageName="OncologyHub"><OncologyHub /></LayoutWrapper>} />
         <Route path="/OncologyAdmin" element={<LayoutWrapper currentPageName="OncologyAdmin"><OncologyAdmin /></LayoutWrapper>} />
+        <Route path="/OncologyPathway" element={<LayoutWrapper currentPageName="OncologyPathway"><OncologyPathway /></LayoutWrapper>} />
         <Route path="/FeedbackInbox" element={<LayoutWrapper currentPageName="FeedbackInbox"><FeedbackInbox /></LayoutWrapper>} />
         <Route path="*" element={<PageNotFound />} />
       </Route>

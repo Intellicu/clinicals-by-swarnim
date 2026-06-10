@@ -90,6 +90,7 @@ const HUB_NAV = [
         icon: FlaskConical,
         children: [
           { title: "Oncology Hub (Protocols)", url: createPageUrl("OncologyHub"), icon: FlaskConical },
+          { title: "🧬 Oncology Pathway Engine", url: "/OncologyPathway", icon: Dna },
           { title: "Oncology Admin", url: createPageUrl("OncologyAdmin"), icon: Shield },
           { title: "ALL — ICiCLe / InPOG", url: createPageUrl("OncologyHub"), icon: Activity },
           { title: "Lymphoma (B-NHL / ALCL)", url: createPageUrl("OncologyHub"), icon: Activity },
