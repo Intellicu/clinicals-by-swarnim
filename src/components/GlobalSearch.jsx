@@ -372,7 +372,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         badgeText: `${g.source || "Guideline"} ${g.year || ""}`.trim(),
         badgeClass: "bg-amber-100 text-amber-700",
         _score: scoreEntityItem(g.title, g.summary, ql),
-        navigate: () => createPageUrl("GuidelinesLibrary") + `?search=${encodeURIComponent(g.title)}&id=${g.id}`,
+        navigate: () => createPageUrl("GuidelinesLibrary") + `?openid=${g.id}&search=${encodeURIComponent(g.title)}`,
       }))
       .sort((a, b) => b._score - a._score)
       .slice(0, 5);

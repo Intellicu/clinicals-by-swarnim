@@ -298,7 +298,10 @@ function IntelligentHubDrawer({ open, activePanel: initialPanel, onClose, allGui
 
 // ── Main page ──────────────────────────────────────────────────────────────
 export default function Guidelines() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("search") || "";
+  });
   const [category, setCategory] = useState("All");
   const [selected, setSelected] = useState(null);
   const [showStarred, setShowStarred] = useState(false);
