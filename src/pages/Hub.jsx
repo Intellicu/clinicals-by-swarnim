@@ -560,6 +560,7 @@ export default function Hub() {
               { label: "HTN Engine",         desc: "Pediatric HTN",          color: "bg-pink-700",   scenario: "htn-engine" },
               { label: "Tubular Engine",     desc: "Fanconi/XLH/NDI",        color: "bg-amber-800",  scenario: "tubular-engine" },
               { label: "Stone Engine",       desc: "Renal stones full",      color: "bg-yellow-700", scenario: "stone-engine" },
+              { label: "Oncology Hub",       desc: "Paediatric protocols",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
               { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
               { label: "Growth Engine",      desc: "Z-scores/CKD growth",    color: "bg-emerald-700", scenario: "growth-assessment-engine" },
               { label: "Anthropometry",      desc: "SAM/MAM/BMI/BSA",        color: "bg-emerald-600", scenario: "anthropometry-engine" },
@@ -579,7 +580,7 @@ export default function Hub() {
                 _fromDb: true,
               })).filter(e => e.scenario),
             ].map((eng) => (
-              <Link key={eng.scenario} to={createPageUrl("ClinicalSupport") + `?tab=pathways&scenario=${eng.scenario}`} className="flex-shrink-0">
+              <Link key={eng.scenario} to={eng._link || createPageUrl("ClinicalSupport") + `?tab=pathways&scenario=${eng.scenario}`} className="flex-shrink-0">
                 <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-violet-50 active:bg-violet-100 transition-colors w-20">
                   <div className={`w-10 h-10 ${eng.color} rounded-xl flex items-center justify-center shadow-sm`}>
                     <GitBranch className="w-5 h-5 text-white" />

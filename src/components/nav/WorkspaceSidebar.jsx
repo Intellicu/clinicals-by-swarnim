@@ -11,7 +11,7 @@ import {
   ClipboardList, UtensilsCrossed, Dna, X, ChevronRight, ChevronDown,
   Settings, Shield, LogOut, Trash2, Microscope, Zap, BarChart2,
   BookMarked, Clock, Star, RefreshCw, Beaker, Wind,
-  Syringe, Radio, FileSearch, Edit3, Database, Cpu
+  Syringe, Radio, FileSearch, Edit3, Database, Cpu, Flag
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -187,6 +187,7 @@ const ADMIN_NAV = [
     icon: Edit3,
     items: [
       { title: "Content Manager", url: createPageUrl("UserContentManager"), icon: Edit3 },
+      { title: "Feedback Inbox", url: createPageUrl("FeedbackInbox"), icon: Flag },
       { title: "Clinical OS", url: createPageUrl("ClinicalOS"), icon: Brain },
       { title: "Audit Logs", url: createPageUrl("AuditLogs"), icon: FileSearch },
     ]

@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, FlaskConical, Calculator, AlertTriangle, Lock, Loader2 } from "lucide-react";
+import { ArrowLeft, FlaskConical, Calculator, AlertTriangle, Lock, Loader2, Flag } from "lucide-react";
+import FeedbackReportButton from "../components/FeedbackReportButton";
 import { createPageUrl } from "@/utils";
 import OncologyProtocolCard from "../components/oncology/OncologyProtocolCard";
 import {
@@ -37,7 +38,7 @@ export default function OncologyHub() {
     queryKey: ["onco-drugs"],
     queryFn: () => base44.entities.Drug.filter({}),
   });
-  const drugs = allDrugs.filter(d => d.category?.startsWith("Chemotherapy"));
+  const drugs = allDrugs.filter(d => d.category?.toLowerCase().includes("chemotherapy"));
 
   const { data: doseRules = [] } = useQuery({
     queryKey: ["onco-doserules"],
@@ -65,13 +66,16 @@ export default function OncologyHub() {
               Protocol library, risk stratification, drug regimens & toxicity monitoring tools
             </p>
           </div>
-          {isAdmin && (
-            <Link to={createPageUrl("OncologyAdmin")}>
-              <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-50">
-                <Lock className="w-3.5 h-3.5 mr-1.5" /> Admin — Manage Protocols
-              </Button>
-            </Link>
-          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            <FeedbackReportButton pageName="OncologyHub" />
+            {isAdmin && (
+              <Link to={createPageUrl("OncologyAdmin")}>
+                <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-50">
+                  <Lock className="w-3.5 h-3.5 mr-1.5" /> Admin — Manage Protocols
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Expert-review gate notice for non-admins */}

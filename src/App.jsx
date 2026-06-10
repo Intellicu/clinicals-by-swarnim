@@ -12,6 +12,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import FeedbackInbox from '@/pages/FeedbackInbox';
 import GeneticReportAnalyzer from './pages/GeneticReportAnalyzer';
 import ResearchMethodsHub from './pages/ResearchMethodsHub';
 import AIClinicalPathway from './pages/AIClinicalPathway';
@@ -132,6 +133,7 @@ const AuthenticatedApp = () => {
         <Route path="/DailySummary" element={<LayoutWrapper currentPageName="DailySummary"><DailySummary /></LayoutWrapper>} />
         <Route path="/OncologyHub" element={<LayoutWrapper currentPageName="OncologyHub"><OncologyHub /></LayoutWrapper>} />
         <Route path="/OncologyAdmin" element={<LayoutWrapper currentPageName="OncologyAdmin"><OncologyAdmin /></LayoutWrapper>} />
+        <Route path="/FeedbackInbox" element={<LayoutWrapper currentPageName="FeedbackInbox"><FeedbackInbox /></LayoutWrapper>} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

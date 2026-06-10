@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { PatientProvider } from "./components/PatientContext";
 import FloatingAIAssistant from "./components/FloatingAIAssistant";
+import FeedbackReportButton from "./components/FeedbackReportButton";
 import BetaDisclaimer from "./components/BetaDisclaimer";
 import OnboardingConsent from "./components/OnboardingConsent";
 import IOSCompatibility from "./components/iOSCompatibility";
@@ -314,6 +315,10 @@ export default function Layout({ children, currentPageName }) {
 
         <FloatingAIAssistant />
         <NotificationEngine />
+        {/* Global feedback button — visible on all pages */}
+        <div className="fixed bottom-20 left-3 z-40 lg:bottom-6">
+          <FeedbackReportButton pageName={currentPageName || window.location.pathname} />
+        </div>
         <FloatingHubButton />
         {showConsent && (
           <OnboardingConsent onComplete={() => setShowConsent(false)} />

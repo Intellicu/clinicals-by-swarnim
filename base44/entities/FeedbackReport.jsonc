@@ -1,0 +1,71 @@
+{
+  "name": "FeedbackReport",
+  "type": "object",
+  "properties": {
+    "page_name": {
+      "type": "string",
+      "description": "Page or section where the issue was found"
+    },
+    "report_type": {
+      "type": "string",
+      "enum": [
+        "Correction",
+        "Modification Request",
+        "Content Error",
+        "Missing Information",
+        "Drug Dose Issue",
+        "Other"
+      ],
+      "description": "Type of feedback"
+    },
+    "description": {
+      "type": "string",
+      "description": "User description of the issue or suggested change"
+    },
+    "screenshot_url": {
+      "type": "string",
+      "description": "URL of the uploaded screenshot"
+    },
+    "section_text": {
+      "type": "string",
+      "description": "Specific text or section being flagged"
+    },
+    "suggested_correction": {
+      "type": "string",
+      "description": "What the user suggests should be corrected"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ],
+      "default": "Medium"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "Under Review",
+        "Resolved",
+        "Declined"
+      ],
+      "default": "Open"
+    },
+    "submitted_by_email": {
+      "type": "string",
+      "description": "Email of the user who submitted the report"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Admin response or notes"
+    }
+  },
+  "required": [
+    "page_name",
+    "report_type",
+    "description"
+  ]
+}
