@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, FlaskConical, Calculator, AlertTriangle, Lock, Calendar, Shield, Zap } from "lucide-react";
+import { ArrowLeft, FlaskConical, Calculator, AlertTriangle, Lock, Calendar, Shield, Zap, GitBranch } from "lucide-react";
 import FeedbackReportButton from "../components/FeedbackReportButton";
 import { createPageUrl } from "@/utils";
 import OncologyEngine from "../components/engines/OncologyEngine";
@@ -21,6 +21,7 @@ import TreatmentTimeline from "../components/oncology/TreatmentTimeline";
 import OncologyDosingCalculator from "../components/oncology/OncologyDosingCalculator";
 import RiskStratificationTool from "../components/oncology/RiskStratificationTool";
 import InteractionChecker from "../components/oncology/InteractionChecker";
+import OncologyPathwayInline from "../components/oncology/OncologyPathwayInline";
 
 export default function OncologyHub() {
   const { data: user } = useQuery({ queryKey: ["me"], queryFn: () => base44.auth.me() });
@@ -54,8 +55,11 @@ export default function OncologyHub() {
           </div>
         </div>
 
-        <Tabs defaultValue="protocols">
+        <Tabs defaultValue="pathway">
           <TabsList className="bg-purple-100 rounded-xl h-auto gap-1 p-1 flex-wrap">
+            <TabsTrigger value="pathway" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
+              <GitBranch className="w-3.5 h-3.5 mr-1" /> Onco Pathway
+            </TabsTrigger>
             <TabsTrigger value="protocols" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
               <FlaskConical className="w-3.5 h-3.5 mr-1" /> Protocols
             </TabsTrigger>
@@ -75,6 +79,10 @@ export default function OncologyHub() {
               <AlertTriangle className="w-3.5 h-3.5 mr-1" /> Toxicity Tools
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="pathway" className="mt-4">
+            <OncologyPathwayInline />
+          </TabsContent>
 
           <TabsContent value="protocols" className="mt-4">
             <OncologyEngine />

@@ -467,7 +467,7 @@ function getTimelineKey(protocolId, arm) {
 
 const MONITOR_ICONS = { labs:"🧪", bma:"🔬", imaging:"📷", surgery:"🔪", audiology:"👂", echo:"❤️", supportive:"💊", path:"🔬", genetics:"🧬" };
 
-export default function OncologyPathway() {
+export default function OncologyPathway({ embedded = false }) {
   const [step, setStep] = useState(0);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedProtocol, setSelectedProtocol] = useState(null);
@@ -630,13 +630,13 @@ export default function OncologyPathway() {
   const STEP_LABELS = ["Condition","Protocol","Patient","Stratification","Pathway"];
 
   return (
-    <div style={{minHeight:"100vh",background:"#f4f6f9",fontFamily:"system-ui,sans-serif"}}>
-      <div style={{background:"#1a1a2e",color:"#fff",padding:"16px 24px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
+    <div style={{minHeight: embedded ? undefined : "100vh",background:"#f4f6f9",fontFamily:"system-ui,sans-serif"}}>
+      {!embedded && <div style={{background:"#1a1a2e",color:"#fff",padding:"16px 24px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
         <div style={{fontSize:18,fontWeight:700}}>🧬 Oncology Pathway Engine</div>
         <div style={{width:1,height:20,background:"#444"}}/>
         <div style={{fontSize:13,color:"#a8b2c1"}}>Pediatric Oncology — Intelligent Treatment Pathway Engine</div>
         <div style={{marginLeft:"auto",fontSize:11,color:"#aaa",background:"#111",padding:"2px 10px",borderRadius:10}}>⚠ Decision-support only — verify all doses against institutional protocol</div>
-      </div>
+      </div>}
       <div style={{background:"#fff",borderBottom:"1px solid #e0e0e0",padding:"0 24px",display:"flex",gap:0,overflowX:"auto"}}>
         {STEP_LABELS.map((l,i)=>(
           <div key={i} onClick={()=>{if(i<step)setStep(i);}} style={{padding:"12px 20px",fontSize:12,fontWeight:600,color:i===step?"#1a1a2e":"#999",borderBottom:i===step?"3px solid #1a1a2e":"3px solid transparent",cursor:i<step?"pointer":"default",transition:"all 0.2s",whiteSpace:"nowrap"}}>
