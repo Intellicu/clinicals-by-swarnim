@@ -674,7 +674,9 @@ export default function GlomerularDiseasesPathway({ initialTab = "diseases" }) {
   const isAdmin = user?.role === "admin";
 
   const allConditions = [...DEFAULT_CONDITIONS, ...customConditions];
-  const categories = ["All", "Nephrotic", "Haematuria/Mixed", "Autoimmune", "TMA", "Mixed", "Genetic", "Rare/Other"];
+  // Note: MPGN is included under C3GN (complement-mediated) and Immune-complex entries
+  // Alport is under Genetic category; links to Rare Disease module for full content
+  const categories = ["All", "Nephrotic", "Haematuria/Mixed", "Autoimmune", "TMA", "Mixed", "Genetic"];
   const filtered = filterCategory === "All" ? allConditions : allConditions.filter((c) => c.category === filterCategory);
 
   const toggle = (id) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));

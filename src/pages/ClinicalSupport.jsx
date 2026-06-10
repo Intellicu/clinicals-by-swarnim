@@ -101,141 +101,60 @@ const SYMPTOM_TEMPLATES = {
 };
 
 
+// ── CONSOLIDATED CLINICAL SCENARIOS ─────────────────────────────────────────
+// Governance: One entry per disease/syndrome. Superficial duplicates removed.
+// Nephrotic: merged childhood/MCD/SSNS/SRNS into ns-engine + nephrotic-syndrome
+// CKD: merged staging/MBD/anemia/comprehensive → ckd-comprehensive + ckd-mbd
+// Electrolytes: merged hyperkalemia variants → hyperkalemia-deep-engine
+// Hematuria: merged hematuria-approach → hematuria-engine
+// Glomerular: IgA Vasculitis/HSPN consolidated; TMA merged with HUS
+// Hypertension: kept bp-classification + htn-pres + secondary-htn + neonatal-htn (all clinically distinct)
 const clinicalScenarios = [
+// ── NEPHROTIC SYNDROME (master) ──
 {
-  id: "nephrotic-syndrome",
-  title: "Nephrotic Syndrome - Initial Presentation",
+  id: "ns-engine",
+  title: "Nephrotic Syndrome — Full Decision Engine (SSNS/FRNS/SDNS/SRNS/MCD/FSGS/MN/Genetic/Congenital)",
   category: "Nephrotic Syndrome",
   priority: "secondary",
-  description: "New onset edema, proteinuria, hypoalbuminemia",
+  description: "ISPN 2022 · IPNA 2021 · Complete stepwise engine: initial Rx, response, steroid-sparing, SRNS, genetics, biopsy",
   icon: Droplet,
   hasFullPathway: true
 },
 {
-  id: "aki-prifle",
-  title: "Acute Kidney Injury (pRIFLE/KDIGO)",
+  id: "severe-edema-ns",
+  title: "Severe Edema & Complications in Nephrotic Syndrome",
+  category: "Nephrotic Syndrome",
+  priority: "danger",
+  description: "Diuretic resistance, hypoalbuminaemia, SBP prophylaxis, VTE, hypertension in active NS",
+  icon: Droplet,
+  hasFullPathway: true
+},
+{
+  id: "congenital-nephrotic",
+  title: "Congenital Nephrotic Syndrome (<3 months)",
+  category: "Nephrotic Syndrome",
+  priority: "warning",
+  description: "Finnish type (NPHS1), NPHS2, WT1, LAMB2 — no steroids, genetic panel, nephrectomy + transplant",
+  icon: Baby,
+  hasFullPathway: true
+},
+// ── AKI & EMERGENCY ──
+{
+  id: "aki-engine",
+  title: "Acute Kidney Injury — Full Engine (pRIFLE/KDIGO)",
   category: "Acute Kidney Disease",
   priority: "danger",
-  description: "Acute rise in creatinine or decreased urine output",
+  description: "Staging · Etiology · Fluid management · RRT triggers · CRRT prescription · Recovery",
   icon: AlertTriangle,
-  hasFullPathway: true
-},
-{
-  id: "iga-nephropathy",
-  title: "IgA Nephropathy (Oxford MEST-C)",
-  category: "Glomerular Disease",
-  priority: "secondary",
-  description: "Management based on Oxford classification",
-  icon: Microscope,
-  hasFullPathway: true
-},
-{
-  id: "hspn",
-  title: "HSP Nephritis (HSPN)",
-  category: "Glomerular Disease",
-  priority: "secondary",
-  description: "Renal involvement in Henoch-Schönlein Purpura (ISKDC 2023)",
-  icon: Heart,
-  hasFullPathway: true
-},
-{
-  id: "htn-emergency",
-  title: "Hypertensive Emergency",
-  category: "Hypertension",
-  priority: "danger",
-  description: "Severe HTN with end-organ damage",
-  icon: Heart,
-  hasFullPathway: true
-},
-{
-  id: "hyperkalemia",
-  title: "Severe Hyperkalemia (K+ >6.0)",
-  category: "Electrolytes",
-  priority: "danger",
-  description: "Life-threatening hyperkalemia - immediate treatment",
-  icon: Zap,
-  hasFullPathway: true
-},
-{
-  id: "uti-febrile",
-  title: "Febrile UTI - Evaluation & Imaging",
-  category: "Infection",
-  priority: "warning",
-  description: "Post-febrile UTI workup, DMSA timing, VUR evaluation",
-  icon: Thermometer,
-  hasFullPathway: true
-},
-{
-  id: "ckd-progression",
-  title: "CKD Progression Risk Stratification",
-  category: "CKD",
-  priority: "warning",
-  description: "Risk assessment and intervention planning",
-  icon: TrendingUp,
   hasFullPathway: true
 },
 {
   id: "hemolytic-uremic",
-  title: "Hemolytic Uremic Syndrome (HUS)",
+  title: "HUS / TMA / aHUS — Complete Pathway",
   category: "Acute Kidney Disease",
   priority: "danger",
-  description: "Microangiopathic hemolytic anemia, thrombocytopenia, AKI",
+  description: "STEC-HUS (supportive) · aHUS (eculizumab/ravulizumab) · TTP (PLEX) · anti-CFH Ab therapy",
   icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "hyponatremia",
-  title: "Hyponatremia (<130 mmol/L)",
-  category: "Electrolytes",
-  priority: "danger",
-  description: "Symptomatic hyponatremia - correction protocol",
-  icon: Droplet,
-  hasFullPathway: true
-},
-
-{
-  id: "ckd-mbd",
-  title: "CKD-Mineral Bone Disease Management",
-  category: "CKD",
-  priority: "secondary",
-  description: "Secondary hyperparathyroidism prevention and treatment",
-  icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "transplant-rejection",
-  title: "Acute Transplant Rejection",
-  category: "Transplant",
-  priority: "danger",
-  description: "Rising creatinine post-transplant - evaluation and treatment",
-  icon: AlertTriangle,
-  hasFullPathway: true
-},
-{
-  id: "lupus-nephritis",
-  title: "Lupus Nephritis (Pediatric)",
-  category: "Glomerular Disease",
-  priority: "warning",
-  description: "Classification and treatment per ISN/RPS class",
-  icon: Microscope,
-  hasFullPathway: true
-},
-{
-  id: "aki-dialysis-timing",
-  title: "AKI - When to Initiate Dialysis",
-  category: "Acute Kidney Disease",
-  priority: "danger",
-  description: "Indications for urgent RRT in pediatric AKI",
-  icon: Droplet,
-  hasFullPathway: true
-},
-{
-  id: "hypercalcemia",
-  title: "Severe Hypercalcemia (>12 mg/dL)",
-  category: "Electrolytes",
-  priority: "danger",
-  description: "Hypercalcemia crisis - evaluation and management",
-  icon: Zap,
   hasFullPathway: true
 },
 {
@@ -243,444 +162,91 @@ const clinicalScenarios = [
   title: "Tumor Lysis Syndrome",
   category: "Acute Kidney Disease",
   priority: "danger",
-  description: "Prevention and management in high tumor burden",
+  description: "Cairo-Bishop criteria · Prevention (allopurinol/rasburicase) · Hyperkalemia/hyperphosphatemia management",
   icon: Flame,
   hasFullPathway: true
 },
+// ── GLOMERULAR DISEASE ──
 {
-  id: "post-strep-gn",
-  title: "Post-Streptococcal Glomerulonephritis",
+  id: "iga-nephropathy",
+  title: "IgA Nephropathy / IgA Vasculitis (Oxford MEST-C)",
   category: "Glomerular Disease",
   priority: "secondary",
-  description: "PSGN diagnosis and supportive management",
+  description: "Oxford classification · ACEi/SGLT2i · Nefecon · IgAV nephritis (HSP) — unified pathway",
   icon: Microscope,
   hasFullPathway: true
 },
-
 {
-  id: "hypophosphatemia",
-  title: "Severe Hypophosphatemia (<1.5 mg/dL)",
-  category: "Electrolytes",
-  priority: "warning",
-  description: "Refeeding syndrome, dialysis-associated",
-  icon: Wind,
-  hasFullPathway: true
-},
-{
-  id: "thrombotic-microangiopathy",
-  title: "Thrombotic Microangiopathy (TMA)",
-  category: "Glomerular Disease",
-  priority: "danger",
-  description: "TTP, HUS, aHUS - differential diagnosis and treatment",
-  icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "dialysis-catheter-infection",
-  title: "Dialysis Catheter-Related Bacteremia",
-  category: "Infection",
-  priority: "danger",
-  description: "Central line infection - antibiotics and catheter management",
-  icon: Thermometer,
-  hasFullPathway: true
-},
-{
-  id: "renal-stone",
-  title: "Renal Stone Analysis & Prevention",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "Metabolic stone workup and prevention strategies",
-  icon: Beaker,
-  hasFullPathway: true
-},
-{
-  id: "bladder-dysfunction",
-  title: "Bladder Dysfunction Evaluation",
-  category: "Lower Urinary Tract",
-  priority: "secondary",
-  description: "Voiding diary interpretation and management per ICCS guidelines",
-  icon: ClipboardList,
-  hasFullPathway: true
-},
-{
-  id: "rta-diagnosis",
-  title: "Renal Tubular Acidosis Diagnosis",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "Classify RTA type 1, 2, or 4 with treatment protocols",
-  icon: Beaker,
-  hasFullPathway: true
-},
-{
-  id: "tubular-function",
-  title: "Tubular Function Assessment",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "FENa, TRP, TmP/GFR, FECa - complete tubular workup",
-  icon: TestTube,
-  hasFullPathway: true
-},
-{
-  id: "hypokalemia",
-  title: "Severe Hypokalemia (K+ <3.0)",
-  category: "Electrolytes",
-  priority: "danger",
-  description: "Cardiac arrhythmia risk - urgent K+ replacement",
-  icon: Zap,
-  hasFullPathway: true
-},
-{
-  id: "severe-edema-ns",
-  title: "Severe Edema in Nephrotic Syndrome",
-  category: "Nephrotic Syndrome",
-  priority: "danger",
-  description: "Diuretic resistance, albumin + diuretic therapy",
-  icon: Droplet,
-  hasFullPathway: true
-},
-{
-  id: "sbp",
-  title: "Spontaneous Bacterial Peritonitis (SBP)",
-  category: "Infection",
-  priority: "danger",
-  description: "Infected ascites in nephrotic syndrome - empiric antibiotics",
-  icon: AlertTriangle,
-  hasFullPathway: true
-},
-{
-  id: "metabolic-acidosis",
-  title: "Severe Metabolic Acidosis",
-  category: "Electrolytes",
-  priority: "danger",
-  description: "pH <7.2 or HCO3 <10 - urgent intervention",
-  icon: Wind,
-  hasFullPathway: true
-},
-{
-  id: "contrast-nephropathy",
-  title: "Contrast-Induced AKI Prevention",
-  category: "Acute Kidney Disease",
-  priority: "warning",
-  description: "Risk stratification and hydration protocol before contrast studies",
-  icon: Stethoscope,
-  hasFullPathway: true
-},
-{
-  id: "fluid-electrolyte",
-  title: "Fluid & Electrolyte Therapy",
-  category: "Fluids & Electrolytes",
-  priority: "secondary",
-  description: "Holliday-Segar maintenance, deficit replacement, electrolyte principles",
-  icon: Droplet,
-  hasFullPathway: true
-},
-{
-  id: "acid-base",
-  title: "Acid-Base Disorder Evaluation",
-  category: "Fluids & Electrolytes",
-  priority: "warning",
-  description: "5-step ABG interpretation, anion gap, MUDPILES, RTA",
-  icon: Wind,
-  hasFullPathway: true
-},
-{
-  id: "htn-diagnosis",
-  title: "Approach to Hypertension Diagnosis",
-  category: "Hypertension",
-  priority: "secondary",
-  description: "AAP 2017 classification, evaluation, ABPM, end-organ assessment",
-  icon: Heart,
-  hasFullPathway: true
-},
-{
-  id: "htn-treatment",
-  title: "Treatment of Hypertension",
-  category: "Hypertension",
-  priority: "secondary",
-  description: "Lifestyle, antihypertensives, drug table with pediatric doses",
-  icon: Heart,
-  hasFullPathway: true
-},
-{
-  id: "vur",
-  title: "Vesicoureteral Reflux (VUR)",
-  category: "Urinary Tract",
-  priority: "secondary",
-  description: "Grading, antibiotic prophylaxis, STING, surgical reimplantation",
-  icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "hydronephrosis",
-  title: "Antenatally Diagnosed Hydronephrosis",
-  category: "Developmental Kidney",
-  priority: "secondary",
-  description: "SFU grading, postnatal management, pyeloplasty indications",
-  icon: Baby,
-  hasFullPathway: true
-},
-{
-  id: "childhood-nephrotic",
-  title: "Childhood Nephrotic Syndrome (ISKDC/IPNA)",
-  category: "Nephrotic Syndrome",
-  priority: "secondary",
-  description: "Prednisolone protocol, SSNS/FRNS/SDNS, steroid-sparing agents",
-  icon: Droplet,
-  hasFullPathway: true
-},
-{
-  id: "congenital-nephrotic",
-  title: "Congenital Nephrotic Syndrome",
-  category: "Nephrotic Syndrome",
-  priority: "warning",
-  description: "Finnish type, NPHS1/2 mutations, conservative vs transplant",
-  icon: Baby,
-  hasFullPathway: true
-},
-{
-  id: "iga-vasculitis",
-  title: "IgA Vasculitis Nephritis (HSPN)",
+  id: "lupus-nephritis",
+  title: "Lupus Nephritis (ISN/RPS · Voclosporin · Belimumab)",
   category: "Glomerular Disease",
   priority: "warning",
-  description: "ISKDC classification, treatment by severity, follow-up",
+  description: "Biopsy mandatory · Class III/IV: Voclosporin triple therapy · Class V: CNI · Maintenance: MMF",
   icon: Microscope,
   hasFullPathway: true
 },
 {
   id: "anca-vasculitis",
-  title: "ANCA-Associated Vasculitis GN",
+  title: "ANCA Vasculitis GN (GPA/MPA · Avacopan)",
   category: "Glomerular Disease",
   priority: "danger",
-  description: "GPA/MPA, pauci-immune crescentic GN, cyclophosphamide/rituximab",
+  description: "Pauci-immune crescentic GN · Rituximab/CYC · Avacopan (steroid-sparing) · PLEX criteria",
   icon: Microscope,
   hasFullPathway: true
 },
 {
-  id: "membranous-nephropathy",
-  title: "Membranous Nephropathy",
+  id: "rpgn-deep-engine",
+  title: "RPGN — Rapidly Progressive GN",
+  category: "Glomerular Disease",
+  priority: "danger",
+  description: "Anti-GBM · ANCA · Immune-complex · IF-guided treatment · PLEX indications",
+  icon: AlertTriangle,
+  hasFullPathway: true
+},
+{
+  id: "post-strep-gn",
+  title: "Post-Streptococcal GN (PSGN)",
   category: "Glomerular Disease",
   priority: "secondary",
-  description: "Anti-PLA2R, conservative phase, rituximab vs Ponticelli",
+  description: "Self-limiting · C3 low/C4 normal · ASOT · Watchful waiting · Red flags for biopsy",
   icon: Microscope,
-  hasFullPathway: true
-},
-{
-  id: "peritoneal-dialysis",
-  title: "Peritoneal Dialysis Management",
-  category: "Peritoneal Dialysis",
-  priority: "secondary",
-  description: "PD prescription, adequacy, peritonitis, exit site infections",
-  icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "hemodialysis",
-  title: "Hemodialysis — Orders & Complications",
-  category: "Hemodialysis",
-  priority: "secondary",
-  description: "HD prescription, Kt/V, vascular access, acute complications",
-  icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "ckd-staging",
-  title: "CKD Staging & Management",
-  category: "CKD",
-  priority: "secondary",
-  description: "Schwartz eGFR, KDIGO stages, renoprotective strategy",
-  icon: TrendingUp,
-  hasFullPathway: true
-},
-{
-  id: "ckd-anemia-mbd",
-  title: "CKD Anemia & Mineral Bone Disease",
-  category: "CKD",
-  priority: "secondary",
-  description: "ESA, IV iron, CKD-MBD targets, phosphate binders, calciphylaxis",
-  icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "kidney-transplant",
-  title: "Pediatric Kidney Transplantation",
-  category: "Transplant",
-  priority: "secondary",
-  description: "Pre-transplant workup, immunosuppression, rejection, BK virus, FSGS recurrence",
-  icon: CheckCircle2,
   hasFullPathway: true
 },
 {
   id: "hematuria-approach",
-  title: "Approach to Hematuria in Children",
+  title: "Haematuria — Diagnostic Algorithm",
   category: "Glomerular Disease",
   priority: "secondary",
-  description: "Glomerular vs non-glomerular, workup algorithm, Alport/TBMN",
+  description: "Glomerular vs urological · RBC casts · Alport/TBMN · Workup algorithm",
   icon: Droplet,
   hasFullPathway: true
 },
 {
   id: "proteinuria-approach",
-  title: "Approach to Proteinuria in Children",
+  title: "Proteinuria — Diagnostic Approach",
   category: "Glomerular Disease",
   priority: "secondary",
-  description: "PCR calculator, transient vs persistent, orthostatic, workup",
+  description: "UPCR · Transient vs persistent · Orthostatic · Glomerular vs tubular · Biopsy indications",
   icon: Beaker,
   hasFullPathway: true
 },
-{
-  id: "cystic-kidney",
-  title: "Cystic Kidney Diseases in Children",
-  category: "Developmental Kidney",
-  priority: "secondary",
-  description: "ADPKD, ARPKD, NPHP, Bardet-Biedl — comparison and management",
-  icon: Info,
-  hasFullPathway: true
-},
-{
-  id: "steroid-resistant-ns",
-  title: "Steroid-Resistant Nephrotic Syndrome",
-  category: "Nephrotic Syndrome",
-  priority: "warning",
-  description: "SRNS workup, genetic testing, biopsy, calcineurin inhibitors",
-  icon: Microscope,
-  hasFullPathway: true
-},
-{
-  id: "ckd-comprehensive",
-  title: "CKD Comprehensive Management",
-  category: "CKD",
-  priority: "warning",
-  description: "All stages, complications, RRT preparation, nutrition",
-  icon: TrendingUp,
-  hasFullPathway: true
-},
-{
-  id: "hypocalcemia",
-  title: "Hypocalcemia Management",
-  category: "Electrolytes",
-  priority: "warning",
-  description: "Calcium correction, vitamin D, causes and IV calcium protocol",
-  icon: Zap,
-  hasFullPathway: true
-},
-// ── Metabolic & Genetic ──
-{
-  id: "cystinosis",
-  title: "Cystinosis",
-  category: "Metabolic & Genetic",
-  priority: "warning",
-  description: "Lysosomal cystine storage, Fanconi syndrome, cysteamine therapy — ISPN/ERKNet + India access notes",
-  icon: Microscope,
-  hasFullPathway: true
-},
-{
-  id: "fabry",
-  title: "Fabry Disease",
-  category: "Metabolic & Genetic",
-  priority: "warning",
-  description: "Alpha-galactosidase A deficiency, ERT, migalastat — ERKNet + India access",
-  icon: Microscope,
-  hasFullPathway: true
-},
-{
-  id: "primary-hyperoxaluria",
-  title: "Primary Hyperoxaluria (Lumasiran)",
-  category: "Metabolic & Genetic",
-  priority: "warning",
-  description: "PH1/PH2/PH3, lumasiran (RNAi), pre-emptive liver-kidney transplant — OHF 2023 + India",
-  icon: TestTube,
-  hasFullPathway: true
-},
-{
-  id: "arpkd-adpkd",
-  title: "ARPKD / ADPKD",
-  category: "Metabolic & Genetic",
-  priority: "secondary",
-  description: "PKHD1 / PKD1+PKD2, tolvaptan in ADPKD, liver complications — KDIGO + ERKNet",
-  icon: Activity,
-  hasFullPathway: true
-},
-{
-  id: "nephronophthisis",
-  title: "Nephronophthisis & Ciliopathies (BBS, Joubert)",
-  category: "Metabolic & Genetic",
-  priority: "secondary",
-  description: "NPHP genes, molar tooth sign, Bardet-Biedl, setmelanotide — CilioPathy Alliance + ISPN",
-  icon: Brain,
-  hasFullPathway: true
-},
-{
-  id: "genetic-nephrotic",
-  title: "Genetic Nephrotic Syndromes",
-  category: "Metabolic & Genetic",
-  priority: "warning",
-  description: "NPHS1/NPHS2/WT1/COQ mutations, WES indication, transplant outcomes — ISPN 2023 + India WES",
-  icon: Microscope,
-  hasFullPathway: true
-},
-// ── Tubular Disorders ──
-{
-  id: "distal-rta",
-  title: "Distal RTA (Type 1) — ERKNet/ESPN 2021",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "ATP6V1B1/ATP6V0A4 mutations, nephrocalcinosis, potassium citrate therapy",
-  icon: TestTube,
-  hasFullPathway: true
-},
-{
-  id: "proximal-rta",
-  title: "Proximal RTA (Type 2) & Fanconi Syndrome",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "SLC4A4, high-dose alkali, phosphopenic rickets, cystinosis, Lowe syndrome",
-  icon: TestTube,
-  hasFullPathway: true
-},
-{
-  id: "bartter",
-  title: "Bartter Syndrome Types 1–5",
-  category: "Tubular Disorders",
-  priority: "warning",
-  description: "TAL salt wasting, indomethacin, polyhydramnios, deafness (Type 4) — ERKNet/ESPN",
-  icon: TestTube,
-  hasFullPathway: true
-},
-{
-  id: "gitelman",
-  title: "Gitelman Syndrome",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "NCCT/SLC12A3, hypomagnesemia + hypokalemia, amiloride, magnesium replacement — ERKNet/ESPN 2022",
-  icon: TestTube,
-  hasFullPathway: true
-},
-{
-  id: "ndi",
-  title: "Nephrogenic Diabetes Insipidus",
-  category: "Tubular Disorders",
-  priority: "secondary",
-  description: "AVPR2/AQP2, HCTZ + amiloride + indomethacin triple therapy, neonatal hypernatremia",
-  icon: Droplet,
-  hasFullPathway: true
-},
-// ── Hypertension ──
-{
-  id: "bp-classification",
-  title: "BP Measurement & Classification",
-  category: "Hypertension",
-  priority: "secondary",
-  description: "AAP 2017, Omron HBP-1120 (India recommendation), ABPM, home BP, percentile interpretation",
-  icon: Heart,
-  hasFullPathway: true
-},
+// ── HYPERTENSION ──
 {
   id: "htn-pres",
   title: "Hypertensive Emergency & PRES",
   category: "Hypertension",
   priority: "danger",
-  description: "IV labetalol/nicardipine protocol, 25% MAP reduction goal, PRES MRI — ISPN/AAP",
+  description: "IV labetalol/nicardipine · 25% MAP reduction · PRES MRI — ISPN/AAP",
   icon: AlertTriangle,
+  hasFullPathway: true
+},
+{
+  id: "htn-engine",
+  title: "Paediatric Hypertension — Full Engine (AAP 2017)",
+  category: "Hypertension",
+  priority: "secondary",
+  description: "BP percentiles · Stage 1/2 · Ambulatory BP · Secondary workup · Drug table",
+  icon: Heart,
   hasFullPathway: true
 },
 {
@@ -688,7 +254,7 @@ const clinicalScenarios = [
   title: "Secondary Hypertension — Renovascular & Endocrine",
   category: "Hypertension",
   priority: "warning",
-  description: "FMD, pheochromocytoma, coarctation, hyperaldosteronism, systematic workup — ISPN",
+  description: "FMD · Phaeochromocytoma · Coarctation · Hyperaldosteronism · Systematic workup",
   icon: Heart,
   hasFullPathway: true
 },
@@ -697,10 +263,208 @@ const clinicalScenarios = [
   title: "Neonatal Hypertension",
   category: "Hypertension",
   priority: "warning",
-  description: "UAC thrombosis, RAS, amlodipine/captopril dosing, 4-limb BP — AAP/ISPN/NeoKidney",
+  description: "UAC thrombosis · Renal artery stenosis · Amlodipine/captopril dosing — NeoKidney/AAP",
   icon: Baby,
   hasFullPathway: true
-}];
+},
+// ── ELECTROLYTES ──
+{
+  id: "electrolytes-hub",
+  title: "Electrolyte Disorders Hub (K+ · Na+ · Ca²⁺ · Mg²⁺ · PO₄)",
+  category: "Electrolytes",
+  priority: "danger",
+  description: "Dyskalemia · Dysnatremia · Calcium/Phosphate · Magnesium — algorithmic engines for all",
+  icon: Zap,
+  hasFullPathway: true
+},
+{
+  id: "acid-base-hub",
+  title: "Acid-Base Interpreter (pH · pCO₂ · HCO₃ · AG · Delta-Delta)",
+  category: "Electrolytes",
+  priority: "warning",
+  description: "Primary disorder · Compensation · Mixed disorders · MUDPILES · RTA differentiation",
+  icon: Wind,
+  hasFullPathway: true
+},
+{
+  id: "fluid-electrolyte",
+  title: "Fluid & Electrolyte Therapy",
+  category: "Fluids & Electrolytes",
+  priority: "secondary",
+  description: "Holliday-Segar maintenance · Deficit replacement · Dehydration correction",
+  icon: Droplet,
+  hasFullPathway: true
+},
+// ── CKD ──
+{
+  id: "ckd-engine",
+  title: "CKD — Complete Management Engine (KDIGO Stages 1–5)",
+  category: "CKD",
+  priority: "secondary",
+  description: "Staging · Etiology · Renoprotection · MBD · Anaemia · Nutrition · ESRD prep · RRT planning",
+  icon: TrendingUp,
+  hasFullPathway: true
+},
+{
+  id: "ckd-progression",
+  title: "CKD Progression Risk Stratification",
+  category: "CKD",
+  priority: "warning",
+  description: "Heat map · Modifiable risk factors · SGLT2i · RAAS · Progression prediction",
+  icon: TrendingUp,
+  hasFullPathway: true
+},
+// ── TRANSPLANT ──
+{
+  id: "kidney-transplant",
+  title: "Paediatric Kidney Transplantation",
+  category: "Transplant",
+  priority: "secondary",
+  description: "Pre-transplant workup · Immunosuppression · Rejection types · BK virus · FSGS recurrence",
+  icon: CheckCircle2,
+  hasFullPathway: true
+},
+{
+  id: "transplant-rejection",
+  title: "Acute Transplant Rejection",
+  category: "Transplant",
+  priority: "danger",
+  description: "Rising creatinine post-Tx · T-cell vs antibody-mediated rejection · Biopsy interpretation",
+  icon: AlertTriangle,
+  hasFullPathway: true
+},
+// ── RRT / DIALYSIS ──
+{
+  id: "rrt-engine",
+  title: "RRT — Dialysis Engine (HD/PD/CRRT/SLED)",
+  category: "RRT & Dialysis",
+  priority: "secondary",
+  description: "Indications · Modality selection · Prescription · Access · Adequacy · Complications",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "dialysis-catheter-infection",
+  title: "Dialysis Catheter-Related Bacteraemia",
+  category: "RRT & Dialysis",
+  priority: "danger",
+  description: "Central line infection · Empiric antibiotics · Catheter salvage vs removal",
+  icon: Thermometer,
+  hasFullPathway: true
+},
+// ── TUBULAR DISORDERS (master hub links) ──
+{
+  id: "tubular-engine",
+  title: "Tubular Disorders Hub (Bartter/Gitelman/RTA/Fanconi/NDI/Dent)",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "All tubular disorders in one algorithmic engine — ERKNet/ESPN aligned",
+  icon: Beaker,
+  hasFullPathway: true
+},
+{
+  id: "renal-stone",
+  title: "Renal Stone Analysis & Prevention",
+  category: "Tubular Disorders",
+  priority: "secondary",
+  description: "Metabolic stone workup · Composition · Prevention strategies · Lithotripsy indications",
+  icon: Beaker,
+  hasFullPathway: true
+},
+// ── CAKUT & UROLOGY ──
+{
+  id: "cakut-engine",
+  title: "CAKUT Master Hub (Hydronephrosis/UPJO/VUR/PUV/Duplex/MCDK)",
+  category: "CAKUT & Urology",
+  priority: "secondary",
+  description: "Antenatal hydronephrosis · UPJO · VUR grading · PUV · Megaureter · MCDK — all algorithmic",
+  icon: Baby,
+  hasFullPathway: true
+},
+{
+  id: "uti-febrile",
+  title: "Febrile UTI — Evaluation & Imaging",
+  category: "CAKUT & Urology",
+  priority: "warning",
+  description: "Post-febrile UTI workup · DMSA timing · VUR evaluation · Antibiotic choice",
+  icon: Thermometer,
+  hasFullPathway: true
+},
+{
+  id: "neurogenic-bladder-engine",
+  title: "Neurogenic Bladder (MMC/SCI/BBD)",
+  category: "CAKUT & Urology",
+  priority: "secondary",
+  description: "Classification · CIC · Anticholinergics · BTX · DSD · Surgical options",
+  icon: Brain,
+  hasFullPathway: true
+},
+// ── METABOLIC & GENETIC (link to Rare Disease module) ──
+{
+  id: "cystinosis",
+  title: "Cystinosis → see Rare Disease Module",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "Lysosomal storage · Fanconi syndrome · Cysteamine therapy — ISPN/ERKNet",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "fabry",
+  title: "Fabry Disease → see Rare Disease Module",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "Alpha-Gal A deficiency · ERT · Migalastat — ERKNet + India access",
+  icon: Microscope,
+  hasFullPathway: true
+},
+{
+  id: "primary-hyperoxaluria",
+  title: "Primary Hyperoxaluria (Lumasiran/Liver-Kidney Tx)",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "PH1/PH2/PH3 · Lumasiran (RNAi) · Pre-emptive liver-kidney transplant — OHF 2023",
+  icon: TestTube,
+  hasFullPathway: true
+},
+{
+  id: "arpkd-adpkd",
+  title: "ARPKD / ADPKD (PKHD1/PKD1/PKD2)",
+  category: "Metabolic & Genetic",
+  priority: "secondary",
+  description: "PKHD1 · PKD1+PKD2 · Tolvaptan in ADPKD · Liver complications — KDIGO + ERKNet",
+  icon: Activity,
+  hasFullPathway: true
+},
+{
+  id: "nephronophthisis",
+  title: "Nephronophthisis & Ciliopathies (NPHP/BBS/Joubert)",
+  category: "Metabolic & Genetic",
+  priority: "secondary",
+  description: "NPHP genes · Molar tooth sign · Bardet-Biedl · Setmelanotide — CilioPathy Alliance",
+  icon: Brain,
+  hasFullPathway: true
+},
+{
+  id: "genetic-nephrotic",
+  title: "Genetic Nephrotic Syndromes (NPHS1/2/WT1/COQ)",
+  category: "Metabolic & Genetic",
+  priority: "warning",
+  description: "WES indication · Transplant outcomes · SRNS genetic panel — ISPN 2023",
+  icon: Microscope,
+  hasFullPathway: true
+},
+// ── INFECTION ──
+{
+  id: "sbp",
+  title: "Spontaneous Bacterial Peritonitis (SBP) in NS",
+  category: "Infection",
+  priority: "danger",
+  description: "Infected ascites · Empiric antibiotics · Prophylaxis in high-risk NS",
+  icon: AlertTriangle,
+  hasFullPathway: true
+},
+];
 
 
 // AI Agent Content Components
@@ -1465,7 +1229,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
     toast.success("Pathway deleted");
   };
 
-  const CATEGORY_ORDER = ["CKD", "Glomerular Disease", "Nephrotic Syndrome", "Acute Kidney Disease", "Hypertension", "Transplant", "Tubular Disorders", "Electrolytes", "Fluids & Electrolytes", "Infection", "Peritoneal Dialysis", "Hemodialysis", "Developmental Kidney", "Urinary Tract", "Lower Urinary Tract", "Metabolic & Genetic"];
+  const CATEGORY_ORDER = ["Nephrotic Syndrome", "Acute Kidney Disease", "Glomerular Disease", "Hypertension", "Electrolytes", "Fluids & Electrolytes", "CKD", "Transplant", "RRT & Dialysis", "Tubular Disorders", "CAKUT & Urology", "Infection", "Metabolic & Genetic"];
 
   const filteredScenarios = clinicalScenarios.filter(s =>
     !scenarioSearch.trim() ||
@@ -1859,7 +1623,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
             <Brain className="w-10 h-10 text-purple-600" />
             Pediatrics Pathways — Pediatric Nephrology and Others
           </h1>
-          <p className="text-slate-600">Evidence-based protocols with file upload, guided symptom entry, and comprehensive pathways — {clinicalScenarios.length}+ scenarios</p>
+          <p className="text-slate-600">Consolidated evidence-based pathways — {clinicalScenarios.length} canonical scenarios (duplicates removed, all topics covered by master hubs)</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -1956,7 +1720,7 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               <CardHeader className="bg-slate-50 border-b">
                 <CardTitle className="flex items-center gap-2">
                   <Stethoscope className="w-6 h-6 text-blue-600" />
-                  Clinical Scenarios Library — {clinicalScenarios.length} Pathways
+                  Clinical Scenarios Library — {clinicalScenarios.length} Consolidated Pathways
                 </CardTitle>
                 <p className="text-sm text-slate-600 mt-1">Grouped by category · Select a scenario to view evidence-based pathways</p>
                 <div className="relative mt-3">

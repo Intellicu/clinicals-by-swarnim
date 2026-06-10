@@ -126,7 +126,10 @@ const HANDLED_IDS = new Set([
   "growth-assessment-engine","anthropometry-engine","nutritional-assessment-engine",
   "renal-nutrition-engine","developmental-assessment-engine","newborn-assessment-engine",
   "vaccination-engine","short-stature-engine","obesity-metabolic-engine",
-  "oncology-engine",
+  "oncology-engine","oncology-hub",
+  "aki-engine","electrolytes-hub","acid-base-hub","rrt-engine","ckd-engine",
+  "tubular-engine","cakut-engine","neurogenic-bladder-engine","htn-engine",
+  "ns-engine",
 ]);
 
 export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAdmin }) {
@@ -253,7 +256,7 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "developmental-assessment-engine") return <GrowthNutritionDevEngine scenario="developmental-assessment-engine" />;
   if (id === "vaccination-engine") return <GrowthNutritionDevEngine scenario="vaccination-engine" />;
   // ── Oncology Engine ──────────────────────────────────────────────────────────
-  if (id === "oncology-engine" || id?.startsWith("oncology-")) return <OncologyEngine scenario={id === "oncology-engine" ? "all" : id.replace("oncology-", "")} />;
+  if (id === "oncology-engine" || id === "oncology-hub" || id?.startsWith("oncology-")) return <OncologyEngine scenario={id === "oncology-engine" || id === "oncology-hub" ? "all" : id.replace("oncology-", "")} />;
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">
@@ -337,6 +340,7 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   );
 
   // IgA Nephropathy is handled inline in ClinicalSupport (MEST-C widget)
+  // IgA Nephropathy — includes IgA Vasculitis/HSPN (consolidated); use MEST-C widget in parent + GN module
   if (id === "iga-nephropathy") return null; // signal to parent to use its own renderer
 
   // Fallback for scenarios with pathway flag but no dedicated component
