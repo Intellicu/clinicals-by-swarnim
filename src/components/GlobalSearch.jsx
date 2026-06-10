@@ -321,10 +321,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     flatResults.current = Object.values(newGroups).flat();
 
     setGroups(newGroups);
-    // Only open if there's an active query (guard against stale async)
-    if (q === query.trim() || q === debouncedQuery) {
-      setOpen(true);
-    }
+    setOpen(true);
     setFocused(0);
     setLoading(false);
   }, []);
