@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, AlertTriangle, ArrowRight, Info, Activity, Pill, Shield, BookOpen } from "lucide-react";
 
 // ─── ONCOLOGY DATA ────────────────────────────────────────────────────────────
@@ -859,14 +860,6 @@ export default function OncologyEngine({ scenario }) {
           <BookOpen className="w-8 h-8 text-slate-400 mx-auto mb-2" />
           <p className="text-sm font-medium text-slate-600">Select a condition above to view protocols</p>
           <p className="text-xs text-slate-400 mt-1">ALL · AML · Wilms · Neuroblastoma · Lymphoma · TLS · Febrile Neutropenia</p>
-        </div>
-      )}
-
-      {condition !== "all" && !data && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-          <AlertTriangle className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-          <p className="text-sm font-medium text-amber-800">Protocol not yet available</p>
-          <p className="text-xs text-amber-600 mt-1">This condition is not yet in the library. Check back soon.</p>
         </div>
       )}
 
