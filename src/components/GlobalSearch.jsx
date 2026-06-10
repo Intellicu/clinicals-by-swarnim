@@ -21,18 +21,17 @@ const SEARCH_INDEX = [
   { title: "Lupus Nephritis (LN)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["lupus nephritis", "LN", "SLE", "ISN RPS", "class III", "class IV", "class V", "MMF", "belimumab", "voclosporin", "hydroxychloroquine", "CYC", "wire loop"] },
   { title: "ANCA Vasculitis GN (GPA/MPA)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["ANCA", "vasculitis", "GPA", "MPA", "PR3", "MPO", "crescentic", "rituximab", "avacopan", "cyclophosphamide", "pauci-immune", "rapidly progressive"] },
   { title: "Anti-GBM Disease / Goodpasture", category: "GN Pathway", page: "GlomerularDiseases", tags: ["anti-GBM", "Goodpasture", "plasma exchange", "pulmonary haemorrhage", "linear IgG", "COL4A3", "crescentic", "RPGN"] },
-  { title: "aHUS – Atypical HUS / TMA", category: "GN Pathway", page: "GlomerularDiseases", tags: ["aHUS", "TMA", "thrombotic microangiopathy", "eculizumab", "ravulizumab", "complement", "CFH", "STEC-HUS", "ADAMTS13", "TTP", "microangiopathic"] },
+  { title: "HUS / TMA / aHUS Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hus-engine", tags: ["aHUS", "TMA", "HUS", "hemolytic uremic syndrome", "thrombotic microangiopathy", "STEC-HUS", "eculizumab", "ravulizumab", "plasma exchange", "anti-FH antibody", "complement", "CFH", "ADAMTS13", "TTP", "ISPN", "microangiopathic", "schistocytes"] },
+  { title: "Therapeutic Plasma Exchange (PLEX/TPE)", category: "Guidelines", page: "GuidelinesLibrary", params: "?search=Plasma+Exchange", tags: ["plasma exchange", "PLEX", "TPE", "apheresis", "therapeutic apheresis", "ASFA", "albumin replacement", "FFP replacement", "citrate anticoagulation", "plasma volume", "TMA PLEX", "ANCA vasculitis PLEX", "anti-GBM PLEX", "lupus PLEX", "TTP PLEX"] },
   { title: "Diabetic Nephropathy / DKD", category: "GN Pathway", page: "GlomerularDiseases", tags: ["DKD", "diabetic nephropathy", "SGLT2", "finerenone", "GLP-1", "empagliflozin", "Kimmelstiel-Wilson", "KDIGO 2022 diabetes"] },
   { title: "Alport Syndrome / COL4 Nephropathy", category: "GN Pathway", page: "GlomerularDiseases", tags: ["Alport", "COL4A3", "COL4A4", "COL4A5", "hearing loss", "lenticonus", "basket weave", "ADAS", "XLAS", "ACEi Alport"] },
   { title: "Congenital Nephrotic Syndrome (CNS)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["congenital nephrotic", "CNS", "NPHS1", "nephrin", "Finnish type", "DMS", "LAMB2", "Pierson", "WT1", "bilateral nephrectomy"] },
   { title: "Nephrotic Syndrome – ISKDC Protocol", category: "Pathway", page: "ClinicalSupport", tags: ["nephrotic", "ISKDC", "prednisolone", "remission", "relapse", "SSNS", "FRNS", "SDNS", "SRNS", "proteinuria"] },
   { title: "Steroid-Resistant NS (SRNS)", category: "Pathway", page: "GlomerularDiseases", tags: ["SRNS", "steroid resistant", "tacrolimus", "cyclosporin", "CNI", "rituximab", "NPHS2", "genetic nephrotic"] },
   { title: "Frequently Relapsing NS (FRNS / SDNS)", category: "Pathway", page: "GlomerularDiseases", tags: ["FRNS", "SDNS", "steroid dependent", "frequently relapsing", "MMF", "levamisole", "rituximab", "cyclophosphamide"] },
-  { title: "AKI – KDIGO Staging & Management", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-prifle", tags: ["AKI", "acute kidney injury", "KDIGO", "creatinine", "oliguria", "staging", "pRIFLE"] },
-  { title: "AKI – Steroids / AIN", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-prifle", tags: ["AKI steroids", "steroid AKI", "interstitial nephritis AIN", "methylprednisolone AKI", "ANCA AKI", "rapidly progressive"] },
-  { title: "Nephrotoxin / Contrast AKI Prevention", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=contrast-nephropathy", tags: ["nephrotoxin", "aminoglycoside", "vancomycin", "NSAID", "contrast", "amphotericin", "nephrotoxic"] },
+  { title: "AKI – KDIGO Staging & Management", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-engine", tags: ["AKI", "acute kidney injury", "KDIGO", "creatinine", "oliguria", "staging", "pRIFLE", "RRT indications", "AEIOU", "dialysis AKI", "furosemide stress test"] },
+  { title: "AKI – Contrast / Nephrotoxin Prevention", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-engine", tags: ["nephrotoxin", "aminoglycoside", "vancomycin", "NSAID", "contrast", "CA-AKI", "amphotericin", "nephrotoxic prevention"] },
   { title: "AKI Stager – KDIGO/pRIFLE", category: "Calculator", page: "AKIStager", tags: ["AKI staging", "pRIFLE", "KDIGO AKI", "creatinine ratio", "urine output"] },
-  { title: "AKI – Dialysis Indications (AEIOU)", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-dialysis-timing", tags: ["dialysis AKI", "AKI dialysis timing", "AEIOU", "RRT indications"] },
   { title: "Tumor Lysis Syndrome (TLS)", category: "Emergency", page: "EmergencyHub", tags: ["TLS", "tumor lysis", "uric acid", "rasburicase", "hyperkalemia", "hyperphosphatemia"] },
   { title: "CKD Staging (KDIGO G1-G5)", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-staging", tags: ["CKD", "chronic kidney disease", "KDIGO", "eGFR", "staging", "G1 G2 G3 G4 G5"] },
   { title: "CKD-MBD – Mineral Bone Disease", category: "Pathway", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-mbd", tags: ["CKD-MBD", "mineral bone", "PTH", "phosphorus", "calcium", "vitamin D", "cinacalcet", "calcification"] },
@@ -118,7 +117,7 @@ const SEARCH_INDEX = [
   { title: "Electrolytes Hub Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=electrolytes-hub", tags: ["electrolytes hub", "electrolyte engine", "hyperkalemia hypokalemia", "hyponatremia hypernatremia", "hypocalcemia", "calcium engine"] },
   { title: "Acid-Base Hub Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=acid-base-hub", tags: ["acid base engine", "ABG engine", "metabolic acidosis engine", "metabolic alkalosis", "respiratory acidosis", "Winter formula engine"] },
   { title: "Pediatric HTN Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=htn-engine", tags: ["HTN engine", "hypertension engine", "BP classification engine", "AAP 2017 engine", "secondary HTN", "labetalol nicardipine"] },
-  { title: "Fabry Disease Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=fabry-engine", tags: ["Fabry engine", "alpha-galactosidase", "lyso-Gb3", "ERT agalsidase", "migalastat", "GLA gene"] },
+  { title: "Fabry Disease Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=fabry-engine", tags: ["Fabry engine", "Fabry disease", "alpha-galactosidase A", "lyso-Gb3", "ERT agalsidase alfa beta", "migalastat", "GLA gene", "angiokeratoma", "acroparesthesias", "Fabry neuropathy", "Fabry cardiac", "Fabry screening", "DBS Fabry", "kidney Fabry"] },
   { title: "Cystinosis Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=cystinosis-engine", tags: ["cystinosis engine", "cysteamine", "CTNS gene", "Fanconi cystinosis", "leukocyte cystine"] },
   { title: "Primary Hyperoxaluria Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hyperoxaluria-engine", tags: ["hyperoxaluria engine", "PH1 PH2 PH3", "lumasiran", "AGXT", "oxalate engine", "liver kidney transplant PH"] },
   { title: "CAKUT Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=cakut-engine", tags: ["CAKUT engine", "hydronephrosis engine", "UPJ engine", "antenatal hydronephrosis", "pyeloplasty", "MAG3 UPJ", "duplex kidney"] },
@@ -131,11 +130,13 @@ const SEARCH_INDEX = [
   { title: "Renal Biopsy Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=renal-biopsy-engine", tags: ["biopsy engine", "renal biopsy", "histology engine", "LM IF EM", "FSGS biopsy", "IgA biopsy", "lupus biopsy"] },
   { title: "Renal Diet Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=diet-engine", tags: ["diet engine", "renal diet engine", "CKD diet engine", "nephrotic diet", "stone diet engine", "dialysis diet", "phosphorus potassium diet"] },
   { title: "Rheumatology Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=rheumatology-engine", tags: ["rheumatology engine", "JIA engine", "SLE engine", "lupus engine", "vasculitis engine", "Kawasaki engine", "periodic fever engine", "MAS engine"] },
-  { title: "Tubular Disorders Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=tubular-engine", tags: ["tubular engine", "Fanconi engine", "XLH engine", "burosumab", "NDI engine", "tubular disorder"] },
+  { title: "Tubular Disorders Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=tubular-engine", tags: ["tubular engine", "Fanconi syndrome", "Dent disease", "Lowe syndrome", "NDI", "nephrogenic diabetes insipidus", "DDAVP", "XLH", "X-linked hypophosphatemia", "burosumab", "RTA", "Bartter", "Gitelman", "cystinosis tubular", "tubular disorder"] },
+  { title: "Dent Disease & Lowe Syndrome Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=tubular-engine", tags: ["Dent disease", "Dent 1 Dent 2", "Lowe syndrome", "CLCN5", "OCRL", "LMW proteinuria", "hypercalciuria", "nephrocalcinosis Dent", "rickets Dent", "CKD Dent"] },
+  { title: "NDI – Nephrogenic Diabetes Insipidus Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=polyuria-full-engine", tags: ["NDI", "nephrogenic DI", "AVPR2", "AQP2", "vasopressin resistance", "DDAVP test", "polyuria polydipsia NDI", "hydrochlorothiazide amiloride NDI", "indomethacin NDI"] },
   { title: "Kidney Stone Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=stone-engine", tags: ["stone engine", "kidney stone engine", "cystinuria engine", "calcium oxalate engine", "uric acid stone engine", "stone metabolic"] },
   { title: "Polyuria / DI Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=polyuria-full-engine", tags: ["polyuria engine", "diabetes insipidus engine", "DDAVP engine", "NDI engine", "water deprivation engine"] },
   { title: "Nephrocalcinosis Stone Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=nephrocalcinosis-stone-engine", tags: ["nephrocalcinosis engine", "stone engine nephrocalcinosis", "hypercalciuria engine"] },
-  { title: "HNF1B / Alport Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hnf1b-alport-engine", tags: ["HNF1B engine", "Alport engine", "COL4A5", "17q12", "hereditary nephropathy engine", "TBMD engine"] },
+  { title: "Alport Syndrome / HNF1B Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hnf1b-alport-engine", tags: ["Alport engine", "HNF1B engine", "COL4A3 COL4A4 COL4A5", "XLAS ADAS ARAS Alport", "sensorineural hearing loss nephropathy", "lenticonus", "basket weave GBM", "17q12 deletion", "HNF1B renal cysts diabetes", "hereditary nephropathy", "TBMD", "ACEi Alport", "family screening Alport", "COL4 nephropathy"] },
   { title: "Polyuria Engine (Basic)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=polyuria-engine", tags: ["DI engine", "polyuria basic", "water deprivation"] },
   { title: "Metabolic Acidosis Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=metabolic-acidosis-engine", tags: ["metabolic acidosis engine", "anion gap engine", "MUDPILES", "RTA engine", "UAG"] },
   { title: "Hypokalemia Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hypokalemia-engine", tags: ["hypokalemia engine", "Bartter engine", "Gitelman engine", "Liddle", "renin aldosterone low K"] },
@@ -357,25 +358,32 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   async function searchGuidelines(q, ql) {
     const all = await base44.entities.Guideline.list("-updated_date", 200);
     return all
-      .filter(g =>
-        includes(g.title, ql) ||
-        includes(g.summary, ql) ||
-        includes(g.source, ql) ||
-        includes(g.category, ql) ||
-        (Array.isArray(g.keywords) && g.keywords.some(k => includes(k, ql))) ||
-        (Array.isArray(g.key_recommendations) && g.key_recommendations.some(r => includes(r, ql)))
-      )
+      .filter(g => {
+        // Exclude archived/superseded records from search results
+        if (g.status === "Archived" || g.title?.startsWith("[MERGED")) return false;
+        return (
+          includes(g.title, ql) ||
+          includes(g.summary, ql) ||
+          includes(g.source, ql) ||
+          includes(g.category, ql) ||
+          includes(g.scope_and_population, ql) ||
+          (Array.isArray(g.keywords) && g.keywords.some(k => includes(k, ql))) ||
+          (Array.isArray(g.key_recommendations) && g.key_recommendations.some(r => includes(r, ql))) ||
+          (Array.isArray(g.practice_pearls) && g.practice_pearls.some(p => includes(p, ql)))
+        );
+      })
       .map(g => ({
         _type: "entity",
         title: g.title,
-        snippet: snippet(g.summary || (g.key_recommendations || []).join(". "), q),
+        snippet: snippet(g.summary || g.scope_and_population || (g.key_recommendations || []).join(". "), q),
         badgeText: `${g.source || "Guideline"} ${g.year || ""}`.trim(),
         badgeClass: "bg-amber-100 text-amber-700",
-        _score: scoreEntityItem(g.title, g.summary, ql),
-        navigate: () => createPageUrl("GuidelinesLibrary") + `?openid=${g.id}&search=${encodeURIComponent(g.title)}`,
+        _score: scoreEntityItem(g.title + " " + (g.keywords || []).join(" "), g.summary + " " + (g.practice_pearls || []).join(" "), ql),
+        // Navigate directly to the guideline page with id — opens modal immediately
+        navigate: () => createPageUrl("GuidelinesLibrary") + `?id=${g.id}`,
       }))
       .sort((a, b) => b._score - a._score)
-      .slice(0, 5);
+      .slice(0, 6);
   }
 
   async function searchProtocols(q, ql) {
