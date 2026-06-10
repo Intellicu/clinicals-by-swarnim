@@ -1,49 +1,206 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ReactMarkdown from "react-markdown";
 import {
   Calendar, RefreshCw, BookOpen, Stethoscope, Lightbulb,
-  Bell, Activity, ChevronLeft, ChevronRight, Sparkles, Clock
+  Sparkles, Search, Star, Share2, ChevronRight, Pill,
+  FlaskConical, Bell, Zap, X, ChevronLeft
 } from "lucide-react";
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+// ── Section card components ───────────────────────────────────────────────────
+
+function SectionCard({ icon: Icon, iconBg, label, children, linkText, linkTo }) {
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+      <div className={`flex items-center gap-2 px-4 py-2.5 ${iconBg}`}>
+        <Icon className="w-3.5 h-3.5 text-white" />
+        <span className="text-xs font-bold text-white uppercase tracking-wide">{label}</span>
+      </div>
+      <div className="px-4 py-3">
+        {children}
+        {linkText && linkTo && (
+          <Link to={linkTo}>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline mt-2">
+              {linkText} <ChevronRight className="w-3 h-3" />
+            </span>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ClinicalPearlSection({ data }) {
+  if (!data?.clinical_pearl) return null;
+  return (
+    <SectionCard icon={Lightbulb} iconBg="bg-amber-500" label="Clinical Pearl"
+      linkText="Open Pathway →" linkTo={data.pearl_pathway_url || createPageUrl("ClinicalSupport")}>
+      <p className="text-sm text-slate-800 leading-relaxed">{data.clinical_pearl}</p>
+    </SectionCard>
+  );
+}
+
+function ClinicalChallengeSection({ data }) {
+  const [revealed, setRevealed] = useState(false);
+  if (!data?.challenge_case) return null;
+  return (
+    <SectionCard icon={Stethoscope} iconBg="bg-blue-600" label="30-Second Clinical Challenge">
+      <p className="text-sm text-slate-700 leading-relaxed mb-3">{data.challenge_case}</p>
+      {data.challenge_options && (
+        <div className="space-y-1.5 mb-3">
+          {data.challenge_options.map((opt, i) => (
+            <div key={i} className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${revealed && i === data.challenge_answer ? "bg-green-50 border-green-300 text-green-800 font-semibold" : "bg-slate-50 border-slate-200 text-slate-700"}`}>
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+      {!revealed ? (
+        <button onClick={() => setRevealed(true)}
+          className="text-xs font-semibold text-blue-600 hover:underline">
+          Reveal Answer ↓
+        </button>
+      ) : (
+        <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 mt-2">
+          <p className="text-xs font-bold text-green-800 mb-0.5">Answer: {data.challenge_options?.[data.challenge_answer]}</p>
+          <p className="text-xs text-green-700 leading-relaxed">{data.challenge_explanation}</p>
+          {data.challenge_link_url && (
+            <Link to={data.challenge_link_url}>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline mt-1">
+                Read further → <ChevronRight className="w-3 h-3" />
+              </span>
+            </Link>
+          )}
+        </div>
+      )}
+    </SectionCard>
+  );
+}
+
+function DrugPearlSection({ data }) {
+  if (!data?.drug_pearl) return null;
+  return (
+    <SectionCard icon={Pill} iconBg="bg-violet-600" label="Drug Pearl"
+      linkText="Open Drug Guide →" linkTo={createPageUrl("DrugsDosing") + (data.drug_name ? `?search=${encodeURIComponent(data.drug_name)}` : "")}>
+      {data.drug_name && <p className="text-xs font-bold text-violet-700 mb-1">{data.drug_name}</p>}
+      <p className="text-sm text-slate-700 leading-relaxed">{data.drug_pearl}</p>
+    </SectionCard>
+  );
+}
+
+function RareDiseaseSection({ data }) {
+  if (!data?.rare_disease_spotlight) return null;
+  return (
+    <SectionCard icon={FlaskConical} iconBg="bg-rose-600" label="Rare Disease Spotlight"
+      linkText="Open Screening Tool →" linkTo={createPageUrl("RareDiseaseModule")}>
+      {data.rare_disease_name && <p className="text-xs font-bold text-rose-700 mb-1">Think {data.rare_disease_name} when:</p>}
+      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{data.rare_disease_spotlight}</p>
+    </SectionCard>
+  );
+}
+
+function GuidelineReminderSection({ data }) {
+  if (!data?.guideline_reminder) return null;
+  return (
+    <SectionCard icon={BookOpen} iconBg="bg-teal-600" label="Guideline Reminder"
+      linkText="Open Guideline →" linkTo={createPageUrl("GuidelinesLibrary")}>
+      {data.guideline_condition && <p className="text-xs font-bold text-teal-700 mb-1">{data.guideline_condition}</p>}
+      <p className="text-sm text-slate-700 leading-relaxed">{data.guideline_reminder}</p>
+    </SectionCard>
+  );
+}
+
+function WhatsNewSection({ data }) {
+  if (!data?.whats_new?.length) return null;
+  return (
+    <SectionCard icon={Sparkles} iconBg="bg-indigo-600" label="What's New">
+      <div className="space-y-1.5">
+        {data.whats_new.slice(0, 3).map((item, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="text-green-500 font-bold text-xs">✓</span>
+            <span className="text-sm text-slate-700">{item}</span>
+          </div>
+        ))}
+      </div>
+    </SectionCard>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function DailySummary() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [generating, setGenerating] = useState(false);
   const [generateMsg, setGenerateMsg] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("ds_favorites") || "[]"); } catch { return []; }
+  });
 
   const { data: user } = useQuery({
     queryKey: ["currentUser"],
     queryFn: () => base44.auth.me(),
     staleTime: 60000,
   });
-
   const isAdmin = user?.role === "admin";
 
-  // Fetch summary for selected date
   const { data: summaries = [], isLoading, refetch } = useQuery({
-    queryKey: ["daily_summary", selectedDate],
-    queryFn: () =>
-      base44.entities.CustomSection.filter({
-        section_type: "general",
-        generation_topic: "daily_summary",
-      }),
+    queryKey: ["daily_summary_all"],
+    queryFn: () => base44.entities.CustomSection.filter({
+      section_type: "general",
+      generation_topic: "daily_summary",
+    }),
     staleTime: 60000,
   });
 
-  const summary = summaries.find(s => s.content?.date === selectedDate);
+  const sortedSummaries = useMemo(() =>
+    [...summaries].sort((a, b) => (b.content?.date || "").localeCompare(a.content?.date || "")),
+    [summaries]
+  );
+
+  const availableDates = useMemo(() =>
+    sortedSummaries.map(s => s.content?.date).filter(Boolean),
+    [sortedSummaries]
+  );
+
+  const filteredDates = useMemo(() => {
+    if (!searchQuery.trim()) return availableDates;
+    const q = searchQuery.toLowerCase();
+    return availableDates.filter(d => {
+      const s = sortedSummaries.find(x => x.content?.date === d);
+      const content = s?.content;
+      if (!content) return false;
+      return (
+        d.includes(q) ||
+        content.clinical_pearl?.toLowerCase().includes(q) ||
+        content.drug_name?.toLowerCase().includes(q) ||
+        content.rare_disease_name?.toLowerCase().includes(q) ||
+        content.guideline_condition?.toLowerCase().includes(q) ||
+        content.challenge_case?.toLowerCase().includes(q)
+      );
+    });
+  }, [availableDates, searchQuery, sortedSummaries]);
+
+  const summary = sortedSummaries.find(s => s.content?.date === selectedDate);
   const summaryData = summary?.content;
+
+  const toggleFavorite = (date) => {
+    const next = favorites.includes(date) ? favorites.filter(d => d !== date) : [...favorites, date];
+    setFavorites(next);
+    localStorage.setItem("ds_favorites", JSON.stringify(next));
+  };
 
   const handleGenerate = async () => {
     setGenerating(true);
     setGenerateMsg("");
     try {
       const res = await base44.functions.invoke("dailyClinicalSummary", {});
-      setGenerateMsg(res.data?.success ? "Summary generated and emailed to admins!" : "Generated.");
+      setGenerateMsg(res.data?.success ? "Generated!" : "Done.");
       refetch();
     } catch (e) {
       setGenerateMsg("Error: " + e.message);
@@ -52,51 +209,88 @@ export default function DailySummary() {
     }
   };
 
-  const goDay = (delta) => {
-    const d = new Date(selectedDate);
-    d.setDate(d.getDate() + delta);
-    setSelectedDate(d.toISOString().slice(0, 10));
+  const handleShare = () => {
+    const text = `📋 CliniCals Daily Summary — ${selectedDate}\n${summaryData?.clinical_pearl || ""}`;
+    if (navigator.share) navigator.share({ title: "CliniCals Daily", text });
+    else navigator.clipboard?.writeText(text);
   };
 
-  const availableDates = summaries.map(s => s.content?.date).filter(Boolean).sort().reverse();
+  const goDay = (delta) => {
+    const idx = availableDates.indexOf(selectedDate);
+    const nextIdx = idx + delta;
+    if (nextIdx >= 0 && nextIdx < availableDates.length) setSelectedDate(availableDates[nextIdx]);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <div className="max-w-3xl mx-auto space-y-4">
+    <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="max-w-2xl mx-auto px-3 py-4 space-y-4">
 
         {/* Header */}
-        <div className="rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-700 p-5 text-white shadow-lg">
-          <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="bg-gradient-to-r from-blue-700 to-indigo-700 rounded-2xl p-4 text-white shadow-lg">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <Stethoscope className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                <Stethoscope className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-lg font-bold">Daily Clinical Summary</h1>
-                <p className="text-blue-100 text-xs">Automated briefing · Clinical vignette · Learning pearl</p>
+                <h1 className="text-base font-bold">🩺 CliniCals Daily</h1>
+                <p className="text-blue-100 text-xs">30–60 second clinical briefings</p>
               </div>
             </div>
-            {isAdmin && (
-              <Button
-                onClick={handleGenerate}
-                disabled={generating}
-                size="sm"
-                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs"
-              >
-                {generating
-                  ? <><RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" /> Generating…</>
-                  : <><Sparkles className="w-3.5 h-3.5 mr-1" /> Generate Now</>}
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {summaryData && (
+                <button onClick={handleShare} className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
+                  <Share2 className="w-4 h-4" />
+                </button>
+              )}
+              {summaryData && (
+                <button onClick={() => toggleFavorite(selectedDate)}
+                  className={`p-2 rounded-lg transition-colors ${favorites.includes(selectedDate) ? "bg-yellow-400/80 text-yellow-900" : "bg-white/20 hover:bg-white/30"}`}>
+                  <Star className="w-4 h-4" />
+                </button>
+              )}
+              {isAdmin && (
+                <Button onClick={handleGenerate} disabled={generating} size="sm"
+                  className="bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs h-8">
+                  {generating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  <span className="ml-1 hidden sm:inline">{generating ? "Generating…" : "Generate"}</span>
+                </Button>
+              )}
+            </div>
           </div>
-          {generateMsg && (
-            <div className="mt-2 text-xs bg-white/10 rounded-lg px-3 py-1.5">{generateMsg}</div>
+          {generateMsg && <p className="mt-2 text-xs bg-white/10 rounded-lg px-3 py-1.5">{generateMsg}</p>}
+        </div>
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search summaries by keyword, drug, disease…"
+            className="w-full pl-9 pr-8 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <X className="w-4 h-4" />
+            </button>
           )}
         </div>
 
-        {/* Date navigator */}
-        <div className="flex items-center justify-between bg-white rounded-xl border border-slate-200 px-4 py-2.5 shadow-sm">
-          <button onClick={() => goDay(-1)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+        {/* Date pills */}
+        {filteredDates.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            {filteredDates.slice(0, 10).map(d => (
+              <button key={d} onClick={() => setSelectedDate(d)}
+                className={`flex-shrink-0 flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${selectedDate === d ? "bg-blue-600 text-white border-blue-600" : favorites.includes(d) ? "bg-yellow-50 border-yellow-300 text-yellow-800" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"}`}>
+                {favorites.includes(d) && <Star className="w-3 h-3" />}
+                {format(new Date(d + "T12:00:00"), "MMM d")}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Date nav */}
+        <div className="flex items-center justify-between bg-white rounded-xl border border-slate-200 px-4 py-2.5">
+          <button onClick={() => goDay(1)} className="p-1 hover:bg-slate-100 rounded-lg disabled:opacity-30"
+            disabled={availableDates.indexOf(selectedDate) >= availableDates.length - 1}>
             <ChevronLeft className="w-4 h-4 text-slate-500" />
           </button>
           <div className="flex items-center gap-2">
@@ -108,128 +302,58 @@ export default function DailySummary() {
               <Badge className="text-xs bg-green-100 text-green-700 border-green-200">Today</Badge>
             )}
           </div>
-          <button onClick={() => goDay(1)} disabled={selectedDate >= new Date().toISOString().slice(0, 10)}
-            className="p-1 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-30">
+          <button onClick={() => goDay(-1)} className="p-1 hover:bg-slate-100 rounded-lg disabled:opacity-30"
+            disabled={availableDates.indexOf(selectedDate) <= 0}>
             <ChevronRight className="w-4 h-4 text-slate-500" />
           </button>
         </div>
-
-        {/* Available dates pills */}
-        {availableDates.length > 1 && (
-          <div className="flex gap-2 flex-wrap">
-            {availableDates.slice(0, 7).map(d => (
-              <button key={d} onClick={() => setSelectedDate(d)}
-                className={`text-xs px-3 py-1 rounded-full border transition-all ${selectedDate === d ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"}`}>
-                {format(new Date(d + "T12:00:00"), "MMM d")}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Loading */}
         {isLoading && (
           <div className="flex items-center justify-center py-12 gap-2 text-slate-400">
             <RefreshCw className="w-5 h-5 animate-spin" />
-            <span className="text-sm">Loading summary…</span>
+            <span className="text-sm">Loading…</span>
           </div>
         )}
 
         {/* No summary */}
         {!isLoading && !summaryData && (
-          <Card className="border-dashed border-slate-300">
-            <CardContent className="py-12 text-center">
-              <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-medium text-slate-500">No summary for {selectedDate}</p>
-              <p className="text-xs text-slate-400 mt-1 mb-4">
-                {isAdmin ? "Generate one now or wait for the daily automation." : "The admin will generate the daily summary each morning."}
-              </p>
-              {isAdmin && (
-                <Button onClick={handleGenerate} disabled={generating} size="sm" className="bg-blue-600 hover:bg-blue-700">
-                  {generating ? <RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
-                  Generate Summary
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Summary content */}
-        {summaryData && (
-          <div className="space-y-4">
-            {/* Meta bar */}
-            <div className="flex items-center gap-3 flex-wrap text-xs text-slate-500">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                Generated {summaryData.generated_at ? format(new Date(summaryData.generated_at), "h:mm a") : "today"}
-              </span>
-              <span className="flex items-center gap-1">
-                <Bell className="w-3.5 h-3.5 text-orange-500" />
-                {summaryData.alerts_count || 0} alerts
-              </span>
-              <span className="flex items-center gap-1">
-                <Activity className="w-3.5 h-3.5 text-blue-500" />
-                {summaryData.encounters_count || 0} encounters
-              </span>
-            </div>
-
-            {/* Main markdown content */}
-            <Card className="border-blue-100 shadow-sm">
-              <CardContent className="p-5">
-                <ReactMarkdown
-                  className="prose prose-sm prose-blue max-w-none text-slate-800 [&>h2]:text-blue-800 [&>h2]:font-bold [&>h2]:mt-4 [&>h2]:mb-2 [&>h3]:text-slate-700 [&>h3]:font-semibold [&>strong]:text-slate-900 [&>ul]:mt-1 [&>li]:my-0.5 [&>p]:text-slate-700 [&>p]:leading-relaxed"
-                  components={{
-                    h2: ({ children }) => (
-                      <h2 className="text-base font-bold text-blue-800 mt-5 mb-2 flex items-center gap-2 border-b border-blue-100 pb-1">
-                        {children}
-                      </h2>
-                    ),
-                    h3: ({ children }) => (
-                      <h3 className="text-sm font-bold text-slate-700 mt-3 mb-1">{children}</h3>
-                    ),
-                    strong: ({ children }) => (
-                      <strong className="font-bold text-slate-900">{children}</strong>
-                    ),
-                    li: ({ children }) => (
-                      <li className="text-sm text-slate-700 my-0.5">{children}</li>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-sm text-slate-700 leading-relaxed my-1">{children}</p>
-                    ),
-                  }}
-                >
-                  {summaryData.summary_markdown || "No content available."}
-                </ReactMarkdown>
-              </CardContent>
-            </Card>
-
-            {/* Quick cards */}
-            <div className="grid grid-cols-2 gap-3">
-              <Card className="border-violet-100 bg-violet-50">
-                <CardContent className="p-3 flex items-start gap-2">
-                  <Lightbulb className="w-4 h-4 text-violet-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs font-bold text-violet-800">Today's Pearl</p>
-                    <p className="text-xs text-violet-700 mt-0.5 line-clamp-3">{summaryData.pearl_title || "See full summary above"}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-teal-100 bg-teal-50">
-                <CardContent className="p-3 flex items-start gap-2">
-                  <BookOpen className="w-4 h-4 text-teal-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs font-bold text-teal-800">Case Vignette</p>
-                    <p className="text-xs text-teal-700 mt-0.5 line-clamp-3">{summaryData.vignette_title || "See full summary above"}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          <div className="bg-white border border-dashed border-slate-300 rounded-xl py-12 text-center">
+            <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+            <p className="text-sm font-medium text-slate-500">No summary for {selectedDate}</p>
+            <p className="text-xs text-slate-400 mt-1 mb-4">
+              {isAdmin ? "Generate one now." : "Summary will appear here when generated."}
+            </p>
+            {isAdmin && (
+              <Button onClick={handleGenerate} disabled={generating} size="sm" className="bg-blue-600 hover:bg-blue-700">
+                {generating ? <RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 mr-1" />}
+                Generate
+              </Button>
+            )}
           </div>
         )}
 
-        {/* Footer note */}
-        <p className="text-center text-xs text-slate-400 pb-4">
-          Daily summaries are auto-generated each morning at 7:00 AM IST. For educational use only.
-        </p>
+        {/* Summary sections */}
+        {summaryData && (
+          <div className="space-y-3">
+            <ClinicalPearlSection data={summaryData} />
+            <ClinicalChallengeSection data={summaryData} />
+            <DrugPearlSection data={summaryData} />
+            <RareDiseaseSection data={summaryData} />
+            <GuidelineReminderSection data={summaryData} />
+            <WhatsNewSection data={summaryData} />
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2 pb-4">
+          <p className="text-xs text-slate-400">Auto-generated · 7:00 AM IST daily · Educational use only</p>
+          <Link to={createPageUrl("NotificationCenter")}>
+            <span className="flex items-center gap-1 text-xs text-slate-400 hover:text-blue-600">
+              <Bell className="w-3 h-3" /> Preferences
+            </span>
+          </Link>
+        </div>
       </div>
     </div>
   );

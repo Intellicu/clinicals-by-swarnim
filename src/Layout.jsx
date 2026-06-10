@@ -10,6 +10,7 @@ import { base44 } from "@/api/base44Client";
 import { PatientProvider } from "./components/PatientContext";
 import FloatingAIAssistant from "./components/FloatingAIAssistant";
 import BetaDisclaimer from "./components/BetaDisclaimer";
+import OnboardingConsent from "./components/OnboardingConsent";
 import IOSCompatibility from "./components/iOSCompatibility";
 import PullToRefresh from "./components/PullToRefresh";
 import NotificationEngine from "./components/notifications/NotificationEngine";
@@ -40,12 +41,18 @@ export default function Layout({ children, currentPageName }) {
   const [user, setUser] = React.useState(null);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [currentTab, setCurrentTab] = React.useState("Hub");
+  const [showConsent, setShowConsent] = React.useState(false);
 
   React.useEffect(() => {
     let retryCount = 0;
     const loadUser = async () => {
       try {
-        setUser(await base44.auth.me());
+        const u = await base44.auth.me();
+        setUser(u);
+        // Show onboarding consent if user hasn't completed it yet
+        if (u && !u.onboarding_consent?.consentAccepted) {
+          setShowConsent(true);
+        }
       } catch {
         if (retryCount < 3) { retryCount++; setTimeout(loadUser, 1000 * retryCount); }
       }
@@ -309,6 +316,9 @@ export default function Layout({ children, currentPageName }) {
         <FloatingAIAssistant />
         <NotificationEngine />
         <FloatingHubButton />
+        {showConsent && (
+          <OnboardingConsent onComplete={() => setShowConsent(false)} />
+        )}
 
         {/* ── Contextual Bottom Navigation ── */}
         <ContextualBottomBar />

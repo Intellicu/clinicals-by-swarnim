@@ -7,13 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Activity, Calculator, Heart, Droplet, Pill, BookOpen,
   Stethoscope, TestTube, Baby, Zap, Sparkles, Brain, AlertCircle,
   UtensilsCrossed, GraduationCap, Layers, FlaskConical, ClipboardList,
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
-  RefreshCw, Shield, Info, BarChart2, Star,
+  RefreshCw, Shield, BarChart2, Star,
   Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
   ChevronDown, ChevronUp, Thermometer, Cpu } from
 "lucide-react";
@@ -807,13 +806,11 @@ export default function Hub() {
           }
         </div>
 
-        {/* ── Disclaimer ── */}
-        <Alert className="bg-blue-50 border-blue-200">
-          <Info className="w-4 h-4 text-blue-600" />
-          <AlertDescription className="text-blue-800 text-xs">
-            <strong>CliniCals Hub by Swarnim</strong> — Pediatric Clinical Intelligence. Integrates KDIGO, IPNA, ISPD, IAP, ESPN guidelines. For educational & informational use only. Exercise independent clinical judgment.
-          </AlertDescription>
-        </Alert>
+        {/* ── Minimal footer disclaimer ── */}
+        <p className="text-center text-xs text-slate-400 pb-2">
+          CliniCals is currently in beta and is intended to support—not replace—professional clinical judgment.{" "}
+          <Link to={createPageUrl("About")} className="underline hover:text-slate-600">Learn More</Link>
+        </p>
       </div>
     </div>);
 
