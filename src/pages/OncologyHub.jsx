@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, FlaskConical, Calculator, AlertTriangle, Lock } from "lucide-react";
+import { ArrowLeft, FlaskConical, Calculator, AlertTriangle, Lock, Calendar, Shield, Zap } from "lucide-react";
 import FeedbackReportButton from "../components/FeedbackReportButton";
 import { createPageUrl } from "@/utils";
 import OncologyEngine from "../components/engines/OncologyEngine";
@@ -17,6 +17,10 @@ import {
   HaemRecoveryGate,
   SIOPBostonReference,
 } from "../components/oncology/OncologyToxicityTools";
+import TreatmentTimeline from "../components/oncology/TreatmentTimeline";
+import OncologyDosingCalculator from "../components/oncology/OncologyDosingCalculator";
+import RiskStratificationTool from "../components/oncology/RiskStratificationTool";
+import InteractionChecker from "../components/oncology/InteractionChecker";
 
 export default function OncologyHub() {
   const { data: user } = useQuery({ queryKey: ["me"], queryFn: () => base44.auth.me() });
@@ -51,17 +55,45 @@ export default function OncologyHub() {
         </div>
 
         <Tabs defaultValue="protocols">
-          <TabsList className="bg-purple-100 rounded-xl h-auto gap-1 p-1">
+          <TabsList className="bg-purple-100 rounded-xl h-auto gap-1 p-1 flex-wrap">
             <TabsTrigger value="protocols" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
-              <FlaskConical className="w-3.5 h-3.5 mr-1" /> Protocols & Drug Schedules
+              <FlaskConical className="w-3.5 h-3.5 mr-1" /> Protocols
+            </TabsTrigger>
+            <TabsTrigger value="timeline" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
+              <Calendar className="w-3.5 h-3.5 mr-1" /> Timeline
+            </TabsTrigger>
+            <TabsTrigger value="dosing" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
+              <Calculator className="w-3.5 h-3.5 mr-1" /> Dose Calc
+            </TabsTrigger>
+            <TabsTrigger value="risk" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
+              <Shield className="w-3.5 h-3.5 mr-1" /> Risk Strat
+            </TabsTrigger>
+            <TabsTrigger value="interactions" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
+              <Zap className="w-3.5 h-3.5 mr-1" /> Interactions
             </TabsTrigger>
             <TabsTrigger value="tools" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white">
-              <Calculator className="w-3.5 h-3.5 mr-1" /> Toxicity Tools
+              <AlertTriangle className="w-3.5 h-3.5 mr-1" /> Toxicity Tools
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="protocols" className="mt-4">
             <OncologyEngine />
+          </TabsContent>
+
+          <TabsContent value="timeline" className="mt-4">
+            <TreatmentTimeline />
+          </TabsContent>
+
+          <TabsContent value="dosing" className="mt-4">
+            <OncologyDosingCalculator />
+          </TabsContent>
+
+          <TabsContent value="risk" className="mt-4">
+            <RiskStratificationTool />
+          </TabsContent>
+
+          <TabsContent value="interactions" className="mt-4">
+            <InteractionChecker />
           </TabsContent>
 
           <TabsContent value="tools" className="mt-4">
