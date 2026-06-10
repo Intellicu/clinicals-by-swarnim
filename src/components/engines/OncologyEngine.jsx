@@ -985,10 +985,39 @@ export default function OncologyEngine({ scenario }) {
           {/* Drugs */}
           {openSection === "drugs" && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <Pill className="w-4 h-4 text-violet-600" />
                 <p className="text-xs font-bold text-slate-700">Drug &amp; Dosing Schedule</p>
                 <span className="text-xs text-slate-400 italic">— tap each drug to expand ward-style detail</span>
+                <button
+                  onClick={() => {
+                    const win = window.open('', '_blank');
+                    const rows = data.drugs.map((d, i) => `
+                      <tr style="page-break-inside:avoid">
+                        <td style="padding:6px 10px;border:1px solid #ccc;font-weight:bold;vertical-align:top">${i+1}. ${d.name}</td>
+                        <td style="padding:6px 10px;border:1px solid #ccc;font-weight:bold;color:#1a4fa8;vertical-align:top">${d.dose}</td>
+                        <td style="padding:6px 10px;border:1px solid #ccc;vertical-align:top">${d.freq}</td>
+                        <td style="padding:6px 10px;border:1px solid #ccc;font-size:11px;vertical-align:top">${d.toxicity || '—'}</td>
+                      </tr>`).join('');
+                    win.document.write(`<!DOCTYPE html><html><head><title>${data.title} — Drug Schedule</title>
+                      <style>body{font-family:Arial,sans-serif;font-size:12px;padding:20px;color:#111}
+                      h2{font-size:16px;margin-bottom:2px}p.sub{font-size:11px;color:#555;margin:0 0 16px}
+                      table{width:100%;border-collapse:collapse}th{background:#1e293b;color:#fff;padding:7px 10px;text-align:left;font-size:12px}
+                      tr:nth-child(even){background:#f8f8f8}
+                      .disclaimer{margin-top:20px;padding:8px;background:#fffbeb;border:1px solid #f59e0b;font-size:10px;color:#92400e}
+                      @media print{button{display:none}}</style></head><body>
+                      <h2>${data.title}</h2><p class="sub">${data.subtitle || ''}</p>
+                      <table><thead><tr><th>Drug</th><th>Dose</th><th>Schedule / Frequency</th><th>Key Toxicities & Precautions</th></tr></thead>
+                      <tbody>${rows}</tbody></table>
+                      <div class="disclaimer">⚠ CLINICAL REFERENCE ONLY — All doses must be verified against the active institutional protocol by a paediatric oncologist and pharmacist before prescribing. Not for direct clinical use without specialist supervision.</div>
+                      <p style="font-size:10px;color:#999;margin-top:8px">Printed from CliniCals Hub — ${new Date().toLocaleDateString()}</p>
+                      <script>window.print()</script></body></html>`);
+                    win.document.close();
+                  }}
+                  className="ml-auto flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 transition-colors"
+                >
+                  🖨 Print Protocol Sheet
+                </button>
               </div>
               {data.drugs.map((d, i) => <DrugCard key={i} drug={d} index={i} />)}
             </div>

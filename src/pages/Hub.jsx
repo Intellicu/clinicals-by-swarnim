@@ -64,6 +64,7 @@ const KNOWLEDGE_SECTIONS = [
   iconColor: "text-purple-700",
   items: [
   { name: "Oncology Hub (Protocols & Toxicity Tools)", page: "OncologyHub", icon: FlaskConical },
+  { name: "🧬 Oncology Pathway Engine", page: "OncologyHub", icon: Dna, _url: "/OncologyPathway" },
   { name: "ALL — ICiCLe ALL-14 / InPOG-ALL-15-01 v1.1", page: "OncologyHub", icon: Activity },
   { name: "AML — BFM / APL (ATRA+ATO)", page: "OncologyHub", icon: Activity },
   { name: "Burkitt / DLBCL / B-NHL (FAB-LMB96 + Rituximab)", page: "OncologyHub", icon: Microscope },
@@ -486,7 +487,7 @@ export default function Hub() {
           <div>
             <h1 className="text-base font-bold text-white leading-tight">CliniCals Hub</h1>
             <p className="text-blue-100 text-xs font-semibold">by Swarnim</p>
-            <p className="text-blue-200 text-xs">Pediatric Nephrology Bedside Assistant</p>
+            <p className="text-blue-200 text-xs">Pediatrics Bedside Assistant — Pediatric Nephrology & Others</p>
           </div>
           <div className="flex items-center gap-1.5">
             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
@@ -557,6 +558,7 @@ export default function Hub() {
             {[
               { label: "Rickets Engine",      desc: "Calcipenic/Phosphopenic", color: "bg-amber-600",  scenario: "rickets-engine" },
               { label: "Oncology Hub",       desc: "ALL·AML·Wilms·RMS·LCH",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
+              { label: "Onco Pathway",      desc: "Intelligent Pathway Engine", color: "bg-fuchsia-700", scenario: "oncology-pathway", _link: "/OncologyPathway" },
               { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
               { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
               { label: "Hyperkalaemia",      desc: "K+ Emergency",          color: "bg-orange-600", scenario: "hyperkalemia-deep-engine" },
@@ -746,6 +748,7 @@ export default function Hub() {
 
 
             { name: "Oncology", icon: FlaskConical, color: "bg-purple-700", page: "OncologyHub" },
+            { name: "Onco Pathway", icon: Dna, color: "bg-fuchsia-700", page: "OncologyHub", _customLink: "/OncologyPathway" },
             { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
             { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
             { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
@@ -758,7 +761,7 @@ export default function Hub() {
             map((chip) => {
               const ChipIcon = chip.icon;
               return (
-                <Link key={chip.name} to={createPageUrl(chip.page)} className="flex-shrink-0">
+                <Link key={chip.name} to={chip._customLink || createPageUrl(chip.page)} className="flex-shrink-0">
                   <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl ${chip.color} text-white active:scale-95 transition-transform shadow-sm`}>
                     <ChipIcon className="w-3.5 h-3.5 flex-shrink-0" />
                     <span className="text-xs font-semibold leading-tight whitespace-nowrap">{chip.name}</span>
@@ -806,7 +809,7 @@ export default function Hub() {
                     {section.items.map((item) => {
                       const ItemIcon = item.icon;
                       return (
-                        <Link key={item.name} to={createPageUrl(item.page)}>
+                        <Link key={item.name} to={item._url || createPageUrl(item.page)}>
                           <div className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-slate-50 transition-all cursor-pointer group active:bg-slate-100">
                             <ItemIcon className={`w-3.5 h-3.5 ${section.iconColor} flex-shrink-0`} />
                             <span className="text-xs text-slate-600 group-hover:text-slate-900 flex-1">{item.name}</span>

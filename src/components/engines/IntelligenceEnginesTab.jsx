@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Cpu, ChevronRight, Search, X, BookOpen, ExternalLink, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -90,6 +91,7 @@ const ENGINES = [
 
   // ── Oncology ──
   { label: "Paediatric Oncology Engine", desc: "ALL · AML · Wilms · Neuroblastoma · NHL · TLS · Febrile Neutropenia · Drug toxicity — Indian protocols (SIOP/COG/BFM/UKALL)", scenario: "oncology-engine", tags: ["oncology", "ALL", "AML", "leukaemia", "Wilms tumour", "neuroblastoma", "lymphoma", "TLS", "febrile neutropenia", "chemotherapy", "vincristine", "6-MP", "asparaginase", "BFM", "SIOP", "COG", "UKALL", "paediatric cancer", "actinomycin", "doxorubicin", "cisplatin", "carboplatin", "etoposide", "antifungal", "MIBG"], group: "Oncology", adminOnly: false },
+  { label: "🧬 Oncology Pathway Engine", desc: "Intelligent 5-step pathway wizard — risk stratification + Gantt timeline for 14 tumour groups", scenario: "oncology-pathway-engine", tags: ["oncology", "pathway", "ALL", "AML", "Wilms", "neuroblastoma", "RMS", "medulloblastoma", "Ewing", "osteosarcoma", "LCH", "hepatoblastoma", "timeline", "Gantt", "protocol"], group: "Oncology", adminOnly: false, _customLink: "/OncologyPathway" },
 ];
 
 const GROUP_STYLE = {
@@ -326,11 +328,19 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={e => { e.stopPropagation(); onSelectEngine(eng.scenario); }}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors">
-                      Open <ChevronRight className="w-3 h-3" />
-                    </button>
+                    {eng._customLink ? (
+                      <Link to={eng._customLink}
+                        className="px-3 py-1.5 bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors"
+                        onClick={e => e.stopPropagation()}>
+                        Open <ChevronRight className="w-3 h-3" />
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={e => { e.stopPropagation(); onSelectEngine(eng.scenario); }}
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors">
+                        Open <ChevronRight className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                 </button>
 
