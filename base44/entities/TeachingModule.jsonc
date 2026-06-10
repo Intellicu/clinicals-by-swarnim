@@ -2,8 +2,12 @@
   "name": "TeachingModule",
   "type": "object",
   "properties": {
+    "title": {
+      "type": "string",
+      "description": "Module title"
+    },
     "category": {
-      "description": "Module category",
+      "type": "string",
       "enum": [
         "Dialysis",
         "AKI",
@@ -17,171 +21,168 @@
         "Pathology",
         "Metabolic & Genetic",
         "Tubular Disorders",
-        "Congenital & CAKUT"
+        "Congenital & CAKUT",
+        "Oncology"
       ],
-      "type": "string"
-    },
-    "clinical_pearls": {
-      "items": {
-        "type": "string"
-      },
-      "type": "array"
-    },
-    "common_pitfalls": {
-      "items": {
-        "type": "string"
-      },
-      "type": "array"
+      "description": "Module category"
     },
     "content": {
+      "type": "object",
       "properties": {
-        "learning_objectives": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
         "overview": {
           "type": "string"
         },
-        "topics": {
+        "learning_objectives": {
+          "type": "array",
           "items": {
+            "type": "string"
+          }
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
             "properties": {
-              "content": {
-                "type": "string"
-              },
-              "diagrams": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
               "heading": {
                 "type": "string"
               },
+              "content": {
+                "type": "string"
+              },
               "key_points": {
+                "type": "array",
                 "items": {
                   "type": "string"
-                },
-                "type": "array"
+                }
+              },
+              "diagrams": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
-            },
-            "type": "object"
-          },
-          "type": "array"
+            }
+          }
         }
-      },
-      "type": "object"
-    },
-    "created_by": {
-      "type": "string"
+      }
     },
     "difficulty_level": {
-      "description": "Difficulty level",
+      "type": "string",
       "enum": [
         "Beginner",
         "Intermediate",
         "Advanced"
       ],
-      "type": "string"
+      "description": "Difficulty level"
     },
     "estimated_duration": {
       "type": "string"
     },
-    "is_default": {
-      "default": false,
-      "type": "boolean"
-    },
-    "linked_guideline_id": {
-      "description": "Optional pointer to the canonical Guideline record holding the full reference pathway for this topic, so the module links to it instead of duplicating reference prose.",
-      "type": "string"
-    },
-    "practice_cases": {
+    "clinical_pearls": {
+      "type": "array",
       "items": {
-        "properties": {
-          "answers": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "case_description": {
-            "type": "string"
-          },
-          "questions": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "type": "object"
-      },
-      "type": "array"
+        "type": "string"
+      }
+    },
+    "common_pitfalls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "quizzes": {
+      "type": "array",
       "items": {
+        "type": "object",
         "properties": {
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "correct_answer": {
             "type": "number"
-          },
-          "difficulty": {
-            "enum": [
-              "Easy",
-              "Medium",
-              "Hard"
-            ],
-            "type": "string"
           },
           "explanation": {
             "type": "string"
           },
-          "options": {
+          "difficulty": {
+            "type": "string",
+            "enum": [
+              "Easy",
+              "Medium",
+              "Hard"
+            ]
+          }
+        }
+      }
+    },
+    "practice_cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_description": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
             "items": {
               "type": "string"
-            },
-            "type": "array"
+            }
           },
-          "question": {
-            "type": "string"
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
-        },
-        "type": "object"
-      },
-      "type": "array"
+        }
+      }
     },
     "resources": {
+      "type": "array",
       "items": {
+        "type": "object",
         "properties": {
           "title": {
             "type": "string"
           },
+          "url": {
+            "type": "string"
+          },
           "type": {
+            "type": "string",
             "enum": [
               "PDF",
               "Video",
               "Article",
               "Guideline"
-            ],
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
+            ]
           }
-        },
-        "type": "object"
-      },
-      "type": "array"
-    },
-    "title": {
-      "description": "Module title",
-      "type": "string"
+        }
+      }
     },
     "uploaded_files": {
+      "type": "array",
       "items": {
         "type": "string"
-      },
-      "type": "array"
+      }
+    },
+    "linked_guideline_id": {
+      "type": "string",
+      "description": "Optional pointer to the canonical Guideline record"
+    },
+    "is_default": {
+      "type": "boolean",
+      "default": false
+    },
+    "created_by": {
+      "type": "string"
     }
   },
   "required": []

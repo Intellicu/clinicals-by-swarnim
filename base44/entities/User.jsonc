@@ -1,0 +1,42 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user"
+    },
+    "beta_consent_given": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has accepted the beta disclaimer on first login"
+    },
+    "beta_consent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when beta consent was accepted (nullable)"
+    },
+    "onboarding_consent": {
+      "type": "object",
+      "description": "Legacy onboarding consent record",
+      "properties": {
+        "consentAccepted": {
+          "type": "boolean"
+        },
+        "consentVersion": {
+          "type": "string"
+        },
+        "consentDate": {
+          "type": "string"
+        },
+        "dailySummarySubscribed": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

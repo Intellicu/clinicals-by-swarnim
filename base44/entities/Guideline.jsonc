@@ -36,7 +36,8 @@
         "Developmental Pediatrics",
         "Adolescent Health",
         "Rheumatology",
-        "Rare Disease"
+        "Rare Disease",
+        "Oncology"
       ],
       "description": "Guideline category"
     },
@@ -112,7 +113,7 @@
     },
     "content": {
       "type": "object",
-      "description": "Full clinical content sections for detailed guideline view",
+      "description": "Full clinical content sections",
       "properties": {
         "sections": {
           "type": "array",
@@ -294,6 +295,11 @@
     "usage_count": {
       "type": "number",
       "default": 0
+    },
+    "institutional_standard": {
+      "type": "boolean",
+      "default": false,
+      "description": "Admin-marked flag indicating this protocol is approved as institutional standard"
     }
   },
   "required": [
