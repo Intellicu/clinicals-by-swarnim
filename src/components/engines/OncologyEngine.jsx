@@ -775,30 +775,93 @@ const DATA = {
 
 // ─── COMPONENT ────────────────────────────────────────────────────────────────
 
-function DrugCard({ drug }) {
+function DrugCard({ drug, index }) {
   const [open, setOpen] = useState(false);
+
+  // Parse toxicity into structured warnings
+  const toxicityPoints = drug.toxicity
+    ? drug.toxicity.split(/[.;]/).map(s => s.trim()).filter(Boolean)
+    : [];
+
+  // Identify high-priority warnings
+  const isVesicant = drug.toxicity?.toLowerCase().includes("vesicant");
+  const needsEcho = drug.toxicity?.toLowerCase().includes("echo") || drug.toxicity?.toLowerCase().includes("cardio");
+  const needsMesna = drug.toxicity?.toLowerCase().includes("mesna");
+  const needsHydration = drug.toxicity?.toLowerCase().includes("hydration") || drug.toxicity?.toLowerCase().includes("hyperhydration");
+  const needsLeucovo = drug.toxicity?.toLowerCase().includes("leucovorin");
+
   return (
-    <div className="border border-slate-200 rounded-xl overflow-hidden">
-      <button className="w-full flex items-center justify-between px-3 py-2.5 bg-white text-left" onClick={() => setOpen(!open)}>
-        <div>
-          <span className="text-sm font-bold text-slate-900">{drug.name}</span>
-          <span className="text-xs text-slate-500 ml-2">{drug.dose}</span>
+    <div className="border-2 border-slate-200 rounded-xl overflow-hidden shadow-sm">
+      {/* Drug header — always visible */}
+      <button
+        className="w-full flex items-start justify-between px-4 py-3 bg-white text-left hover:bg-slate-50 transition-colors"
+        onClick={() => setOpen(!open)}
+      >
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <span className="w-6 h-6 bg-slate-700 text-white rounded-full text-xs flex items-center justify-center font-bold flex-shrink-0">{index + 1}</span>
+            <span className="font-bold text-slate-900 text-sm">{drug.name}</span>
+            {isVesicant && <Badge className="bg-red-600 text-white text-xs px-1.5 py-0">VESICANT</Badge>}
+            {needsEcho && <Badge className="bg-orange-500 text-white text-xs px-1.5 py-0">Echo required</Badge>}
+            {needsMesna && <Badge className="bg-blue-600 text-white text-xs px-1.5 py-0">Mesna mandatory</Badge>}
+          </div>
+          {/* Inline dose summary */}
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5 ml-8">
+            <span className="text-xs text-blue-700 font-semibold">{drug.dose}</span>
+            <span className="text-xs text-slate-500">{drug.freq}</span>
+          </div>
         </div>
-        {open ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
+        {open ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />}
       </button>
+
       {open && (
-        <div className="px-3 pb-3 border-t border-slate-100 pt-2 space-y-1.5">
-          <div className="flex items-start gap-1.5">
-            <Badge className="bg-blue-100 text-blue-700 text-xs flex-shrink-0">Dose</Badge>
-            <p className="text-xs text-slate-700">{drug.dose}</p>
-          </div>
-          <div className="flex items-start gap-1.5">
-            <Badge className="bg-green-100 text-green-700 text-xs flex-shrink-0">Freq</Badge>
-            <p className="text-xs text-slate-700">{drug.freq}</p>
-          </div>
-          <div className="flex items-start gap-1.5">
-            <Badge className="bg-red-100 text-red-700 text-xs flex-shrink-0">Toxicity</Badge>
-            <p className="text-xs text-slate-700">{drug.toxicity}</p>
+        <div className="border-t-2 border-slate-100">
+          {/* Ward-style protocol table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs border-collapse">
+              <tbody>
+                <tr className="border-b border-slate-100">
+                  <td className="px-3 py-2 font-bold text-slate-500 uppercase tracking-wide bg-slate-50 w-28 align-top">Drug</td>
+                  <td className="px-3 py-2 font-bold text-slate-900 align-top">{drug.name}</td>
+                </tr>
+                <tr className="border-b border-slate-100">
+                  <td className="px-3 py-2 font-bold text-slate-500 uppercase tracking-wide bg-slate-50 align-top">Dose</td>
+                  <td className="px-3 py-2 text-blue-800 font-semibold align-top">{drug.dose}</td>
+                </tr>
+                <tr className="border-b border-slate-100">
+                  <td className="px-3 py-2 font-bold text-slate-500 uppercase tracking-wide bg-slate-50 align-top">Schedule</td>
+                  <td className="px-3 py-2 text-slate-700 align-top">{drug.freq}</td>
+                </tr>
+                {/* Mandatory precautions row */}
+                {(isVesicant || needsMesna || needsHydration || needsLeucovo) && (
+                  <tr className="border-b border-slate-100 bg-red-50">
+                    <td className="px-3 py-2 font-bold text-red-700 uppercase tracking-wide align-top">⚠ Precautions</td>
+                    <td className="px-3 py-2 align-top">
+                      <div className="space-y-1">
+                        {isVesicant && <p className="text-red-700 font-semibold">VESICANT — Central venous access preferred. Confirm patency before administration. Extravasation protocol must be available.</p>}
+                        {needsMesna && <p className="text-blue-800 font-semibold">MESNA mandatory — dose = 80–100% of ifosfamide/cyclophosphamide dose. Give at 0h, 4h, 8h post-infusion.</p>}
+                        {needsHydration && <p className="text-cyan-800 font-semibold">HYPERHYDRATION required — 3000 mL/m²/day. Monitor urine output ≥3 mL/kg/h. Alkalinise urine if MTX-based.</p>}
+                        {needsLeucovo && <p className="text-green-800 font-semibold">LEUCOVORIN rescue required — begin 42h from start of MTX infusion. Guided by MTX serum levels at 24h, 48h, 72h.</p>}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {/* Toxicity breakdown */}
+                <tr>
+                  <td className="px-3 py-2 font-bold text-slate-500 uppercase tracking-wide bg-slate-50 align-top">Toxicities</td>
+                  <td className="px-3 py-2 align-top">
+                    <ul className="space-y-1">
+                      {toxicityPoints.map((t, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-slate-700">
+                          <span className="text-orange-500 mt-0.5 flex-shrink-0">▸</span>
+                          <span>{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       )}
@@ -922,11 +985,12 @@ export default function OncologyEngine({ scenario }) {
           {/* Drugs */}
           {openSection === "drugs" && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-2">
                 <Pill className="w-4 h-4 text-violet-600" />
-                <p className="text-xs font-bold text-slate-700">Drug Reference — tap to expand dose/toxicity</p>
+                <p className="text-xs font-bold text-slate-700">Drug &amp; Dosing Schedule</p>
+                <span className="text-xs text-slate-400 italic">— tap each drug to expand ward-style detail</span>
               </div>
-              {data.drugs.map((d, i) => <DrugCard key={i} drug={d} />)}
+              {data.drugs.map((d, i) => <DrugCard key={i} drug={d} index={i} />)}
             </div>
           )}
 
