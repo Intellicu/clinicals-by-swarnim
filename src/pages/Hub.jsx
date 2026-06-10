@@ -51,7 +51,7 @@ const QUICK_CALCS = [
 { name: "Sodium Corr.", icon: Droplet, color: "bg-blue-500", page: "SodiumCalculator" },
 { name: "K+ Calc", icon: Zap, color: "bg-amber-600", page: "PotassiumCalculator" },
 { name: "Fluids", icon: Waves, color: "bg-cyan-600", page: "FluidCalculator" },
-{ name: "Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
+{ name: "Growth/Anthropometry", icon: Baby, color: "bg-green-600", page: "Anthropometry" },
 { name: "All Calcs →", icon: Calculator, color: "bg-slate-700", page: "CalculatorsHub" }];
 
 
@@ -63,8 +63,7 @@ const KNOWLEDGE_SECTIONS = [
   color: "border-purple-300 bg-purple-50",
   iconColor: "text-purple-700",
   items: [
-  { name: "Oncology Hub (Protocols & Toxicity Tools)", page: "OncologyHub", icon: FlaskConical },
-  { name: "🧬 Oncology Pathway Engine", page: "OncologyHub", icon: Dna, _url: "/OncologyPathway" },
+  { name: "Oncology Hub (Protocols, Pathway Engine & Toxicity Tools)", page: "OncologyHub", icon: FlaskConical },
   { name: "ALL — ICiCLe ALL-14 / InPOG-ALL-15-01 v1.1", page: "OncologyHub", icon: Activity },
   { name: "AML — BFM / APL (ATRA+ATO)", page: "OncologyHub", icon: Activity },
   { name: "Burkitt / DLBCL / B-NHL (FAB-LMB96 + Rituximab)", page: "OncologyHub", icon: Microscope },
@@ -548,7 +547,7 @@ export default function Hub() {
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
-              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">{41 + dbEngineRecords.length}</span>
+              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">{38 + dbEngineRecords.length}</span>
             </div>
             <Link to={createPageUrl("ClinicalSupport") + "?tab=engines"}>
               <span className="text-xs text-violet-600 font-semibold">All →</span>
@@ -556,11 +555,10 @@ export default function Hub() {
           </div>
           <div className="flex gap-2 overflow-x-auto p-2.5" style={{ scrollbarWidth: "none" }}>
             {[
-              { label: "Rickets Engine",      desc: "Calcipenic/Phosphopenic", color: "bg-amber-600",  scenario: "rickets-engine" },
-              { label: "Oncology Hub",       desc: "ALL·AML·Wilms·RMS·LCH",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
-              { label: "Onco Pathway",      desc: "Intelligent Pathway Engine", color: "bg-fuchsia-700", scenario: "oncology-pathway", _link: "/OncologyPathway" },
-              { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
               { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
+              { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
+              { label: "Rickets Engine",     desc: "Calcipenic/Phosphopenic", color: "bg-amber-600", scenario: "rickets-engine" },
+              { label: "Oncology Hub",       desc: "ALL·AML·Wilms·RMS·LCH",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
               { label: "Hyperkalaemia",      desc: "K+ Emergency",          color: "bg-orange-600", scenario: "hyperkalemia-deep-engine" },
               { label: "Hyponatraemia",      desc: "Na Correction",         color: "bg-cyan-600",   scenario: "hyponatremia-engine" },
               { label: "RPGN Engine",        desc: "Crescentic GN",         color: "bg-red-700",    scenario: "rpgn-deep-engine" },
@@ -588,12 +586,10 @@ export default function Hub() {
               { label: "Stone Engine",       desc: "Renal stones full",      color: "bg-yellow-700", scenario: "stone-engine" },
               { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
               { label: "Growth Engine",      desc: "Z-scores/CKD growth",    color: "bg-emerald-700", scenario: "growth-assessment-engine" },
-              { label: "Anthropometry",      desc: "SAM/MAM/BMI/BSA",        color: "bg-emerald-600", scenario: "anthropometry-engine" },
               { label: "Nutrition Engine",   desc: "PEM·SAM·Renal diet",     color: "bg-green-700",  scenario: "nutritional-assessment-engine" },
               { label: "Dev Assessment",     desc: "Milestones+M-CHAT",      color: "bg-teal-700",   scenario: "developmental-assessment-engine" },
               { label: "Vaccination",        desc: "IAP 2023+Special risk",  color: "bg-cyan-700",   scenario: "vaccination-engine" },
               { label: "Short Stature",      desc: "GHD/Turner/delay",       color: "bg-green-800",  scenario: "short-stature-engine" },
-              { label: "Renal Nutrition",    desc: "CKD/HD/PD/Tx diet",      color: "bg-lime-700",   scenario: "renal-nutrition-engine" },
               { label: "Newborn Engine",     desc: "APGAR/NBS/NEC/Jaundice", color: "bg-amber-700",  scenario: "newborn-assessment-engine" },
               { label: "Obesity Engine",     desc: "Metabolic syndrome",     color: "bg-orange-700", scenario: "obesity-metabolic-engine" },
               // DB-generated engines injected below
@@ -747,8 +743,7 @@ export default function Hub() {
 
 
 
-            { name: "Oncology", icon: FlaskConical, color: "bg-purple-700", page: "OncologyHub" },
-            { name: "Onco Pathway", icon: Dna, color: "bg-fuchsia-700", page: "OncologyHub", _customLink: "/OncologyPathway" },
+            { name: "Oncology Hub", icon: FlaskConical, color: "bg-purple-700", page: "OncologyHub" },
             { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
             { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
             { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },

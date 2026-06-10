@@ -398,5 +398,6 @@ export default function GrowthNutritionDevEngine({ scenario }) {
   if (scenario === "developmental-assessment-engine") return <DevelopmentalAssessmentEngine />;
   if (scenario === "vaccination-engine") return <VaccinationEngine />;
   if (scenario === "nutritional-assessment-engine" || scenario === "renal-nutrition-engine") return <NutritionalAssessmentEngine />;
+  // anthropometry-engine merged into growth-assessment-engine
   return <GrowthAssessmentEngine />;
 }
