@@ -58,6 +58,29 @@ const QUICK_CALCS = [
 // ── Knowledge sections ──
 const KNOWLEDGE_SECTIONS = [
 {
+  title: "Pediatric Oncology",
+  icon: FlaskConical,
+  color: "border-purple-300 bg-purple-50",
+  iconColor: "text-purple-700",
+  items: [
+  { name: "Oncology Hub (Protocols & Toxicity Tools)", page: "OncologyHub", icon: FlaskConical },
+  { name: "ALL — ICiCLe ALL-14 / InPOG-ALL-15-01 v1.1", page: "OncologyHub", icon: Activity },
+  { name: "AML — BFM / APL (ATRA+ATO)", page: "OncologyHub", icon: Activity },
+  { name: "Burkitt / DLBCL / B-NHL (FAB-LMB96 + Rituximab)", page: "OncologyHub", icon: Microscope },
+  { name: "ALCL — COG ANHL0131 (APO)", page: "OncologyHub", icon: Layers },
+  { name: "Neuroblastoma HR — HR-NBL-1 / SIOPEN", page: "OncologyHub", icon: Activity },
+  { name: "Neuroblastoma LR — LINES / SIOPEN", page: "OncologyHub", icon: Activity },
+  { name: "Wilms & Renal Tumours — SIOP-RTSG UMBRELLA", page: "OncologyHub", icon: Droplet },
+  { name: "RMS & Soft Tissue Sarcomas — CWS/EpSSG", page: "OncologyHub", icon: Layers },
+  { name: "Medulloblastoma — SIOP-E / ESCP", page: "OncologyHub", icon: Brain },
+  { name: "CNS GCT — SIOP CNS GCT II (2021)", page: "OncologyHub", icon: Brain },
+  { name: "Langerhans Cell Histiocytosis (LCH-IV)", page: "OncologyHub", icon: FlaskConical },
+  { name: "Tumour Lysis Syndrome (TLS)", page: "OncologyHub", icon: AlertCircle },
+  { name: "Febrile Neutropenia Protocol", page: "OncologyHub", icon: AlertCircle },
+  { name: "Chemotherapy Toxicity & Monitoring", page: "OncologyHub", icon: Shield },
+  { name: "Oncology Admin (Protocols)", page: "OncologyAdmin", icon: Layers }]
+},
+{
   title: "Glomerular Diseases",
   icon: Microscope,
   color: "border-blue-300 bg-blue-50",
@@ -533,6 +556,7 @@ export default function Hub() {
           <div className="flex gap-2 overflow-x-auto p-2.5" style={{ scrollbarWidth: "none" }}>
             {[
               { label: "Rickets Engine",      desc: "Calcipenic/Phosphopenic", color: "bg-amber-600",  scenario: "rickets-engine" },
+              { label: "Oncology Hub",       desc: "ALL·AML·Wilms·RMS·LCH",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
               { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
               { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
               { label: "Hyperkalaemia",      desc: "K+ Emergency",          color: "bg-orange-600", scenario: "hyperkalemia-deep-engine" },
@@ -560,7 +584,6 @@ export default function Hub() {
               { label: "HTN Engine",         desc: "Pediatric HTN",          color: "bg-pink-700",   scenario: "htn-engine" },
               { label: "Tubular Engine",     desc: "Fanconi/XLH/NDI",        color: "bg-amber-800",  scenario: "tubular-engine" },
               { label: "Stone Engine",       desc: "Renal stones full",      color: "bg-yellow-700", scenario: "stone-engine" },
-              { label: "Oncology Hub",       desc: "Paediatric protocols",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
               { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
               { label: "Growth Engine",      desc: "Z-scores/CKD growth",    color: "bg-emerald-700", scenario: "growth-assessment-engine" },
               { label: "Anthropometry",      desc: "SAM/MAM/BMI/BSA",        color: "bg-emerald-600", scenario: "anthropometry-engine" },
@@ -722,6 +745,7 @@ export default function Hub() {
 
 
 
+            { name: "Oncology", icon: FlaskConical, color: "bg-purple-700", page: "OncologyHub" },
             { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
             { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
             { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },

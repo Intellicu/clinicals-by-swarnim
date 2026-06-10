@@ -86,6 +86,21 @@ const HUB_NAV = [
         ]
       },
       {
+        title: "Pediatric Oncology",
+        icon: FlaskConical,
+        children: [
+          { title: "Oncology Hub (Protocols)", url: createPageUrl("OncologyHub"), icon: FlaskConical },
+          { title: "Oncology Admin", url: createPageUrl("OncologyAdmin"), icon: Shield },
+          { title: "ALL — ICiCLe / InPOG", url: createPageUrl("OncologyHub"), icon: Activity },
+          { title: "Lymphoma (B-NHL / ALCL)", url: createPageUrl("OncologyHub"), icon: Activity },
+          { title: "Neuroblastoma (HR / LR)", url: createPageUrl("OncologyHub"), icon: Activity },
+          { title: "Wilms & Renal UMBRELLA", url: createPageUrl("OncologyHub"), icon: Droplet },
+          { title: "RMS / Sarcomas", url: createPageUrl("OncologyHub"), icon: Activity },
+          { title: "Medulloblastoma / CNS GCT", url: createPageUrl("OncologyHub"), icon: Brain },
+          { title: "LCH & TLS / Febrile Neutropenia", url: createPageUrl("OncologyHub"), icon: AlertTriangle },
+        ]
+      },
+      {
         title: "Emergency Hub",
         icon: AlertTriangle,
         children: [
