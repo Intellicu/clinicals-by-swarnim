@@ -93,7 +93,6 @@ import RenalDietEngine from "../engines/RenalDietEngine";
 import RheumatologyEngine from "../engines/RheumatologyEngine";
 import RicketsEngine from "../engines/RicketsEngine";
 import WilmsTumorEngine from "../engines/WilmsTumorEngine";
-import GrowthNutritionDevEngine from "../engines/GrowthNutritionDevEngine";
 import OncologyEngine from "../engines/OncologyEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
@@ -123,9 +122,6 @@ const HANDLED_IDS = new Set([
   "electrolytes-hub","acid-base-hub","neurogenic-bladder-engine",
   "bladder-diary-engine","renal-biopsy-engine",
   "diet-engine","rheumatology-engine","rickets-engine","wilms-tumor-engine",
-  "growth-assessment-engine","anthropometry-engine","nutritional-assessment-engine",
-  "renal-nutrition-engine","developmental-assessment-engine","newborn-assessment-engine",
-  "vaccination-engine","short-stature-engine","obesity-metabolic-engine",
   "oncology-engine","oncology-hub",
   "aki-engine","electrolytes-hub","acid-base-hub","rrt-engine","ckd-engine",
   "tubular-engine","cakut-engine","neurogenic-bladder-engine","htn-engine",
@@ -249,12 +245,43 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "rheumatology-engine") return <RheumatologyEngine />;
   if (id === "rickets-engine") return <RicketsEngine />;
   if (id === "wilms-tumor-engine") return <WilmsTumorEngine />;
-  // ── Growth, Nutrition & Development Engines ──────────────────────────────
+  // ── Retired pseudo-engines — content consolidated into appropriate sections ──
   if (["growth-assessment-engine","anthropometry-engine","nutritional-assessment-engine",
        "renal-nutrition-engine","short-stature-engine","obesity-metabolic-engine",
-       "newborn-assessment-engine"].includes(id)) return <GrowthNutritionDevEngine scenario={id} />;
-  if (id === "developmental-assessment-engine") return <GrowthNutritionDevEngine scenario="developmental-assessment-engine" />;
-  if (id === "vaccination-engine") return <GrowthNutritionDevEngine scenario="vaccination-engine" />;
+       "newborn-assessment-engine","developmental-assessment-engine","vaccination-engine"].includes(id)) {
+    const RELOCATION = {
+      "growth-assessment-engine": { title: "Growth Assessment", dest: "Anthropometry calculator (Calculators Hub) · CKD Growth monitoring (CKD Engine → Monitoring)", link: "/Anthropometry" },
+      "anthropometry-engine": { title: "Anthropometry", dest: "Calculators Hub → Anthropometry", link: "/Anthropometry" },
+      "nutritional-assessment-engine": { title: "Nutritional Assessment (SAM/MAM)", dest: "General Pediatrics Hub → SAM Management · Nutrition Hub", link: "/NutritionHub" },
+      "renal-nutrition-engine": { title: "Renal Nutrition", dest: "Renal Diet Engine (active below) · Nutrition Hub", link: "/NutritionHub" },
+      "short-stature-engine": { title: "Short Stature", dest: "Pediatric Endocrinology Hub → Growth Hormone Deficiency", link: "/PediatricEndocrinology" },
+      "obesity-metabolic-engine": { title: "Obesity & Metabolic Syndrome", dest: "Pediatric Endocrinology Hub · General Pediatrics Hub", link: "/PediatricEndocrinology" },
+      "newborn-assessment-engine": { title: "Newborn Assessment", dest: "General Pediatrics Hub → Newborn Screening · Neonatology", link: "/GeneralPediatricsHub" },
+      "developmental-assessment-engine": { title: "Developmental Assessment", dest: "General Pediatrics Hub → Developmental Milestones · M-CHAT", link: "/GeneralPediatricsHub" },
+      "vaccination-engine": { title: "Vaccination Schedule (IAP 2023)", dest: "General Pediatrics Hub → IAP Vaccination 2023 · Patient & Family Education", link: "/GeneralPediatricsHub" },
+    };
+    const meta = RELOCATION[id] || { title: id, dest: "See relevant section", link: "/" };
+    return (
+      <div className="space-y-3 p-1">
+        <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">📦</span>
+            <div>
+              <p className="font-bold text-amber-900 text-sm">{meta.title} — Content Relocated</p>
+              <p className="text-xs text-amber-800 mt-1">
+                This section did not meet the minimum standard for a clinical decision engine (branching logic · differential generation · investigation & management recommendations).
+                Its content has been consolidated into more appropriate modules:
+              </p>
+              <p className="text-xs font-semibold text-amber-900 mt-2">→ {meta.dest}</p>
+            </div>
+          </div>
+        </div>
+        <a href={meta.link} className="block w-full text-center px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-xl transition-colors">
+          Go to {meta.title} →
+        </a>
+      </div>
+    );
+  }
   // ── Oncology Engine ──────────────────────────────────────────────────────────
   if (id === "oncology-engine" || id === "oncology-hub" || id?.startsWith("oncology-")) return <OncologyEngine scenario={id === "oncology-engine" || id === "oncology-hub" ? "all" : id.replace("oncology-", "")} />;
   if (id === "rpgn-engine") return (

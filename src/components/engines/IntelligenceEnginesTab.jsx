@@ -73,15 +73,6 @@ const ENGINES = [
   // ── Rheumatology ──
   { label: "Rheumatology Engine", desc: "JIA · SLE/LN · ANCA Vasculitis · HSP · Periodic Fevers · JDM · KD · MAS — diagnosis + management", scenario: "rheumatology-engine", tags: ["JIA", "SLE", "lupus", "vasculitis", "ANCA", "GPA", "MPA", "HSP", "IgA vasculitis", "periodic fever", "FMF", "CAPS", "JDM", "Kawasaki", "MAS", "HLH", "arthritis", "rheumatology"], group: "Rheumatology" },
 
-  // ── Growth & Anthropometry ──
-  { label: "Growth Assessment Engine", desc: "WHO/IAP growth charts · Z-scores · Stunting/Wasting/Obesity · Growth failure in CKD — complete engine", scenario: "growth-assessment-engine", tags: ["growth", "stunting", "wasting", "z-score", "WHO", "IAP", "weight for height", "BMI", "short stature", "growth failure", "CKD growth", "GH deficiency", "anthropometry", "undernutrition", "SAM", "MAM", "MUAC", "BSA", "ideal body weight", "catch-up growth", "percentile"], group: "Growth, Nutrition & Development" },
-  { label: "Nutritional Assessment Engine", desc: "PEM · Micronutrient deficiency · Renal nutrition · Tube feeding · TPN — SAM protocol + IAP/WHO", scenario: "nutritional-assessment-engine", tags: ["nutrition", "malnutrition", "PEM", "SAM", "MAM", "kwashiorkor", "marasmus", "micronutrient", "iron deficiency", "vitamin A", "zinc", "tube feeding", "TPN", "renal nutrition", "IAP WHO", "CKD diet", "dialysis diet", "nephrotic diet", "transplant diet", "protein CKD", "KDOQI nutrition"], group: "Growth, Nutrition & Development" },
-  { label: "Developmental Assessment Engine", desc: "Gross motor · Fine motor · Language · Social milestones · Red flags · M-CHAT · Developmental delay — IAP/WHO", scenario: "developmental-assessment-engine", tags: ["developmental milestones", "gross motor", "fine motor", "language", "social", "autism", "M-CHAT", "developmental delay", "ASD", "cerebral palsy", "ADHD", "neurodevelopment", "DQ", "Denver", "IAP", "WHO milestones", "neurodevelopmental"], group: "Growth, Nutrition & Development" },
-  { label: "Newborn Assessment Engine", desc: "APGAR · NBS · Neonatal jaundice · IUGR · LBW · NEC · Hypoglycemia · Sepsis — neonatal protocols", scenario: "newborn-assessment-engine", tags: ["newborn", "neonatal", "APGAR", "NBS", "jaundice", "hyperbilirubinemia", "IUGR", "LBW", "NEC", "hypoglycemia", "neonatal sepsis", "phototherapy", "exchange transfusion", "ELBW", "VLBW"], group: "Growth, Nutrition & Development" },
-  { label: "Vaccination Engine", desc: "IAP 2023 schedule · Catch-up · Special risk groups (CKD/transplant/immunocompromised) · Live vaccine rules", scenario: "vaccination-engine", tags: ["vaccination", "immunization", "IAP schedule", "catch-up immunization", "live vaccine", "transplant vaccine", "CKD vaccine", "immunocompromised vaccine", "AEFI", "BCG", "pentavalent", "PCV", "MMR", "varicella", "HPV"], group: "Growth, Nutrition & Development" },
-  { label: "Short Stature Engine", desc: "Height SDS · Growth velocity · Bone age · GH stimulation tests · Turner syndrome · Hypothyroidism · Constitutional delay vs GHD", scenario: "short-stature-engine", tags: ["short stature", "growth hormone deficiency", "GHD", "IGF-1", "bone age", "Turner syndrome", "Noonan", "constitutional delay", "familial short stature", "hypothyroidism", "GH stimulation test", "growth velocity"], group: "Growth, Nutrition & Development" },
-  { label: "Obesity & Metabolic Engine", desc: "Pediatric obesity — BMI ≥95th · Metabolic syndrome · Fatty liver · Insulin resistance · Lifestyle + pharmacotherapy", scenario: "obesity-metabolic-engine", tags: ["obesity", "overweight", "metabolic syndrome", "fatty liver", "NAFLD", "insulin resistance", "waist circumference", "dyslipidemia", "pre-diabetes", "metformin", "GLP-1", "lifestyle", "pediatric obesity"], group: "Growth, Nutrition & Development" },
-
   // ── Oncology ──
   { label: "Pediatric Oncology Hub", desc: "ALL · AML · Wilms · Neuroblastoma · NHL · TLS · Febrile Neutropenia · Drug toxicity · Pathway Engine — SIOP/COG/BFM/UKALL", scenario: "oncology-hub", _customLink: "/OncologyHub", tags: ["oncology", "ALL", "AML", "leukaemia", "Wilms tumour", "neuroblastoma", "lymphoma", "TLS", "febrile neutropenia", "chemotherapy", "vincristine", "6-MP", "asparaginase", "BFM", "SIOP", "COG", "UKALL", "paediatric cancer", "actinomycin", "doxorubicin", "cisplatin", "carboplatin", "etoposide", "antifungal", "MIBG"], group: "Oncology", adminOnly: false },
 
@@ -97,7 +88,6 @@ const GROUP_STYLE = {
   "RRT & Dialysis": "bg-indigo-50 border-indigo-200 text-indigo-900",
   "Nutrition & Diet": "bg-green-50 border-green-200 text-green-900",
   "Rheumatology": "bg-violet-50 border-violet-200 text-violet-900",
-  "Growth, Nutrition & Development": "bg-emerald-50 border-emerald-200 text-emerald-900",
   "Oncology": "bg-red-50 border-red-200 text-red-900",
 };
 
@@ -111,7 +101,6 @@ const GROUP_BADGE = {
   "RRT & Dialysis": "bg-indigo-600",
   "Nutrition & Diet": "bg-green-600",
   "Rheumatology": "bg-violet-700",
-  "Growth, Nutrition & Development": "bg-emerald-600",
   "Oncology": "bg-red-700",
 };
 
@@ -142,15 +131,6 @@ const ENGINE_GUIDELINE_KEYS = {
   "diet-engine": ["CKD", "Nutrition", "Nephrotic Syndrome", "Stone", "Dialysis", "Transplant"],
   "rheumatology-engine": ["SLE", "Lupus", "Vasculitis", "JIA", "Arthritis", "HSP", "ANCA", "Kawasaki"],
   "electrolytes-hub": ["Electrolyte", "Potassium", "Sodium", "Calcium"],
-  "growth-assessment-engine": ["Growth", "Stunting", "CKD Growth", "Short Stature", "WHO"],
-  "anthropometry-engine": ["Anthropometry", "BMI", "SAM", "MAM", "Nutrition"],
-  "nutritional-assessment-engine": ["Nutrition", "SAM", "Malnutrition", "PEM"],
-  "renal-nutrition-engine": ["CKD", "Nutrition", "Nephrotic Syndrome", "Dialysis"],
-  "developmental-assessment-engine": ["Developmental", "Milestones", "Autism", "M-CHAT"],
-  "newborn-assessment-engine": ["Neonatal", "Newborn", "Jaundice", "NEC"],
-  "vaccination-engine": ["Vaccination", "Immunization", "IAP", "Live Vaccine"],
-  "short-stature-engine": ["Growth Hormone", "Short Stature", "Turner", "GHD"],
-  "obesity-metabolic-engine": ["Obesity", "Metabolic Syndrome", "Fatty Liver", "Insulin Resistance"],
   "acid-base-hub": ["Acid-Base", "Metabolic Acidosis", "Alkalosis", "ABG"],
   "hyperoxaluria-engine": ["Hyperoxaluria", "Primary Hyperoxaluria"],
   "cystinosis-engine": ["Cystinosis"],
