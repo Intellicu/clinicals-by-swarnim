@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Download, Share2, Pill, Activity, FileText, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Download, Share2, Pill, Activity, FileText, Loader2, FlaskConical } from 'lucide-react';
+import FormularyBrowser from '../drugs/FormularyBrowser';
 import { toast } from 'sonner';
 import EnhancedDigitalPrescriptionPad from './EnhancedDigitalPrescriptionPad';
 
@@ -110,10 +111,13 @@ export default function EnhancedClinicalEncounter({ appointment, workspace, onCo
       </Card>
 
       <Tabs defaultValue="encounter">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="encounter">Clinical Encounter</TabsTrigger>
           <TabsTrigger value="monitoring">Home Monitoring</TabsTrigger>
           <TabsTrigger value="prescription">Digital Prescription</TabsTrigger>
+          <TabsTrigger value="formulary" className="flex items-center gap-1">
+            <FlaskConical className="w-3.5 h-3.5" />Formulary
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="encounter" className="space-y-4">
@@ -214,6 +218,26 @@ export default function EnhancedClinicalEncounter({ appointment, workspace, onCo
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="formulary" className="space-y-3">
+          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 flex items-center gap-2">
+            <FlaskConical className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+            <div>
+              <p className="text-xs font-semibold text-indigo-800">Dose calculations use patient vitals from this encounter</p>
+              <p className="text-xs text-indigo-600">
+                Weight: <strong>{encounterData.vitals.weight || patient?.weight_kg || "—"} kg</strong>
+                {encounterData.vitals.height && <> · Height: <strong>{encounterData.vitals.height} cm</strong></>}
+              </p>
+            </div>
+          </div>
+          <FormularyBrowser
+            weight={encounterData.vitals.weight || patient?.weight_kg}
+            height={encounterData.vitals.height}
+            patientName={patient?.patient_name}
+            patientId={patient?.id}
+            onPrescriptionSaved={(rx) => toast.success(`Rx for ${rx.medications?.[0]?.drug_name || "drug"} saved to patient record`)}
+          />
         </TabsContent>
 
         <TabsContent value="prescription">

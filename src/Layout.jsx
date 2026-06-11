@@ -315,8 +315,14 @@ export default function Layout({ children, currentPageName }) {
 
         <FloatingAIAssistant />
         <NotificationEngine />
-        {/* Global feedback button — visible on all pages */}
-        <div className="fixed bottom-20 left-3 z-40 lg:bottom-6">
+        {/* Global feedback button — pinned bottom-right, always visible, never obstructs content */}
+        <div
+          className="fixed z-40"
+          style={{
+            bottom: "calc(var(--tab-bar-height, 64px) + 8px)",
+            right: "12px",
+          }}
+        >
           <FeedbackReportButton pageName={currentPageName || window.location.pathname} />
         </div>
         <FloatingHubButton />

@@ -41,7 +41,7 @@ function getBadgeClass(cls) {
   return "bg-slate-100 text-slate-700";
 }
 
-export default function FormularyBrowser({ weight, height, egfr, initialSearch = "" }) {
+export default function FormularyBrowser({ weight, height, egfr, initialSearch = "", patientName, patientId, encounterId, onPrescriptionSaved }) {
   const [query, setQuery] = useState(initialSearch);
   const [catFilter, setCatFilter] = useState("All");
   const [selected, setSelected] = useState(null);
@@ -159,6 +159,10 @@ export default function FormularyBrowser({ weight, height, egfr, initialSearch =
               weight={weight}
               bsa={bsa}
               egfr={egfr}
+              patientName={patientName}
+              patientId={patientId}
+              encounterId={encounterId}
+              onPrescriptionSaved={onPrescriptionSaved}
             />
           </CardContent>
         </Card>

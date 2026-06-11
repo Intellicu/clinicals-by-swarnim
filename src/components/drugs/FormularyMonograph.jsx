@@ -7,6 +7,8 @@ import {
   Activity, Info, CheckCircle, BookOpen, FlaskConical, Syringe,
   AlertTriangle, Thermometer, Package, Utensils, TestTube
 } from "lucide-react";
+import DoseSafetyWarning from "./DoseSafetyWarning";
+import PrescriptionBuilder from "./PrescriptionBuilder";
 
 const SECTIONS = [
   { key: "mechanism", label: "Mechanism of Action", icon: TestTube, color: "slate" },
@@ -125,7 +127,7 @@ function DoseCalculatorPanel({ drug, weight, bsa, egfr }) {
   );
 }
 
-export default function FormularyMonograph({ drug, weight, bsa, egfr }) {
+export default function FormularyMonograph({ drug, weight, bsa, egfr, patientName, patientId, encounterId, onPrescriptionSaved }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!drug) return null;
@@ -166,6 +168,20 @@ export default function FormularyMonograph({ drug, weight, bsa, egfr }) {
 
       {/* Dose calculator */}
       <DoseCalculatorPanel drug={drug} weight={weight} bsa={bsa} egfr={egfr} />
+
+      {/* Safety warnings */}
+      {weight && <DoseSafetyWarning drug={drug} weight={weight} bsa={bsa} />}
+
+      {/* Prescription builder */}
+      <PrescriptionBuilder
+        drug={drug}
+        weight={weight}
+        bsa={bsa}
+        patientName={patientName}
+        patientId={patientId}
+        encounterId={encounterId}
+        onPrescriptionSaved={onPrescriptionSaved}
+      />
 
       {/* Full monograph toggle */}
       <Button
