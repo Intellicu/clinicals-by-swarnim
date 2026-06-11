@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { PatientProvider } from "./components/PatientContext";
-import FloatingAIAssistant from "./components/FloatingAIAssistant";
+
 import FeedbackReportButton from "./components/FeedbackReportButton";
 import BetaDisclaimer from "./components/BetaDisclaimer";
 import OnboardingConsent from "./components/OnboardingConsent";
@@ -313,18 +313,18 @@ export default function Layout({ children, currentPageName }) {
           </footer>
         </main>
 
-        <FloatingAIAssistant />
         <NotificationEngine />
-        {/* Global feedback button — pinned bottom-right, always visible, never obstructs content */}
+        {/* Feedback button — offset left of the AI FAB to avoid overlap */}
         <div
           className="fixed z-40"
           style={{
             bottom: "calc(var(--tab-bar-height, 64px) + 8px)",
-            right: "12px",
+            right: "80px",
           }}
         >
           <FeedbackReportButton pageName={currentPageName || window.location.pathname} />
         </div>
+        {/* AI Hub FAB — bottom-right */}
         <FloatingHubButton />
         {showConsent && (
           <OnboardingConsent onComplete={() => setShowConsent(false)} />

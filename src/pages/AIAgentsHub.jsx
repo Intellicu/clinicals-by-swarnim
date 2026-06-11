@@ -10,6 +10,7 @@ import {
   ArrowLeft, Bot, Microscope, Dna, Zap, Brain, Beaker,
   FlaskConical, TestTube, Search, BookOpen, Loader2, Info
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
 const ICON_MAP = {
@@ -45,7 +46,16 @@ function ToolRunner({ tool, onClose }) {
         .map(f => `${f.label}: ${inputs[f.name] || "(not provided)"}`)
         .join("\n");
 
-      const prompt = `${tool.calculation_logic || tool.description}\n\n---\nPATIENT INPUT:\n${inputSummary}\n\nProvide a structured clinical response with clear sections and recommendations.`;
+      const prompt = `You are a concise clinical decision-support AI for paediatric nephrology. Answer directly and clinically. Use bullet points, short tables, and clear headings. Avoid preamble, disclaimers, and repetition. Keep response under 400 words unless a detailed plan is truly needed.
+
+TOOL: ${tool.name}
+${tool.calculation_logic || tool.description}
+
+---
+PATIENT INPUT:
+${inputSummary}
+
+Respond with: 1) Key finding/assessment (2-3 sentences), 2) Recommended action / dose / plan (bullet list), 3) Monitoring (brief). No verbose introductions.`;
 
       const res = await base44.integrations.Core.InvokeLLM({
         prompt,
@@ -126,10 +136,14 @@ function ToolRunner({ tool, onClose }) {
       )}
 
       {result && (
-        <Card className="bg-slate-900 border-0">
+        <Card className="bg-white border border-slate-200 shadow-sm">
           <CardContent className="p-4">
-            <p className="text-xs text-slate-400 mb-2 font-semibold uppercase tracking-wide">AI Clinical Output</p>
-            <pre className="text-sm text-green-300 font-mono whitespace-pre-wrap leading-relaxed">{result}</pre>
+            <p className="text-xs text-indigo-600 mb-3 font-semibold uppercase tracking-wide flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5" /> AI Clinical Output
+            </p>
+            <div className="prose prose-sm prose-slate max-w-none text-sm [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+              <ReactMarkdown>{result}</ReactMarkdown>
+            </div>
           </CardContent>
         </Card>
       )}

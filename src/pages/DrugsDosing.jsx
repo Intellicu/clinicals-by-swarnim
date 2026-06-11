@@ -787,13 +787,54 @@ CliniCals by Swarnim | Verify all doses independently`;
 
           {/* ── PRESCRIPTION TAB ─────────────────────────────── */}
           <TabsContent value="prescription" className="space-y-4">
+            {/* Quick Drug Search inside Rx tab */}
+            <Card className="bg-indigo-50 border border-indigo-200">
+              <CardContent className="p-3">
+                <p className="text-xs font-semibold text-indigo-800 mb-2">⚡ Quick Add Drug to Prescription</p>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    value={query}
+                    onChange={e => { setQuery(e.target.value); setFocusDrug(null); }}
+                    placeholder="Type drug name to search & add..."
+                    className="pl-9 text-sm bg-white"
+                  />
+                </div>
+                {query.length >= 2 && !focusDrug && (
+                  <div className="border rounded-lg mt-1.5 divide-y max-h-52 overflow-y-auto shadow-sm bg-white">
+                    {filtered.slice(0, 10).map(d => {
+                      const isInRx = rxDrugs.find(rx => rx.id === d.id);
+                      const dose = calcDose(d, parseFloat(weight), bsa, effectiveEgfr);
+                      return (
+                        <div key={d.id} className="px-3 py-2 hover:bg-indigo-50 flex items-center justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900">{d.generic_name}</p>
+                            <p className="text-xs text-slate-500 truncate">
+                              {d.therapeutic_class}
+                              {dose && dose.type !== "TDM" && dose.type !== "unknown" && weight
+                                ? ` · ${dose.perDose} ${dose.freq} ${d.route || "PO"}`
+                                : dose?.type === "TDM" ? " · TDM-guided" : ""}
+                            </p>
+                          </div>
+                          <Button size="sm"
+                            onClick={() => { addToRx(d); setQuery(""); }}
+                            disabled={!!isInRx}
+                            className={`text-xs h-7 flex-shrink-0 ${isInRx ? "bg-green-100 text-green-700" : "bg-indigo-600 hover:bg-indigo-700 text-white"}`}>
+                            {isInRx ? <CheckCircle className="w-3 h-3" /> : <><Plus className="w-3 h-3 mr-0.5" />Add</>}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                    {filtered.length === 0 && <p className="px-3 py-3 text-xs text-slate-400 text-center">No matches found</p>}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {rxDrugs.length === 0 ? (
-              <div className="text-center py-16 text-slate-400">
+              <div className="text-center py-10 text-slate-400">
                 <Pill className="w-10 h-10 mx-auto mb-3 opacity-40" />
-                <p className="text-sm">No drugs added yet. Search and add drugs using the Drug Search or Dose Calculator tabs.</p>
-                <Button size="sm" variant="outline" className="mt-4" onClick={() => setActiveTab("search")}>
-                  Go to Drug Search
-                </Button>
+                <p className="text-sm">Search above to add drugs to your prescription.</p>
               </div>
             ) : (
               <>
