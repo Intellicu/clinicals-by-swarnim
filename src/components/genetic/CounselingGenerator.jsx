@@ -117,8 +117,7 @@ export default function CounselingGenerator({ conversation, onSendMessage }) {
     try {
       const prompt = buildPrompt();
       const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are ClinGen Assist, an expert genetic counseling AI for a paediatric nephrology centre in India (AIIMS Patna). ${prompt}`,
-        model: "claude_sonnet_4_6",
+        prompt: `You are ClinGen Assist, an expert genetic counseling AI for a paediatric nephrology centre in India (AIIMS Patna). Be structured and thorough. Use markdown headers and bullet points. ${prompt}`,
       });
       setResult(res);
     } catch (e) {

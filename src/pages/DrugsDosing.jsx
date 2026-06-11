@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   ArrowLeft, Search, Pill, AlertTriangle, Info, Calculator, Shield,
   Printer, MessageCircle, Plus, Trash2, CheckCircle, Activity, Beaker, X,
-  FlaskConical, BookOpen, Syringe, Library
+  FlaskConical, BookOpen, Syringe, Library, Upload, FileText, Download
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
@@ -25,6 +25,7 @@ import FormularyBrowser from "../components/drugs/FormularyBrowser";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
 import StickyToolNav from "../components/StickyToolNav";
+
 
 // ─── Inline interaction rules (rule-based, no DB needed) ─────────────────────
 const INTERACTION_RULES = [
@@ -203,10 +204,62 @@ export default function DrugsDosing() {
   const [rxDrugs, setRxDrugs] = useState([]);
   const [focusDrug, setFocusDrug] = useState(null);
 
+  const queryClient = useQueryClient();
+
   const { data: drugs = [] } = useQuery({
     queryKey: ["drugs-full"],
     queryFn: () => base44.entities.Drug.list("generic_name", 200),
   });
+
+  // Bulk import state
+  const [importFile, setImportFile] = useState(null);
+  const [importPreview, setImportPreview] = useState([]);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportFile(file);
+    setImportResult(null);
+    try {
+      const text = await file.text();
+      let rows = [];
+      if (file.name.endsWith(".json")) {
+        rows = JSON.parse(text);
+      } else if (file.name.endsWith(".csv")) {
+        const lines = text.split("\n").filter(l => l.trim());
+        const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
+        rows = lines.slice(1).map(line => {
+          const vals = line.split(",").map(v => v.trim().replace(/^"|"$/g, ""));
+          const obj = {};
+          headers.forEach((h, i) => { if (vals[i]) obj[h] = vals[i]; });
+          return obj;
+        });
+      }
+      setImportPreview(rows.slice(0, 5));
+      setImportFile({ file, rows });
+    } catch {
+      toast.error("Failed to parse file — ensure it's valid JSON or CSV");
+    }
+  };
+
+  const runImport = async () => {
+    if (!importFile?.rows?.length) return;
+    setImportLoading(true);
+    let success = 0, fail = 0;
+    for (const row of importFile.rows) {
+      try {
+        if (!row.generic_name || !row.category || !row.route) { fail++; continue; }
+        await base44.entities.Drug.create(row);
+        success++;
+      } catch { fail++; }
+    }
+    setImportResult({ success, fail, total: importFile.rows.length });
+    setImportLoading(false);
+    queryClient.invalidateQueries({ queryKey: ["drugs-full"] });
+    toast.success(`Import complete: ${success} added, ${fail} failed`);
+  };
 
   // BSA (Mosteller)
   const bsa = useMemo(() => {
@@ -369,6 +422,7 @@ CliniCals by Swarnim | Verify all doses independently`;
               <TabsTrigger value="eculizumab" className="text-xs whitespace-nowrap min-h-[36px] px-3">🛡️ Eculizumab</TabsTrigger>
               <TabsTrigger value="plasmapheresis" className="text-xs whitespace-nowrap min-h-[36px] px-3">💉 Plasmapheresis</TabsTrigger>
               <TabsTrigger value="ckd-dosing" className="text-xs whitespace-nowrap min-h-[36px] px-3">🫘 CKD Dosing</TabsTrigger>
+              <TabsTrigger value="bulk-import" className="text-xs whitespace-nowrap min-h-[36px] px-3">📥 Bulk Import</TabsTrigger>
             </TabsList>
           </div>
 
@@ -1008,6 +1062,138 @@ CliniCals by Swarnim | Verify all doses independently`;
               </AlertDescription>
             </Alert>
           </TabsContent>
+          {/* ── BULK IMPORT TAB ───────────────────────────── */}
+          <TabsContent value="bulk-import" className="space-y-4">
+            <Card className="bg-gradient-to-r from-teal-600 to-emerald-700 text-white border-0">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Upload className="w-8 h-8" />
+                  <div>
+                    <h2 className="font-bold text-lg">Bulk Drug Import</h2>
+                    <p className="text-teal-100 text-sm">Upload JSON or CSV files to populate the formulary rapidly</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Template download */}
+            <Card className="bg-white border border-slate-200">
+              <CardHeader className="bg-slate-50 border-b py-3 px-5">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-teal-600" /> File Format & Template
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <p className="text-xs text-slate-600">Upload a <strong>JSON array</strong> or <strong>CSV</strong> file. Required fields: <code className="bg-slate-100 px-1 rounded">generic_name</code>, <code className="bg-slate-100 px-1 rounded">category</code>, <code className="bg-slate-100 px-1 rounded">route</code>.</p>
+                <p className="text-xs text-slate-500">Optional fields: <code className="bg-slate-100 px-1 rounded">dose_weight_based</code>, <code className="bg-slate-100 px-1 rounded">frequency</code>, <code className="bg-slate-100 px-1 rounded">max_dose_per_day</code>, <code className="bg-slate-100 px-1 rounded">brands_indian</code>, <code className="bg-slate-100 px-1 rounded">therapeutic_class</code>, <code className="bg-slate-100 px-1 rounded">renal_adjust</code>, <code className="bg-slate-100 px-1 rounded">indications</code>, <code className="bg-slate-100 px-1 rounded">monitoring</code>, <code className="bg-slate-100 px-1 rounded">adverse_effects</code>, <code className="bg-slate-100 px-1 rounded">contraindications</code>, <code className="bg-slate-100 px-1 rounded">dose_calculation_type</code> (per_day / per_dose / TDM / fixed), <code className="bg-slate-100 px-1 rounded">hd_adjust</code>, <code className="bg-slate-100 px-1 rounded">pd_adjust</code>.</p>
+                <button
+                  onClick={() => {
+                    const template = JSON.stringify([{
+                      generic_name: "Example Drug",
+                      category: "Corticosteroid",
+                      therapeutic_class: "Glucocorticoid",
+                      route: "PO",
+                      dose_weight_based: "1-2 mg/kg/day",
+                      frequency: "OD",
+                      max_dose_per_day: "60",
+                      dose_calculation_type: "per_day",
+                      brands_indian: "Example Brand",
+                      indications: "NS relapse",
+                      renal_adjust: "No adjustment",
+                      monitoring: "BP, weight, blood glucose",
+                      adverse_effects: "Weight gain, hypertension",
+                      hd_adjust: "No extra dose",
+                      pd_adjust: "No adjustment"
+                    }], null, 2);
+                    const blob = new Blob([template], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a"); a.href = url; a.download = "drug_import_template.json"; a.click();
+                  }}
+                  className="flex items-center gap-2 text-xs px-3 py-2 bg-teal-50 hover:bg-teal-100 border border-teal-300 text-teal-800 rounded-lg transition-colors font-medium"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download JSON Template
+                </button>
+              </CardContent>
+            </Card>
+
+            {/* Upload area */}
+            <Card className="bg-white border-2 border-dashed border-teal-300">
+              <CardContent className="p-6 text-center space-y-3">
+                <Upload className="w-10 h-10 text-teal-400 mx-auto" />
+                <p className="text-sm font-medium text-slate-700">Drop your file here or click to browse</p>
+                <p className="text-xs text-slate-400">Accepts .json or .csv files</p>
+                <label className="cursor-pointer">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                    <Upload className="w-4 h-4" /> Choose File
+                  </span>
+                  <input type="file" accept=".json,.csv" className="hidden" onChange={handleImportFile} />
+                </label>
+                {importFile?.file && (
+                  <p className="text-xs text-teal-700 font-medium">✓ {importFile.file.name} — {importFile.rows?.length} records detected</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Preview */}
+            {importPreview.length > 0 && (
+              <Card className="bg-white border border-slate-200">
+                <CardHeader className="bg-slate-50 border-b py-3 px-5">
+                  <CardTitle className="text-sm">Preview (first 5 records)</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100">
+                          {Object.keys(importPreview[0]).slice(0, 6).map(k => (
+                            <th key={k} className="text-left px-2 py-1.5 font-semibold text-slate-700">{k}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importPreview.map((row, i) => (
+                          <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                            {Object.values(row).slice(0, 6).map((v, j) => (
+                              <td key={j} className="px-2 py-1.5 text-slate-700 max-w-[120px] truncate">{String(v)}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Import button */}
+            {importFile?.rows?.length > 0 && !importResult && (
+              <Button onClick={runImport} disabled={importLoading}
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white h-11">
+                {importLoading
+                  ? <><Beaker className="w-4 h-4 mr-2 animate-spin" />Importing {importFile.rows.length} drugs...</>
+                  : <><Upload className="w-4 h-4 mr-2" />Import {importFile.rows.length} Drugs to Formulary</>}
+              </Button>
+            )}
+
+            {/* Result */}
+            {importResult && (
+              <Alert className="bg-green-50 border-green-300">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <AlertDescription className="text-green-800 text-sm">
+                  <strong>Import complete!</strong> {importResult.success} drugs added successfully.
+                  {importResult.fail > 0 && ` ${importResult.fail} failed (missing required fields: generic_name, category, route).`}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <Alert className="bg-amber-50 border-amber-300">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <AlertDescription className="text-xs text-amber-800">
+                <strong>Note:</strong> Imported drugs are added to the live formulary. Verify dosing data carefully before importing. Duplicate entries are not auto-detected — check the formulary after import.
+              </AlertDescription>
+            </Alert>
+          </TabsContent>
+
         </Tabs>
       </div>
     </div>

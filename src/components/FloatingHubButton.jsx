@@ -132,6 +132,8 @@ export default function FloatingHubButton() {
   const [activeGroup, setActiveGroup] = useState("Clinical AI");
   const [panel, setPanel] = useState("tools"); // "tools" | "chat"
 
+  const switchToTools = () => setPanel("tools");
+
   if (location.pathname === "/AIAgentsHub") return null;
 
   const groupTools = AI_ANALYSER_TOOLS.filter(t => t.group === activeGroup);
@@ -147,7 +149,7 @@ export default function FloatingHubButton() {
       {open && (
         <div
           className="fixed z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
-          style={{ bottom: "calc(var(--tab-bar-height, 64px) + 60px)", right: "12px" }}
+          style={{ bottom: "calc(var(--tab-bar-height, 64px) + 60px)", right: "12px", maxHeight: "min(480px, calc(100vh - 180px))", display: "flex", flexDirection: "column" }}
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-700 to-violet-700 px-4 py-3 flex items-center justify-between">
@@ -172,6 +174,15 @@ export default function FloatingHubButton() {
               </button>
             </div>
           </div>
+
+          {panel === "chat" && (
+            <div className="flex items-center gap-2 px-3 py-2 border-b bg-slate-50">
+              <button onClick={switchToTools} className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                Back to Tools
+              </button>
+            </div>
+          )}
 
           {panel === "tools" ? (
             <>
