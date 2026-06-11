@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Building2, Users, Calendar, Stethoscope, FileText, 
-  Plus, ArrowRight, CheckCircle, Play, Home, Clock, ChevronRight, ArrowLeft
+  Plus, ArrowRight, CheckCircle, Play, Home, Clock, ChevronRight, ArrowLeft, Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -18,6 +18,7 @@ import WorkspaceWizard from '../components/clinic/WorkspaceWizard';
 import PatientOnboarding from '../components/clinic/PatientOnboarding';
 import AppointmentScheduler from '../components/clinic/AppointmentScheduler';
 import EnhancedClinicalEncounter from '../components/clinic/EnhancedClinicalEncounter';
+import StartAppointmentWorkspace from '../components/clinic/StartAppointmentWorkspace';
 import DataChatbot from '../components/DataChatbot';
 
 export default function ClinicWorkflow() {
@@ -28,6 +29,8 @@ export default function ClinicWorkflow() {
   const [showWorkspaceWizard, setShowWorkspaceWizard] = useState(false);
   const [showPatientOnboarding, setShowPatientOnboarding] = useState(false);
   const [showScheduler, setShowScheduler] = useState(false);
+  const [sosPatient, setSosPatient] = useState(null);
+  const [showSOSPicker, setShowSOSPicker] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -261,6 +264,16 @@ export default function ClinicWorkflow() {
                   <p className="text-purple-100 text-sm">View monitoring data</p>
                 </CardContent>
               </Card>
+
+              <Card className="bg-gradient-to-br from-red-500 to-orange-500 text-white cursor-pointer hover:shadow-xl transition-shadow col-span-full md:col-span-1" onClick={() => setShowSOSPicker(true)}>
+                <CardContent className="p-6 flex items-center gap-4 md:block">
+                  <Play className="w-12 h-12 md:mb-3" />
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">Start SOS Appointment</h3>
+                    <p className="text-red-100 text-sm">Walk-in / unscheduled visit</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Today's Appointments */}
@@ -334,17 +347,19 @@ export default function ClinicWorkflow() {
           </div>
         )}
 
-        {/* Clinical Encounter View */}
-        {currentStep === 'consult' && selectedAppointment && (
-          <EnhancedClinicalEncounter
-            appointment={selectedAppointment}
+        {/* Comprehensive Appointment Workspace */}
+        {currentStep === 'consult' && (selectedAppointment || sosPatient) && (
+          <StartAppointmentWorkspace
+            appointment={selectedAppointment || { appointment_type: "Emergency", chief_complaint: "SOS Visit" }}
+            patient={sosPatient || patients.find(p => p.id === selectedAppointment?.patient_id)}
             workspace={selectedWorkspace}
-            onComplete={(prescription) => {
-              toast.success('Consultation completed!');
+            onComplete={() => {
+              toast.success('Consultation completed & records saved!');
               setCurrentStep('dashboard');
+              setSosPatient(null);
               queryClient.invalidateQueries({ queryKey: ['appointments'] });
             }}
-            onBack={() => setCurrentStep('dashboard')}
+            onBack={() => { setCurrentStep('dashboard'); setSosPatient(null); }}
           />
         )}
       </div>
@@ -377,6 +392,38 @@ export default function ClinicWorkflow() {
               toast.success('Patient enrolled successfully!');
             }}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* SOS Patient Picker */}
+      <Dialog open={showSOSPicker} onOpenChange={setShowSOSPicker}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-700">
+              <Play className="w-5 h-5" /> Start SOS / Walk-in Appointment
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-slate-600">Select the patient for this unscheduled visit:</p>
+            <div className="max-h-64 overflow-y-auto space-y-1.5">
+              {patients.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => { setSosPatient(p); setShowSOSPicker(false); setCurrentStep('consult'); }}
+                  className="w-full text-left flex items-center justify-between px-4 py-3 rounded-xl border-2 border-slate-200 hover:border-red-400 hover:bg-red-50 transition-all"
+                >
+                  <div>
+                    <p className="font-semibold text-slate-900">{p.patient_name}</p>
+                    <p className="text-xs text-slate-500">{p.cr_number} · {p.age_years}y · {p.diagnosis}</p>
+                  </div>
+                  <Play className="w-4 h-4 text-red-500" />
+                </button>
+              ))}
+            </div>
+            <Button variant="outline" onClick={() => { setShowSOSPicker(false); setShowPatientOnboarding(true); }} className="w-full gap-2">
+              <Plus className="w-4 h-4" /> Register New Patient First
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
