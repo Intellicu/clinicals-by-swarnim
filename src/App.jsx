@@ -56,6 +56,7 @@ import DailySummary from './pages/DailySummary';
 import OncologyHub from './pages/OncologyHub';
 import OncologyAdmin from './pages/OncologyAdmin';
 import OncologyPathway from './pages/OncologyPathway';
+import EngineAuditBlueprint from './pages/EngineAuditBlueprint';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -136,6 +137,7 @@ const AuthenticatedApp = () => {
         <Route path="/OncologyAdmin" element={<LayoutWrapper currentPageName="OncologyAdmin"><OncologyAdmin /></LayoutWrapper>} />
         <Route path="/OncologyPathway" element={<LayoutWrapper currentPageName="OncologyPathway"><OncologyPathway /></LayoutWrapper>} />
         <Route path="/FeedbackInbox" element={<LayoutWrapper currentPageName="FeedbackInbox"><FeedbackInbox /></LayoutWrapper>} />
+        <Route path="/EngineAuditBlueprint" element={<LayoutWrapper currentPageName="EngineAuditBlueprint"><EngineAuditBlueprint /></LayoutWrapper>} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
