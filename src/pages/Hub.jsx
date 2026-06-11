@@ -493,47 +493,20 @@ export default function Hub() {
               <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
               <span className="hidden sm:inline">{isOnline ? "Online" : "Offline"}</span>
             </span>
-            {/* Emergency Protocols button */}
             <button
               onClick={() => setEmergencyProtocolOpen(true)}
               className="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white rounded-lg h-7 px-2.5 text-xs font-bold transition-colors shadow-sm"
               aria-label="Emergency Protocols">
-              
               <AlertCircle className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Emergency</span>
             </button>
-            <Link to={createPageUrl("ClinicalWorkspace")}>
-              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                <Layers className="w-3 h-3" />
-                <span className="hidden sm:inline">Workspace</span>
-              </Button>
-            </Link>
-            <Link to={createPageUrl("GuidelinesLibrary")}>
-              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                <BookOpen className="w-3 h-3" />
-                <span className="hidden sm:inline">Guidelines</span>
-              </Button>
-            </Link>
-            <Link to={createPageUrl("ClinicalSupport")}>
-              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                <GitBranch className="w-3 h-3" />
-                <span className="hidden sm:inline">Pathways</span>
-              </Button>
-            </Link>
             {isAdmin &&
-            <>
               <Link to={createPageUrl("ClinicDashboard")}>
-                <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2">
+                <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
                   <Users className="w-3 h-3" />
+                  <span className="hidden sm:inline">Clinic</span>
                 </Button>
               </Link>
-              <Link to={createPageUrl("PathwayApprovalDashboard")}>
-                <Button size="sm" className="bg-amber-500/80 hover:bg-amber-400 text-white border-amber-400/30 border text-xs h-7 px-2 gap-1 hidden">
-                  <Sparkles className="w-3 h-3" />
-                  <span className="hidden sm:inline">Approvals</span>
-                </Button>
-              </Link>
-            </>
             }
           </div>
         </div>
