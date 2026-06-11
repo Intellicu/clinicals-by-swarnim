@@ -128,6 +128,126 @@ function useFavorites() {
   return { favIds, toggle };
 }
 
+// ── Quick Drug Search for Rx builder ──────────────────────────────────────────
+function RxQuickSearch({ drugs, weight, bsa, effectiveEgfr, onAdd, onView, rxDrugs }) {
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const results = useMemo(() => {
+    if (!q.trim() || q.length < 2) return [];
+    const lower = q.toLowerCase();
+    return drugs.filter(d =>
+      (d.generic_name?.toLowerCase().includes(lower) || d.brands_indian?.toLowerCase().includes(lower)) && !d.is_duplicate_hidden
+    ).slice(0, 8);
+  }, [drugs, q]);
+
+  React.useEffect(() => { setOpen(results.length > 0); }, [results]);
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-500" />
+        <input value={q} onChange={e => setQ(e.target.value)}
+          onFocus={() => results.length > 0 && setOpen(true)}
+          placeholder="Quick-search drug to add to Rx..."
+          className="w-full pl-9 pr-4 py-2.5 text-sm border-2 border-teal-200 rounded-xl bg-teal-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all" />
+        {q && <button onClick={() => { setQ(""); setOpen(false); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500"><X className="w-4 h-4" /></button>}
+      </div>
+      {open && results.length > 0 && (
+        <div className="absolute z-50 left-0 right-0 mt-1 bg-white rounded-xl border border-teal-200 shadow-xl overflow-hidden">
+          {results.map(drug => {
+            const dose = calcDose(drug, weight, bsa, effectiveEgfr);
+            const isInRx = rxDrugs.find(d => d.id === drug.id);
+            return (
+              <div key={drug.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-teal-50 border-b border-slate-100 last:border-0 transition-colors">
+                <Pill className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
+                <div className="flex-1 min-w-0" onClick={() => { onView(drug); setQ(""); setOpen(false); }} style={{ cursor: "pointer" }}>
+                  <p className="text-sm font-semibold text-slate-900 leading-tight">{drug.generic_name}</p>
+                  {dose && dose.perDose !== drug.dose_weight_based && (
+                    <p className="text-xs text-teal-700 font-medium">{dose.perDose} · {dose.freq} · {drug.route}</p>
+                  )}
+                  {(!dose || dose.perDose === drug.dose_weight_based) && (
+                    <p className="text-xs text-slate-400">{drug.dose_weight_based || drug.category}</p>
+                  )}
+                </div>
+                <Button size="sm" onClick={() => { onAdd(drug); setQ(""); setOpen(false); }}
+                  className={`text-xs flex-shrink-0 h-7 px-2 ${isInRx ? "bg-green-100 text-green-700 border border-green-300" : "bg-teal-600 hover:bg-teal-700 text-white"}`}>
+                  {isInRx ? <CheckCircle className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Formulary Tab with search + grouped categories ────────────────────────────
+function FormularyTab({ drugs, isLoading, selectDrug, favIds, toggleFav, rxDrugs, effectiveEgfr }) {
+  const [fSearch, setFSearch] = useState("");
+  const [fCat, setFCat] = useState("All");
+
+  const cats = useMemo(() => ["All", ...Array.from(new Set(drugs.map(d => d.category || "Other"))).sort()], [drugs]);
+
+  const filtered = useMemo(() => {
+    const q = fSearch.toLowerCase();
+    return drugs.filter(d => {
+      const matchQ = !q || d.generic_name?.toLowerCase().includes(q) || d.brands_indian?.toLowerCase().includes(q);
+      const matchC = fCat === "All" || d.category === fCat;
+      return matchQ && matchC && !d.is_duplicate_hidden;
+    });
+  }, [drugs, fSearch, fCat]);
+
+  const grouped = useMemo(() => {
+    return filtered.reduce((acc, d) => {
+      const cat = d.category || "Other";
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(d);
+      return acc;
+    }, {});
+  }, [filtered]);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <BookOpen className="w-4 h-4 text-teal-600 flex-shrink-0" />
+        <h2 className="text-sm font-bold text-slate-700">Pediatric Drug Formulary</h2>
+        <span className="ml-auto text-xs text-slate-400">{filtered.length} drugs</span>
+      </div>
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input value={fSearch} onChange={e => setFSearch(e.target.value)}
+          placeholder="Search formulary..."
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
+      </div>
+      {/* Category pills */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        {cats.map(c => (
+          <button key={c} onClick={() => setFCat(c)}
+            className={`flex-shrink-0 px-3 py-1 text-xs font-semibold rounded-lg border transition-all ${fCat === c ? "bg-teal-600 text-white border-teal-600" : "bg-white border-slate-200 text-slate-600 hover:border-teal-300"}`}>
+            {c}
+          </button>
+        ))}
+      </div>
+      {isLoading ? (
+        <p className="text-slate-400 text-sm text-center py-8">Loading formulary...</p>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-10 text-slate-400">
+          <Pill className="w-8 h-8 mx-auto mb-2 opacity-30" />
+          <p className="text-sm">No drugs found</p>
+        </div>
+      ) : (
+        Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([cat, catDrugs]) => (
+          <FormularyCategory key={cat} category={cat} drugs={catDrugs} onSelect={selectDrug}
+            favIds={favIds} toggleFav={toggleFav} rxDrugs={rxDrugs} effectiveEgfr={effectiveEgfr} />
+        ))
+      )}
+    </div>
+  );
+}
+
 // ── Collapsible formulary category ────────────────────────────────────────────
 function FormularyCategory({ category, drugs, onSelect, favIds, toggleFav, rxDrugs, effectiveEgfr }) {
   const [open, setOpen] = useState(true);
@@ -882,12 +1002,10 @@ export default function DrugsDosing() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2"><Printer className="w-4 h-4 text-teal-600" /> Prescription Builder</h2>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => setMode("search")} className="text-xs h-8 gap-1">
-                  <Plus className="w-3 h-3" /> Add Drug
-                </Button>
-              </div>
             </div>
+
+            {/* ── Quick Drug Search inside Rx ── */}
+            <RxQuickSearch drugs={drugs} weight={parseFloat(weight)} bsa={bsa} effectiveEgfr={effectiveEgfr} onAdd={(drug) => { addToRx(drug); }} onView={selectDrug} rxDrugs={rxDrugs} />
 
             {/* Template section */}
             <div className="bg-white rounded-xl border border-slate-200 p-3">
@@ -1008,21 +1126,7 @@ export default function DrugsDosing() {
         {mode === "plasmapheresis" && <PlasmapheresisModule />}
 
         {mode === "formulary" && (
-          <div className="space-y-4">
-            <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2"><BookOpen className="w-4 h-4 text-teal-600" /> Pediatric Drug Formulary</h2>
-            {/* Grouped by category */}
-            {isLoading ? <p className="text-slate-400 text-sm">Loading...</p> : (() => {
-              const grouped = drugs.reduce((acc, d) => {
-                const cat = d.category || "Other";
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push(d);
-                return acc;
-              }, {});
-              return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([cat, catDrugs]) => (
-                <FormularyCategory key={cat} category={cat} drugs={catDrugs} onSelect={selectDrug} favIds={favIds} toggleFav={toggleFav} rxDrugs={rxDrugs} effectiveEgfr={effectiveEgfr} />
-              ));
-            })()}
-          </div>
+          <FormularyTab drugs={drugs} isLoading={isLoading} selectDrug={selectDrug} favIds={favIds} toggleFav={toggleFav} rxDrugs={rxDrugs} effectiveEgfr={effectiveEgfr} />
         )}
 
         {mode === "ckd" && (
