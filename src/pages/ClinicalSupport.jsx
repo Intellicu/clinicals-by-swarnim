@@ -1749,6 +1749,9 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               onBack={() => setActiveTab("scenarios")}
             />
           </TabsContent>
+
+          {/* Oncology note: OncologyEngine accessed via PathwayRenderer (oncology-engine scenario id),
+              not as standalone page. Opens in ClinicalSupport pathways tab, no patient fields. */}
         </Tabs>
 
         <Alert className="mt-6 bg-purple-50 border-purple-200">

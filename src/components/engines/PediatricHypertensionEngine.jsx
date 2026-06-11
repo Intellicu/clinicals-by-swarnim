@@ -52,10 +52,49 @@ export default function PediatricHypertensionEngine() {
   const [symptoms, setSymptoms] = useState({});
   const [bpClass, setBPClass] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
+  const [cause, setCause] = useState("");
 
   const toggle = (id) => setSymptoms(s => ({ ...s, [id]: !s[id] }));
   const isEmergency = symptoms.seizure || symptoms.encephalopathy || symptoms.pulm_edema;
-  const isUrgency = !isEmergency && (symptoms.headache || symptoms.visual) && bpClass === "Stage 2 HTN";
+
+  const AGE_CAUSES = {
+    neonate: [
+      { cause: "Renal artery thrombosis (UAC-related)", workup: "Renal Doppler, renin, history of umbilical artery catheter" },
+      { cause: "Coarctation of aorta", workup: "4-limb BP, echo, CT angiography" },
+      { cause: "Renal vein thrombosis", workup: "Renal USG + Doppler, LDH, haematuria" },
+      { cause: "CAKUT / Renal dysplasia", workup: "Renal USG, eGFR, UPCR" },
+    ],
+    infant: [
+      { cause: "Renovascular (RAS, FMD)", workup: "Renal artery Doppler, captopril scintigraphy, MRA, renin" },
+      { cause: "CKD / Reflux nephropathy", workup: "USG kidneys, eGFR, UPCR, DMSA" },
+      { cause: "Coarctation", workup: "4-limb BP, echo" },
+      { cause: "Neuroblastoma / Wilms", workup: "USS abdomen, urine catecholamines, AFP" },
+    ],
+    child: [
+      { cause: "CKD / Reflux nephropathy", workup: "USG kidneys, eGFR, UPCR, DMSA" },
+      { cause: "Renovascular (FMD / RAS)", workup: "Renal artery Doppler, MRA, renin" },
+      { cause: "Primary aldosteronism", workup: "Aldosterone, renin, A:R ratio, adrenal CT" },
+      { cause: "Pheochromocytoma", workup: "Plasma metanephrines (preferred), urine catecholamines" },
+      { cause: "Coarctation", workup: "4-limb BP, echo" },
+    ],
+    adolescent: [
+      { cause: "Essential HTN (obesity-linked)", workup: "BMI, waist circumference, fasting glucose, lipids, ABPM" },
+      { cause: "CKD / Reflux nephropathy", workup: "USG kidneys, eGFR, UPCR" },
+      { cause: "Renovascular", workup: "Renal artery Doppler, MRA, renin" },
+      { cause: "Pheochromocytoma", workup: "Plasma metanephrines" },
+      { cause: "White coat HTN", workup: "ABPM (ambulatory BP monitoring) — confirms white coat vs sustained" },
+    ],
+  };
+
+  const DRUG_CAUSE_GUIDE = [
+    { cause: "CKD + proteinuria", drug: "ACEi/ARB first line", rationale: "ESCAPE trial — losartan slows CKD progression; reduces proteinuria", warning: null },
+    { cause: "Renovascular (bilateral RAS or single functioning kidney)", drug: "Amlodipine (CCB) first", rationale: "ACEi/ARB can precipitate acute AKI in bilateral RAS — use with extreme caution or avoid", warning: "⚠️ ACEi/ARB: risk of AKI in bilateral RAS" },
+    { cause: "Pheochromocytoma", drug: "Alpha-blocker FIRST (phenoxybenzamine 0.2–1 mg/kg/day)", rationale: "NEVER give beta-blocker alone — unmasked alpha stimulation → hypertensive crisis", warning: "⚠️ Beta-blocker alone is CONTRAINDICATED — only after alpha block established" },
+    { cause: "Primary aldosteronism", drug: "Spironolactone or eplerenone; surgery if unilateral adenoma", rationale: "Aldosterone blockade is pathophysiologically correct treatment", warning: null },
+    { cause: "Coarctation", drug: "Antihypertensives as bridge — surgical/interventional repair is definitive", rationale: "Balloon angioplasty or surgery fixes anatomical cause", warning: null },
+    { cause: "White coat HTN", drug: "No drug treatment — lifestyle + ABPM follow-up", rationale: "ABPM distinguishes sustained from white coat — avoid unnecessary treatment", warning: null },
+    { cause: "Essential HTN + obesity", drug: "Non-pharmacological first: weight loss, DASH diet, exercise (6 months trial)", rationale: "AAP 2017: pharmacological only if persistent Stage 2 or Stage 1 + symptoms", warning: null },
+  ];
 
   return (
     <div className="space-y-4">
@@ -111,22 +150,50 @@ export default function PediatricHypertensionEngine() {
 
       {step === 2 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-slate-700">Secondary Hypertension — Causes & Workup:</p>
-          <p className="text-xs text-slate-500">In children, 85% of sustained HTN is secondary. Consider age: Neonates → RAS/coarctation; Infants → RAS/CKD; School age → CKD/renovascular; Adolescents → Essential + secondary</p>
-          {SECONDARY_CAUSES.map((c, i) => (
-            <div key={i} className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-sm font-bold text-slate-800">{c.cause}</p>
-              <p className="text-xs text-slate-600 mt-1">→ {c.workup}</p>
-            </div>
+          <p className="text-sm font-semibold text-slate-700">Age group — helps prioritise cause:</p>
+          <p className="text-xs text-slate-500">In children, 85% of sustained HTN is secondary. Age determines most likely cause.</p>
+          {[
+            { id: "neonate", label: "Neonate (0–1 month)", sub: "RAS/coarctation/UAC thrombosis most likely" },
+            { id: "infant", label: "Infant (1 month – 2 years)", sub: "Renovascular, CKD, CAKUT, tumours" },
+            { id: "child", label: "Child (2–12 years)", sub: "CKD/reflux nephropathy, renovascular, phaeochromocytoma" },
+            { id: "adolescent", label: "Adolescent (>12 years)", sub: "Essential HTN (obesity), CKD, white coat HTN" },
+          ].map(ag => (
+            <button key={ag.id} onClick={() => { setAgeGroup(ag.id); setStep(2.5); }}
+              className={`w-full flex items-start justify-between px-4 py-3 rounded-xl border-2 transition-all text-left ${ageGroup === ag.id ? "border-red-400 bg-red-50" : "border-slate-200 bg-white hover:border-red-300"}`}>
+              <div>
+                <p className="text-sm font-bold text-slate-800">{ag.label}</p>
+                <p className="text-xs text-slate-500">{ag.sub}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 mt-0.5" />
+            </button>
+          ))}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setStep(1)} className="flex-1"><ArrowLeft className="w-4 h-4 mr-1" />Back</Button>
+          </div>
+        </div>
+      )}
+
+      {step === 2.5 && ageGroup && (
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-slate-700">Age-specific causes — {ageGroup} group:</p>
+          {AGE_CAUSES[ageGroup].map((c, i) => (
+            <button key={i} onClick={() => { setCause(c.cause); setStep(3); }}
+              className="w-full flex items-start justify-between px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-red-400 hover:bg-red-50 transition-all text-left">
+              <div>
+                <p className="text-sm font-bold text-slate-800">{c.cause}</p>
+                <p className="text-xs text-slate-500 mt-0.5">Workup: {c.workup}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 mt-0.5" />
+            </button>
           ))}
           <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 space-y-1 text-xs text-blue-900">
             <p className="font-bold">Standard Workup (all children with confirmed HTN):</p>
-            {["Urine: Urinalysis, UPCR, sodium, osmolality", "Blood: eGFR, electrolytes, Ca, glucose, cholesterol, HbA1c", "USG kidneys + bladder (renal size, echogenicity, Doppler)", "Echo (LVH — end-organ damage)", "ABPM (ambulatory BP monitoring) — white coat vs sustained HTN"].map((w, j) => (
+            {["Urinalysis, UPCR, urine sodium, osmolality", "eGFR, electrolytes, Ca, glucose, cholesterol, HbA1c", "USG kidneys + bladder (renal size, echogenicity, Doppler)", "Echo (LVH — end-organ damage marker)", "ABPM — white coat vs sustained HTN"].map((w, j) => (
               <div key={j} className="flex items-start gap-1.5"><ChevronRight className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-blue-500" />{w}</div>
             ))}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setStep(1)} className="flex-1"><ArrowLeft className="w-4 h-4 mr-1" />Back</Button>
+            <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="w-4 h-4 mr-1" />Back</Button>
             <Button className="flex-1 bg-red-600 hover:bg-red-700" onClick={() => setStep(3)}>Drug Selection <ChevronRight className="w-4 h-4 ml-1" /></Button>
           </div>
         </div>
@@ -134,11 +201,28 @@ export default function PediatricHypertensionEngine() {
 
       {step === 3 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-slate-700">Drug Selection Guide (by indication):</p>
           <div className="rounded-xl bg-amber-50 border border-amber-200 p-2 text-xs text-amber-900 space-y-0.5">
             <p className="font-bold">Non-pharmacological: ALWAYS first in Elevated BP / Stage 1 without symptoms</p>
             <p>Weight reduction, DASH diet, salt restriction (Na &lt;2g/day), regular exercise, sleep hygiene</p>
           </div>
+
+          {/* Cause-specific drug guide */}
+          {cause && (() => {
+            const guide = DRUG_CAUSE_GUIDE.find(g => g.cause.toLowerCase().includes(cause.toLowerCase().split(" ")[0]) || cause.toLowerCase().includes(g.cause.toLowerCase().split(" ")[0]));
+            if (!guide) return null;
+            return (
+              <div className="rounded-xl bg-blue-50 border-2 border-blue-300 p-3 space-y-2">
+                <p className="text-xs font-bold text-blue-800">Cause-Specific Drug Choice: {guide.cause}</p>
+                <div className="bg-blue-100 rounded-lg p-2">
+                  <p className="text-sm font-bold text-blue-900">{guide.drug}</p>
+                  <p className="text-xs text-blue-700 mt-0.5">{guide.rationale}</p>
+                </div>
+                {guide.warning && <p className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 rounded-lg px-2 py-1">{guide.warning}</p>}
+              </div>
+            );
+          })()}
+
+          <p className="text-sm font-semibold text-slate-700">Full Drug Reference:</p>
           {DRUGS.map((d, i) => (
             <div key={i} className="rounded-xl border border-slate-200 bg-white p-3">
               <div className="flex items-start justify-between">
@@ -154,12 +238,12 @@ export default function PediatricHypertensionEngine() {
           {isEmergency && (
             <div className="rounded-xl bg-red-50 border-2 border-red-400 p-3 space-y-1 text-xs text-red-900">
               <p className="font-bold">Hypertensive Emergency Protocol:</p>
-              {["IV Labetalol 0.2–1 mg/kg/dose — preferred (alpha + beta)", "OR Nicardipine infusion 1–3 µg/kg/min (if labetalol unavailable)", "Goal: Reduce MAP by ≤25% in first hour — faster = risk of ischaemia/PRES", "PRES: MRI FLAIR + levetiracetam for seizures", "ICU: Continuous BP monitoring (arterial line if possible)", "Identify and treat underlying cause (CKD flare, RAS, pheochromocytoma)"].map((m, j) => (
+              {["IV Labetalol 0.2–1 mg/kg/dose — preferred (alpha + beta)", "OR Nicardipine infusion 1–3 µg/kg/min (if labetalol unavailable)", "Goal: Reduce MAP by ≤25% in first hour — faster = risk of ischaemia/PRES", "PRES: MRI FLAIR + levetiracetam for seizures", "ICU: Continuous BP monitoring (arterial line if possible)"].map((m, j) => (
                 <div key={j} className="flex items-start gap-1.5"><ChevronRight className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-red-600" />{m}</div>
               ))}
             </div>
           )}
-          <Button className="w-full bg-red-600 hover:bg-red-700" onClick={() => { setStep(0); setSymptoms({}); setBPClass(""); }}>New Patient</Button>
+          <Button className="w-full bg-red-600 hover:bg-red-700" onClick={() => { setStep(0); setSymptoms({}); setBPClass(""); setCause(""); setAgeGroup(""); }}>New Patient</Button>
         </div>
       )}
     </div>

@@ -6,15 +6,84 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, ChevronRight, ArrowLeft, Baby, Droplet, Activity, AlertCircle } from "lucide-react";
 
 const SUB_ENGINES = [
-  { id: "antenatal_hydro", label: "Antenatal Hydronephrosis", desc: "UTD classification, postnatal workup" },
-  { id: "upj", label: "UPJ Obstruction", desc: "Diagnosis, MAG3, pyeloplasty indications" },
-  { id: "megaureter", label: "Megaureter", desc: "Primary vs secondary, obstructed vs reflux" },
-  { id: "mcdk", label: "Multicystic Dysplastic Kidney", desc: "Involution monitoring, contralateral VUR" },
-  { id: "sfk", label: "Solitary Functioning Kidney", desc: "Compensatory hypertrophy, monitoring protocol" },
-  { id: "duplex", label: "Duplex System / Ureterocele", desc: "Upper-lower pole, ureterocele, obstruction" },
+  { id: "puv", label: "PUV — Posterior Urethral Valves", desc: "URGENT: Male infant + bilateral HN + distended bladder", color: "bg-red-600" },
+  { id: "vur", label: "VUR — Vesicoureteric Reflux", desc: "Grade I–V · CAP vs surgery · RIVUR trial", color: "bg-orange-600" },
+  { id: "antenatal_hydro", label: "Antenatal Hydronephrosis", desc: "UTD classification, postnatal workup", color: "bg-blue-600" },
+  { id: "upj", label: "UPJ Obstruction", desc: "Diagnosis, MAG3, pyeloplasty indications", color: "bg-teal-600" },
+  { id: "megaureter", label: "Megaureter", desc: "Primary vs secondary, obstructed vs reflux", color: "bg-violet-600" },
+  { id: "mcdk", label: "Multicystic Dysplastic Kidney", desc: "Involution monitoring, contralateral VUR", color: "bg-slate-600" },
+  { id: "sfk", label: "Solitary Functioning Kidney", desc: "Compensatory hypertrophy, monitoring protocol", color: "bg-green-600" },
+  { id: "duplex", label: "Duplex System / Ureterocele", desc: "Upper-lower pole, ureterocele, obstruction", color: "bg-purple-600" },
 ];
 
 const ENGINE_CONTENT = {
+  puv: {
+    title: "Posterior Urethral Valves — URGENT",
+    steps: [
+      { heading: "⚠️ Red Flag Recognition — Suspect PUV if:", color: "bg-red-50 border-red-300", items: [
+        "Male infant + bilateral hydronephrosis on antenatal or postnatal USG",
+        "Distended bladder that does not empty on repeat scan",
+        "Poor urinary stream / dribbling urine in male neonate",
+        "Oligohydramnios on antenatal scan + male fetus",
+        "Elevated creatinine in male neonate (above age-adjusted norm)",
+      ]},
+      { heading: "Immediate Investigations", color: "bg-blue-50 border-blue-200", items: [
+        "Renal + bladder USG STAT: Bilateral HN + thick-walled bladder + dilated posterior urethra",
+        "Serum creatinine + electrolytes: Assess renal function severity",
+        "VCUG (voiding cystourethrogram): Gold standard — posterior urethral dilation = PUV",
+        "Urinalysis: UTI screen (common at presentation)",
+        "CXR if oligohydramnios: Pulmonary hypoplasia assessment",
+      ]},
+      { heading: "Management", color: "bg-green-50 border-green-200", items: [
+        "Insert urethral catheter IMMEDIATELY — decompress bladder (8 Fr catheter)",
+        "Post-obstructive diuresis: IV fluids replacement (urine output ml for ml for first 12h)",
+        "Correct electrolytes: Hyperkalaemia, metabolic acidosis common",
+        "Prophylactic antibiotics: Trimethoprim 2 mg/kg OD until definitive treatment",
+        "Cystoscopic valve ablation (endoscopic): Definitive treatment when stable (>2–3 kg weight)",
+        "Bilateral ureterostomy: If too small for cystoscopy or upper tract decompression needed",
+      ]},
+      { heading: "Long-term Monitoring (CKD Risk High)", color: "bg-amber-50 border-amber-200", items: [
+        "eGFR every 3 months for 2 years, then 6-monthly: 30% reach ESKD by 30 years",
+        "BP every 3 months: Hypertension very common post-PUV",
+        "UPCR every 6 months: Proteinuria = poor prognosis marker",
+        "Renal USG 6-monthly: Hydronephrosis resolution, bladder wall thickness",
+        "Urodynamics at 1 year: 'Valve bladder' — detrusor overactivity + high pressure storage",
+        "ACEi/ARB: If UPCR >0.2 mg/mg — renoprotective",
+      ]},
+    ]
+  },
+  vur: {
+    title: "VUR — Vesicoureteric Reflux",
+    steps: [
+      { heading: "VUR Grading (International Classification)", color: "bg-blue-50 border-blue-200", items: [
+        "Grade I: Reflux into ureter only (no pelvic dilation)",
+        "Grade II: Reflux into collecting system; no calyceal dilation",
+        "Grade III: Mild-moderate calyceal dilation; fornices preserved",
+        "Grade IV: Moderate dilation; blunted fornices",
+        "Grade V: Gross dilation + tortuous ureter + calyceal clubbing",
+      ]},
+      { heading: "Management by Grade (RIVUR Trial 2014 Evidence)", color: "bg-green-50 border-green-200", items: [
+        "Grade I–II: Observation + good voiding habits; treat BBD; annual USG; no CAP unless recurrent UTI",
+        "Grade III–IV: Continuous antibiotic prophylaxis (CAP) + annual DMSA; RIVUR trial: CAP reduces febrile UTI by 50% in grades I–IV + BBD",
+        "Grade V: Early ureteric reimplantation (open Politano-Leadbetter or laparoscopic); manage associated renal dysplasia",
+        "CAP drug choice: Trimethoprim 2 mg/kg OD or Nitrofurantoin 1 mg/kg OD (avoid in infants <3m or G6PD)",
+        "Endoscopic STING (submucosal injection): Grades III–IV with breakthrough UTI on CAP — 70–80% success rate 1 injection",
+      ]},
+      { heading: "DMSA Scan — When and How to Use", color: "bg-amber-50 border-amber-200", items: [
+        "Acute DMSA: 4–6 months after febrile UTI — detects renal scarring (not acute pyelonephritis)",
+        "Grade III–IV VUR: DMSA at 1 year (baseline) and 3 years (scar progression)",
+        "Differential function <45%: May indicate severe dysplasia — surgical planning",
+        "New scars on serial DMSA despite CAP: Consider ureteric reimplantation",
+      ]},
+      { heading: "Long-term Monitoring", color: "bg-slate-50 border-slate-200", items: [
+        "eGFR 6-monthly for 2 years post-resolution, then annually",
+        "BP annually: Renal scarring → hypertension risk",
+        "UPCR annually: Reflux nephropathy + scarring → proteinuria",
+        "ACEi/ARB: If UPCR >0.2 mg/mg or hypertension",
+        "VUR often resolves spontaneously by age 5–6y in grades I–III",
+      ]},
+    ]
+  },
   antenatal_hydro: {
     title: "Antenatal Hydronephrosis Engine",
     steps: [
@@ -143,15 +212,12 @@ export default function CAKUTEngine() {
         <div className="grid gap-2">
           {SUB_ENGINES.map(eng => (
             <button key={eng.id} onClick={() => setSelected(eng.id)}
-              className="flex items-start gap-3 p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-teal-300 hover:bg-teal-50 transition-all text-left">
-              <div className="w-8 h-8 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Droplet className="w-4 h-4 text-white" />
-              </div>
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-white text-left shadow-sm ${eng.color || "bg-teal-600"} hover:opacity-90 active:scale-95 transition-all`}>
+              <ChevronRight className="w-4 h-4 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-slate-800">{eng.label}</p>
-                <p className="text-xs text-slate-500">{eng.desc}</p>
+                <p className="text-sm font-bold">{eng.label}</p>
+                <p className="text-xs opacity-80 mt-0.5">{eng.desc}</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
             </button>
           ))}
         </div>

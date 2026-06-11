@@ -204,9 +204,52 @@ export default function VoidingDysfunctionEngine() {
     </div>
   );
 
+  const INVESTIGATIONS = {
+    oab: {
+      must: ["Urinalysis + MSU culture", "Renal + bladder USG (pre/post-void, bladder wall thickness)", "Bladder diary × 3 days (voiding frequency + volumes)", "BBD questionnaire score"],
+      should: ["Uroflow + PVR", "Spine XR or MRI if any neurological features"],
+      monitoring: ["4-weekly review for first 3 months", "DVSS score at baseline and follow-up", "Refer to specialist if no improvement after 6 months urotherapy + medication"],
+    },
+    dv: {
+      must: ["Uroflow + PVR", "Urinalysis + MSU culture", "Renal + bladder USG", "BBD questionnaire + constipation assessment"],
+      should: ["Bladder diary × 3 days", "Perineal EMG (biofeedback assessment)"],
+      monitoring: ["Monthly during active biofeedback", "CIC if PVR consistently >30% bladder capacity", "Refer urology if Hinman syndrome suspected (non-neurogenic neurogenic bladder)"],
+    },
+    underactive: {
+      must: ["Uroflow + PVR (elevated PVR is key finding)", "Urinalysis + MSU culture", "Renal + bladder USG", "Spine MRI if neurological symptoms"],
+      should: ["Urodynamic study if PVR >30% bladder capacity on multiple occasions"],
+      monitoring: ["CIC if PVR >30% bladder capacity — self-catheterisation teaching", "eGFR + USG annually (upper tract protection)", "Refer urology long-term for CIC management"],
+    },
+    neurogenic: {
+      must: ["Urodynamic study (UDS) with cystometrogram + EMG — ESSENTIAL", "MRI spine (tethered cord, sacral agenesis, spinal cord lesion)", "Renal + bladder USG", "VCUG (assess vesico-ureteric reflux + detrusor-sphincter dyssynergia)"],
+      should: ["eGFR + UPCR (upper tract protection — neurogenic bladder highest risk for CKD)"],
+      monitoring: ["6-monthly renal USG + eGFR", "Annual urodynamics if high-risk features (high detrusor pressure)", "Multidisciplinary: nephrology + urology + neurology + physiotherapy"],
+    },
+    bbd: {
+      must: ["Constipation assessment (Bristol stool chart, abdominal XR if needed)", "Bladder diary", "MSU culture", "Renal + bladder USG"],
+      should: ["Uroflow + PVR", "BBD questionnaire score (DVSS)"],
+      monitoring: ["Monthly until symptom resolution", "Treat constipation FIRST — incontinence often resolves spontaneously with bowel treatment", "UPCR if recurrent UTIs causing renal scarring"],
+    },
+    mne: {
+      must: ["Urinalysis + MSU culture (exclude UTI)", "Bladder diary (voiding frequency, volumes, wet nights)", "DVSS screening (for daytime symptoms — classify NMNE if present)"],
+      should: ["Renal + bladder USG if secondary enuresis or daytime symptoms"],
+      monitoring: ["3-monthly response assessment (dry nights per week)", "Enuresis alarm: minimum 3-month trial before assessing failure", "Reassess for daytime symptoms at each visit — reclassify if present"],
+    },
+  };
+
+  const REFERRAL = {
+    oab: "Refer to paediatric urology/nephrology if no improvement after 6 months urotherapy + oxybutynin",
+    dv: "Refer if biofeedback unavailable or Hinman syndrome suspected (requires UDS + specialist input)",
+    underactive: "Refer urology: CIC teaching + long-term management of underactive bladder",
+    neurogenic: "Immediate referral: Nephrology + Urology + Neurology — multidisciplinary care essential",
+    bbd: "Refer if constipation refractory or recurrent febrile UTIs causing renal scarring",
+    mne: "Refer if alarm + desmopressin both fail after 6 months; consider urodynamics for complex cases",
+  };
+
   const renderDiagnosisOutput = () => {
     const dx = DIAGNOSES[diagnosis];
     if (!dx) return null;
+    const inv = INVESTIGATIONS[diagnosis];
     return (
       <div className="space-y-3">
         <div className={`rounded-xl border-2 p-4 ${dx.color}`}>
@@ -224,14 +267,25 @@ export default function VoidingDysfunctionEngine() {
             ))}
           </CardContent>
         </Card>
-        <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-1 text-xs text-slate-700">
-          <p className="font-bold text-slate-800">Investigations Required:</p>
-          {[
-            "Must: Urinalysis + urine culture, USG kidneys/bladder (pre/post-void), bladder diary × 48h",
-            "Should: Uroflow + PVR, BBD questionnaire score",
-            "If complex/neurogenic: Urodynamic study (UDS), spine MRI, VCUG",
-          ].map((i, j) => <p key={j}>{i}</p>)}
-        </div>
+        {inv && (
+          <>
+            <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 space-y-1.5 text-xs">
+              <p className="font-bold text-blue-900">Must Order:</p>
+              {inv.must.map((i, j) => <p key={j} className="text-blue-800 flex items-start gap-1"><span className="font-bold flex-shrink-0">•</span>{i}</p>)}
+              <p className="font-bold text-blue-900 mt-2">Should Order:</p>
+              {inv.should.map((i, j) => <p key={j} className="text-blue-700 flex items-start gap-1"><span className="font-bold flex-shrink-0">◦</span>{i}</p>)}
+            </div>
+            <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 space-y-1.5 text-xs">
+              <p className="font-bold text-amber-900">Follow-up and Monitoring:</p>
+              {inv.monitoring.map((m, i) => <p key={i} className="text-amber-800 flex items-start gap-1"><span className="font-bold flex-shrink-0">→</span>{m}</p>)}
+            </div>
+            {REFERRAL[diagnosis] && (
+              <div className="rounded-xl bg-slate-100 border border-slate-300 p-2.5 text-xs text-slate-700">
+                <span className="font-bold">Referral: </span>{REFERRAL[diagnosis]}
+              </div>
+            )}
+          </>
+        )}
         <Button className="w-full bg-teal-600 hover:bg-teal-700" onClick={() => { setStep(0); setSymptoms({}); setContinenceAchieved(null); setHasDaytime(null); setBBD({}); setUroflow(""); setPVR(""); setDiagnosis(""); }}>
           New Patient
         </Button>
