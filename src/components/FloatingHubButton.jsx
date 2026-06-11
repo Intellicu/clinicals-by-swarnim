@@ -64,7 +64,7 @@ function MiniChat({ onClose }) {
   };
 
   return (
-    <div className="flex flex-col" style={{ height: "380px" }}>
+    <div className="flex flex-col h-full min-h-0">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {messages.length === 0 && (
@@ -148,17 +148,16 @@ export default function FloatingHubButton() {
       {/* Panel */}
       {open && (
         <div
-          className="fixed z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
-          style={{ bottom: "calc(var(--tab-bar-height, 64px) + 60px)", right: "12px", maxHeight: "min(480px, calc(100vh - 180px))", display: "flex", flexDirection: "column" }}
+          className="fixed z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col"
+          style={{ bottom: "calc(var(--tab-bar-height, 64px) + 60px)", right: "12px", height: "min(500px, calc(100vh - 160px))" }}
         >
-          {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-700 to-violet-700 px-4 py-3 flex items-center justify-between">
+          {/* Header — always visible, never scrolls away */}
+          <div className="flex-shrink-0 bg-gradient-to-r from-indigo-700 to-violet-700 px-4 py-2.5 flex items-center justify-between rounded-t-2xl">
             <div className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-white" />
+              <Bot className="w-4 h-4 text-white" />
               <p className="text-white font-bold text-sm">Clinical AI Hub</p>
             </div>
             <div className="flex items-center gap-1">
-              {/* Panel toggle */}
               <div className="flex bg-white/20 rounded-lg overflow-hidden text-xs">
                 <button onClick={() => setPanel("tools")}
                   className={`px-2.5 py-1 font-medium transition-colors ${panel === "tools" ? "bg-white text-indigo-700" : "text-white/80 hover:text-white"}`}>
@@ -169,25 +168,16 @@ export default function FloatingHubButton() {
                   Chat
                 </button>
               </div>
-              <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white ml-1">
+              <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white ml-1.5">
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {panel === "chat" && (
-            <div className="flex items-center gap-2 px-3 py-2 border-b bg-slate-50">
-              <button onClick={switchToTools} className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                Back to Tools
-              </button>
-            </div>
-          )}
-
           {panel === "tools" ? (
             <>
               {/* Group tabs */}
-              <div className="flex border-b border-slate-100 bg-slate-50">
+              <div className="flex-shrink-0 flex border-b border-slate-100 bg-slate-50">
                 {GROUPS.map(g => (
                   <button key={g} onClick={() => setActiveGroup(g)}
                     className={`flex-1 py-2 text-xs font-semibold transition-all ${activeGroup === g ? "bg-white text-indigo-700 border-b-2 border-indigo-600" : "text-slate-500 hover:text-slate-700"}`}>
@@ -196,8 +186,8 @@ export default function FloatingHubButton() {
                 ))}
               </div>
 
-              {/* Tools grid */}
-              <div className="p-3 grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+              {/* Tools grid — scrollable */}
+              <div className="flex-1 overflow-y-auto p-3 grid grid-cols-3 gap-2 content-start">
                 {groupTools.map(tool => {
                   const Icon = tool.icon;
                   const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
@@ -214,7 +204,7 @@ export default function FloatingHubButton() {
                 })}
               </div>
 
-              <Link to="/AIAgentsHub" onClick={() => setOpen(false)}>
+              <Link to="/AIAgentsHub" onClick={() => setOpen(false)} className="flex-shrink-0">
                 <div className="flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-slate-100 bg-slate-50 hover:bg-indigo-50 transition-colors">
                   <span className="text-xs font-semibold text-indigo-600">View All AI Agents</span>
                   <ChevronRight className="w-3.5 h-3.5 text-indigo-600" />
@@ -222,7 +212,9 @@ export default function FloatingHubButton() {
               </Link>
             </>
           ) : (
-            <MiniChat onClose={() => setOpen(false)} />
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+              <MiniChat onClose={() => setOpen(false)} />
+            </div>
           )}
         </div>
       )}

@@ -2,17 +2,14 @@ import React, { useState, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search, Pill, AlertTriangle, Calculator, Shield,
   Printer, MessageCircle, Plus, Trash2, CheckCircle, Activity, Beaker, X,
-  BookOpen, Star, StarOff, Upload, FileText, Download, Sparkles, Globe,
-  ChevronLeft, Save, FolderOpen, Clock, ArrowRight
+  BookOpen, Star, StarOff, Upload, Download, Sparkles, Globe,
+  ChevronLeft, ChevronDown, ChevronUp, Save, FolderOpen, Clock, ArrowRight, Lock
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
@@ -131,6 +128,61 @@ function useFavorites() {
   return { favIds, toggle };
 }
 
+// ── Collapsible formulary category ────────────────────────────────────────────
+function FormularyCategory({ category, drugs, onSelect, favIds, toggleFav, rxDrugs, effectiveEgfr }) {
+  const [open, setOpen] = useState(true);
+  const CAT_COLORS = {
+    Corticosteroid: "text-purple-700 bg-purple-50 border-purple-200",
+    Immunosuppressant: "text-blue-700 bg-blue-50 border-blue-200",
+    Antihypertensive: "text-rose-700 bg-rose-50 border-rose-200",
+    Diuretic: "text-cyan-700 bg-cyan-50 border-cyan-200",
+    Antibiotic: "text-green-700 bg-green-50 border-green-200",
+    Biologic: "text-violet-700 bg-violet-50 border-violet-200",
+    "Complement Inhibitor": "text-amber-700 bg-amber-50 border-amber-200",
+  };
+  const colorClass = CAT_COLORS[category] || "text-slate-700 bg-slate-50 border-slate-200";
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <button onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors">
+        <div className="flex items-center gap-2">
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-md border ${colorClass}`}>{category}</span>
+          <span className="text-xs text-slate-400">{drugs.length} drug{drugs.length !== 1 ? "s" : ""}</span>
+        </div>
+        {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+      </button>
+      {open && (
+        <div className="divide-y divide-slate-100">
+          {drugs.map(drug => {
+            const isFav = favIds.includes(drug.id);
+            const isInRx = rxDrugs.find(d => d.id === drug.id);
+            const renalFlag = effectiveEgfr ? getRenalFlag(drug, effectiveEgfr) : null;
+            return (
+              <div key={drug.id} onClick={() => onSelect(drug)}
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-teal-50 cursor-pointer transition-colors">
+                <Pill className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-slate-900 leading-tight">{drug.generic_name}</p>
+                  {drug.brands_indian && <p className="text-xs text-slate-400 truncate">{drug.brands_indian.split(",")[0].trim()}</p>}
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  {renalFlag && <span className="text-[10px] text-amber-600">⚠️</span>}
+                  {isInRx && <CheckCircle className="w-3.5 h-3.5 text-green-500" />}
+                  <button onClick={e => { e.stopPropagation(); toggleFav(drug.id); }}
+                    className="text-slate-200 hover:text-amber-400 transition-colors">
+                    {isFav ? <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> : <StarOff className="w-3.5 h-3.5" />}
+                  </button>
+                  {drug.dose_weight_based && <span className="text-[10px] text-slate-400 hidden sm:block ml-1">{drug.dose_weight_based.split(" ").slice(0,2).join(" ")}</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DrugsDosing() {
   const { patientData } = usePatient();
   const urlParams = new URLSearchParams(window.location.search);
@@ -170,6 +222,13 @@ export default function DrugsDosing() {
   const [newDrug, setNewDrug] = useState({ generic_name: "", category: "Corticosteroid", route: "PO", dose_weight_based: "", frequency: "OD", brands_indian: "" });
 
   const queryClient = useQueryClient();
+
+  const { data: currentUser } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: () => base44.auth.me(),
+    staleTime: 60000,
+  });
+  const isAdmin = currentUser?.role === "admin";
 
   const { data: drugs = [], isLoading } = useQuery({
     queryKey: ["drugs-full"],
@@ -285,17 +344,30 @@ export default function DrugsDosing() {
   const runImport = async () => {
     if (!importFile?.rows?.length) return;
     setImportLoading(true);
+    setImportResult(null);
     let success = 0, fail = 0;
+    const failedRows = [];
     for (const row of importFile.rows) {
+      if (!row.generic_name || !row.category || !row.route) {
+        fail++;
+        failedRows.push(row.generic_name || "(missing name)");
+        continue;
+      }
+      // Clean up any undefined/empty fields
+      const cleanRow = Object.fromEntries(Object.entries(row).filter(([, v]) => v !== "" && v !== undefined && v !== null));
       try {
-        if (!row.generic_name || !row.category || !row.route) { fail++; continue; }
-        await base44.entities.Drug.create(row); success++;
-      } catch { fail++; }
+        await base44.entities.Drug.create(cleanRow);
+        success++;
+      } catch (e) {
+        fail++;
+        failedRows.push(row.generic_name);
+      }
     }
-    setImportResult({ success, fail });
+    setImportResult({ success, fail, failed: failedRows });
     setImportLoading(false);
-    queryClient.invalidateQueries({ queryKey: ["drugs-full"] });
-    toast.success(`Import: ${success} added, ${fail} failed`);
+    await queryClient.invalidateQueries({ queryKey: ["drugs-full"] });
+    if (success > 0) toast.success(`✅ ${success} drug${success !== 1 ? "s" : ""} imported successfully`);
+    if (fail > 0) toast.error(`${fail} row${fail !== 1 ? "s" : ""} failed — check required fields`);
   };
 
   // Manual add
@@ -334,25 +406,31 @@ export default function DrugsDosing() {
           </div>
 
           {/* Mode nav */}
-          <div className="flex items-center gap-1 pb-0" style={{ borderBottom: "none" }}>
+          <div className="flex items-center gap-0 pb-0 overflow-x-auto" style={{ borderBottom: "none", scrollbarWidth: "none" }}>
             {[
               { id: "search", label: "Search" },
               { id: "recents", label: "Recent" },
-              { id: "favorites", label: "Favorites" },
+              { id: "favorites", label: "⭐ Fav" },
               { id: "rx", label: `Rx${rxDrugs.length ? ` (${rxDrugs.length})` : ""}` },
-              { id: "more", label: "More ↓" },
+              { id: "steroids", label: "Steroids" },
+              { id: "eculizumab", label: "Eculizumab" },
+              { id: "plasmapheresis", label: "Plasmapheresis" },
+              { id: "ckd", label: "CKD Doses" },
+              { id: "formulary", label: "Formulary" },
             ].map(m => (
-              <button key={m.id} onClick={() => setMode(m.id === mode ? mode : m.id)}
-                className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${mode === m.id ? "border-teal-600 text-teal-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
+              <button key={m.id} onClick={() => setMode(m.id)}
+                className={`flex-shrink-0 px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${mode === m.id ? "border-teal-600 text-teal-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
                 {m.label}
               </button>
             ))}
-            <div className="ml-auto flex-shrink-0 pb-1">
-              <Button size="sm" onClick={() => setAddMode(addMode ? null : "menu")}
-                className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 gap-1.5">
-                <Plus className="w-3.5 h-3.5" /> Add Drug
-              </Button>
-            </div>
+            {isAdmin && (
+              <div className="ml-auto flex-shrink-0 pb-1 pl-2">
+                <Button size="sm" onClick={() => setAddMode(addMode ? null : "menu")}
+                  className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 gap-1.5 whitespace-nowrap">
+                  <Plus className="w-3.5 h-3.5" /> Add Drug
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -440,7 +518,13 @@ export default function DrugsDosing() {
                           {importLoading ? `Importing ${importFile.rows.length}...` : `Import ${importFile.rows.length} Drugs`}
                         </Button>
                       )}
-                      {importResult && <p className="text-xs text-green-700 font-semibold">✅ {importResult.success} added, {importResult.fail} failed</p>}
+                      {importResult && (
+                    <div className="space-y-1">
+                      {importResult.success > 0 && <p className="text-xs text-green-700 font-semibold">✅ {importResult.success} drug{importResult.success !== 1 ? "s" : ""} added to formulary</p>}
+                      {importResult.fail > 0 && <p className="text-xs text-red-600 font-semibold">❌ {importResult.fail} failed: {importResult.failed?.join(", ")}</p>}
+                      <button onClick={() => { setImportFile(null); setImportResult(null); }} className="text-xs text-teal-600 underline">Import another file</button>
+                    </div>
+                  )}
                     </div>
                   )}
                 </div>
@@ -918,105 +1002,66 @@ export default function DrugsDosing() {
           </div>
         )}
 
-        {/* ── MORE MODE (advanced tools) ── */}
-        {mode === "more" && (
+        {/* ── ADVANCED TOOL VIEWS (direct tabs, no "more" menu) ── */}
+        {mode === "steroids" && <SteroidEquivalenceEngine />}
+        {mode === "eculizumab" && <EculizumabGuidance />}
+        {mode === "plasmapheresis" && <PlasmapheresisModule />}
+
+        {mode === "formulary" && (
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-slate-700">Advanced Tools</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {[
-                { label: "Steroid Equivalence", icon: Activity, color: "bg-purple-600", action: () => setMode("steroids") },
-                { label: "Eculizumab Guide", icon: Shield, color: "bg-violet-700", action: () => setMode("eculizumab") },
-                { label: "Plasmapheresis", icon: Beaker, color: "bg-indigo-700", action: () => setMode("plasmapheresis") },
-                { label: "CKD Dosing Table", icon: Calculator, color: "bg-blue-700", action: () => setMode("ckd") },
-                { label: "Full Formulary", icon: BookOpen, color: "bg-teal-700", action: () => setMode("formulary") },
-              ].map(t => (
-                <button key={t.label} onClick={t.action}
-                  className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-slate-200 hover:border-teal-300 hover:shadow-sm transition-all">
-                  <div className={`w-10 h-10 ${t.color} rounded-xl flex items-center justify-center`}>
-                    <t.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-700 text-center leading-tight">{t.label}</span>
-                </button>
-              ))}
-            </div>
+            <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2"><BookOpen className="w-4 h-4 text-teal-600" /> Pediatric Drug Formulary</h2>
+            {/* Grouped by category */}
+            {isLoading ? <p className="text-slate-400 text-sm">Loading...</p> : (() => {
+              const grouped = drugs.reduce((acc, d) => {
+                const cat = d.category || "Other";
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(d);
+                return acc;
+              }, {});
+              return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([cat, catDrugs]) => (
+                <FormularyCategory key={cat} category={cat} drugs={catDrugs} onSelect={selectDrug} favIds={favIds} toggleFav={toggleFav} rxDrugs={rxDrugs} effectiveEgfr={effectiveEgfr} />
+              ));
+            })()}
           </div>
         )}
 
-        {/* ── ADVANCED TOOL VIEWS ── */}
-        {mode === "steroids" && (
-          <div className="space-y-3">
-            <button onClick={() => setMode("more")} className="flex items-center gap-1.5 text-sm text-teal-600 font-semibold hover:text-teal-800">
-              <ChevronLeft className="w-4 h-4" /> Back
-            </button>
-            <SteroidEquivalenceEngine />
-          </div>
-        )}
-        {mode === "eculizumab" && (
-          <div className="space-y-3">
-            <button onClick={() => setMode("more")} className="flex items-center gap-1.5 text-sm text-teal-600 font-semibold hover:text-teal-800">
-              <ChevronLeft className="w-4 h-4" /> Back
-            </button>
-            <EculizumabGuidance />
-          </div>
-        )}
-        {mode === "plasmapheresis" && (
-          <div className="space-y-3">
-            <button onClick={() => setMode("more")} className="flex items-center gap-1.5 text-sm text-teal-600 font-semibold hover:text-teal-800">
-              <ChevronLeft className="w-4 h-4" /> Back
-            </button>
-            <PlasmapheresisModule />
-          </div>
-        )}
-        {mode === "formulary" && (
-          <div className="space-y-3">
-            <button onClick={() => setMode("more")} className="flex items-center gap-1.5 text-sm text-teal-600 font-semibold hover:text-teal-800">
-              <ChevronLeft className="w-4 h-4" /> Back
-            </button>
-            <FormularyBrowser weight={weight} height={height} egfr={effectiveEgfr} initialSearch="" />
-          </div>
-        )}
         {mode === "ckd" && (
-          <div className="space-y-3">
-            <button onClick={() => setMode("more")} className="flex items-center gap-1.5 text-sm text-teal-600 font-semibold hover:text-teal-800">
-              <ChevronLeft className="w-4 h-4" /> Back
-            </button>
-            <Card className="bg-white border border-slate-200">
-              <CardHeader className="py-3 px-4 border-b"><CardTitle className="text-sm">CKD & Dialysis Dosing Reference</CardTitle></CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs border-collapse">
-                    <thead><tr className="bg-slate-100">
-                      <th className="text-left px-3 py-2 font-semibold">Drug</th>
-                      <th className="text-center px-2 py-2 font-semibold">eGFR 30–60</th>
-                      <th className="text-center px-2 py-2 font-semibold">eGFR &lt;30</th>
-                      <th className="text-center px-2 py-2 font-semibold">HD</th>
-                      <th className="text-center px-2 py-2 font-semibold">PD</th>
-                    </tr></thead>
-                    <tbody>
-                      {[
-                        { drug: "Prednisolone", g30_60: "No adj.", esrd: "No adj.", hd: "Not dialysed", pd: "Not removed" },
-                        { drug: "Tacrolimus", g30_60: "TDM", esrd: "TDM", hd: "Not dialysed", pd: "Not removed" },
-                        { drug: "Enalapril", g30_60: "50–75%", esrd: "25–50%", hd: "Supplement", pd: "No extra" },
-                        { drug: "Furosemide", g30_60: "Higher dose", esrd: "Ineffective", hd: "Not removed", pd: "Residual" },
-                        { drug: "Cotrimoxazole", g30_60: "75%", esrd: "Avoid", hd: "Supplement", pd: "50%" },
-                        { drug: "Acyclovir", g30_60: "50%", esrd: "5 mg/kg/24h", hd: "Supplement", pd: "50%" },
-                        { drug: "Vancomycin", g30_60: "Extend, TDM", esrd: "Single, TDM", hd: "TDM", pd: "TDM" },
-                        { drug: "Cyclophosphamide", g30_60: "Full", esrd: "Reduce 50%", hd: "Supplement", pd: "25%" },
-                      ].map((row, i) => (
-                        <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                          <td className="px-3 py-2 font-semibold text-slate-900">{row.drug}</td>
-                          <td className="px-2 py-2 text-center text-slate-600">{row.g30_60}</td>
-                          <td className="px-2 py-2 text-center text-red-700">{row.esrd}</td>
-                          <td className="px-2 py-2 text-center text-indigo-700">{row.hd}</td>
-                          <td className="px-2 py-2 text-center text-purple-700">{row.pd}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="bg-white border border-slate-200">
+            <CardHeader className="py-3 px-4 border-b"><CardTitle className="text-sm">CKD & Dialysis Dosing Reference</CardTitle></CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead><tr className="bg-slate-100">
+                    <th className="text-left px-3 py-2 font-semibold">Drug</th>
+                    <th className="text-center px-2 py-2 font-semibold">eGFR 30–60</th>
+                    <th className="text-center px-2 py-2 font-semibold">eGFR &lt;30</th>
+                    <th className="text-center px-2 py-2 font-semibold">HD</th>
+                    <th className="text-center px-2 py-2 font-semibold">PD</th>
+                  </tr></thead>
+                  <tbody>
+                    {[
+                      { drug: "Prednisolone", g30_60: "No adj.", esrd: "No adj.", hd: "Not dialysed", pd: "Not removed" },
+                      { drug: "Tacrolimus", g30_60: "TDM", esrd: "TDM", hd: "Not dialysed", pd: "Not removed" },
+                      { drug: "Enalapril", g30_60: "50–75%", esrd: "25–50%", hd: "Supplement", pd: "No extra" },
+                      { drug: "Furosemide", g30_60: "Higher dose", esrd: "Ineffective", hd: "Not removed", pd: "Residual" },
+                      { drug: "Cotrimoxazole", g30_60: "75%", esrd: "Avoid", hd: "Supplement", pd: "50%" },
+                      { drug: "Acyclovir", g30_60: "50%", esrd: "5 mg/kg/24h", hd: "Supplement", pd: "50%" },
+                      { drug: "Vancomycin", g30_60: "Extend, TDM", esrd: "Single, TDM", hd: "TDM", pd: "TDM" },
+                      { drug: "Cyclophosphamide", g30_60: "Full", esrd: "Reduce 50%", hd: "Supplement", pd: "25%" },
+                    ].map((row, i) => (
+                      <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                        <td className="px-3 py-2 font-semibold text-slate-900">{row.drug}</td>
+                        <td className="px-2 py-2 text-center text-slate-600">{row.g30_60}</td>
+                        <td className="px-2 py-2 text-center text-red-700">{row.esrd}</td>
+                        <td className="px-2 py-2 text-center text-indigo-700">{row.hd}</td>
+                        <td className="px-2 py-2 text-center text-purple-700">{row.pd}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
