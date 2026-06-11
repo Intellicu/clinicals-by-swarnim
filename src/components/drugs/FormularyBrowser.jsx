@@ -44,6 +44,7 @@ function getBadgeClass(cls) {
 export default function FormularyBrowser({ weight, height, egfr, initialSearch = "", patientName, patientId, encounterId, onPrescriptionSaved, onAddToRx }) {
   const [query, setQuery] = useState(initialSearch);
   const [catFilter, setCatFilter] = useState("All");
+  const [alphaFilter, setAlphaFilter] = useState("");
   const [selected, setSelected] = useState(null);
 
   const allDrugs = useMemo(() => Object.values(FORMULARY), []);
@@ -76,8 +77,14 @@ export default function FormularyBrowser({ weight, height, egfr, initialSearch =
         d.class?.toLowerCase().includes(catFilter.toLowerCase())
       );
     }
-    return results;
-  }, [allDrugs, query, catFilter]);
+    if (alphaFilter) {
+      results = results.filter(d =>
+        d.generic?.toUpperCase().startsWith(alphaFilter)
+      );
+    }
+    // Sort alphabetically
+    return [...results].sort((a, b) => (a.generic || "").localeCompare(b.generic || ""));
+  }, [allDrugs, query, catFilter, alphaFilter]);
 
   const bsa = useMemo(() => {
     const h = parseFloat(height), w = parseFloat(weight);
@@ -108,13 +115,13 @@ export default function FormularyBrowser({ weight, height, egfr, initialSearch =
         </div>
       </div>
 
-      {/* Category pills */}
-      <div className="flex gap-1.5 flex-wrap">
-        {FORMULARY_CATEGORIES.slice(0, 12).map(cat => (
+      {/* Category pills — scrollable row */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+        {FORMULARY_CATEGORIES.map(cat => (
           <button
             key={cat}
-            onClick={() => setCatFilter(cat)}
-            className={`px-2.5 py-1 text-[11px] font-medium rounded-full border transition-all ${catFilter === cat
+            onClick={() => { setCatFilter(cat); setAlphaFilter(""); }}
+            className={`flex-shrink-0 px-2.5 py-1 text-[11px] font-medium rounded-full border transition-all ${catFilter === cat
               ? "bg-indigo-600 text-white border-indigo-600"
               : "bg-white border-slate-300 text-slate-600 hover:border-indigo-400"
             }`}
@@ -122,12 +129,25 @@ export default function FormularyBrowser({ weight, height, egfr, initialSearch =
             {cat}
           </button>
         ))}
-        <button
-          onClick={() => setCatFilter("All")}
-          className="px-2.5 py-1 text-[11px] font-medium rounded-full border border-slate-300 text-slate-500 hover:border-slate-400 bg-white"
-        >
-          More...
-        </button>
+      </div>
+
+      {/* A–Z alpha index */}
+      <div className="flex gap-0.5 flex-wrap">
+        {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(letter => (
+          <button
+            key={letter}
+            onClick={() => { setAlphaFilter(alphaFilter === letter ? "" : letter); setCatFilter("All"); }}
+            className={`w-6 h-6 text-[10px] font-bold rounded transition-all ${alphaFilter === letter
+              ? "bg-indigo-600 text-white"
+              : "bg-slate-100 text-slate-600 hover:bg-indigo-100"
+            }`}
+          >
+            {letter}
+          </button>
+        ))}
+        {alphaFilter && (
+          <button onClick={() => setAlphaFilter("")} className="ml-1 text-[10px] text-slate-400 hover:text-slate-600">✕ Clear</button>
+        )}
       </div>
 
       {/* Count */}

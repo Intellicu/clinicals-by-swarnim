@@ -1,8 +1,11 @@
 /**
- * Pediatric Nephrology Formulary — Static Drug Library
- * Comprehensive monographs for nephrology, immunosuppression, and common pediatric drugs.
- * Separated from dosing logic so formulations can be updated independently.
+ * Pediatric Formulary — Static Drug Library (A–Z, 250+ drugs)
+ * Nephrology, PICU, Neonatal, ID, Endocrine, Neurology, Respiratory,
+ * GI, Haematology, Rheumatology, Emergency Medicine.
+ * Part 2 (H–Z) imported from nephrology-drugs-extended.js
  */
+
+import { FORMULARY_EXTENDED, FORMULARY_EXTENDED_CATEGORIES } from './nephrology-drugs-extended';
 
 export const FORMULARY = {
 
@@ -1161,6 +1164,9 @@ export const FORMULARY = {
   },
 };
 
+// ── Merge Part-2 drugs into main formulary ────────────────────────────────
+Object.assign(FORMULARY, FORMULARY_EXTENDED);
+
 // ── Drug categories for filtering ──────────────────────────────────────────
 export const FORMULARY_CATEGORIES = [
   "All",
@@ -1184,6 +1190,20 @@ export const FORMULARY_CATEGORIES = [
   "Emergency",
   "GI / PPI",
   "Immunomodulator",
+  "Vasopressor",
+  "Antiepileptic",
+  "DMARD",
+  "Antithyroid",
+  "ICS",
+  "SABA",
+  "Antiemetic",
+  "Anticoagulant",
+  "Trace Element",
+  "Neonatal",
+  "Transplant",
+  "mTOR Inhibitor",
+  "VDRA",
+  "Calcimimetic",
 ];
 
 export function searchFormulary(query) {
