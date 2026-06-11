@@ -14,13 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   ArrowLeft, Search, Pill, AlertTriangle, Info, Calculator, Shield,
   Printer, MessageCircle, Plus, Trash2, CheckCircle, Activity, Beaker, X,
-  FlaskConical, BookOpen, Syringe
+  FlaskConical, BookOpen, Syringe, Library
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
 import PlasmapheresisCalculator from "../components/drugs/PlasmapheresisCalculator";
+import FormularyBrowser from "../components/drugs/FormularyBrowser";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
 import StickyToolNav from "../components/StickyToolNav";
@@ -182,6 +183,9 @@ const CATEGORY_FILTERS = [
 
 export default function DrugsDosing() {
   const { patientData } = usePatient();
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlFormularyDrug = urlParams.get("formulary");
+  const urlSearch = urlParams.get("search");
 
   // Patient inputs
   const [weight, setWeight] = useState(patientData.weight ? String(patientData.weight) : "");
@@ -193,7 +197,7 @@ export default function DrugsDosing() {
   // Drug search
   const [query, setQuery] = useState("");
   const [catFilter, setCatFilter] = useState("All");
-  const [activeTab, setActiveTab] = useState("search");
+  const [activeTab, setActiveTab] = useState(urlFormularyDrug ? "formulary" : urlSearch ? "search" : "formulary");
 
   // Selected drugs for prescription / interaction check
   const [rxDrugs, setRxDrugs] = useState([]);
@@ -304,15 +308,16 @@ CliniCals by Swarnim | Verify all doses independently`;
               <Pill className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Drugs & Dosing</h1>
-              <p className="text-purple-100 text-sm">Pediatric nephrology drug calculator · renal dose adjustment · interaction checker · prescription builder</p>
+              <h1 className="text-2xl font-bold">Drugs & Dosing Formulary</h1>
+              <p className="text-purple-100 text-sm">Comprehensive pediatric nephrology formulary · mg/kg dose calculator · renal adjustments · Indian formulations</p>
             </div>
           </div>
           <div className="flex gap-2 flex-wrap text-xs">
+            <Badge className="bg-white/20">📚 Full Monographs</Badge>
             <Badge className="bg-white/20">mg/kg & mg/m² dosing</Badge>
+            <Badge className="bg-white/20">Indian brands & formulations</Badge>
             <Badge className="bg-white/20">Renal adjustment engine</Badge>
             <Badge className="bg-white/20">Drug interactions</Badge>
-            <Badge className="bg-white/20">Print & WhatsApp Rx</Badge>
           </div>
         </div>
 
@@ -351,11 +356,12 @@ CliniCals by Swarnim | Verify all doses independently`;
           </CardContent>
         </Card>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="formulary">
           {/* Mobile-first scrollable tab strip — never pushes page width */}
           <div className="w-full overflow-x-auto mb-4" style={{ scrollbarWidth: "none" }}>
             <TabsList className="flex w-max gap-1 h-auto p-1">
-              <TabsTrigger value="search" className="text-xs whitespace-nowrap min-h-[36px] px-3">🔍 Search</TabsTrigger>
+              <TabsTrigger value="formulary" className="text-xs whitespace-nowrap min-h-[36px] px-3">📚 Formulary</TabsTrigger>
+              <TabsTrigger value="search" className="text-xs whitespace-nowrap min-h-[36px] px-3">🔍 DB Search</TabsTrigger>
               <TabsTrigger value="calculator" className="text-xs whitespace-nowrap min-h-[36px] px-3">💊 Dose Calc</TabsTrigger>
               <TabsTrigger value="interactions" className="text-xs whitespace-nowrap min-h-[36px] px-3">⚡ Interactions</TabsTrigger>
               <TabsTrigger value="prescription" className="text-xs whitespace-nowrap min-h-[36px] px-3">📋 Rx {rxDrugs.length > 0 && `(${rxDrugs.length})`}</TabsTrigger>
@@ -365,6 +371,22 @@ CliniCals by Swarnim | Verify all doses independently`;
               <TabsTrigger value="ckd-dosing" className="text-xs whitespace-nowrap min-h-[36px] px-3">🫘 CKD Dosing</TabsTrigger>
             </TabsList>
           </div>
+
+          {/* ── FORMULARY TAB ─────────────────────────────────── */}
+          <TabsContent value="formulary" className="space-y-4">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4 mb-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-indigo-900 text-sm">Comprehensive Pediatric Nephrology Formulary</h3>
+                  <p className="text-indigo-600 text-xs mt-0.5">Full monographs · Indian formulations & brands · Renal dose adjustments · Administration guidance</p>
+                </div>
+              </div>
+            </div>
+            <FormularyBrowser weight={weight} height={height} egfr={effectiveEgfr} initialSearch={urlFormularyDrug || ""} />
+          </TabsContent>
 
           {/* ── SEARCH TAB ─────────────────────────────────────── */}
           <TabsContent value="search" className="space-y-4">

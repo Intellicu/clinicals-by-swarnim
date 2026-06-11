@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers, Mic, MicOff } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { searchFormulary } from "@/lib/formulary/nephrology-drugs";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATIC KNOWLEDGE INDEX (pages / pathways / calculators)
@@ -218,12 +219,13 @@ const CATEGORY_COLORS = {
 };
 
 const ENTITY_GROUP_META = {
-  drugs:      { label: "Drugs",               icon: Pill,          color: "text-violet-600" },
-  guidelines: { label: "Guidelines",           icon: BookOpen,      color: "text-amber-600" },
-  protocols:  { label: "Treatment Protocols",  icon: FileText,      color: "text-blue-600" },
-  teaching:   { label: "Teaching Modules",     icon: GraduationCap, color: "text-teal-600" },
-  biopsy:     { label: "Biopsy Patterns",      icon: Microscope,    color: "text-rose-600" },
-  static:     { label: "Pathways & Tools",     icon: Layers,        color: "text-slate-600" },
+  formulary:  { label: "Formulary (Monographs)", icon: Pill,          color: "text-indigo-600" },
+  drugs:      { label: "Drug Database",          icon: Pill,          color: "text-violet-600" },
+  guidelines: { label: "Guidelines",             icon: BookOpen,      color: "text-amber-600" },
+  protocols:  { label: "Treatment Protocols",    icon: FileText,      color: "text-blue-600" },
+  teaching:   { label: "Teaching Modules",       icon: GraduationCap, color: "text-teal-600" },
+  biopsy:     { label: "Biopsy Patterns",        icon: Microscope,    color: "text-rose-600" },
+  static:     { label: "Pathways & Tools",       icon: Layers,        color: "text-slate-600" },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -298,6 +300,18 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         },
       }));
 
+    // 1b. Formulary static search (instant)
+    const formularyMatches = searchFormulary(q)
+      .slice(0, 5)
+      .map(d => ({
+        _type: "static",
+        title: d.generic,
+        snippet: d.class + (d.formulations?.[0]?.brands ? ` · ${d.formulations[0].brands.split(",")[0].trim()}` : ""),
+        category: "Formulary",
+        _score: d.generic?.toLowerCase().includes(ql) ? 3 : 1,
+        navigate: () => createPageUrl("DrugsDosing") + `?formulary=${encodeURIComponent(d.generic)}`,
+      }));
+
     // 2. Entity searches (parallel)
     const [drugs, guidelines, protocols, teaching, biopsy] = await Promise.allSettled([
       searchDrugs(q, ql),
@@ -308,6 +322,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     ]);
 
     const newGroups = {};
+    if (formularyMatches.length) newGroups.formulary = formularyMatches;
     if (drugs.status === "fulfilled" && drugs.value.length) newGroups.drugs = drugs.value;
     if (guidelines.status === "fulfilled" && guidelines.value.length) newGroups.guidelines = guidelines.value;
     if (protocols.status === "fulfilled" && protocols.value.length) newGroups.protocols = protocols.value;

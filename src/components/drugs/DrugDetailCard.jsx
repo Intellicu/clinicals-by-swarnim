@@ -8,6 +8,8 @@ import {
   Thermometer, Pill, Shield, Activity, Info, CheckCircle,
   BookOpen, FlaskConical, Syringe
 } from "lucide-react";
+import { getFormularyDrug } from "@/lib/formulary/nephrology-drugs";
+import FormularyMonograph from "./FormularyMonograph";
 
 // ── Static practical guidance library ──────────────────────────────────────
 export const DRUG_GUIDANCE = {
@@ -265,15 +267,20 @@ const COLOR_MAP = {
   slate: "bg-slate-50 border-slate-200 text-slate-700",
 };
 
-export default function DrugDetailCard({ drug }) {
+export default function DrugDetailCard({ drug, weight, egfr }) {
   const [expanded, setExpanded] = useState(false);
   const guidanceName = drug?.generic_name?.toLowerCase().replace(/\s+/g, "");
   const guidance = DRUG_GUIDANCE[guidanceName] || null;
+  const formularyDrug = getFormularyDrug(drug?.generic_name);
 
   if (!drug) return null;
 
   return (
     <div className="space-y-3 mt-4">
+      {/* Rich formulary monograph if available */}
+      {formularyDrug && (
+        <FormularyMonograph drug={formularyDrug} weight={weight} egfr={egfr} />
+      )}
       {/* Eculizumab special banner */}
       {guidanceName === "eculizumab" && (
         <Alert className="bg-red-50 border-red-400 border-2">
