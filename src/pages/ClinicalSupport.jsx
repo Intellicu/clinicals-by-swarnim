@@ -485,8 +485,15 @@ export default function ClinicalSupport() {
   };
 
   const [activeTab, setActiveTab] = useState(() => getUrlParams().tab);
-  const [selectedScenario, setSelectedScenario] = useState(() => getUrlParams().scenario);
-  const [scenarioSource, setScenarioSource] = useState("scenarios"); // track where user came from
+  const [selectedScenario, setSelectedScenario] = useState(() => {
+    const s = getUrlParams().scenario;
+    return s || null;
+  });
+  const [scenarioSource, setScenarioSource] = useState(() => {
+    // If opened with a scenario from URL, default to engines source so back goes to engines
+    const s = getUrlParams().scenario;
+    return s ? "engines" : "scenarios";
+  });
 
   // Re-read URL params whenever location changes (e.g. navigation from hub)
   useEffect(() => {
@@ -1749,9 +1756,6 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
               onBack={() => setActiveTab("scenarios")}
             />
           </TabsContent>
-
-          {/* Oncology note: OncologyEngine accessed via PathwayRenderer (oncology-engine scenario id),
-              not as standalone page. Opens in ClinicalSupport pathways tab, no patient fields. */}
         </Tabs>
 
         <Alert className="mt-6 bg-purple-50 border-purple-200">

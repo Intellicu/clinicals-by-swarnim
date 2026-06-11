@@ -283,7 +283,23 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
     );
   }
   // ── Oncology Engine ──────────────────────────────────────────────────────────
-  if (id === "oncology-engine" || id === "oncology-hub" || id?.startsWith("oncology-")) return <OncologyEngine scenario={id === "oncology-engine" || id === "oncology-hub" ? "all" : id.replace("oncology-", "")} />;
+  if (id === "oncology-engine" || id === "oncology-hub" || id?.startsWith("oncology-")) {
+    const oncScenario = id === "oncology-engine" || id === "oncology-hub" ? "all" : id.replace("oncology-", "");
+    return (
+      <div className="space-y-3">
+        <div className="rounded-xl bg-gradient-to-r from-slate-800 to-slate-700 p-3 text-white flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold text-slate-300">Oncology is a learning tool</p>
+            <p className="text-sm font-bold">Open in Oncology Hub for full protocol access</p>
+          </div>
+          <a href="/OncologyHub" className="bg-white text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+            Open Hub →
+          </a>
+        </div>
+        <OncologyEngine scenario={oncScenario} />
+      </div>
+    );
+  }
   if (id === "rpgn-engine") return (
     <div className="space-y-3">
       <div className="rounded-xl bg-gradient-to-r from-red-800 to-rose-700 p-4 text-white">

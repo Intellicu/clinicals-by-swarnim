@@ -255,7 +255,7 @@ const PROTOCOL_LABELS = {
   HEPATO:"Hepatoblastoma (SIOPEL/PHITT)", LCH:"LCH (LCH-IV)",
 };
 
-const STEP_LABELS = ["Condition","Protocol","Parameters","Stratification","Pathway"];
+const STEP_LABELS = ["Condition","Protocol","Patient","Stratification","Pathway"];
 
 export default function OncologyPathwayInline() {
   const [step, setStep] = useState(0);
@@ -357,8 +357,8 @@ export default function OncologyPathwayInline() {
         <div>
           <button onClick={() => setStep(selectedGroup?.protocols.length > 1 ? 1 : 0)} style={{ fontSize: 12, color: "#666", background: "none", border: "none", cursor: "pointer", marginBottom: 12 }}>← Back</button>
           <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, color: "#1a1a2e" }}>Clinical Parameters</p>
-          <p style={{ fontSize: 12, color: "#666", marginBottom: 14 }}>Enter weight and height for BSA-based dose reference (no patient identifiers required).</p>
-          <div style={{ background: "#fff", borderRadius: 10, padding: 20, border: "1px solid #e0e0e0", display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 14, maxWidth: 480 }}>
+          <p style={{ fontSize: 12, color: "#666", marginBottom: 14 }}>Weight and height are used for BSA-based dose calculations. No patient identifiers required.</p>
+          <div style={{ background: "#fff", borderRadius: 10, padding: 20, border: "1px solid #e0e0e0", display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 14, maxWidth: 500 }}>
             {[["weight","Weight (kg)","number"],["height","Height (cm)","number"]].map(([k,l,t]) => (
               <div key={k}>
                 <label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 4 }}>{l}</label>
@@ -370,9 +370,6 @@ export default function OncologyPathwayInline() {
               <label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 4 }}>BSA (m²) — auto-calculated</label>
               <input readOnly value={patientInfo.bsa || "—"} style={{ width: "100%", padding: "7px 10px", border: "1px solid #ddd", borderRadius: 6, fontSize: 13, background: "#f9f9f9", boxSizing: "border-box" }} />
             </div>
-          </div>
-          <div style={{ marginTop: 10, padding: "8px 12px", background: "#e8f5e9", borderRadius: 6, fontSize: 11, color: "#2e7d32", border: "1px solid #a5d6a7", maxWidth: 480 }}>
-            This pathway tool is for learning and clinical reference. No patient identifiers are collected or stored.
           </div>
           <button onClick={() => setStep(3)} style={{ marginTop: 16, background: "#1a1a2e", color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Continue to Risk Stratification →</button>
         </div>
@@ -426,7 +423,7 @@ export default function OncologyPathwayInline() {
                 <div style={{ fontSize: 13, color: "#444", marginTop: 4, lineHeight: 1.5 }}><strong>Regimen:</strong> {result.regimen}</div>
               </div>
               {(patientInfo.weight || patientInfo.bsa) && (
-                <div style={{ background: "#f9f9f9", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#555", minWidth: 160 }}>
+                <div style={{ background: "#f9f9f9", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#555", minWidth: 140 }}>
                   {patientInfo.weight && <div>Weight: {patientInfo.weight} kg</div>}
                   {patientInfo.height && <div>Height: {patientInfo.height} cm</div>}
                   {patientInfo.bsa && <div style={{ fontWeight: 700, marginTop: 4 }}>BSA: {patientInfo.bsa} m²</div>}

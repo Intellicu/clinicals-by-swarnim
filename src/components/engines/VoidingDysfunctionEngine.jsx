@@ -34,12 +34,48 @@ const UROFLOW_PATTERNS = [
 ];
 
 const DIAGNOSES = {
-  oab: { label: "Overactive Bladder (OAB)", color: "bg-amber-50 border-amber-300", mgmt: ["Bladder training (timed voiding schedule)", "Anticholinergics: Oxybutynin 0.1–0.2 mg/kg TDS; or Solifenacin", "Treat constipation — vital for OAB resolution", "Avoid caffeine, carbonated drinks", "Biofeedback for urgency suppression"] },
-  dv: { label: "Dysfunctional Voiding", color: "bg-red-50 border-red-300", mgmt: ["Urotherapy (education, voiding schedule)", "Pelvic floor relaxation training", "Biofeedback (perineal EMG-guided)", "Treat underlying constipation", "CIC if significant PVR or staccato pattern persists"] },
-  underactive: { label: "Underactive Bladder", color: "bg-blue-50 border-blue-300", mgmt: ["Timed voiding every 2–3 hours (alarm reminders)", "Double voiding technique", "CIC if PVR >30% bladder capacity", "Parasympathomimetics (bethanechol) — limited evidence", "Refer urology if CIC required long-term"] },
-  neurogenic: { label: "Neurogenic Bladder", color: "bg-red-50 border-red-300", mgmt: ["Urodynamics (UDS) ESSENTIAL for classification", "CIC ± anticholinergics (if detrusor overactivity + compliance)", "Baclofen/Botox for detrusor hyperreflexia", "Annual upper tract monitoring (USG ± VCUG)", "Multidisciplinary: nephrology + urology + neurology"] },
-  bbd: { label: "Bladder Bowel Dysfunction (BBD)", color: "bg-orange-50 border-orange-300", mgmt: ["Treat CONSTIPATION FIRST — most important step", "Timed voiding schedule + fluid optimization", "Biofeedback for dysfunctional voiding component", "Anticholinergics only after constipation resolved", "Monitor: UPCR, USG, post-void residual"] },
-  mne: { label: "Monosymptomatic Nocturnal Enuresis (MNE)", color: "bg-green-50 border-green-300", mgmt: ["First line: Enuresis alarm (70–80% success, 3 months)", "Second line: Desmopressin 0.1–0.4 mg oral (bedtime)", "Combination: alarm + desmopressin for fast responders", "Restrict fluids 1–2h before sleep", "Motivational therapy, reward charts"] },
+  oab: {
+    label: "Overactive Bladder (OAB)", color: "bg-amber-50 border-amber-300",
+    mgmt: ["Bladder training (timed voiding schedule every 2h)", "Anticholinergics: Oxybutynin 0.1–0.2 mg/kg TDS; or Solifenacin 5–10 mg OD", "Treat constipation — vital for OAB resolution", "Avoid caffeine, carbonated drinks", "Biofeedback for urgency suppression"],
+    investigations: { must: ["Urinalysis + MSU culture", "Renal + bladder USG (pre/post-void, wall thickness)", "Bladder diary × 3 days (voiding frequency + volumes)"], should: ["Uroflow + PVR (if not already done)", "BBD questionnaire score"] },
+    monitoring: ["4-weekly review for first 3 months", "DVSS score at baseline and follow-up", "Refer if no improvement after 6 months urotherapy + oxybutynin"],
+    refer: "No improvement after 6 months combined urotherapy + anticholinergic → specialist centre",
+  },
+  dv: {
+    label: "Dysfunctional Voiding", color: "bg-red-50 border-red-300",
+    mgmt: ["Urotherapy (education, voiding schedule)", "Pelvic floor relaxation training", "Biofeedback (perineal EMG-guided)", "Treat underlying constipation", "CIC if significant PVR (>30% bladder capacity) or staccato pattern persists"],
+    investigations: { must: ["Urinalysis + MSU culture", "Renal + bladder USG pre/post-void", "Uroflow + PVR"], should: ["Spine XR if neurological features (sacral dimple, hair tuft)", "Urodynamic study (UDS) if persistent PVR >50 mL"] },
+    monitoring: ["Monthly × 3 months initially", "Repeat uroflow at 3 months to assess response"],
+    refer: "Persistent elevated PVR or staccato pattern on biofeedback therapy → urologist + paediatric physio",
+  },
+  underactive: {
+    label: "Underactive Bladder", color: "bg-blue-50 border-blue-300",
+    mgmt: ["Timed voiding every 2–3 hours (alarm reminders)", "Double voiding technique", "CIC if PVR >30% bladder capacity", "Parasympathomimetics (bethanechol 0.1–0.3 mg/kg TDS) — limited evidence", "Refer urology if CIC required long-term"],
+    investigations: { must: ["Bladder USG (post-void residual — must document volume)", "Urinalysis + MSU", "Spine MRI if any neurological signs"], should: ["Urodynamics: Cystometrogram to assess detrusor contractility"] },
+    monitoring: ["PVR monthly until stable", "eGFR + UPCR 6-monthly if recurrent UTIs"],
+    refer: "CIC required → urology. Any neurological signs → spine MRI + neurology",
+  },
+  neurogenic: {
+    label: "Neurogenic Bladder", color: "bg-red-50 border-red-300",
+    mgmt: ["Urodynamics (UDS with cystometrogram + EMG) ESSENTIAL before treatment", "CIC ± anticholinergics (if detrusor overactivity + poor compliance)", "Baclofen/Botulinum toxin A for detrusor hyperreflexia", "Annual upper tract monitoring (USG ± VCUG)", "Multidisciplinary: nephrology + urology + neurology + physio"],
+    investigations: { must: ["Urodynamic study (UDS)", "MRI spine (tethered cord, sacral agenesis, MMC)", "Renal USG (upper tract protection)", "VCUG (VUR + DSD)"], should: ["Renal function: eGFR + UPCR 6-monthly"] },
+    monitoring: ["6-monthly renal USG + eGFR", "Annual urodynamics if high-risk features (high storage pressure >40 cmH2O)"],
+    refer: "IMMEDIATE referral to urology + neurology. Any child with MMC → neurogenic bladder by default",
+  },
+  bbd: {
+    label: "Bladder Bowel Dysfunction (BBD)", color: "bg-orange-50 border-orange-300",
+    mgmt: ["Treat CONSTIPATION FIRST — OAB/incontinence often resolves alone", "Macrogol (PEG) laxatives: 0.5–1 g/kg/day; adjust to 1–2 soft stools/day", "Timed voiding schedule + fluid optimization (1.5–2 L/day)", "Biofeedback for dysfunctional voiding component", "Anticholinergics ONLY after constipation fully resolved"],
+    investigations: { must: ["Constipation assessment: Bristol stool chart, abdominal XR if needed", "Bladder diary", "MSU culture (recurrent UTI risk high in BBD)"], should: ["Uroflow + PVR once constipation treated"] },
+    monitoring: ["Monthly until symptom resolution", "UPCR + USG if recurrent febrile UTIs (scarring risk)"],
+    refer: "Recurrent febrile UTIs on BBD treatment → renal USG + VCUG + nephrology",
+  },
+  mne: {
+    label: "Monosymptomatic Nocturnal Enuresis (MNE)", color: "bg-green-50 border-green-300",
+    mgmt: ["First line: Enuresis alarm — 70–80% success; minimum 3-month trial", "Second line: Desmopressin 120–240 mcg sublingual at bedtime (avoid in polydipsia)", "Combination: alarm + desmopressin for faster responders", "Restrict fluids 1–2h before sleep", "Motivational therapy, reward charts"],
+    investigations: { must: ["Urinalysis + MSU (exclude UTI/DM)", "Bladder diary × 3 nights (nocturnal urine volume vs bladder capacity)"], should: ["Exclude daytime symptoms — if present, reclassify as non-MNE"] },
+    monitoring: ["3-monthly response assessment (dry nights per week)", "Reassess daytime symptoms at each visit"],
+    refer: "Alarm + desmopressin failed × 6 months → paediatric continence service",
+  },
 };
 
 export default function VoidingDysfunctionEngine() {
@@ -204,57 +240,17 @@ export default function VoidingDysfunctionEngine() {
     </div>
   );
 
-  const INVESTIGATIONS = {
-    oab: {
-      must: ["Urinalysis + MSU culture", "Renal + bladder USG (pre/post-void, bladder wall thickness)", "Bladder diary × 3 days (voiding frequency + volumes)", "BBD questionnaire score"],
-      should: ["Uroflow + PVR", "Spine XR or MRI if any neurological features"],
-      monitoring: ["4-weekly review for first 3 months", "DVSS score at baseline and follow-up", "Refer to specialist if no improvement after 6 months urotherapy + medication"],
-    },
-    dv: {
-      must: ["Uroflow + PVR", "Urinalysis + MSU culture", "Renal + bladder USG", "BBD questionnaire + constipation assessment"],
-      should: ["Bladder diary × 3 days", "Perineal EMG (biofeedback assessment)"],
-      monitoring: ["Monthly during active biofeedback", "CIC if PVR consistently >30% bladder capacity", "Refer urology if Hinman syndrome suspected (non-neurogenic neurogenic bladder)"],
-    },
-    underactive: {
-      must: ["Uroflow + PVR (elevated PVR is key finding)", "Urinalysis + MSU culture", "Renal + bladder USG", "Spine MRI if neurological symptoms"],
-      should: ["Urodynamic study if PVR >30% bladder capacity on multiple occasions"],
-      monitoring: ["CIC if PVR >30% bladder capacity — self-catheterisation teaching", "eGFR + USG annually (upper tract protection)", "Refer urology long-term for CIC management"],
-    },
-    neurogenic: {
-      must: ["Urodynamic study (UDS) with cystometrogram + EMG — ESSENTIAL", "MRI spine (tethered cord, sacral agenesis, spinal cord lesion)", "Renal + bladder USG", "VCUG (assess vesico-ureteric reflux + detrusor-sphincter dyssynergia)"],
-      should: ["eGFR + UPCR (upper tract protection — neurogenic bladder highest risk for CKD)"],
-      monitoring: ["6-monthly renal USG + eGFR", "Annual urodynamics if high-risk features (high detrusor pressure)", "Multidisciplinary: nephrology + urology + neurology + physiotherapy"],
-    },
-    bbd: {
-      must: ["Constipation assessment (Bristol stool chart, abdominal XR if needed)", "Bladder diary", "MSU culture", "Renal + bladder USG"],
-      should: ["Uroflow + PVR", "BBD questionnaire score (DVSS)"],
-      monitoring: ["Monthly until symptom resolution", "Treat constipation FIRST — incontinence often resolves spontaneously with bowel treatment", "UPCR if recurrent UTIs causing renal scarring"],
-    },
-    mne: {
-      must: ["Urinalysis + MSU culture (exclude UTI)", "Bladder diary (voiding frequency, volumes, wet nights)", "DVSS screening (for daytime symptoms — classify NMNE if present)"],
-      should: ["Renal + bladder USG if secondary enuresis or daytime symptoms"],
-      monitoring: ["3-monthly response assessment (dry nights per week)", "Enuresis alarm: minimum 3-month trial before assessing failure", "Reassess for daytime symptoms at each visit — reclassify if present"],
-    },
-  };
-
-  const REFERRAL = {
-    oab: "Refer to paediatric urology/nephrology if no improvement after 6 months urotherapy + oxybutynin",
-    dv: "Refer if biofeedback unavailable or Hinman syndrome suspected (requires UDS + specialist input)",
-    underactive: "Refer urology: CIC teaching + long-term management of underactive bladder",
-    neurogenic: "Immediate referral: Nephrology + Urology + Neurology — multidisciplinary care essential",
-    bbd: "Refer if constipation refractory or recurrent febrile UTIs causing renal scarring",
-    mne: "Refer if alarm + desmopressin both fail after 6 months; consider urodynamics for complex cases",
-  };
+  const resetAll = () => { setStep(0); setSymptoms({}); setContinenceAchieved(null); setHasDaytime(null); setBBD({}); setUroflow(""); setPVR(""); setDiagnosis(""); };
 
   const renderDiagnosisOutput = () => {
     const dx = DIAGNOSES[diagnosis];
     if (!dx) return null;
-    const inv = INVESTIGATIONS[diagnosis];
     return (
       <div className="space-y-3">
         <div className={`rounded-xl border-2 p-4 ${dx.color}`}>
           <p className="text-base font-bold text-slate-900">Diagnosis: {dx.label}</p>
         </div>
+
         <Card className="border-green-200 bg-green-50">
           <CardHeader className="py-2 px-3 border-b border-green-200">
             <CardTitle className="text-xs font-bold text-green-900 uppercase tracking-wide">Management Protocol</CardTitle>
@@ -267,28 +263,42 @@ export default function VoidingDysfunctionEngine() {
             ))}
           </CardContent>
         </Card>
-        {inv && (
-          <>
-            <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 space-y-1.5 text-xs">
-              <p className="font-bold text-blue-900">Must Order:</p>
-              {inv.must.map((i, j) => <p key={j} className="text-blue-800 flex items-start gap-1"><span className="font-bold flex-shrink-0">•</span>{i}</p>)}
-              <p className="font-bold text-blue-900 mt-2">Should Order:</p>
-              {inv.should.map((i, j) => <p key={j} className="text-blue-700 flex items-start gap-1"><span className="font-bold flex-shrink-0">◦</span>{i}</p>)}
-            </div>
-            <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 space-y-1.5 text-xs">
-              <p className="font-bold text-amber-900">Follow-up and Monitoring:</p>
-              {inv.monitoring.map((m, i) => <p key={i} className="text-amber-800 flex items-start gap-1"><span className="font-bold flex-shrink-0">→</span>{m}</p>)}
-            </div>
-            {REFERRAL[diagnosis] && (
-              <div className="rounded-xl bg-slate-100 border border-slate-300 p-2.5 text-xs text-slate-700">
-                <span className="font-bold">Referral: </span>{REFERRAL[diagnosis]}
+
+        <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 space-y-2">
+          <p className="font-bold text-xs text-blue-900 uppercase tracking-wide">Investigations</p>
+          <div>
+            <p className="text-xs font-semibold text-blue-800 mb-1">Must Order:</p>
+            {dx.investigations.must.map((inv, i) => (
+              <div key={i} className="flex items-start gap-1.5 text-xs text-blue-800 mb-0.5">
+                <span className="text-blue-500 font-bold flex-shrink-0">→</span>{inv}
               </div>
-            )}
-          </>
+            ))}
+          </div>
+          {dx.investigations.should && (
+            <div>
+              <p className="text-xs font-semibold text-blue-700 mb-1">Should Order:</p>
+              {dx.investigations.should.map((inv, i) => (
+                <div key={i} className="flex items-start gap-1.5 text-xs text-blue-700 mb-0.5">
+                  <span className="text-blue-400 flex-shrink-0">→</span>{inv}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-1 text-xs text-slate-700">
+          <p className="font-bold text-slate-800">Monitoring:</p>
+          {dx.monitoring.map((m, i) => <div key={i} className="flex items-start gap-1.5"><span className="text-slate-400 flex-shrink-0">→</span>{m}</div>)}
+        </div>
+
+        {dx.refer && (
+          <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
+            <p className="font-bold mb-0.5">Referral Criteria:</p>
+            <p>{dx.refer}</p>
+          </div>
         )}
-        <Button className="w-full bg-teal-600 hover:bg-teal-700" onClick={() => { setStep(0); setSymptoms({}); setContinenceAchieved(null); setHasDaytime(null); setBBD({}); setUroflow(""); setPVR(""); setDiagnosis(""); }}>
-          New Patient
-        </Button>
+
+        <Button className="w-full bg-teal-600 hover:bg-teal-700" onClick={resetAll}>New Case</Button>
       </div>
     );
   };
