@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
 import FormularyBrowser from "../components/drugs/FormularyBrowser";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
+import { FORMULARY, getFormularyDrug } from "@/lib/formulary/nephrology-drugs";
 
 // ─── Interaction rules ─────────────────────────────────────────────────────────
 const INTERACTION_RULES = [
@@ -163,12 +164,13 @@ function RxQuickSearch({ drugs, weight, bsa, effectiveEgfr, onAdd, onView, rxDru
                 <Pill className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
                 <div className="flex-1 min-w-0" onClick={() => { onView(drug); setQ(""); setOpen(false); }} style={{ cursor: "pointer" }}>
                   <p className="text-sm font-semibold text-slate-900 leading-tight">{drug.generic_name}</p>
-                  {dose && dose.perDose !== drug.dose_weight_based && (
-                    <p className="text-xs text-teal-700 font-medium">{dose.perDose} · {dose.freq} · {drug.route}</p>
-                  )}
-                  {(!dose || dose.perDose === drug.dose_weight_based) && (
-                    <p className="text-xs text-slate-400">{drug.dose_weight_based || drug.category}</p>
-                  )}
+                  {(() => {
+                    const fDrug = getFormularyDrug(drug.generic_name);
+                    const calcedDose = calcDose(drug, weight, bsa, effectiveEgfr);
+                    if (fDrug?.peds_dose) return <p className="text-xs text-indigo-700 font-medium">{fDrug.peds_dose.split(".")[0]}</p>;
+                    if (calcedDose && calcedDose.perDose !== drug.dose_weight_based) return <p className="text-xs text-teal-700 font-medium">{calcedDose.perDose} · {calcedDose.freq}</p>;
+                    return <p className="text-xs text-slate-400">{drug.dose_weight_based || drug.category}</p>;
+                  })()}
                 </div>
                 <Button size="sm" onClick={() => { onAdd(drug); setQ(""); setOpen(false); }}
                   className={`text-xs flex-shrink-0 h-7 px-2 ${isInRx ? "bg-green-100 text-green-700 border border-green-300" : "bg-teal-600 hover:bg-teal-700 text-white"}`}>
@@ -1072,10 +1074,24 @@ export default function DrugsDosing() {
                               <p className="text-sm font-bold text-slate-900">{drug.generic_name}</p>
                               {drug.brands_indian && <span className="text-xs text-slate-400">({drug.brands_indian.split(",")[0].trim()})</span>}
                             </div>
-                            {dose && dose.type !== "TDM" && (
-                              <p className="text-xs text-teal-700 font-semibold ml-7 mt-0.5">{dose.perDose} · {dose.freq} · {drug.route || "PO"}</p>
-                            )}
-                            {dose?.type === "TDM" && <p className="text-xs text-blue-700 ml-7 mt-0.5">TDM-guided</p>}
+                            {(() => {
+                              const fDrug = getFormularyDrug(drug.generic_name);
+                              const wt = parseFloat(weight);
+                              // Try to auto-calculate from formulary monograph peds_dose
+                              if (fDrug?.peds_dose && wt) {
+                                const perKg = fDrug.peds_dose.match(/([\d.]+)(?:–|-)([\d.]+)?\s*mg\/kg/);
+                                if (perKg) {
+                                  const lo = (parseFloat(perKg[1]) * wt).toFixed(1);
+                                  const hi = perKg[2] ? (parseFloat(perKg[2]) * wt).toFixed(1) : null;
+                                  return <p className="text-xs text-indigo-700 font-semibold ml-7 mt-0.5">📊 {hi ? `${lo}–${hi} mg` : `${lo} mg`} · {drug.frequency || "per dose"} · {drug.route || "PO"}</p>;
+                                }
+                              }
+                              if (dose && dose.type !== "TDM") return <p className="text-xs text-teal-700 font-semibold ml-7 mt-0.5">{dose.perDose} · {dose.freq} · {drug.route || "PO"}</p>;
+                              if (dose?.type === "TDM") return <p className="text-xs text-blue-700 ml-7 mt-0.5">TDM-guided</p>;
+                              if (fDrug?.peds_dose) return <p className="text-xs text-indigo-600 ml-7 mt-0.5 text-[11px]">{fDrug.peds_dose.split(".")[0]}</p>;
+                              return null;
+                            })()}
+                            {!weight && <p className="text-xs text-amber-600 ml-7 mt-0.5">Enter weight above to auto-calculate dose</p>}
                             {renalFlag && <p className="text-xs text-amber-700 ml-7 mt-0.5">⚠️ {renalFlag.msg}</p>}
                           </div>
                           <button onClick={() => setRxDrugs(p => p.filter(d => d.id !== drug.id))}
@@ -1126,7 +1142,24 @@ export default function DrugsDosing() {
         {mode === "plasmapheresis" && <PlasmapheresisModule />}
 
         {mode === "formulary" && (
-          <FormularyTab drugs={drugs} isLoading={isLoading} selectDrug={selectDrug} favIds={favIds} toggleFav={toggleFav} rxDrugs={rxDrugs} effectiveEgfr={effectiveEgfr} />
+          <div className="space-y-4">
+            {/* Header matching the screenshot design */}
+            <div className="bg-white rounded-2xl border border-indigo-200 p-4 flex items-center gap-4">
+              <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Comprehensive Pediatric Nephrology Formulary</h2>
+                <p className="text-xs text-indigo-600 mt-0.5">Full monographs · Indian formulations & brands · Renal dose adjustments · Administration guidance</p>
+              </div>
+            </div>
+            <FormularyBrowser
+              weight={weight}
+              height={height}
+              egfr={effectiveEgfr?.toString()}
+              initialSearch=""
+            />
+          </div>
         )}
 
         {mode === "ckd" && (
