@@ -27,6 +27,7 @@ import HubDrugSearch from "../components/hub/HubDrugSearch";
 import HubQuickLaunch from "../components/hub/HubQuickLaunch";
 import QuickLaunchBar from "../components/hub/QuickLaunchBar";
 import HubSectionCustomizer, { useHubSectionVisibility } from "../components/hub/HubSectionCustomizer";
+import HubMoreMenu from "../components/hub/HubMoreMenu";
 
 // ── AI Analyser Tools ── (url = full path, or page for createPageUrl)
 const AI_TOOLS = [
@@ -488,10 +489,10 @@ export default function Hub() {
             <p className="text-blue-100 text-xs font-semibold">by Swarnim</p>
             <p className="text-blue-200 text-xs">Pediatrics Bedside Assistant — Pediatric Nephrology & Others</p>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
-              <span className="hidden sm:inline">{isOnline ? "Online" : "Offline"}</span>
+              <span className="hidden xs:inline">{isOnline ? "Online" : "Offline"}</span>
             </span>
             <button
               onClick={() => setEmergencyProtocolOpen(true)}
@@ -500,32 +501,15 @@ export default function Hub() {
               <AlertCircle className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Emergency</span>
             </button>
-            <Link to={createPageUrl("ClinicalWorkspace")}>
-              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                <Layers className="w-3 h-3" />
-                <span className="hidden sm:inline">Workspace</span>
-              </Button>
-            </Link>
-            <Link to={createPageUrl("GuidelinesLibrary")}>
-              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                <BookOpen className="w-3 h-3" />
-                <span className="hidden sm:inline">Guidelines</span>
-              </Button>
-            </Link>
-            <Link to={createPageUrl("ClinicalSupport")}>
-              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                <GitBranch className="w-3 h-3" />
-                <span className="hidden sm:inline">Pathways</span>
-              </Button>
-            </Link>
-            {isAdmin &&
+            {isAdmin && (
               <Link to={createPageUrl("ClinicDashboard")}>
                 <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
                   <Users className="w-3 h-3" />
                   <span className="hidden sm:inline">Clinic</span>
                 </Button>
               </Link>
-            }
+            )}
+            <HubMoreMenu />
           </div>
         </div>
 

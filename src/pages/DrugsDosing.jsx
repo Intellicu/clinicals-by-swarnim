@@ -316,7 +316,7 @@ export default function DrugsDosing() {
   const [egfr, setEgfr] = useState("");
 
   // Main workspace modes
-  const [mode, setMode] = useState("search"); // "search" | "drug" | "rx" | "more"
+  const [mode, setMode] = useState("formulary"); // "formulary" | "search" | "drug" | "rx" | ...
   const [selectedDrug, setSelectedDrug] = useState(null);
   const [drugSubTab, setDrugSubTab] = useState("dose");
 
@@ -354,7 +354,7 @@ export default function DrugsDosing() {
 
   const { data: drugs = [], isLoading } = useQuery({
     queryKey: ["drugs-full"],
-    queryFn: () => base44.entities.Drug.list("generic_name", 300),
+    queryFn: () => base44.entities.Drug.list("generic_name", 1000),
   });
 
   const bsa = useMemo(() => {
@@ -530,7 +530,8 @@ export default function DrugsDosing() {
           {/* Mode nav */}
           <div className="flex items-center gap-0 pb-0 overflow-x-auto" style={{ borderBottom: "none", scrollbarWidth: "none" }}>
             {[
-              { id: "search", label: "Search" },
+              { id: "formulary", label: "Pediatric Nephrology Formulary" },
+              { id: "search", label: "Search Other Drugs" },
               { id: "recents", label: "Recent" },
               { id: "favorites", label: "⭐ Fav" },
               { id: "rx", label: `Rx${rxDrugs.length ? ` (${rxDrugs.length})` : ""}` },
@@ -538,7 +539,6 @@ export default function DrugsDosing() {
               { id: "eculizumab", label: "Eculizumab" },
               { id: "plasmapheresis", label: "Plasmapheresis" },
               { id: "ckd", label: "CKD Doses" },
-              { id: "formulary", label: "Formulary" },
             ].map(m => (
               <button key={m.id} onClick={() => setMode(m.id)}
                 className={`flex-shrink-0 px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${mode === m.id ? "border-teal-600 text-teal-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
@@ -1143,13 +1143,13 @@ export default function DrugsDosing() {
 
         {mode === "formulary" && (
           <div className="space-y-4">
-            {/* Header matching the screenshot design */}
+            {/* Header */}
             <div className="bg-white rounded-2xl border border-indigo-200 p-4 flex items-center gap-4">
               <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-slate-900">Comprehensive Pediatric Nephrology Formulary</h2>
+                <h2 className="text-base font-bold text-slate-900">Pediatric Nephrology Formulary</h2>
                 <p className="text-xs text-indigo-600 mt-0.5">Full monographs · Indian formulations & brands · Renal dose adjustments · Administration guidance</p>
               </div>
             </div>
@@ -1158,6 +1158,23 @@ export default function DrugsDosing() {
               height={height}
               egfr={effectiveEgfr?.toString()}
               initialSearch=""
+              onAddToRx={(formularyDrug) => {
+                // Map formulary drug shape → DB drug shape for Rx builder
+                const mapped = {
+                  id: formularyDrug.generic,
+                  generic_name: formularyDrug.generic,
+                  category: formularyDrug.class || "Formulary",
+                  therapeutic_class: formularyDrug.class,
+                  route: formularyDrug.formulations?.[0]?.form?.includes("IV") ? "IV" : "PO",
+                  dose_weight_based: formularyDrug.peds_dose || formularyDrug.dose || "",
+                  frequency: formularyDrug.freq || "OD",
+                  brands_indian: formularyDrug.formulations?.map(f => f.brands).filter(Boolean).join(", ") || "",
+                  renal_adjust: formularyDrug.renal_adjust || "",
+                  dose_calculation_type: "per_day",
+                };
+                addToRx(mapped);
+                setMode("rx");
+              }}
             />
           </div>
         )}

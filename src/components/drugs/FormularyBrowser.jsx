@@ -174,15 +174,15 @@ export default function FormularyBrowser({ weight, height, egfr, initialSearch =
                 <p className="text-xs text-blue-800">{selected.indications}</p>
               </div>
             )}
-            {/* onAddToRx mode: show a prominent Add to Rx button inline */}
+            {/* Add Rx button — matches Drug Search section */}
             {onAddToRx && (
               <div className="mb-3">
                 <Button
                   onClick={() => onAddToRx(selected)}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                  className="w-full bg-teal-600 hover:bg-teal-700 text-white gap-2 text-sm font-bold"
                 >
-                  <CheckCircle className="w-4 h-4" />
-                  Add {selected.generic} to Prescription
+                  <Plus className="w-4 h-4" />
+                  + Add Rx
                 </Button>
               </div>
             )}
