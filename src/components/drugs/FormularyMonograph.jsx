@@ -127,7 +127,7 @@ function DoseCalculatorPanel({ drug, weight, bsa, egfr }) {
   );
 }
 
-export default function FormularyMonograph({ drug, weight, bsa, egfr, patientName, patientId, encounterId, onPrescriptionSaved }) {
+export default function FormularyMonograph({ drug, weight, bsa, egfr, patientName, patientId, encounterId, onPrescriptionSaved, hideRxBuilder }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!drug) return null;
@@ -172,16 +172,18 @@ export default function FormularyMonograph({ drug, weight, bsa, egfr, patientNam
       {/* Safety warnings */}
       {weight && <DoseSafetyWarning drug={drug} weight={weight} bsa={bsa} />}
 
-      {/* Prescription builder */}
-      <PrescriptionBuilder
-        drug={drug}
-        weight={weight}
-        bsa={bsa}
-        patientName={patientName}
-        patientId={patientId}
-        encounterId={encounterId}
-        onPrescriptionSaved={onPrescriptionSaved}
-      />
+      {/* Prescription builder — hidden when parent already provides Add Rx flow */}
+      {!hideRxBuilder && (
+        <PrescriptionBuilder
+          drug={drug}
+          weight={weight}
+          bsa={bsa}
+          patientName={patientName}
+          patientId={patientId}
+          encounterId={encounterId}
+          onPrescriptionSaved={onPrescriptionSaved}
+        />
+      )}
 
       {/* Full monograph toggle */}
       <Button
