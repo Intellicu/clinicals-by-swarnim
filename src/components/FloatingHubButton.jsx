@@ -131,8 +131,25 @@ export default function FloatingHubButton() {
   const [open, setOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState("Clinical AI");
   const [panel, setPanel] = useState("tools"); // "tools" | "chat"
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
 
   const switchToTools = () => setPanel("tools");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const current = window.scrollY;
+      if (current > lastScrollY.current + 40 && current > 100) {
+        setHidden(true);
+        setOpen(false);
+      } else if (current < lastScrollY.current - 20) {
+        setHidden(false);
+      }
+      lastScrollY.current = current;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   if (location.pathname === "/AIAgentsHub") return null;
 
@@ -222,12 +239,12 @@ export default function FloatingHubButton() {
       {/* Single FAB */}
       <button
         onClick={() => setOpen(v => !v)}
-        className={`fixed z-50 flex items-center gap-1.5 text-white text-xs font-semibold px-3.5 py-2.5 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95 ${open ? "bg-slate-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
-        style={{ bottom: "calc(var(--tab-bar-height, 64px) + 8px)", right: "12px" }}
+        className={`fixed z-50 flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95 ${open ? "bg-slate-700" : "bg-indigo-600 hover:bg-indigo-700"} ${hidden ? "translate-y-20 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}
+        style={{ bottom: "calc(var(--tab-bar-height, 64px) + 8px)", right: "12px", transition: "transform 0.3s ease, opacity 0.3s ease, background-color 0.15s" }}
         title="Clinical AI Hub"
       >
-        {open ? <X className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-        <span>{open ? "Close" : "AI"}</span>
+        {open ? <X className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
+        <span className="hidden sm:inline">{open ? "Close" : "AI"}</span>
       </button>
     </>
   );

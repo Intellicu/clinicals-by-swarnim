@@ -28,6 +28,7 @@ import HubQuickLaunch from "../components/hub/HubQuickLaunch";
 import QuickLaunchBar from "../components/hub/QuickLaunchBar";
 import HubSectionCustomizer, { useHubSectionVisibility } from "../components/hub/HubSectionCustomizer";
 import HubMoreMenu from "../components/hub/HubMoreMenu";
+import TodaySnapshot from "../components/hub/TodaySnapshot";
 
 // ── AI Analyser Tools ── (url = full path, or page for createPageUrl)
 const AI_TOOLS = [
@@ -512,6 +513,9 @@ export default function Hub() {
             <HubMoreMenu />
           </div>
         </div>
+
+        {/* ── Quick Actions ── */}
+        <TodaySnapshot />
 
         {/* ── Quick Launch (customisable) ── */}
         <HubQuickLaunch />

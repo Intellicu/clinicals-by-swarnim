@@ -2,9 +2,9 @@ import React from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
-  Home, Search, Calculator, AlertTriangle, LayoutGrid,
-  Users, Stethoscope, Pill, Clock, Star,
-  BarChart2, FileText, Droplet, BookOpen, Sparkles,
+  Home, Search, Calculator, LayoutGrid,
+  Users, Pill, Clock, Star,
+  BarChart2, FileText, Sparkles,
   GitBranch, Baby
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -49,9 +49,9 @@ export default function ContextualBottomBar() {
   const hubTabs = [
     { icon: Home, label: "Home", to: createPageUrl("Hub") },
     { icon: GitBranch, label: "Pathways", to: createPageUrl("ClinicalSupport") },
-    { icon: Baby, label: "Pediatrics", to: createPageUrl("GeneralPediatricsHub") },
-    { icon: Sparkles, label: "AI", to: createPageUrl("ClinicalAIHub") },
+    { icon: Pill, label: "Drugs", to: createPageUrl("DrugsDosing") },
     { icon: Calculator, label: "Calc", to: createPageUrl("CalculatorsHub") },
+    { icon: Baby, label: "Pediatrics", to: createPageUrl("GeneralPediatricsHub") },
   ];
 
   const calcTabs = [
