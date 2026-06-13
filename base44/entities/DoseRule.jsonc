@@ -10,9 +10,39 @@
       "type": "string",
       "description": "Reference to Drug entity ID"
     },
+    "drug_name": {
+      "type": "string",
+      "description": "Drug generic name (denormalised for fast lookup)"
+    },
     "indication": {
       "type": "string",
-      "description": "Clinical indication"
+      "description": "Clinical indication \u2014 must be specific (e.g. SRNS, FRNS, SDNS, Post-Transplant, LN Class III/IV, MCNS Induction)",
+      "enum": [
+        "MCNS Induction",
+        "MCNS Relapse",
+        "SRNS",
+        "FRNS",
+        "SDNS",
+        "FSGS",
+        "MN",
+        "LN Class III/IV Induction",
+        "LN Class III/IV Maintenance",
+        "LN Class V",
+        "ANCA Vasculitis Induction",
+        "ANCA Vasculitis Maintenance",
+        "IgAN",
+        "Post-Transplant Induction",
+        "Post-Transplant Maintenance",
+        "aHUS",
+        "Hypertension",
+        "CKD Proteinuria",
+        "Secondary Hyperparathyroidism",
+        "Anaemia of CKD",
+        "PCP Prophylaxis",
+        "UTI Prophylaxis",
+        "UTI Treatment",
+        "Other"
+      ]
     },
     "dose_unit": {
       "type": "string",
@@ -20,14 +50,17 @@
         "mg/kg/day",
         "mg/m2/day",
         "mg/dose",
+        "mg/kg/dose",
         "mcg/kg/day",
-        "units/kg/day"
+        "units/kg/day",
+        "mg/m2/dose",
+        "mcg/kg/dose"
       ],
       "description": "Dosing unit"
     },
     "dose_value": {
       "type": "number",
-      "description": "Standard dose value"
+      "description": "Standard/target dose value"
     },
     "min_dose_per_kg": {
       "type": "number",
@@ -39,11 +72,11 @@
     },
     "max_total_mg": {
       "type": "number",
-      "description": "Absolute maximum dose"
+      "description": "Absolute maximum dose per administration"
     },
     "frequency": {
       "type": "string",
-      "description": "Dosing frequency (OD, BD, TDS, QID)"
+      "description": "Dosing frequency (OD, BD, TDS, QID, alternate-day, weekly)"
     },
     "route": {
       "type": "string",
@@ -59,7 +92,32 @@
     },
     "duration_days": {
       "type": "number",
-      "description": "Standard treatment duration"
+      "description": "Standard treatment duration in days (0 = indefinite/TDM-guided)"
+    },
+    "duration_notes": {
+      "type": "string",
+      "description": "Narrative duration guidance (e.g., 'until remission then taper', '12\u201324 months for SDNS')"
+    },
+    "egfr_threshold_caution": {
+      "type": "number",
+      "description": "eGFR below which dose reduction is required (mL/min/1.73m\u00b2)"
+    },
+    "egfr_adjustment_notes": {
+      "type": "string",
+      "description": "Specific eGFR-based dose adjustment instructions"
+    },
+    "tdm_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether therapeutic drug monitoring is required"
+    },
+    "target_trough": {
+      "type": "string",
+      "description": "TDM target level for this indication (e.g., '8-12 ng/mL', 'C2 1000-1500 ng/mL')"
+    },
+    "pre_dose_workup": {
+      "type": "string",
+      "description": "Required pre-dose workup for this indication (e.g., HBsAg, CD19, CMV PCR)"
     },
     "age_min_months": {
       "type": "number",
@@ -68,6 +126,10 @@
     "age_max_months": {
       "type": "number",
       "description": "Maximum age in months (null = no limit)"
+    },
+    "weight_max_kg": {
+      "type": "number",
+      "description": "Maximum weight for weight-based calculation (cap at adult dose)"
     },
     "rounding_strategy": {
       "type": "string",
@@ -80,6 +142,22 @@
       ],
       "description": "Dose rounding method"
     },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "induction",
+        "maintenance",
+        "taper",
+        "prophylaxis",
+        "rescue",
+        "single_dose"
+      ],
+      "description": "Treatment phase this rule applies to"
+    },
+    "guideline_source": {
+      "type": "string",
+      "description": "Guideline reference (e.g., IPNA 2023, KDIGO 2022)"
+    },
     "references": {
       "type": "string",
       "description": "Source references"
@@ -87,6 +165,7 @@
   },
   "required": [
     "drug_id",
+    "indication",
     "dose_unit",
     "dose_value"
   ]

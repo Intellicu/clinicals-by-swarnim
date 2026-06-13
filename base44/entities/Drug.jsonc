@@ -10,6 +10,26 @@
       "type": "string",
       "description": "Generic drug name"
     },
+    "formulary_category": {
+      "type": "string",
+      "enum": [
+        "Steroids",
+        "Calcineurin Inhibitors",
+        "Antimetabolites",
+        "Alkylating Agents",
+        "Biologics",
+        "RAAS Blockers",
+        "Diuretics",
+        "CKD-MBD",
+        "Immunization & Infection Prophylaxis",
+        "Dialysis Medications",
+        "Transplant Medications",
+        "ESA & Iron",
+        "Emergency",
+        "Other"
+      ],
+      "description": "Formulary collection/category for display grouping"
+    },
     "category": {
       "type": "string",
       "description": "Drug category (Antihypertensive, Diuretic, Immunosuppressant, etc.)"
@@ -114,6 +134,42 @@
     "monitoring_frequency": {
       "type": "string",
       "description": "How often TDM or monitoring labs required"
+    },
+    "pre_treatment_workup": {
+      "type": "string",
+      "description": "Required tests/workup before initiating this drug (e.g., HBsAg, CD19, baseline creatinine)"
+    },
+    "post_treatment_monitoring": {
+      "type": "string",
+      "description": "Structured monitoring plan after initiation (e.g., CBC at 4w, TDM at 1w, CD19 at 1m)"
+    },
+    "target_trough_level": {
+      "type": "string",
+      "description": "TDM target trough/C0/C2 level by indication (e.g., Transplant: 8-12 ng/mL; SRNS: 5-8 ng/mL)"
+    },
+    "dose_duration": {
+      "type": "string",
+      "description": "Standard treatment duration by indication (e.g., SDNS: 12-24 months; LN induction: 6 months)"
+    },
+    "vaccination_guidance": {
+      "type": "string",
+      "description": "Specific vaccination requirements before/during/after therapy"
+    },
+    "redosing_criteria": {
+      "type": "string",
+      "description": "When to redose or retreat (e.g., CD19 recovery + clinical relapse for rituximab)"
+    },
+    "special_precautions": {
+      "type": "string",
+      "description": "High-risk scenarios, emergency precautions, handling instructions"
+    },
+    "guideline_source": {
+      "type": "string",
+      "description": "Primary guideline source(s) for dosing (e.g., IPNA 2023, KDIGO 2022)"
+    },
+    "evidence_summary": {
+      "type": "string",
+      "description": "Key RCT/trial evidence summary (e.g., RITUXNS trial, FONT trial, REENAL trial)"
     },
     "contraindications": {
       "type": "string",
