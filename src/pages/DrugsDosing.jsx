@@ -14,6 +14,7 @@ import {
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import RxIndicationBuilder from "../components/drugs/RxIndicationBuilder";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
+import SteroidSparingAgents from "../components/drugs/SteroidSparingAgents";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
 import FormularyBrowser from "../components/drugs/FormularyBrowser";
@@ -579,6 +580,7 @@ export default function DrugsDosing() {
               { id: "recents", label: "Recent" },
               { id: "favorites", label: "⭐ Fav" },
               { id: "rx", label: `Rx${rxDrugs.length ? ` (${rxDrugs.length})` : ""}` },
+              { id: "steroid-sparing", label: "Steroid-Sparing" },
               { id: "steroids", label: "Steroids" },
               { id: "eculizumab", label: "Eculizumab" },
               { id: "plasmapheresis", label: "Plasmapheresis" },
@@ -1215,6 +1217,7 @@ export default function DrugsDosing() {
         )}
 
         {/* ── ADVANCED TOOL VIEWS (direct tabs, no "more" menu) ── */}
+        {mode === "steroid-sparing" && <SteroidSparingAgents />}
         {mode === "steroids" && <SteroidEquivalenceEngine />}
         {mode === "eculizumab" && <EculizumabGuidance />}
         {mode === "plasmapheresis" && <PlasmapheresisModule />}
