@@ -431,20 +431,24 @@ export default function DrugsDosing() {
   const buildRx = () => {
     const wt = parseFloat(weight);
     const lines = rxDrugs.map((drug, i) => {
-      // Structured output if added via indication builder
+      // Structured output if added via indication builder — use the stored prescriptionText directly
+      if (drug._prescriptionText) {
+        return `${i + 1}. ${drug._prescriptionText}`;
+      }
+      // Indication-builder drug without prescriptionText (legacy)
       if (drug._indication && drug.dose_weight_based) {
         const formLine = drug._formulation
           ? `\n   Formulation: ${drug._formulation.form} ${drug._formulation.strength}${drug._formulation.brands ? ` (${drug._formulation.brands})` : ""}`
           : "";
         const durationLine = drug._duration ? `\n   Duration: ${drug._duration}` : "";
-        const brandLine = drug.brands_indian ? `\n   Brands (India): ${drug.brands_indian.split(",")[0].trim()}` : "";
-        return `${i + 1}. ${drug.generic_name}\n   Indication: ${drug._indication}\n   Dose: ${drug.dose_weight_based}  |  ${drug.frequency || "—"}  |  ${drug.route || "PO"}${durationLine}${formLine}${brandLine}`;
+        return `${i + 1}. ${drug.generic_name}\n   Indication: ${drug._indication}\n   Dose: ${drug.dose_weight_based}  |  ${drug.frequency || "—"}  |  ${drug.route || "PO"}${durationLine}${formLine}`;
       }
       // Fallback: generic dose calculation
       const dose = calcDose(drug, wt, bsa, effectiveEgfr);
       const doseStr = dose?.type === "TDM" ? "TDM-guided (see monograph)" : dose?.perDose || drug.dose_weight_based || "—";
       const durationInfo = drug._duration ? `\n   Duration: ${drug._duration}` : "";
-      return `${i + 1}. ${drug.generic_name}\n   Dose: ${doseStr}  |  ${drug.frequency || dose?.freq || "—"}  |  ${drug.route || "PO"}${durationInfo}\n   Brands (India): ${drug.brands_indian || "Generic"}`;
+      const brandInfo = drug.brands_indian ? `\n   Brands (India): ${drug.brands_indian.split(",").slice(0,2).join(", ")}` : "";
+      return `${i + 1}. ${drug.generic_name}\n   Dose: ${doseStr}  |  ${drug.frequency || dose?.freq || "—"}  |  ${drug.route || "PO"}${durationInfo}${brandInfo}`;
     }).join("\n\n");
     return `PEDIATRIC Rx\n${"─".repeat(40)}\nAge: ${age || "—"} y  |  Wt: ${weight || "—"} kg  |  BSA: ${bsa ? bsa + " m²" : "—"}  |  eGFR: ${effectiveEgfr || "—"}\n\n${lines}\n\n${"─".repeat(40)}\n${interactions.length ? `⚠️ Interactions: ${interactions.map(ix => `${ix.a}+${ix.b}`).join("; ")}` : "✅ No major interactions"}\nCliniCals by Swarnim | Verify all doses`;
   };

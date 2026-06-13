@@ -1,10 +1,10 @@
 // ── Single source of truth for all Clinical AI Analyzers ──────────────────────
 // Import this wherever you need to show the analyzer list.
-// All hubs, FAB, and AI Center page should use this registry.
+// All hubs, FAB, and AI Center page MUST use this registry — no duplicate lists.
 
 import {
   Microscope, Layers, BookOpen, Brain, TestTube,
-  Activity, Dna, FlaskConical, HeartPulse, Wind
+  Activity, Dna, HeartPulse
 } from "lucide-react";
 
 export const CLINICAL_AI_ANALYZERS = [
@@ -28,7 +28,7 @@ export const CLINICAL_AI_ANALYZERS = [
   },
   {
     id: "differential",
-    name: "Differential Diagnosis",
+    name: "Differential Dx",
     icon: Brain,
     color: "bg-indigo-600",
     page: "DifferentialEngine",

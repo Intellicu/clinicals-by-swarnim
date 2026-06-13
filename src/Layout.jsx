@@ -204,7 +204,7 @@ export default function Layout({ children, currentPageName }) {
         {/* ── Main Content ── */}
         <main
           className="flex-1 flex flex-col lg:ml-80 min-w-0"
-          style={{ paddingBottom: "calc(var(--tab-bar-height, 64px) + env(safe-area-inset-bottom, 0px))", overflowX: "hidden" }}
+          style={{ paddingBottom: "calc(var(--tab-bar-height, 64px) + env(safe-area-inset-bottom, 0px) + 16px)", overflowX: "hidden" }}
           aria-label="Main content"
         >
           {/* Header */}

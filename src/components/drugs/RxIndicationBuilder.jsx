@@ -106,26 +106,29 @@ function selectBestFormulation(formulations, dosePerAdmin_mg) {
 function calcVolume(formulation, dosePerAdmin_mg) {
   if (!formulation || !dosePerAdmin_mg) return null;
   const str = formulation.strength || "";
-  // e.g. "125 mg/5 mL" or "250 mg/5 mL"
+  // Liquid: "125 mg/5 mL" or "250 mg/5 mL"
   const mlMatch = str.match(/([\d.]+)\s*mg\s*\/\s*([\d.]+)\s*mL/i);
   if (mlMatch) {
     const mgPerMl = parseFloat(mlMatch[1]) / parseFloat(mlMatch[2]);
     const vol = dosePerAdmin_mg / mgPerMl;
-    return vol.toFixed(1);
+    return parseFloat(vol.toFixed(1)); // numeric, caller adds "mL"
   }
-  // e.g. "500 mg" tablet
+  // Tablet/capsule: "500 mg"
   const tabMatch = str.match(/([\d.]+)\s*mg/i);
   if (tabMatch) {
     const mgPerTab = parseFloat(tabMatch[1]);
     const tabs = dosePerAdmin_mg / mgPerTab;
-    return `${tabs.toFixed(1)} tab${tabs !== 1 ? "s" : ""}`;
+    return `${tabs % 1 === 0 ? tabs.toFixed(0) : tabs.toFixed(1)} tab${tabs !== 1 ? "s" : ""}`;
   }
   return null;
 }
 
 export default function RxIndicationBuilder({ drug, weight, patientAge, patientName, onClose, onAddToRxList }) {
-  const drugKey = (drug?.generic_name || drug?.generic || "").toLowerCase().replace(/[^a-z]/g, "");
-  const indications = INDICATION_PRESETS[drugKey] || [];
+  const drugKey = (drug?.generic_name || drug?.generic || "").toLowerCase().replace(/[^a-z\s]/g, "").replace(/\s+/g, "").trim();
+  // Try exact key match then partial
+  const indications = INDICATION_PRESETS[drugKey]
+    || INDICATION_PRESETS[Object.keys(INDICATION_PRESETS).find(k => drugKey.startsWith(k) || k.startsWith(drugKey)) || ""]
+    || [];
 
   const [selectedIndication, setSelectedIndication] = useState(null);
   const [overrideDose, setOverrideDose] = useState("");
@@ -160,11 +163,20 @@ export default function RxIndicationBuilder({ drug, weight, patientAge, patientN
     const bestForm = selectBestFormulation(formulations, roundedPerAdmin);
     const volumeStr = bestForm ? calcVolume(bestForm, roundedPerAdmin) : null;
 
+    // Build a clean per-dose display string
+    let perAdminDisplay = `${roundedPerAdmin} mg`;
+    if (bestForm && volumeStr !== null) {
+      const isLiquid = typeof volumeStr === "number";
+      perAdminDisplay = isLiquid
+        ? `${roundedPerAdmin} mg (${volumeStr} mL)`
+        : `${roundedPerAdmin} mg (${volumeStr})`;
+    }
+
     return {
       type: "weight",
       dailyMg: roundedDay,
       perAdminMg: roundedPerAdmin,
-      perAdminDisplay: volumeStr ? `${roundedPerAdmin} mg (${volumeStr} ${bestForm?.strength?.includes("/") ? "mL" : ""})` : `${roundedPerAdmin} mg`,
+      perAdminDisplay,
       formulation: bestForm,
       volumeStr,
       note: ind.note,
@@ -185,26 +197,48 @@ export default function RxIndicationBuilder({ drug, weight, patientAge, patientN
     if (overrideDose) {
       doseStr = `${overrideDose} mg`;
     } else if (calcResult?.type === "weight") {
-      doseStr = calcResult.perAdminDisplay;
+      // Use volume-based dose if liquid formulation, else mg dose
+      if (typeof calcResult.volumeStr === "number" && calcResult.volumeStr) {
+        doseStr = `${calcResult.volumeStr} mL (${calcResult.perAdminMg} mg)`;
+      } else {
+        doseStr = calcResult.perAdminDisplay;
+      }
     } else if (calcResult?.type === "TDM") {
       doseStr = `(TDM-guided — see note)`;
     } else {
       doseStr = ind.note || "— see monograph";
     }
 
-    const brandLine = calcResult?.formulation
-      ? `  Formulation: ${calcResult.formulation.form} ${calcResult.formulation.strength} (${calcResult.formulation.brands || "Generic"})`
+    const form = calcResult?.formulation;
+    const formLine = form
+      ? `  Formulation: ${form.form} ${form.strength}${form.brands ? ` (${form.brands})` : ""}`
       : "";
+    const quantityLine = (() => {
+      if (!form || !calcResult?.volumeStr || !duration) return "";
+      // Estimate quantity only for liquid forms
+      const durMatch = duration.match(/(\d+)/);
+      if (!durMatch) return "";
+      const days = parseInt(durMatch[1]);
+      const freqMap = { "OD": 1, "BD": 2, "TDS": 3, "TID": 3, "QID": 4 };
+      const doses = freqMap[freq] || 1;
+      const totalDoses = days * doses;
+      const isLiquid = form.strength?.includes("/");
+      if (typeof calcResult.volumeStr === "number" && calcResult.volumeStr) {
+        const totalMl = (calcResult.volumeStr * totalDoses).toFixed(0);
+        return `  Qty: ${totalMl} mL total (${totalDoses} doses × ${calcResult.volumeStr} mL)`;
+      }
+      return "";
+    })();
 
     return [
       `${drugName}`,
       `  Indication: ${ind.label}`,
-      `  Dose: ${doseStr}`,
-      `  Route: ${route}  |  Frequency: ${freq}`,
+      weight ? `  Weight: ${weight} kg` : "",
+      `  Dose: ${doseStr} ${route} ${freq}`,
       `  Duration: ${duration}`,
-      brandLine,
+      formLine,
+      quantityLine,
       calcResult?.note ? `  Note: ${calcResult.note}` : "",
-      weight ? `  (Wt: ${weight} kg)` : "",
     ].filter(Boolean).join("\n");
   }, [selectedIndication, calcResult, overrideDose, overrideFreq, overrideDuration, overrideRoute, drug, weight]);
 
@@ -331,7 +365,13 @@ export default function RxIndicationBuilder({ drug, weight, patientAge, patientN
                   <div className="bg-white rounded-xl border border-slate-200 px-3 py-2.5">
                     <p className="text-xs font-bold text-indigo-600 mb-1">Recommended Formulation</p>
                     <p className="text-sm font-semibold text-slate-800">{calcResult.formulation.form} {calcResult.formulation.strength}</p>
-                    {calcResult.volumeStr && <p className="text-xs text-teal-700 mt-0.5">Volume per dose: <strong>{calcResult.volumeStr} {calcResult.formulation.strength?.includes("/") ? "mL" : ""}</strong></p>}
+                    {calcResult.volumeStr !== null && (
+                      <p className="text-xs text-teal-700 mt-0.5">
+                        Per dose: <strong>
+                          {typeof calcResult.volumeStr === "number" ? `${calcResult.volumeStr} mL` : calcResult.volumeStr}
+                        </strong>
+                      </p>
+                    )}
                     {calcResult.formulation.brands && <p className="text-xs text-slate-400 mt-0.5">Brands: {calcResult.formulation.brands}</p>}
                   </div>
                 )}
