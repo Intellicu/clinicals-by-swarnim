@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Calendar, RefreshCw, BookOpen, Stethoscope, Lightbulb,
   Sparkles, Search, Star, Share2, ChevronRight, Pill,
-  FlaskConical, Bell, Zap, X, ChevronLeft, AlertTriangle, TestTube, TrendingUp
+  FlaskConical, Bell, Zap, X, ChevronLeft, AlertTriangle, TestTube, TrendingUp, BarChart2
 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
@@ -146,6 +146,17 @@ function GuidelineReminderSection({ data }) {
         {data.guideline_condition && <span className="text-xs text-slate-500 font-semibold">{data.guideline_condition}</span>}
       </div>
       <p className="text-sm text-slate-700 leading-relaxed">{data.guideline_reminder}</p>
+    </SectionCard>
+  );
+}
+
+function TrendingTopicSection({ data }) {
+  if (!data?.trending_topic) return null;
+  return (
+    <SectionCard icon={BarChart2} iconBg="bg-orange-500" label="Trending Today"
+      linkText="Open Pathway →" linkTo={data.trending_link || "/ClinicalSupport"}>
+      <p className="text-sm font-bold text-orange-700 mb-1">{data.trending_topic}</p>
+      <p className="text-sm text-slate-600 leading-relaxed">{data.trending_desc}</p>
     </SectionCard>
   );
 }
@@ -384,6 +395,7 @@ export default function DailySummary() {
             <DrugPearlSection data={summaryData} />
             <RareDiseaseSection data={summaryData} />
             <LabPearlSection data={summaryData} />
+            <TrendingTopicSection data={summaryData} />
             <WhatsNewSection data={summaryData} />
           </div>
         )}
