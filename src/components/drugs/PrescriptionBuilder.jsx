@@ -502,6 +502,7 @@ function RxDraftPanel({ drug, weight, indication, bsa, patientName, patientId, e
 export default function PrescriptionBuilder({ drug, weight, bsa, patientName, patientId, encounterId, onPrescriptionSaved }) {
   const [open, setOpen] = useState(false);
   const [selectedIndication, setSelectedIndication] = useState(null);
+  const [activeTab, setActiveTab] = useState("dosing"); // "dosing" | "templates"
 
   if (!drug) return null;
 
@@ -510,16 +511,22 @@ export default function PrescriptionBuilder({ drug, weight, bsa, patientName, pa
   const blocked = isBlockedBiologic(generic);
   const isSimpleDrug = !multiKey && !blocked;
 
-  const handleClose = () => { setOpen(false); setSelectedIndication(null); };
+  const handleClose = () => { setOpen(false); setSelectedIndication(null); setActiveTab("dosing"); };
 
   return (
     <div className="mt-3">
       {!open ? (
-        <Button onClick={() => setOpen(true)} size="sm"
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
-          <FileText className="w-4 h-4" />
-          {multiKey || blocked ? "View Dosing Guide" : "Add to Prescription"}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => { setOpen(true); setActiveTab("dosing"); }} size="sm"
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+            <FileText className="w-4 h-4" />
+            {multiKey || blocked ? "Dosing Guide" : "Add to Prescription"}
+          </Button>
+          <Button onClick={() => { setOpen(true); setActiveTab("templates"); }} size="sm" variant="outline"
+            className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 gap-2">
+            <Layers className="w-4 h-4" /> Templates
+          </Button>
+        </div>
       ) : (
         <div className="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-4 space-y-3">
           <div className="flex items-center justify-between">
@@ -534,40 +541,75 @@ export default function PrescriptionBuilder({ drug, weight, bsa, patientName, pa
             </button>
           </div>
 
-          {/* Biologic blocked */}
-          {blocked && !multiKey && (
-            <Alert className="bg-red-50 border-red-400">
-              <ShieldAlert className="w-4 h-4 text-red-600" />
-              <AlertDescription className="text-red-800 text-sm">
-                <strong>{generic}</strong> requires a validated indication-specific DoseRule. Use the <strong>Prescriber Wizard</strong> tab for guideline-driven prescribing.
-              </AlertDescription>
-            </Alert>
-          )}
+          {/* Tab switcher */}
+          <div className="flex gap-1 bg-white rounded-lg p-1 border border-emerald-200">
+            <button onClick={() => setActiveTab("dosing")}
+              className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all ${activeTab === "dosing" ? "bg-emerald-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}>
+              <FileText className="w-3.5 h-3.5 inline mr-1" /> Drug Dosing
+            </button>
+            <button onClick={() => setActiveTab("templates")}
+              className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all ${activeTab === "templates" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}>
+              <Layers className="w-3.5 h-3.5 inline mr-1" /> Tx Templates
+            </button>
+          </div>
 
-          {/* Multi-indication drug */}
-          {multiKey && !selectedIndication && (
-            <MultiIndicationDosingPanel
-              drugKey={multiKey}
-              drug={drug}
+          {/* Templates tab */}
+          {activeTab === "templates" && (
+            <TreatmentTemplatePanel
               weight={weight}
               bsa={bsa}
-              onSelectIndication={setSelectedIndication}
+              onSelectTemplate={(template) => {
+                toast.success(`Template "${template.name}" copied to clipboard!`);
+                // Also switch to dosing tab
+                setActiveTab("dosing");
+              }}
             />
           )}
 
-          {/* Draft mode: after indication selected or simple drug */}
-          {(selectedIndication || isSimpleDrug) && (
-            <RxDraftPanel
-              drug={drug}
-              weight={weight}
-              bsa={bsa}
-              indication={selectedIndication}
-              patientName={patientName}
-              patientId={patientId}
-              encounterId={encounterId}
-              onPrescriptionSaved={() => { onPrescriptionSaved?.(); handleClose(); }}
-              onBack={selectedIndication ? () => setSelectedIndication(null) : undefined}
-            />
+          {/* Dosing tab */}
+          {activeTab === "dosing" && (
+            <>
+              {/* Biologic blocked */}
+              {blocked && !multiKey && (
+                <Alert className="bg-red-50 border-red-400">
+                  <ShieldAlert className="w-4 h-4 text-red-600" />
+                  <AlertDescription className="text-red-800 text-sm">
+                    <strong>{generic}</strong> requires a validated indication-specific DoseRule. Use the <strong>Prescriber Wizard</strong> tab for guideline-driven prescribing.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Simple drug: show dose range banner too */}
+              {isSimpleDrug && (
+                <DoseRangeBanner drug={drug} weight={weight} bsa={bsa} />
+              )}
+
+              {/* Multi-indication drug */}
+              {multiKey && !selectedIndication && (
+                <MultiIndicationDosingPanel
+                  drugKey={multiKey}
+                  drug={drug}
+                  weight={weight}
+                  bsa={bsa}
+                  onSelectIndication={setSelectedIndication}
+                />
+              )}
+
+              {/* Draft mode: after indication selected or simple drug */}
+              {(selectedIndication || isSimpleDrug) && (
+                <RxDraftPanel
+                  drug={drug}
+                  weight={weight}
+                  bsa={bsa}
+                  indication={selectedIndication}
+                  patientName={patientName}
+                  patientId={patientId}
+                  encounterId={encounterId}
+                  onPrescriptionSaved={() => { onPrescriptionSaved?.(); handleClose(); }}
+                  onBack={selectedIndication ? () => setSelectedIndication(null) : undefined}
+                />
+              )}
+            </>
           )}
         </div>
       )}

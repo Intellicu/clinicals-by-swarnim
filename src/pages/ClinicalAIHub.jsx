@@ -1,40 +1,45 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { HeartPulse, Dna, ExternalLink } from 'lucide-react';
+import { HeartPulse, Dna } from 'lucide-react';
 import BiopsyAnalyzer from '../components/clinical-ai/BiopsyAnalyzer';
 import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
 import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
 import UDSAnalyzer from '../components/clinical-ai/UDSAnalyzer';
-import UroflowAIAnalyzer from '../components/clinical-ai/UroflowAIAnalyzer';
-import GeneticReportAnalyzer from './GeneticReportAnalyzer';
+import UroflowAnalyzer from '../components/clinical-ai/UroflowAnalyzer';
 import { CLINICAL_AI_ANALYZERS } from '@/lib/aiAnalyzers';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
 
-// ECG placeholder
+// ECG placeholder (no standalone component yet)
 function ECGAnalyzerPlaceholder() {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
       <HeartPulse className="w-12 h-12 text-red-400 mx-auto mb-4" />
       <h3 className="text-lg font-bold text-slate-800 mb-2">ECG Analyzer</h3>
       <p className="text-sm text-slate-500 max-w-md mx-auto">
-        Pediatric ECG interpretation including electrolyte effects, arrhythmia screening, and QTc calculation. Coming soon — use Case Discussion AI for now.
+        Pediatric ECG interpretation including electrolyte effects, arrhythmia screening, and QTc calculation. Coming soon — use Differential Dx for now.
       </p>
     </div>
   );
 }
 
+// Genetics placeholder — redirects to GeneticReportAnalyzer
+function GeneticsRedirect() {
+  const navigate = useNavigate();
+  React.useEffect(() => { navigate('/GeneticReportAnalyzer', { replace: true }); }, [navigate]);
+  return <div className="p-8 text-center text-slate-400 text-sm">Redirecting to Genetics AI…</div>;
+}
+
 // Tab value → component map
 const TAB_COMPONENTS = {
   uds: <UDSAnalyzer />,
-  uroflow: <UroflowAIAnalyzer />,
+  uroflow: <UroflowAnalyzer />,
   biopsy: <BiopsyAnalyzer />,
   radiology: <RadiologyAnalyzer />,
   labs: <LabReportAnalyzer />,
   case: <ClinicalCaseAnalyzer />,
   ecg: <ECGAnalyzerPlaceholder />,
-  genetics: <GeneticReportAnalyzer />,
+  genetics: <GeneticsRedirect />,
 };
 
 export default function ClinicalAIHub() {
@@ -49,15 +54,19 @@ export default function ClinicalAIHub() {
           <h1 className="text-xl font-bold">Clinical AI Center</h1>
           <p className="text-purple-200 text-xs mt-0.5">AI-powered diagnostic analysis · Evidence-based · Pediatric-focused</p>
           <div className="flex gap-2 mt-3 flex-wrap">
-            {['Claude AI (High Quality)', 'Image Recognition', 'Evidence-Based', 'KDIGO/IPNA Guidelines'].map(tag => (
+            {['Advanced LLM', 'Image Recognition', 'Evidence-Based'].map(tag => (
               <span key={tag} className="bg-white/20 text-white text-[11px] px-2.5 py-1 rounded-lg font-medium">{tag}</span>
             ))}
           </div>
-          <p className="text-purple-300 text-[10px] mt-2">Uses advanced AI models (claude_sonnet_4_6). Each analysis consumes integration credits. For clinical decision support only — not a substitute for specialist review.</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-4">
+        {/* Global disclaimer */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-3 flex items-start gap-2">
+          <span className="text-amber-600 text-base flex-shrink-0">⚠️</span>
+          <p className="text-xs text-amber-800"><strong>Clinical Decision Support Only.</strong> All AI analyzers use advanced LLM models (Claude Sonnet). Results are for educational and decision-support purposes — always correlate with clinical findings and seek specialist review. Not a substitute for professional clinical judgment.</p>
+        </div>
         <Tabs defaultValue={defaultTab} className="w-full">
           {/* Tab bar — scrollable, uses CLINICAL_AI_ANALYZERS as source of truth */}
           <TabsList className="flex w-full h-auto overflow-x-auto bg-white border border-slate-200 rounded-xl p-1 gap-0.5">

@@ -5,12 +5,206 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   AlertTriangle, ChevronDown, ChevronUp, Clock, Droplets,
-  Thermometer, Pill, Shield, Activity, Info, CheckCircle,
-  BookOpen, FlaskConical, Syringe
+  Thermometer, Pill, Shield, Activity, CheckCircle,
+  BookOpen, FlaskConical, Syringe, ClipboardList, TestTube2, Info
 } from "lucide-react";
 import { getFormularyDrug } from "@/lib/formulary/nephrology-drugs";
 import FormularyMonograph from "./FormularyMonograph";
-import DrugMonitoringTab from "./DrugMonitoringTab";
+
+// ── Pre/post treatment monitoring data per drug ────────────────────────────
+const DRUG_MONITORING = {
+  tacrolimus: {
+    pre_workup: [
+      "Serum creatinine and eGFR baseline",
+      "Full blood count (CBC)",
+      "Liver function tests (ALT, AST, bilirubin)",
+      "Fasting blood glucose",
+      "Blood pressure baseline",
+      "CMV/EBV serology (IgG/IgM) before transplant",
+      "Tacrolimus level NOT needed before starting",
+      "HBsAg, Anti-HCV, HIV serology (transplant)",
+      "Echocardiogram (transplant only)",
+    ],
+    post_monitoring: [
+      "Tacrolimus trough C0: Weekly for 4 weeks, then monthly",
+      "Target: 8–12 ng/mL (0–3 months post-Tx); 5–10 ng/mL (3–12 months); 4–8 ng/mL (SRNS/SDNS)",
+      "Serum creatinine: Weekly first month, then monthly",
+      "Potassium: Weekly first month (risk of hyperkalaemia)",
+      "Fasting glucose: Monthly (PTDM risk ~20%)",
+      "CBC: Monthly",
+      "LFTs: Monthly first 3 months",
+      "Blood pressure: Every visit",
+      "Magnesium (hypomagnesemia common): Monthly",
+    ],
+    escalation_criteria: [
+      "Trough >15 ng/mL → reduce dose by 25%",
+      "Creatinine rise >25% from baseline → consider dose reduction or nephrotoxicity",
+      "New-onset diabetes → endocrinology review",
+      "Potassium >5.5 mEq/L → dietary restriction, reduce dose",
+    ]
+  },
+  rituximab: {
+    pre_workup: [
+      "CBC + differential (baseline)",
+      "Serum IgG levels (baseline)",
+      "HBsAg + Anti-HBc total (MANDATORY — reactivation risk)",
+      "Anti-HBs titres",
+      "HIV serology",
+      "Liver function tests",
+      "Chest X-ray",
+      "CMV/EBV serology",
+      "CD19/CD20 count (baseline B-cell count)",
+      "Varicella IgG status",
+      "Ensure MMR, varicella, BCG given ≥4 weeks before rituximab",
+      "PCV13 + PPSV23 given before starting",
+      "Meningococcal vaccine given before starting",
+    ],
+    post_monitoring: [
+      "CD19 count at 4 weeks (target <1% = successful depletion)",
+      "CD19 monthly until depletion confirmed, then every 3 months",
+      "Serum IgG at 3, 6, 9, 12 months (risk of hypogammaglobulinaemia)",
+      "IgG <400 mg/dL → consider IV immunoglobulin (IVIG)",
+      "CBC monthly for 6 months",
+      "Hepatitis B reactivation screen (HBsAg + HBV DNA) at 1 and 3 months",
+      "Infusion reaction monitoring during infusion: BP, O2 sat, temp every 15 min",
+      "PCP prophylaxis (cotrimoxazole) throughout B-cell depletion",
+      "Re-dosing criteria: CD19 >1% + clinical relapse",
+    ],
+    escalation_criteria: [
+      "IgG <400 mg/dL → IVIG 400 mg/kg every 4–6 weeks",
+      "Any fever/infection → hold re-dosing until resolved",
+      "HBV reactivation → urgent hepatology review + antivirals",
+    ]
+  },
+  cyclosporine: {
+    pre_workup: [
+      "Serum creatinine and eGFR baseline",
+      "Blood pressure baseline",
+      "Lipid profile",
+      "Uric acid",
+      "Magnesium",
+      "CBC, LFTs",
+      "Urine protein:creatinine ratio",
+    ],
+    post_monitoring: [
+      "Cyclosporine C0 trough or C2 (2h post-dose): Weekly × 4 weeks, then monthly",
+      "C0 target: 80–120 ng/mL (NS); 100–150 ng/mL (MN/LN); C2 800–1200 ng/mL (early transplant)",
+      "Serum creatinine: Weekly first month, then monthly",
+      "Blood pressure: Every visit (50% develop HTN)",
+      "Potassium: Monthly",
+      "Lipids: 3-monthly",
+      "Magnesium: Monthly (hypomagnesemia common)",
+      "Uric acid: 3-monthly",
+      "eGFR at 6 months (nephrotoxicity assessment)",
+    ],
+    escalation_criteria: [
+      "Creatinine >25% above baseline → consider dose reduction",
+      "C0 >150 ng/mL → reduce dose by 0.5 mg/kg/day",
+      "New/worsening hypertension → add CCB (amlodipine preferred)",
+    ]
+  },
+  mmf: {
+    pre_workup: [
+      "CBC baseline",
+      "LFTs baseline",
+      "Serum creatinine",
+      "Pregnancy test in adolescent females (teratogenic)",
+      "CMV/EBV serology (transplant)",
+    ],
+    post_monitoring: [
+      "CBC: Monthly (myelosuppression, cytopenias)",
+      "LFTs: Every 3 months",
+      "Serum creatinine: Monthly",
+      "CMV PCR: At 1, 3, 6 months post-transplant",
+      "BK virus PCR: At 3 and 6 months post-transplant",
+      "Hold if WBC <3000/mm³ or neutrophils <1500/mm³",
+    ],
+    escalation_criteria: [
+      "WBC <3000 → halve dose, recheck in 2 weeks",
+      "CMV viremia → ganciclovir/valganciclovir, reduce MMF",
+      "BK nephropathy → reduce MMF or switch to leflunomide",
+    ]
+  },
+  cyclophosphamide: {
+    pre_workup: [
+      "CBC + differential (must be normal before each pulse)",
+      "Urinalysis (must be free of haematuria before each IV pulse)",
+      "LFTs",
+      "Serum creatinine and eGFR",
+      "HBsAg, anti-HBC (reactivation risk with immunosuppression)",
+      "Ensure PCP prophylaxis started (cotrimoxazole)",
+      "Gonadal toxicity counselling (cumulative dose >200 mg/kg)",
+      "Arrange MESNA and IV hydration (2–3 L/m²) before IV pulse",
+    ],
+    post_monitoring: [
+      "CBC at Day 10–14 post-pulse (nadir check) — hold next pulse if WBC <3000",
+      "Urinalysis before EACH IV pulse (haemorrhagic cystitis screen)",
+      "LFTs monthly",
+      "Creatinine monthly",
+      "CBC weekly during oral therapy",
+      "Total cumulative dose tracking (oral max 168 mg/kg)",
+    ],
+    escalation_criteria: [
+      "WBC <3000 or PMN <1500 → delay next pulse by 2 weeks",
+      "Haematuria before pulse → investigate before proceeding",
+      "Cumulative dose approaching 168 mg/kg (oral) → stop and switch agent",
+    ]
+  },
+  eculizumab: {
+    pre_workup: [
+      "MANDATORY: Meningococcal vaccines (MenACWY + MenB) ≥2 weeks before starting",
+      "If urgent: Penicillin V 250 mg BD prophylaxis from Day 1",
+      "Pneumococcal vaccine (PCV13 + PPSV23)",
+      "Haemophilus influenzae type B vaccine",
+      "Serum LDH, haptoglobin, platelets, schistocyte count",
+      "CH50/AP50 (alternative pathway complement activity)",
+      "ADAMTS13 activity (to exclude TTP)",
+      "Stool culture for Shiga toxin (STEC-HUS vs aHUS)",
+      "Complement genetics panel (C3, CFH, CFI, CFB, CD46, THBD)",
+      "Serum creatinine, eGFR, urinalysis",
+    ],
+    post_monitoring: [
+      "CBC, LDH, haptoglobin, schistocyte count: Before each infusion",
+      "Serum creatinine, eGFR: Monthly",
+      "CH50/AP50: To confirm complement inhibition (should be <10%)",
+      "Meningococcal antibody titres: Annually",
+      "Patient to carry Meningococcal Emergency Card at all times",
+      "Annual review of complement genetics results (VUS reclassification)",
+    ],
+    escalation_criteria: [
+      "ANY fever ≥38°C → EMERGENCY — meningococcal sepsis protocol",
+      "LDH rising → check for eculizumab failure or non-compliance",
+      "CH50 not suppressed → check for antibody development",
+    ]
+  },
+  prednisolone: {
+    pre_workup: [
+      "Blood pressure baseline",
+      "Height and weight baseline",
+      "Urine dipstick (confirm nephrotic range proteinuria)",
+      "Serum creatinine + electrolytes",
+      "Fasting glucose (baseline)",
+      "Varicella IgG status (vaccination if seronegative before steroids if time permits)",
+      "Ophthalmology referral if >3 months planned",
+    ],
+    post_monitoring: [
+      "Urine dipstick: Daily at home by parents",
+      "Weight: Weekly during induction",
+      "Blood pressure: Weekly during induction, then each visit",
+      "Fasting glucose: Monthly if on high-dose",
+      "Height: Every 3 months (growth monitoring)",
+      "Bone profile (Ca, phosphate, ALP): Every 6 months if >3 months steroids",
+      "DEXA scan: If >6 months continuous steroids",
+      "Ophthalmology: Annually if >3 months (cataract/glaucoma)",
+      "Annual influenza vaccine (inactivated only)",
+    ],
+    escalation_criteria: [
+      "No remission by 4 weeks → SRNS protocol, biopsy workup",
+      "2+ relapses/year → FRNS criteria, start steroid-sparing agent",
+      "Growth velocity <4 cm/year → growth hormone assessment",
+    ]
+  }
+};
 
 // ── Static practical guidance library ──────────────────────────────────────
 export const DRUG_GUIDANCE = {
@@ -269,18 +463,14 @@ const COLOR_MAP = {
 };
 
 export default function DrugDetailCard({ drug, weight, egfr }) {
+  const [activeTab, setActiveTab] = useState("guidance"); // "guidance" | "monitoring"
   const [expanded, setExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState("guidance");
   const guidanceName = drug?.generic_name?.toLowerCase().replace(/\s+/g, "");
   const guidance = DRUG_GUIDANCE[guidanceName] || null;
+  const monitoringData = DRUG_MONITORING[guidanceName] || null;
   const formularyDrug = getFormularyDrug(drug?.generic_name);
 
   if (!drug) return null;
-
-  const tabs = [
-    { id: "guidance", label: "Guidance" },
-    { id: "monitoring", label: "Monitoring" },
-  ];
 
   return (
     <div className="space-y-3 mt-4">
@@ -296,8 +486,7 @@ export default function DrugDetailCard({ drug, weight, egfr }) {
             <strong className="text-red-900 block mb-1">⚠️ INFECTION EMERGENCY WARNING — Eculizumab</strong>
             <span className="text-red-800 text-sm">
               Patients on eculizumab are at HIGH RISK for life-threatening meningococcal infection.
-              ANY fever ≥38°C = medical emergency. Patient/family must present to emergency immediately.
-              Carry the patient emergency card at all times. Ceftriaxone IV is first-line empiric therapy.
+              ANY fever ≥38°C = medical emergency. Carry the patient emergency card at all times. Ceftriaxone IV is first-line empiric therapy.
             </span>
           </AlertDescription>
         </Alert>
@@ -311,15 +500,20 @@ export default function DrugDetailCard({ drug, weight, egfr }) {
         </div>
       )}
 
-      {/* Tab switcher */}
-      <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-        {tabs.map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all ${activeTab === tab.id ? "bg-white shadow text-slate-900" : "text-slate-500 hover:text-slate-700"}`}>
-            {tab.label}
+      {/* Tab bar — Guidance | Monitoring */}
+      {(guidance || monitoringData) && (
+        <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+          <button onClick={() => setActiveTab("guidance")}
+            className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1 ${activeTab === "guidance" ? "bg-white text-purple-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+            <BookOpen className="w-3.5 h-3.5" /> Guidance
           </button>
-        ))}
-      </div>
+          <button onClick={() => setActiveTab("monitoring")}
+            className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1 ${activeTab === "monitoring" ? "bg-white text-teal-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+            <ClipboardList className="w-3.5 h-3.5" /> Monitoring
+            {monitoringData && <span className="w-1.5 h-1.5 bg-teal-500 rounded-full" />}
+          </button>
+        </div>
+      )}
 
       {/* Guidance tab */}
       {activeTab === "guidance" && guidance && (
@@ -343,13 +537,13 @@ export default function DrugDetailCard({ drug, weight, egfr }) {
               {guidance.last_updated && (
                 <p className="text-xs text-slate-400 text-right">Last updated: {guidance.last_updated}</p>
               )}
-              {SECTIONS.map(({ key, label, icon: Icon, color }) => {
+              {SECTIONS.map(({ key, label, icon: SIcon, color }) => {
                 const val = guidance[key];
                 if (!val) return null;
                 return (
                   <div key={key} className={`rounded-lg border p-3 ${COLOR_MAP[color]}`}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <SIcon className="w-4 h-4 flex-shrink-0" />
                       <span className="font-semibold text-xs uppercase tracking-wide">{label}</span>
                     </div>
                     {Array.isArray(val) ? (
@@ -373,7 +567,66 @@ export default function DrugDetailCard({ drug, weight, egfr }) {
 
       {/* Monitoring tab */}
       {activeTab === "monitoring" && (
-        <DrugMonitoringTab drug={drug} />
+        <div className="space-y-3">
+          {monitoringData ? (
+            <>
+              {/* Pre-treatment workup */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-blue-800 mb-2 flex items-center gap-1.5">
+                  <TestTube2 className="w-3.5 h-3.5" /> Pre-treatment Workup Required
+                </p>
+                <ul className="space-y-1">
+                  {monitoringData.pre_workup.map((item, i) => (
+                    <li key={i} className="text-xs text-blue-900 flex items-start gap-1.5">
+                      <CheckCircle className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Post-treatment monitoring */}
+              <div className="bg-teal-50 border border-teal-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-teal-800 mb-2 flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5" /> Ongoing Monitoring Schedule
+                </p>
+                <ul className="space-y-1">
+                  {monitoringData.post_monitoring.map((item, i) => (
+                    <li key={i} className="text-xs text-teal-900 flex items-start gap-1.5">
+                      <ClipboardList className="w-3 h-3 text-teal-500 flex-shrink-0 mt-0.5" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Dose escalation / stopping criteria */}
+              {monitoringData.escalation_criteria && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  <p className="text-xs font-bold text-amber-800 mb-2 flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5" /> Dose Adjustment / Escalation Criteria
+                  </p>
+                  <ul className="space-y-1">
+                    {monitoringData.escalation_criteria.map((item, i) => (
+                      <li key={i} className="text-xs text-amber-900 flex items-start gap-1.5">
+                        <span className="text-amber-600 font-bold flex-shrink-0">→</span> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+              <ClipboardList className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-xs text-slate-500">Detailed monitoring protocol not yet available for this drug.</p>
+              {guidance?.monitoring && (
+                <div className="mt-3 text-left bg-white rounded-lg border border-slate-200 p-3">
+                  <p className="text-xs font-semibold text-slate-600 mb-1">General monitoring guidance:</p>
+                  <p className="text-xs text-slate-700">{guidance.monitoring}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Quick bedside card always visible */}
