@@ -2,33 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import {
-  Bot, X, Microscope, Dna, Zap, Brain, TestTube, Layers,
-  FlaskConical, BookOpen, Activity, Sparkles, Wind, Droplet,
-  Baby, AlertCircle, UtensilsCrossed, ChevronRight,
-  Send, Loader2, MessageCircle
-} from "lucide-react";
+import { Bot, X, ChevronRight, Send, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-
-const AI_ANALYSER_TOOLS = [
-  { name: "Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub", tab: "labs", group: "Clinical AI" },
-  { name: "Biopsy AI", icon: Layers, color: "bg-violet-700", page: "ClinicalAIHub", tab: "biopsy", group: "Clinical AI" },
-  { name: "Case Analyzer", icon: BookOpen, color: "bg-emerald-700", page: "ClinicalAIHub", tab: "case", group: "Clinical AI" },
-  { name: "Differential Dx", icon: Brain, color: "bg-indigo-600", page: "DifferentialEngine", group: "Clinical AI" },
-  { name: "Urine/UDS AI", icon: TestTube, color: "bg-teal-600", page: "ClinicalAIHub", tab: "uds", group: "Clinical AI" },
-  { name: "Radiology AI", icon: Activity, color: "bg-sky-700", page: "ClinicalAIHub", tab: "radiology", group: "Clinical AI" },
-  { name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer", group: "Nephrology" },
-  { name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub", tab: "uroflow", group: "Nephrology" },
-  { name: "Rare Lab AI", icon: FlaskConical, color: "bg-purple-700", page: "RareDiseaseModule", group: "Nephrology" },
-  { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-700", page: "AIPrescriber", group: "Nephrology" },
-  { name: "ABG Analyzer", icon: Wind, color: "bg-rose-600", page: "ABGInterpreter", group: "Pediatrics" },
-  { name: "Growth Analyzer", icon: Baby, color: "bg-green-600", page: "GeneralPediatricsHub", group: "Pediatrics" },
-  { name: "Nutrition AI", icon: UtensilsCrossed, color: "bg-orange-600", page: "NutritionHub", group: "Pediatrics" },
-  { name: "Sepsis AI", icon: AlertCircle, color: "bg-red-600", page: "ClinicalAIHub", group: "Pediatrics" },
-  { name: "Dehydration AI", icon: Droplet, color: "bg-cyan-600", page: "ClinicalAIHub", group: "Pediatrics" },
-];
-
-const GROUPS = ["Clinical AI", "Nephrology", "Pediatrics"];
+import { CLINICAL_AI_ANALYZERS } from "@/lib/aiAnalyzers";
 
 const QUICK_QS = [
   "Nephrotic syndrome steroid dosing?",
@@ -127,24 +103,16 @@ function MiniChat({ onClose }) {
 
 export default function FloatingHubButton() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [activeGroup, setActiveGroup] = useState("Clinical AI");
-  const [panel, setPanel] = useState("tools"); // "tools" | "chat"
+  const [panel, setPanel] = useState("tools");
   const [hidden, setHidden] = useState(false);
   const lastScrollY = useRef(0);
-
-  const switchToTools = () => setPanel("tools");
 
   useEffect(() => {
     const handleScroll = () => {
       const current = window.scrollY;
-      if (current > lastScrollY.current + 40 && current > 100) {
-        setHidden(true);
-        setOpen(false);
-      } else if (current < lastScrollY.current - 20) {
-        setHidden(false);
-      }
+      if (current > lastScrollY.current + 40 && current > 100) { setHidden(true); setOpen(false); }
+      else if (current < lastScrollY.current - 20) { setHidden(false); }
       lastScrollY.current = current;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -153,26 +121,20 @@ export default function FloatingHubButton() {
 
   if (location.pathname === "/AIAgentsHub") return null;
 
-  const groupTools = AI_ANALYSER_TOOLS.filter(t => t.group === activeGroup);
-
   return (
     <>
-      {/* Overlay */}
-      {open && (
-        <div className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm" onClick={() => setOpen(false)} />
-      )}
+      {open && <div className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm" onClick={() => setOpen(false)} />}
 
-      {/* Panel */}
       {open && (
         <div
           className="fixed z-50 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col"
-          style={{ bottom: "calc(var(--tab-bar-height, 64px) + 60px)", right: "12px", height: "min(500px, calc(100vh - 160px))" }}
+          style={{ bottom: "calc(var(--tab-bar-height, 64px) + 60px)", right: "12px", height: "min(480px, calc(100vh - 160px))" }}
         >
-          {/* Header — always visible, never scrolls away */}
+          {/* Header */}
           <div className="flex-shrink-0 bg-gradient-to-r from-indigo-700 to-violet-700 px-4 py-2.5 flex items-center justify-between rounded-t-2xl">
             <div className="flex items-center gap-2">
               <Bot className="w-4 h-4 text-white" />
-              <p className="text-white font-bold text-sm">Clinical AI Hub</p>
+              <p className="text-white font-bold text-sm">Clinical AI Center</p>
             </div>
             <div className="flex items-center gap-1">
               <div className="flex bg-white/20 rounded-lg overflow-hidden text-xs">
@@ -193,23 +155,12 @@ export default function FloatingHubButton() {
 
           {panel === "tools" ? (
             <>
-              {/* Group tabs */}
-              <div className="flex-shrink-0 flex border-b border-slate-100 bg-slate-50">
-                {GROUPS.map(g => (
-                  <button key={g} onClick={() => setActiveGroup(g)}
-                    className={`flex-1 py-2 text-xs font-semibold transition-all ${activeGroup === g ? "bg-white text-indigo-700 border-b-2 border-indigo-600" : "text-slate-500 hover:text-slate-700"}`}>
-                    {g}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tools grid — scrollable */}
               <div className="flex-1 overflow-y-auto p-3 grid grid-cols-3 gap-2 content-start">
-                {groupTools.map(tool => {
+                {CLINICAL_AI_ANALYZERS.map(tool => {
                   const Icon = tool.icon;
                   const href = createPageUrl(tool.page) + (tool.tab ? `?tab=${tool.tab}` : "");
                   return (
-                    <Link key={tool.name} to={href} onClick={() => setOpen(false)}>
+                    <Link key={tool.id} to={href} onClick={() => setOpen(false)}>
                       <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50 transition-all active:scale-95 cursor-pointer">
                         <div className={`w-10 h-10 ${tool.color} rounded-xl flex items-center justify-center shadow-sm`}>
                           <Icon className="w-5 h-5 text-white" />
@@ -220,10 +171,9 @@ export default function FloatingHubButton() {
                   );
                 })}
               </div>
-
-              <Link to="/AIAgentsHub" onClick={() => setOpen(false)} className="flex-shrink-0">
-                <div className="flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-slate-100 bg-slate-50 hover:bg-indigo-50 transition-colors">
-                  <span className="text-xs font-semibold text-indigo-600">View All AI Agents</span>
+              <Link to="/ClinicalAIHub" onClick={() => setOpen(false)} className="flex-shrink-0">
+                <div className="flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-slate-100 bg-slate-50 hover:bg-indigo-50 transition-colors rounded-b-2xl">
+                  <span className="text-xs font-semibold text-indigo-600">Open Clinical AI Center</span>
                   <ChevronRight className="w-3.5 h-3.5 text-indigo-600" />
                 </div>
               </Link>
@@ -236,12 +186,11 @@ export default function FloatingHubButton() {
         </div>
       )}
 
-      {/* Single FAB */}
       <button
         onClick={() => setOpen(v => !v)}
         className={`fixed z-50 flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-2 rounded-full shadow-xl transition-all hover:scale-105 active:scale-95 ${open ? "bg-slate-700" : "bg-indigo-600 hover:bg-indigo-700"} ${hidden ? "translate-y-20 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}
         style={{ bottom: "calc(var(--tab-bar-height, 64px) + 8px)", right: "12px", transition: "transform 0.3s ease, opacity 0.3s ease, background-color 0.15s" }}
-        title="Clinical AI Hub"
+        title="Clinical AI Center"
       >
         {open ? <X className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
         <span className="hidden sm:inline">{open ? "Close" : "AI"}</span>

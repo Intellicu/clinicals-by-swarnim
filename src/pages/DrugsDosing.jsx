@@ -130,8 +130,8 @@ function useFavorites() {
   return { favIds, toggle };
 }
 
-// ── Quick Drug Search for Rx builder ──────────────────────────────────────────
-function RxQuickSearch({ drugs, weight, bsa, effectiveEgfr, onAdd, onView, rxDrugs }) {
+// ── Quick Drug Search for Rx builder — always opens indication builder ────────
+function RxQuickSearch({ drugs, weight, bsa, effectiveEgfr, onSelectForRx, rxDrugs }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -151,32 +151,26 @@ function RxQuickSearch({ drugs, weight, bsa, effectiveEgfr, onAdd, onView, rxDru
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-500" />
         <input value={q} onChange={e => setQ(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder="Quick-search drug to add to Rx..."
+          placeholder="Search drug to add to prescription..."
           className="w-full pl-9 pr-4 py-2.5 text-sm border-2 border-teal-200 rounded-xl bg-teal-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all" />
         {q && <button onClick={() => { setQ(""); setOpen(false); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500"><X className="w-4 h-4" /></button>}
       </div>
       {open && results.length > 0 && (
         <div className="absolute z-50 left-0 right-0 mt-1 bg-white rounded-xl border border-teal-200 shadow-xl overflow-hidden">
           {results.map(drug => {
-            const dose = calcDose(drug, weight, bsa, effectiveEgfr);
             const isInRx = rxDrugs.find(d => d.id === drug.id);
             return (
-              <div key={drug.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-teal-50 border-b border-slate-100 last:border-0 transition-colors">
+              <div key={drug.id}
+                onClick={() => { onSelectForRx(drug); setQ(""); setOpen(false); }}
+                className="flex items-center gap-3 px-3 py-2.5 hover:bg-teal-50 border-b border-slate-100 last:border-0 transition-colors cursor-pointer">
                 <Pill className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
-                <div className="flex-1 min-w-0" onClick={() => { onView(drug); setQ(""); setOpen(false); }} style={{ cursor: "pointer" }}>
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-900 leading-tight">{drug.generic_name}</p>
-                  {(() => {
-                    const fDrug = getFormularyDrug(drug.generic_name);
-                    const calcedDose = calcDose(drug, weight, bsa, effectiveEgfr);
-                    if (fDrug?.peds_dose) return <p className="text-xs text-indigo-700 font-medium">{fDrug.peds_dose.split(".")[0]}</p>;
-                    if (calcedDose && calcedDose.perDose !== drug.dose_weight_based) return <p className="text-xs text-teal-700 font-medium">{calcedDose.perDose} · {calcedDose.freq}</p>;
-                    return <p className="text-xs text-slate-400">{drug.dose_weight_based || drug.category}</p>;
-                  })()}
+                  <p className="text-xs text-slate-400">{drug.therapeutic_class || drug.category}</p>
                 </div>
-                <Button size="sm" onClick={() => { onAdd(drug); setQ(""); setOpen(false); }}
-                  className={`text-xs flex-shrink-0 h-7 px-2 ${isInRx ? "bg-green-100 text-green-700 border border-green-300" : "bg-teal-600 hover:bg-teal-700 text-white"}`}>
-                  {isInRx ? <CheckCircle className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-                </Button>
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${isInRx ? "bg-green-100 text-green-700" : "bg-teal-100 text-teal-700"}`}>
+                  {isInRx ? "In Rx ✓" : "Select →"}
+                </span>
               </div>
             );
           })}
@@ -335,8 +329,9 @@ export default function DrugsDosing() {
     try { return JSON.parse(localStorage.getItem("recent_drugs") || "[]"); } catch { return []; }
   });
 
-  // Indication builder
+  // Indication builder — tracks which drug is being configured for Rx
   const [showIndicationBuilder, setShowIndicationBuilder] = useState(false);
+  const [rxBuilderDrug, setRxBuilderDrug] = useState(null);
 
   // Add Drug Panel
   const [addMode, setAddMode] = useState(null); // null | "ai" | "import" | "manual"
@@ -402,21 +397,56 @@ export default function DrugsDosing() {
     }
   };
 
+  // Opens the indication builder for a drug (from drug detail view or search)
+  const openRxBuilder = (drug, fromDrugView = false) => {
+    setRxBuilderDrug({ ...drug, _inDrugView: fromDrugView });
+    setShowIndicationBuilder(true);
+  };
+
+  const handleIndicationAdd = ({ drug: d, indication, dose, freq, route, duration, formulation, prescriptionText }) => {
+    const mapped = {
+      id: d.id,
+      generic_name: d.generic_name,
+      category: d.category,
+      therapeutic_class: d.therapeutic_class,
+      route: route || d.route || "PO",
+      dose_weight_based: dose,
+      frequency: freq || d.frequency || "OD",
+      brands_indian: d.brands_indian || "",
+      renal_adjust: d.renal_adjust || "",
+      dose_calculation_type: "per_day",
+      _indication: indication,
+      _prescriptionText: prescriptionText,
+      _formulation: formulation,
+      _duration: duration,
+    };
+    addToRx(mapped);
+    setShowIndicationBuilder(false);
+    setRxBuilderDrug(null);
+    setMode("rx");
+  };
+
   const interactions = useMemo(() => findInteractions(rxDrugs), [rxDrugs]);
 
   const buildRx = () => {
     const wt = parseFloat(weight);
     const lines = rxDrugs.map((drug, i) => {
-      // If drug was added via indication builder, use that prescription text
-      if (drug._prescriptionText) {
-        return `${i + 1}. ${drug._prescriptionText.replace(/^/, "")}`;
+      // Structured output if added via indication builder
+      if (drug._indication && drug.dose_weight_based) {
+        const formLine = drug._formulation
+          ? `\n   Formulation: ${drug._formulation.form} ${drug._formulation.strength}${drug._formulation.brands ? ` (${drug._formulation.brands})` : ""}`
+          : "";
+        const durationLine = drug._duration ? `\n   Duration: ${drug._duration}` : "";
+        const brandLine = drug.brands_indian ? `\n   Brands (India): ${drug.brands_indian.split(",")[0].trim()}` : "";
+        return `${i + 1}. ${drug.generic_name}\n   Indication: ${drug._indication}\n   Dose: ${drug.dose_weight_based}  |  ${drug.frequency || "—"}  |  ${drug.route || "PO"}${durationLine}${formLine}${brandLine}`;
       }
+      // Fallback: generic dose calculation
       const dose = calcDose(drug, wt, bsa, effectiveEgfr);
-      const formInfo = drug._formulation ? `\n   Formulation: ${drug._formulation.form} ${drug._formulation.strength}` : "";
-      const durationInfo = drug._duration ? ` × ${drug._duration}` : "";
-      return `${i + 1}. ${drug.generic_name}${drug._indication ? ` [${drug._indication}]` : ""}\n   Dose: ${drug.dose_weight_based || dose?.perDose || "—"}  |  ${drug.frequency || dose?.freq || "—"}  |  ${drug.route || "PO"}${durationInfo}${formInfo}\n   Brands (India): ${drug.brands_indian || "Generic"}`;
+      const doseStr = dose?.type === "TDM" ? "TDM-guided (see monograph)" : dose?.perDose || drug.dose_weight_based || "—";
+      const durationInfo = drug._duration ? `\n   Duration: ${drug._duration}` : "";
+      return `${i + 1}. ${drug.generic_name}\n   Dose: ${doseStr}  |  ${drug.frequency || dose?.freq || "—"}  |  ${drug.route || "PO"}${durationInfo}\n   Brands (India): ${drug.brands_indian || "Generic"}`;
     }).join("\n\n");
-    return `PEDIATRIC NEPHROLOGY Rx\n${"─".repeat(40)}\nAge: ${age || "—"} y  |  Wt: ${weight || "—"} kg  |  BSA: ${bsa || "—"} m²  |  eGFR: ${effectiveEgfr || "—"}\n\n${lines}\n\n${"─".repeat(40)}\n${interactions.length ? `⚠️ Interactions: ${interactions.map(ix => `${ix.a}+${ix.b}`).join("; ")}` : "✅ No major interactions"}\nCliniCals by Swarnim | Verify all doses`;
+    return `PEDIATRIC Rx\n${"─".repeat(40)}\nAge: ${age || "—"} y  |  Wt: ${weight || "—"} kg  |  BSA: ${bsa ? bsa + " m²" : "—"}  |  eGFR: ${effectiveEgfr || "—"}\n\n${lines}\n\n${"─".repeat(40)}\n${interactions.length ? `⚠️ Interactions: ${interactions.map(ix => `${ix.a}+${ix.b}`).join("; ")}` : "✅ No major interactions"}\nCliniCals by Swarnim | Verify all doses`;
   };
 
   // AI Drug Addition
@@ -858,9 +888,9 @@ export default function DrugsDosing() {
                     <p className="text-xs text-slate-500 ml-6">{selectedDrug.therapeutic_class || selectedDrug.category}</p>
                     {selectedDrug.brands_indian && <p className="text-xs text-slate-400 ml-6 mt-0.5">Brands: {selectedDrug.brands_indian}</p>}
                   </div>
-                  <Button size="sm" onClick={() => setShowIndicationBuilder(v => !v)}
+                  <Button size="sm" onClick={() => openRxBuilder(selectedDrug, true)}
                     className={`text-xs flex-shrink-0 ${isInRx ? "bg-green-100 text-green-700 border border-green-300" : "bg-teal-600 hover:bg-teal-700 text-white"}`}>
-                    {isInRx ? <><CheckCircle className="w-3 h-3 mr-1" />In Rx</> : <><Plus className="w-3 h-3 mr-1" />Add Rx</>}
+                    {isInRx ? <><CheckCircle className="w-3 h-3 mr-1" />In Rx</> : <><Plus className="w-3 h-3 mr-1" />Prescribe</>}
                   </Button>
                 </div>
 
@@ -870,35 +900,15 @@ export default function DrugsDosing() {
                   </div>
                 )}
 
-                {/* Indication-based Rx builder */}
-                {showIndicationBuilder && (
+                {/* Indication-based Rx builder — opened via Prescribe button */}
+                {showIndicationBuilder && rxBuilderDrug?._inDrugView && rxBuilderDrug?.id === selectedDrug.id && (
                   <div className="mb-3">
                     <RxIndicationBuilder
                       drug={selectedDrug}
                       weight={weight}
                       patientAge={age}
-                      onClose={() => setShowIndicationBuilder(false)}
-                      onAddToRxList={({ drug: d, indication, dose, freq, route, duration, formulation, prescriptionText }) => {
-                        const mapped = {
-                          id: d.id,
-                          generic_name: d.generic_name,
-                          category: d.category,
-                          therapeutic_class: d.therapeutic_class,
-                          route: route || d.route || "PO",
-                          dose_weight_based: dose,
-                          frequency: freq || d.frequency || "OD",
-                          brands_indian: d.brands_indian || "",
-                          renal_adjust: d.renal_adjust || "",
-                          dose_calculation_type: "per_day",
-                          _indication: indication,
-                          _prescriptionText: prescriptionText,
-                          _formulation: formulation,
-                          _duration: duration,
-                        };
-                        addToRx(mapped);
-                        setShowIndicationBuilder(false);
-                        setMode("rx");
-                      }}
+                      onClose={() => { setShowIndicationBuilder(false); setRxBuilderDrug(null); }}
+                      onAddToRxList={handleIndicationAdd}
                     />
                   </div>
                 )}
@@ -1049,8 +1059,19 @@ export default function DrugsDosing() {
               <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2"><Printer className="w-4 h-4 text-teal-600" /> Prescription Builder</h2>
             </div>
 
-            {/* ── Quick Drug Search inside Rx ── */}
-            <RxQuickSearch drugs={drugs} weight={parseFloat(weight)} bsa={bsa} effectiveEgfr={effectiveEgfr} onAdd={(drug) => { addToRx(drug); }} onView={selectDrug} rxDrugs={rxDrugs} />
+            {/* ── Quick Drug Search inside Rx — opens indication builder ── */}
+            <RxQuickSearch drugs={drugs} weight={parseFloat(weight)} bsa={bsa} effectiveEgfr={effectiveEgfr} onSelectForRx={openRxBuilder} rxDrugs={rxDrugs} />
+
+            {/* Indication builder (appears inline when drug selected from search) */}
+            {showIndicationBuilder && rxBuilderDrug && !rxBuilderDrug._inDrugView && (
+              <RxIndicationBuilder
+                drug={rxBuilderDrug}
+                weight={weight}
+                patientAge={age}
+                onClose={() => { setShowIndicationBuilder(false); setRxBuilderDrug(null); }}
+                onAddToRxList={handleIndicationAdd}
+              />
+            )}
 
             {/* Template section */}
             <div className="bg-white rounded-xl border border-slate-200 p-3">
