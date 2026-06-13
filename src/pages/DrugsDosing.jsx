@@ -12,6 +12,7 @@ import {
   ChevronLeft, ChevronDown, ChevronUp, Save, FolderOpen, Clock, ArrowRight, Lock
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
+import RxIndicationBuilder from "../components/drugs/RxIndicationBuilder";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
@@ -334,6 +335,9 @@ export default function DrugsDosing() {
     try { return JSON.parse(localStorage.getItem("recent_drugs") || "[]"); } catch { return []; }
   });
 
+  // Indication builder
+  const [showIndicationBuilder, setShowIndicationBuilder] = useState(false);
+
   // Add Drug Panel
   const [addMode, setAddMode] = useState(null); // null | "ai" | "import" | "manual"
   const [aiPrompt, setAiPrompt] = useState("");
@@ -403,8 +407,14 @@ export default function DrugsDosing() {
   const buildRx = () => {
     const wt = parseFloat(weight);
     const lines = rxDrugs.map((drug, i) => {
+      // If drug was added via indication builder, use that prescription text
+      if (drug._prescriptionText) {
+        return `${i + 1}. ${drug._prescriptionText.replace(/^/, "")}`;
+      }
       const dose = calcDose(drug, wt, bsa, effectiveEgfr);
-      return `${i + 1}. ${drug.generic_name}\n   Dose: ${dose?.perDose || drug.dose_weight_based}  |  ${dose?.freq || drug.frequency}  |  ${drug.route || "PO"}\n   Brands (India): ${drug.brands_indian || "Generic"}`;
+      const formInfo = drug._formulation ? `\n   Formulation: ${drug._formulation.form} ${drug._formulation.strength}` : "";
+      const durationInfo = drug._duration ? ` × ${drug._duration}` : "";
+      return `${i + 1}. ${drug.generic_name}${drug._indication ? ` [${drug._indication}]` : ""}\n   Dose: ${drug.dose_weight_based || dose?.perDose || "—"}  |  ${drug.frequency || dose?.freq || "—"}  |  ${drug.route || "PO"}${durationInfo}${formInfo}\n   Brands (India): ${drug.brands_indian || "Generic"}`;
     }).join("\n\n");
     return `PEDIATRIC NEPHROLOGY Rx\n${"─".repeat(40)}\nAge: ${age || "—"} y  |  Wt: ${weight || "—"} kg  |  BSA: ${bsa || "—"} m²  |  eGFR: ${effectiveEgfr || "—"}\n\n${lines}\n\n${"─".repeat(40)}\n${interactions.length ? `⚠️ Interactions: ${interactions.map(ix => `${ix.a}+${ix.b}`).join("; ")}` : "✅ No major interactions"}\nCliniCals by Swarnim | Verify all doses`;
   };
@@ -848,7 +858,7 @@ export default function DrugsDosing() {
                     <p className="text-xs text-slate-500 ml-6">{selectedDrug.therapeutic_class || selectedDrug.category}</p>
                     {selectedDrug.brands_indian && <p className="text-xs text-slate-400 ml-6 mt-0.5">Brands: {selectedDrug.brands_indian}</p>}
                   </div>
-                  <Button size="sm" onClick={() => { addToRx(selectedDrug); setMode("rx"); }}
+                  <Button size="sm" onClick={() => setShowIndicationBuilder(v => !v)}
                     className={`text-xs flex-shrink-0 ${isInRx ? "bg-green-100 text-green-700 border border-green-300" : "bg-teal-600 hover:bg-teal-700 text-white"}`}>
                     {isInRx ? <><CheckCircle className="w-3 h-3 mr-1" />In Rx</> : <><Plus className="w-3 h-3 mr-1" />Add Rx</>}
                   </Button>
@@ -857,6 +867,39 @@ export default function DrugsDosing() {
                 {renalFlag && (
                   <div className={`rounded-lg px-3 py-2 text-xs font-medium border mb-3 ${renalFlag.level === "critical" ? "bg-red-50 border-red-300 text-red-800" : "bg-amber-50 border-amber-300 text-amber-800"}`}>
                     ⚠️ Renal adjustment required: {renalFlag.msg}
+                  </div>
+                )}
+
+                {/* Indication-based Rx builder */}
+                {showIndicationBuilder && (
+                  <div className="mb-3">
+                    <RxIndicationBuilder
+                      drug={selectedDrug}
+                      weight={weight}
+                      patientAge={age}
+                      onClose={() => setShowIndicationBuilder(false)}
+                      onAddToRxList={({ drug: d, indication, dose, freq, route, duration, formulation, prescriptionText }) => {
+                        const mapped = {
+                          id: d.id,
+                          generic_name: d.generic_name,
+                          category: d.category,
+                          therapeutic_class: d.therapeutic_class,
+                          route: route || d.route || "PO",
+                          dose_weight_based: dose,
+                          frequency: freq || d.frequency || "OD",
+                          brands_indian: d.brands_indian || "",
+                          renal_adjust: d.renal_adjust || "",
+                          dose_calculation_type: "per_day",
+                          _indication: indication,
+                          _prescriptionText: prescriptionText,
+                          _formulation: formulation,
+                          _duration: duration,
+                        };
+                        addToRx(mapped);
+                        setShowIndicationBuilder(false);
+                        setMode("rx");
+                      }}
+                    />
                   </div>
                 )}
 
@@ -1075,9 +1118,19 @@ export default function DrugsDosing() {
                               {drug.brands_indian && <span className="text-xs text-slate-400">({drug.brands_indian.split(",")[0].trim()})</span>}
                             </div>
                             {(() => {
+                              // If added via indication builder, show structured output
+                              if (drug._indication) {
+                                return (
+                                  <div className="ml-7 mt-0.5 space-y-0.5">
+                                    <p className="text-[11px] text-teal-600 font-semibold">📋 {drug._indication}</p>
+                                    {drug.dose_weight_based && <p className="text-xs text-teal-800 font-bold">{drug.dose_weight_based} · {drug.frequency || "—"} · {drug.route || "PO"}</p>}
+                                    {drug._duration && <p className="text-xs text-slate-500">Duration: {drug._duration}</p>}
+                                    {drug._formulation && <p className="text-xs text-indigo-600">{drug._formulation.form} {drug._formulation.strength}</p>}
+                                  </div>
+                                );
+                              }
                               const fDrug = getFormularyDrug(drug.generic_name);
                               const wt = parseFloat(weight);
-                              // Try to auto-calculate from formulary monograph peds_dose
                               if (fDrug?.peds_dose && wt) {
                                 const perKg = fDrug.peds_dose.match(/([\d.]+)(?:–|-)([\d.]+)?\s*mg\/kg/);
                                 if (perKg) {

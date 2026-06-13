@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Calendar, RefreshCw, BookOpen, Stethoscope, Lightbulb,
   Sparkles, Search, Star, Share2, ChevronRight, Pill,
-  FlaskConical, Bell, Zap, X, ChevronLeft
+  FlaskConical, Bell, Zap, X, ChevronLeft, AlertTriangle, TestTube, TrendingUp
 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
@@ -104,12 +104,47 @@ function RareDiseaseSection({ data }) {
   );
 }
 
+// (GuidelineReminderSection now defined below WhatsNewSection)
+
+function EmergencyMinuteSection({ data }) {
+  if (!data?.emergency_scenario) return null;
+  return (
+    <SectionCard icon={Zap} iconBg="bg-red-600" label="Emergency Minute"
+      linkText="Open Emergency Hub →" linkTo={data.emergency_url || "/EmergencyHub"}>
+      <p className="text-xs font-bold text-red-700 mb-2">{data.emergency_scenario}</p>
+      <div className="space-y-1">
+        {(data.emergency_steps || "").split(/[①②③④⑤]/).filter(s => s.trim()).map((step, i) => (
+          <div key={i} className="flex items-start gap-2">
+            <span className="bg-red-100 text-red-700 font-bold text-[10px] rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+            <p className="text-xs text-slate-700 leading-relaxed">{step.trim()}</p>
+          </div>
+        ))}
+        {!(data.emergency_steps || "").includes("①") && (
+          <p className="text-sm text-slate-700 leading-relaxed">{data.emergency_steps}</p>
+        )}
+      </div>
+    </SectionCard>
+  );
+}
+
+function LabPearlSection({ data }) {
+  if (!data?.lab_pearl) return null;
+  return (
+    <SectionCard icon={TestTube} iconBg="bg-teal-600" label="Lab Interpretation Pearl">
+      <p className="text-sm text-slate-800 leading-relaxed">{data.lab_pearl}</p>
+    </SectionCard>
+  );
+}
+
 function GuidelineReminderSection({ data }) {
   if (!data?.guideline_reminder) return null;
   return (
     <SectionCard icon={BookOpen} iconBg="bg-teal-600" label="Guideline Reminder"
-      linkText="Open Guideline →" linkTo={createPageUrl("GuidelinesLibrary")}>
-      {data.guideline_condition && <p className="text-xs font-bold text-teal-700 mb-1">{data.guideline_condition}</p>}
+      linkText="Open Guideline Library →" linkTo="/GuidelinesLibrary">
+      <div className="flex items-center gap-2 mb-2">
+        {data.guideline_org && <span className="text-xs font-bold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">{data.guideline_org}</span>}
+        {data.guideline_condition && <span className="text-xs text-slate-500 font-semibold">{data.guideline_condition}</span>}
+      </div>
       <p className="text-sm text-slate-700 leading-relaxed">{data.guideline_reminder}</p>
     </SectionCard>
   );
@@ -336,11 +371,19 @@ export default function DailySummary() {
         {/* Summary sections */}
         {summaryData && (
           <div className="space-y-3">
+            {summaryData.theme && (
+              <div className="flex items-center gap-2 px-1">
+                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">Today's Theme: {summaryData.theme}</span>
+              </div>
+            )}
             <ClinicalPearlSection data={summaryData} />
+            <GuidelineReminderSection data={summaryData} />
             <ClinicalChallengeSection data={summaryData} />
+            <EmergencyMinuteSection data={summaryData} />
             <DrugPearlSection data={summaryData} />
             <RareDiseaseSection data={summaryData} />
-            <GuidelineReminderSection data={summaryData} />
+            <LabPearlSection data={summaryData} />
             <WhatsNewSection data={summaryData} />
           </div>
         )}
