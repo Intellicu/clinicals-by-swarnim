@@ -57,8 +57,36 @@ const QUICK_CALCS = [
 { name: "All Calcs →", icon: Calculator, color: "bg-slate-700", page: "CalculatorsHub" }];
 
 
-// ── Knowledge sections ──
+// ── Knowledge sections — subspecialties first, then nephrology-heavy sections ──
 const KNOWLEDGE_SECTIONS = [
+{
+  title: "Pediatric Rheumatology",
+  icon: Heart,
+  color: "border-rose-200 bg-rose-50",
+  iconColor: "text-rose-600",
+  items: [
+  { name: "Rheumatology Hub", page: "PediatricRheumatology", icon: Stethoscope },
+  { name: "JIA — Juvenile Idiopathic Arthritis", page: "PediatricRheumatology", icon: Shield },
+  { name: "SLE & Lupus Nephritis", page: "PediatricRheumatology", icon: Shield },
+  { name: "Vasculitis (IgAV/ANCA/KD)", page: "PediatricRheumatology", icon: Activity },
+  { name: "Scoring (JADAS, SLEDAI, SLICC)", page: "CalculatorsHub", icon: BarChart2 },
+  { name: "Autoinflammatory Diseases", page: "PediatricRheumatology", icon: Dna },
+  { name: "CTD & Myositis", page: "PediatricRheumatology", icon: Activity }]
+},
+{
+  title: "Pediatric Endocrinology",
+  icon: Thermometer,
+  color: "border-orange-200 bg-orange-50",
+  iconColor: "text-orange-600",
+  items: [
+  { name: "Endocrinology Hub", page: "PediatricEndocrinology", icon: Thermometer },
+  { name: "DKA Management", page: "EmergencyHub", icon: AlertCircle },
+  { name: "Growth Hormone Deficiency", page: "PediatricEndocrinology", icon: Baby },
+  { name: "Thyroid Disorders", page: "PediatricEndocrinology", icon: Thermometer },
+  { name: "Adrenal Disorders (CAH)", page: "PediatricEndocrinology", icon: Zap },
+  { name: "Diabetes Mellitus Type 1/2", page: "PediatricEndocrinology", icon: Activity },
+  { name: "Pubertal Disorders", page: "PediatricEndocrinology", icon: Users }]
+},
 {
   title: "Pediatric Oncology",
   icon: FlaskConical,
@@ -283,32 +311,6 @@ const KNOWLEDGE_SECTIONS = [
 
 },
 {
-  title: "Pediatric Rheumatology",
-  icon: Heart,
-  color: "border-rose-200 bg-rose-50",
-  iconColor: "text-rose-600",
-  items: [
-  { name: "Rheumatology Hub", page: "PediatricRheumatology", icon: Stethoscope },
-  { name: "JIA, SLE, Vasculitis", page: "PediatricRheumatology", icon: Shield },
-  { name: "Scoring (JADAS, SLEDAI)", page: "CalculatorsHub", icon: BarChart2 }]
-
-},
-{
-  title: "Pediatric Endocrinology",
-  icon: Thermometer,
-  color: "border-orange-200 bg-orange-50",
-  iconColor: "text-orange-600",
-  items: [
-  { name: "Endocrinology Hub", page: "PediatricEndocrinology", icon: Thermometer },
-  { name: "DKA Management", page: "EmergencyHub", icon: AlertCircle },
-  { name: "Growth Hormone Deficiency", page: "PediatricEndocrinology", icon: Baby },
-  { name: "Thyroid Disorders", page: "PediatricEndocrinology", icon: Thermometer },
-  { name: "Adrenal Disorders (CAH)", page: "PediatricEndocrinology", icon: Zap },
-  { name: "Diabetes Mellitus Type 1/2", page: "PediatricEndocrinology", icon: Activity },
-  { name: "Pubertal Disorders", page: "PediatricEndocrinology", icon: Users }]
-
-},
-{
   title: "Pediatric Gastroenterology",
   icon: Activity,
   color: "border-orange-200 bg-orange-50",
@@ -472,7 +474,7 @@ export default function Hub() {
     );
   }, [sectionQuery]);
 
-  const visibleSections = showAllKnowledge ? filteredSections : filteredSections.slice(0, 6);
+  const visibleSections = showAllKnowledge ? filteredSections : filteredSections.slice(0, 4);
 
   const handleOCRScan = async (type, inputId) => {
     const input = document.getElementById(inputId);
@@ -702,40 +704,6 @@ export default function Hub() {
         <EmergencyAccessDrawer open={emergencyDrawerOpen} onClose={() => setEmergencyDrawerOpen(false)} />
         <EmergencyProtocolDrawer open={emergencyProtocolOpen} onClose={() => setEmergencyProtocolOpen(false)} weight={patientData.weight ? String(patientData.weight) : ""} />
 
-        {/* ── Key Module Chips ── */}
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Layers className="w-4 h-4 text-slate-500" />
-            <h2 className="text-sm font-bold text-slate-700">Specialty Modules</h2>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            {[
-
-
-
-            { name: "Oncology Hub", icon: FlaskConical, color: "bg-purple-700", page: "OncologyHub" },
-            { name: "Rheumatology", icon: Shield, color: "bg-rose-600", page: "PediatricRheumatology" },
-            { name: "Nutrition Hub", icon: UtensilsCrossed, color: "bg-green-700", page: "NutritionHub" },
-            { name: "Research Platform", icon: Layers, color: "bg-slate-700", page: "ResearchHub" },
-
-            { name: "Endocrinology", icon: Thermometer, color: "bg-orange-500", page: "PediatricEndocrinology" },
-            { name: "Gastroenterology", icon: Activity, color: "bg-orange-600", page: "GeneralPediatricsHub" },
-            { name: "Haematology", icon: Beaker, color: "bg-red-700", page: "GeneralPediatricsHub" },
-            { name: "Subspecialties", icon: Stethoscope, color: "bg-slate-600", page: "SubspecialtiesHub" },
-            { name: "Procedures", icon: ClipboardList, color: "bg-slate-800", page: "ProcedureHub" }].
-            map((chip) => {
-              const ChipIcon = chip.icon;
-              return (
-                <Link key={chip.name} to={chip._customLink || createPageUrl(chip.page)} className="flex-shrink-0">
-                  <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl ${chip.color} text-white active:scale-95 transition-transform shadow-sm`}>
-                    <ChipIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span className="text-xs font-semibold leading-tight whitespace-nowrap">{chip.name}</span>
-                  </div>
-                </Link>);
-            })}
-          </div>
-        </div>
-
         {/* ── Knowledge Base ── */}
         <div>
           <div className="flex items-center justify-between gap-3 mb-3">
@@ -789,7 +757,7 @@ export default function Hub() {
             })}
           </div>
 
-          {filteredSections.length > 6 &&
+          {filteredSections.length > 4 &&
           <button
             onClick={() => setShowAllKnowledge((v) => !v)}
             className="w-full mt-2 py-2 text-xs font-semibold text-blue-600 bg-white border border-slate-200 rounded-xl hover:bg-blue-50 transition-colors">

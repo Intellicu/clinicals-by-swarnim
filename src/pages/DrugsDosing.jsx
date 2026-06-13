@@ -23,6 +23,13 @@ import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
 import { FORMULARY, getFormularyDrug } from "@/lib/formulary/nephrology-drugs";
 
+// Multi-indication drugs that must NOT generate a single fallback dose
+const MULTI_IND_KEYS = ["tacrolimus", "cyclosporine", "ciclosporin", "rituximab", "acyclovir", "aciclovir", "adrenaline", "epinephrine", "cyclophosphamide", "mycophenolate", "mmf", "eculizumab", "ravulizumab"];
+function isMultiIndicationDrug(generic = "") {
+  const k = generic.toLowerCase().replace(/[^a-z]/g, "");
+  return MULTI_IND_KEYS.some(m => k.includes(m));
+}
+
 // ─── Interaction rules ─────────────────────────────────────────────────────────
 const INTERACTION_RULES = [
   { a: "tacrolimus", b: "fluconazole", severity: "high", msg: "Fluconazole inhibits CYP3A4 → markedly increases Tacrolimus levels → nephrotoxicity risk." },
@@ -445,7 +452,11 @@ export default function DrugsDosing() {
         const durationLine = drug._duration ? `\n   Duration: ${drug._duration}` : "";
         return `${i + 1}. ${drug.generic_name}\n   Indication: ${drug._indication}\n   Dose: ${drug.dose_weight_based}  |  ${drug.frequency || "—"}  |  ${drug.route || "PO"}${durationLine}${formLine}`;
       }
-      // Fallback: generic dose calculation
+      // Block single-dose fallback for multi-indication drugs — must use indication wizard
+      if (isMultiIndicationDrug(drug.generic_name)) {
+        return `${i + 1}. ${drug.generic_name}\n   ⚠️ INDICATION NOT SELECTED — multiple dosing regimens exist.\n   Use Prescriber Wizard to select indication before prescribing.\n   Dose shown here would be UNSAFE without clinical context.`;
+      }
+      // Fallback: generic dose calculation for simple drugs
       const dose = calcDose(drug, wt, bsa, effectiveEgfr);
       const doseStr = dose?.type === "TDM" ? "TDM-guided (see monograph)" : dose?.perDose || drug.dose_weight_based || "—";
       const durationInfo = drug._duration ? `\n   Duration: ${drug._duration}` : "";
@@ -1158,6 +1169,15 @@ export default function DrugsDosing() {
                                   </div>
                                 );
                               }
+                              // Block fallback dose for multi-indication drugs
+                              if (isMultiIndicationDrug(drug.generic_name)) {
+                                return (
+                                  <div className="ml-7 mt-1">
+                                    <p className="text-xs text-red-600 font-semibold">⚠️ Indication not selected</p>
+                                    <button onClick={() => openRxBuilder(drug)} className="text-[11px] text-indigo-600 underline font-semibold">Select indication via Prescriber Wizard →</button>
+                                  </div>
+                                );
+                              }
                               const fDrug = getFormularyDrug(drug.generic_name);
                               const wt = parseFloat(weight);
                               if (fDrug?.peds_dose && wt) {
@@ -1222,7 +1242,7 @@ export default function DrugsDosing() {
         {mode === "wizard" && (
           <div className="space-y-3">
             <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-4 text-white">
-              <h2 className="text-base font-bold">Safe Prescriber Wizard</h2>
+              <h2 className="text-base font-bold">Prescriber Wizard</h2>
               <p className="text-xs text-indigo-100 mt-0.5">DoseRule-driven · Indication-specific · Blocks unsafe prescribing</p>
             </div>
             <IndicationPrescribeWizard
