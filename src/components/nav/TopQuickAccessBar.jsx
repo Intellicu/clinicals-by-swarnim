@@ -1,10 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Sparkles, Pill, BookOpen, Dna, Droplet, Baby, GraduationCap, Brain, Library, Activity } from "lucide-react";
+import { Home, Sparkles, Pill, BookOpen, Dna, Droplet, Baby, GraduationCap, Brain, Library, Microscope } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Hub", icon: Home, page: "Hub", activeCheck: ["/Hub", "/"] },
+  { label: "Clinical AI Hub", icon: Microscope, page: "ClinicalAIHub", activeCheck: ["/ClinicalAIHub"] },
   { label: "Engines", icon: Brain, page: "ClinicalSupport", activeCheck: ["/ClinicalSupport?tab=engines"], extraParams: "?tab=engines" },
   { label: "Guidelines", icon: BookOpen, page: "Guidelines", activeCheck: ["/GuidelinesLibrary", "/Guidelines"] },
   { label: "Drugs & Dosing", icon: Pill, page: "DrugsDosing", activeCheck: ["/DrugsDosing", "/DrugCalculator"] },
@@ -14,7 +15,6 @@ const NAV_ITEMS = [
   { label: "Teaching Hub", icon: GraduationCap, page: "TeachingHub", activeCheck: ["/TeachingHub"] },
   { label: "Clinical OS", icon: Brain, page: "ClinicalOS", activeCheck: ["/ClinicalOS"] },
   { label: "Ref Library", icon: Library, page: "ClinicalReferenceLibrary", activeCheck: ["/ClinicalReferenceLibrary"] },
-  { label: "Monitoring", icon: Activity, page: "MonitoringTasksDashboard", activeCheck: ["/MonitoringTasksDashboard"] },
   { label: "AI Prescriber", icon: Sparkles, page: "AIPrescriber", activeCheck: ["/AIPrescriber"] },
 ];
 

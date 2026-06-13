@@ -581,7 +581,7 @@ export default function DrugsDosing() {
               { id: "recents", label: "Recent" },
               { id: "favorites", label: "⭐ Fav" },
               { id: "rx", label: `Rx${rxDrugs.length ? ` (${rxDrugs.length})` : ""}` },
-              { id: "wizard", label: "🧭 Safe Prescriber" },
+              { id: "wizard", label: "🧭 Prescriber Wizard" },
               { id: "steroid-sparing", label: "Steroid-Sparing" },
               { id: "steroids", label: "Steroids" },
               { id: "eculizumab", label: "Eculizumab" },

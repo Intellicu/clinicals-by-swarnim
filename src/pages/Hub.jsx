@@ -502,14 +502,12 @@ export default function Hub() {
               <AlertCircle className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Emergency</span>
             </button>
-            {isAdmin && (
-              <Link to={createPageUrl("ClinicDashboard")}>
-                <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                  <Users className="w-3 h-3" />
-                  <span className="hidden sm:inline">Clinic</span>
-                </Button>
-              </Link>
-            )}
+            <Link to={createPageUrl("ClinicalAIHub")}>
+              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
+                <Sparkles className="w-3 h-3" />
+                <span className="hidden sm:inline">AI Hub</span>
+              </Button>
+            </Link>
             <HubMoreMenu />
           </div>
         </div>
