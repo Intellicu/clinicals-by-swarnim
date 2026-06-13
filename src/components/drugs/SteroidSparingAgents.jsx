@@ -157,20 +157,20 @@ const AGENTS = [
     route: "IV",
     duration: "Single induction course. Redosing every 6–12 months based on CD19 + relapse.",
     tdm: false,
-    monitoring: "CD19 count at 1 month (target <1% = B-cell depletion confirmed). IgG at 3, 6, 9, 12 months. CBC monthly. CMV/EBV PCR if symptomatic.",
-    preWorkup: "HBsAg + anti-HBc (MANDATORY). HIV. CBC, IgG, CD19/CD20. CMV/EBV serology. VZV IgG. Vaccinations ≥4 weeks before first dose.",
-    target: "CD19 <1% = confirmed B-cell depletion. IgG >600 mg/dL (if <400 → give IVIG 400 mg/kg).",
+    monitoring: "CD19 count at 1 month (target <1% = B-cell depletion confirmed). IgG at 3, 6, 9, 12 months. CBC monthly.",
+    preWorkup: "CBC. Liver transaminases (ALT, AST). HBsAg. Anti-HBc. HIV serology. Serum IgG.",
+    target: "CD19 <1% = confirmed B-cell depletion. IgG >600 mg/dL. Redose if CD19 >5/µL or >1% of CD45+ cells after initial 2 doses.",
     sideEffects: "Infusion reactions (first dose highest risk — premedicate), hypogammaglobulinaemia, infections (bacterial, PCP, HBV reactivation), late neutropenia",
-    emergency: "PREMEDICATE before each dose: methylprednisolone 2 mg/kg IV + paracetamol + chlorpheniramine. HBV reactivation can be fatal — screen ALL patients.",
+    emergency: "PREMEDICATE before each dose: paracetamol + antihistamine (chlorpheniramine) ± prednisolone 30 min before infusion. HBV reactivation can be fatal — screen ALL patients. Hold if IgG <400 mg/dL.",
     costIndia: "Very high — ₹20,000–40,000/vial. Biosimilars (Reditux, Maball) ~₹8,000–15,000/vial.",
     brands: "Mabthera (Roche), Reditux (Dr Reddy's), Maball (Reliance Life Sciences)",
     evidence: "RITUXNS trial (Iijima NEJM 2014). REENAL trial (Basu Lancet 2020). IPNA 2023 Grade 1A for FRNS/SDNS.",
     pearls: [
-      "IPNA 2023: now first-line for FRNS/SDNS (before CNIs and cyclophosphamide)",
+      "ISPN SSNS Guideline: 375 mg/m² × 2 doses, 1 week apart (redose if CD19 >5/µL or >1% CD45+ after initial 2 doses)",
       "Indian biosimilars (Reditux, Maball) = comparable efficacy at lower cost",
-      "PCP prophylaxis with cotrimoxazole during B-cell depletion period",
-      "CD19 monitoring: redose when CD19 >1% AND clinical relapse",
-      "IgG <400 mg/dL: IVIG 400 mg/kg — do not wait for infection"
+      "Check IgG before each course — hold if IgG severely low (<400 mg/dL)",
+      "CD19 monitoring: additional doses if CD19 >5/µL OR >1% CD45+ after initial course",
+      "Do NOT give live vaccines for 12 months post-rituximab"
     ]
   }
 ];

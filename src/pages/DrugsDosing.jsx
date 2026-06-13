@@ -15,6 +15,7 @@ import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import RxIndicationBuilder from "../components/drugs/RxIndicationBuilder";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import SteroidSparingAgents from "../components/drugs/SteroidSparingAgents";
+import IndicationPrescribeWizard from "../components/drugs/IndicationPrescribeWizard";
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
 import FormularyBrowser from "../components/drugs/FormularyBrowser";
@@ -580,6 +581,7 @@ export default function DrugsDosing() {
               { id: "recents", label: "Recent" },
               { id: "favorites", label: "⭐ Fav" },
               { id: "rx", label: `Rx${rxDrugs.length ? ` (${rxDrugs.length})` : ""}` },
+              { id: "wizard", label: "🧭 Safe Prescriber" },
               { id: "steroid-sparing", label: "Steroid-Sparing" },
               { id: "steroids", label: "Steroids" },
               { id: "eculizumab", label: "Eculizumab" },
@@ -1217,6 +1219,18 @@ export default function DrugsDosing() {
         )}
 
         {/* ── ADVANCED TOOL VIEWS (direct tabs, no "more" menu) ── */}
+        {mode === "wizard" && (
+          <div className="space-y-3">
+            <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-4 text-white">
+              <h2 className="text-base font-bold">Safe Prescriber Wizard</h2>
+              <p className="text-xs text-indigo-100 mt-0.5">DoseRule-driven · Indication-specific · Blocks unsafe prescribing</p>
+            </div>
+            <IndicationPrescribeWizard
+              weight={weight} height={height} age={age} egfr={effectiveEgfr?.toString()}
+              onAddToRx={(drug) => { addToRx(drug); setMode("rx"); }}
+            />
+          </div>
+        )}
         {mode === "steroid-sparing" && <SteroidSparingAgents />}
         {mode === "steroids" && <SteroidEquivalenceEngine />}
         {mode === "eculizumab" && <EculizumabGuidance />}
