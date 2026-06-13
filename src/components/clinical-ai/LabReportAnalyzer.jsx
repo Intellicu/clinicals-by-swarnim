@@ -26,6 +26,7 @@ export default function LabReportAnalyzer() {
       }
 
       const result = await base44.integrations.Core.InvokeLLM({
+        model: "claude_sonnet_4_6",
         prompt: `You are an expert pediatric nephrologist analyzing laboratory results.
         
         Lab Type: ${labType}
@@ -286,6 +287,9 @@ export default function LabReportAnalyzer() {
                 </ul>
               </div>
             )}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="text-xs text-amber-800"><strong>⚠️ Disclaimer:</strong> AI lab interpretation is for clinical decision support only. Uses advanced LLM (Claude Sonnet). Always correlate with clinical context and repeat labs as needed. Not a substitute for clinical laboratory specialist review.</p>
+            </div>
           </CardContent>
         </Card>
       )}

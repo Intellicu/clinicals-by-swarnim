@@ -20,10 +20,11 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   FileText, Printer, Copy, CheckCircle, AlertTriangle,
-  ShieldAlert, X, Plus, ChevronDown, ChevronUp, Info
+  ShieldAlert, X, Plus, ChevronDown, ChevronUp, Info, Layers, TrendingUp
 } from "lucide-react";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
+import { TreatmentTemplatePanel } from "./TreatmentTemplates";
 
 // ── Multi-indication drugs: show dosing table, require indication selection ──
 const MULTI_INDICATION_DRUGS = {
@@ -204,6 +205,33 @@ function calcForIndication(indication, weight, bsa) {
   return null;
 }
 
+// ── Min/Max dose range banner ─────────────────────────────────────────────────
+function DoseRangeBanner({ drug, weight, bsa }) {
+  const ranges = computeDoseRange(drug, weight, bsa);
+  const ceiling = getSafetyCeiling(drug?.generic_name || drug?.generic);
+  if (!ranges?.length && !ceiling) return null;
+  return (
+    <div className="bg-blue-50 border border-blue-300 rounded-xl px-3 py-2.5 space-y-1">
+      <p className="text-xs font-bold text-blue-800 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Patient-Specific Dose Range</p>
+      {ranges?.map((r, i) => (
+        <div key={i} className="flex items-center justify-between text-xs">
+          <span className="text-blue-700">{r.label}:</span>
+          <span className="font-bold text-blue-900 text-sm">
+            {r.hi ? `${r.lo} – ${r.hi} mg` : `${r.lo} mg`}
+          </span>
+        </div>
+      ))}
+      {ceiling && (
+        <div className="flex items-center justify-between text-xs border-t border-blue-200 pt-1 mt-1">
+          <span className="text-red-700 font-semibold">🔴 Safety ceiling:</span>
+          <span className="font-bold text-red-800">{ceiling.isPerKg ? `${ceiling.maxPerDay} ${ceiling.unit}` : `${ceiling.maxPerDay} mg/day`}</span>
+        </div>
+      )}
+      {ceiling && <p className="text-xs text-slate-500 italic">{ceiling.ref}</p>}
+    </div>
+  );
+}
+
 // ── Multi-Indication Dosing Display ──────────────────────────────────────────
 function MultiIndicationDosingPanel({ drugKey, drug, weight, bsa, onSelectIndication }) {
   const config = MULTI_INDICATION_DRUGS[drugKey];
@@ -220,6 +248,9 @@ function MultiIndicationDosingPanel({ drugKey, drug, weight, bsa, onSelectIndica
         <Info className="w-4 h-4 text-amber-600 flex-shrink-0" />
         <AlertDescription className="text-amber-800 text-xs font-semibold">{config.note}</AlertDescription>
       </Alert>
+
+      {/* Patient-specific dose range banner */}
+      <DoseRangeBanner drug={drug} weight={weight} bsa={bsa} />
 
       {/* Patient context */}
       {(wt || bsaNum) && (

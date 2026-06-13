@@ -85,28 +85,38 @@ export default function UDSAnalyzer() {
         fileUrl = uploadRes.file_url;
       }
 
-      const prompt = `You are a pediatric nephrologist interpreting a urine dipstick and microscopy report.
+      const prompt = `You are a highly experienced consultant pediatric nephrologist performing a comprehensive, expert-level urine report interpretation.
 
-${file ? "Analyze the uploaded urine report image/document." : `Urine Report Text:\n${manualText}`}
+${file ? "Carefully analyse the uploaded urine dipstick/microscopy report image." : `Urine Report Text:\n${manualText}`}
 
-Provide a comprehensive clinical interpretation with these sections:
+Provide a detailed, high-quality clinical analysis:
 
-1. DIPSTICK_SUMMARY: Extract/summarize key dipstick values (protein, blood, glucose, ketones, nitrites, LE, pH, SG)
-2. MICROSCOPY_FINDINGS: Extract/summarize microscopy findings (RBCs, WBCs, casts, crystals, bacteria)
-3. PATTERN: Most likely urinary syndrome pattern (nephrotic/nephritic/UTI/tubular/hypercalciuria/TMA/mixed)
-4. CLINICAL_INTERPRETATION: 2-3 sentence clinical interpretation relevant to pediatric nephrology
-5. DIFFERENTIALS: Top 3-5 diagnoses to consider with brief reasoning
-6. NEPHROLOGY_SIGNIFICANCE: Specific significance for kidney disease (GN, NS, tubular, structural)
-7. SUGGESTED_NEXT_TESTS: Prioritized list of next investigations
-8. MONITORING_ADVICE: What to monitor and when to escalate
-9. RED_FLAGS: Any urgent findings requiring immediate action
-10. LINKED_PATHWAYS: Which clinical pathways to trigger (e.g., nephrotic syndrome pathway, AKI pathway)
+1. DIPSTICK_SUMMARY: Extract ALL dipstick parameters precisely (protein grade, blood, glucose, ketones, nitrites, leukocyte esterase, pH, specific gravity, bilirubin, urobilinogen). Quantify abnormalities.
 
-Be specific and clinical. Use pediatric reference ranges. Flag if pattern suggests urgent nephrology referral.`;
+2. MICROSCOPY_FINDINGS: Analyse all formed elements: RBCs (morphology — isomorphic vs dysmorphic, acanthocytes %), WBCs, casts (hyaline/granular/RBC/WBC/waxy), crystals (type), bacteria, oval fat bodies. State what is present AND what is absent (relevant negatives).
+
+3. PATTERN: Identify the urinary syndrome pattern precisely — nephrotic / nephritic / UTI / tubular dysfunction / hypercalciuria / TMA / haematuria-only / mixed. Explain your reasoning.
+
+4. CLINICAL_INTERPRETATION: A 3–5 sentence expert clinical interpretation. What does this pattern mean in a paediatric nephrology context? What is happening at the kidney level?
+
+5. DIFFERENTIALS: Top 5 differential diagnoses in order of probability. For each: condition name, supporting findings from the report, and distinguishing features from other differentials.
+
+6. NEPHROLOGY_SIGNIFICANCE: Disease-specific significance — does this indicate: (a) Glomerular disease (GN type?), (b) Tubular dysfunction, (c) Structural/obstructive, (d) Infectious, (e) Metabolic?
+
+7. SUGGESTED_NEXT_TESTS: Prioritised investigation list. For each: what test and why. Include: serum panel, spot urine ratios, imaging, serologies, culture as appropriate.
+
+8. MONITORING_ADVICE: Specific parameters to track and at what frequency. When to escalate to nephrology referral.
+
+9. RED_FLAGS: Any findings requiring urgent escalation — renal failure, HTN emergency, nephrotic crisis, TMA. State urgency level.
+
+10. LINKED_PATHWAYS: Which specific clinical management pathway to initiate (nephrotic syndrome pathway, AKI pathway, haematuria workup, UTI pathway etc.)
+
+Be precise, evidence-based, and use KDIGO/IPNA guidelines. This is a specialist clinical decision-support tool — provide the highest quality interpretation.`;
 
       const res = await base44.integrations.Core.InvokeLLM({
         prompt,
         file_urls: fileUrl ? [fileUrl] : undefined,
+        model: "claude_sonnet_4_6",
         response_json_schema: {
           type: "object",
           properties: {

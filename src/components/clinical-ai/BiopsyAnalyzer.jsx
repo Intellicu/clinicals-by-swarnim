@@ -23,7 +23,8 @@ export default function BiopsyAnalyzer() {
       }
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an expert nephropathologist. Analyze this renal biopsy report.
+        model: "claude_sonnet_4_6",
+        prompt: `You are a senior nephropathologist with expertise in paediatric renal biopsies. Provide expert-level histopathological analysis.
         
         ${biopsyText ? `Report text: ${biopsyText}` : ''}
         

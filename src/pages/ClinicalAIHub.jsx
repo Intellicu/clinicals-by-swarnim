@@ -1,43 +1,40 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { HeartPulse, Dna } from 'lucide-react';
+import { HeartPulse, Dna, ExternalLink } from 'lucide-react';
 import BiopsyAnalyzer from '../components/clinical-ai/BiopsyAnalyzer';
 import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
 import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
 import UDSAnalyzer from '../components/clinical-ai/UDSAnalyzer';
+import UroflowAIAnalyzer from '../components/clinical-ai/UroflowAIAnalyzer';
+import GeneticReportAnalyzer from './GeneticReportAnalyzer';
 import { CLINICAL_AI_ANALYZERS } from '@/lib/aiAnalyzers';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
-// ECG placeholder (no standalone component yet)
+// ECG placeholder
 function ECGAnalyzerPlaceholder() {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
       <HeartPulse className="w-12 h-12 text-red-400 mx-auto mb-4" />
       <h3 className="text-lg font-bold text-slate-800 mb-2">ECG Analyzer</h3>
       <p className="text-sm text-slate-500 max-w-md mx-auto">
-        Pediatric ECG interpretation including electrolyte effects, arrhythmia screening, and QTc calculation. Coming soon — use Differential Dx for now.
+        Pediatric ECG interpretation including electrolyte effects, arrhythmia screening, and QTc calculation. Coming soon — use Case Discussion AI for now.
       </p>
     </div>
   );
 }
 
-// Genetics placeholder — redirects to GeneticReportAnalyzer
-function GeneticsRedirect() {
-  const navigate = useNavigate();
-  React.useEffect(() => { navigate('/GeneticReportAnalyzer', { replace: true }); }, [navigate]);
-  return <div className="p-8 text-center text-slate-400 text-sm">Redirecting to Genetics AI…</div>;
-}
-
 // Tab value → component map
 const TAB_COMPONENTS = {
   uds: <UDSAnalyzer />,
+  uroflow: <UroflowAIAnalyzer />,
   biopsy: <BiopsyAnalyzer />,
   radiology: <RadiologyAnalyzer />,
   labs: <LabReportAnalyzer />,
   case: <ClinicalCaseAnalyzer />,
   ecg: <ECGAnalyzerPlaceholder />,
-  genetics: <GeneticsRedirect />,
+  genetics: <GeneticReportAnalyzer />,
 };
 
 export default function ClinicalAIHub() {
@@ -52,10 +49,11 @@ export default function ClinicalAIHub() {
           <h1 className="text-xl font-bold">Clinical AI Center</h1>
           <p className="text-purple-200 text-xs mt-0.5">AI-powered diagnostic analysis · Evidence-based · Pediatric-focused</p>
           <div className="flex gap-2 mt-3 flex-wrap">
-            {['Advanced LLM', 'Image Recognition', 'Evidence-Based'].map(tag => (
+            {['Claude AI (High Quality)', 'Image Recognition', 'Evidence-Based', 'KDIGO/IPNA Guidelines'].map(tag => (
               <span key={tag} className="bg-white/20 text-white text-[11px] px-2.5 py-1 rounded-lg font-medium">{tag}</span>
             ))}
           </div>
+          <p className="text-purple-300 text-[10px] mt-2">Uses advanced AI models (claude_sonnet_4_6). Each analysis consumes integration credits. For clinical decision support only — not a substitute for specialist review.</p>
         </div>
       </div>
 

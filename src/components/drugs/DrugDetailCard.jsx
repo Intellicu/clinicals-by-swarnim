@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { getFormularyDrug } from "@/lib/formulary/nephrology-drugs";
 import FormularyMonograph from "./FormularyMonograph";
+import DrugMonitoringTab from "./DrugMonitoringTab";
 
 // ── Static practical guidance library ──────────────────────────────────────
 export const DRUG_GUIDANCE = {
@@ -269,11 +270,17 @@ const COLOR_MAP = {
 
 export default function DrugDetailCard({ drug, weight, egfr }) {
   const [expanded, setExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState("guidance");
   const guidanceName = drug?.generic_name?.toLowerCase().replace(/\s+/g, "");
   const guidance = DRUG_GUIDANCE[guidanceName] || null;
   const formularyDrug = getFormularyDrug(drug?.generic_name);
 
   if (!drug) return null;
+
+  const tabs = [
+    { id: "guidance", label: "Guidance" },
+    { id: "monitoring", label: "Monitoring" },
+  ];
 
   return (
     <div className="space-y-3 mt-4">
@@ -304,8 +311,18 @@ export default function DrugDetailCard({ drug, weight, egfr }) {
         </div>
       )}
 
-      {/* Toggle full guidance */}
-      {guidance && (
+      {/* Tab switcher */}
+      <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+        {tabs.map(tab => (
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-all ${activeTab === tab.id ? "bg-white shadow text-slate-900" : "text-slate-500 hover:text-slate-700"}`}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Guidance tab */}
+      {activeTab === "guidance" && guidance && (
         <div>
           <Button
             variant="outline"
@@ -352,6 +369,11 @@ export default function DrugDetailCard({ drug, weight, egfr }) {
             </div>
           )}
         </div>
+      )}
+
+      {/* Monitoring tab */}
+      {activeTab === "monitoring" && (
+        <DrugMonitoringTab drug={drug} />
       )}
 
       {/* Quick bedside card always visible */}

@@ -23,7 +23,8 @@ export default function ClinicalCaseAnalyzer() {
   const analyzeMutation = useMutation({
     mutationFn: async () => {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an expert pediatric nephrologist. Analyze this clinical case comprehensively.
+        model: "claude_sonnet_4_6",
+        prompt: `You are a senior consultant pediatric nephrologist conducting a comprehensive, attending-level clinical case analysis. Provide the highest quality clinical reasoning.
         
         Patient: ${caseDetails.age} years old ${caseDetails.gender}
         
