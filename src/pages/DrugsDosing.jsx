@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import RxIndicationBuilder from "../components/drugs/RxIndicationBuilder";
+import FormularyMonograph from "../components/drugs/FormularyMonograph";
 import IndicationPickerEngine from "../components/drugs/IndicationPickerEngine";
 import FormularyCategoryStrips from "../components/drugs/FormularyCategoryStrips";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
@@ -414,7 +415,7 @@ export default function DrugsDosing() {
     setShowIndicationBuilder(true);
   };
 
-  const handleIndicationAdd = ({ drug: d, indication, dose, freq, route, duration, formulation, prescriptionText, calcTrail }) => {
+  const handleIndicationAdd = ({ drug: d, indication, dose, freq, route, duration, formulation, prescriptionText, calcTrail = "" }) => {
     const mapped = {
       id: d.id,
       generic_name: d.generic_name,
@@ -592,79 +593,103 @@ function buildCalcTrail(drug, rule, calc) {
   return trail;
 }
 
-// ── Full drug monograph component ─────────────────────────────────────────────
+// ── Full drug monograph component (colorful) ──────────────────────────────────
+const MONOGRAPH_SECTIONS = [
+  { key: "description", label: "Description", colorHeader: "bg-slate-700", colorBody: "bg-slate-50 border-slate-200 text-slate-800" },
+  { key: "indications", label: "Indications", colorHeader: "bg-blue-700", colorBody: "bg-blue-50 border-blue-200 text-blue-900" },
+  { key: "dose_weight_based", label: "Pediatric Dose (Weight-based)", colorHeader: "bg-purple-700", colorBody: "bg-purple-50 border-purple-200 text-purple-900" },
+  { key: "dose_age_based", label: "Age-based / Indication-specific Dose", colorHeader: "bg-indigo-700", colorBody: "bg-indigo-50 border-indigo-200 text-indigo-900" },
+  { key: "neonatal_dose", label: "Neonatal Dose", colorHeader: "bg-pink-700", colorBody: "bg-pink-50 border-pink-200 text-pink-900" },
+  { key: "renal_adjust", label: "Renal Dose Adjustment", colorHeader: "bg-amber-700", colorBody: "bg-amber-50 border-amber-200 text-amber-900" },
+  { key: "hd_adjust", label: "Haemodialysis", colorHeader: "bg-cyan-700", colorBody: "bg-cyan-50 border-cyan-200 text-cyan-900" },
+  { key: "pd_adjust", label: "Peritoneal Dialysis", colorHeader: "bg-teal-700", colorBody: "bg-teal-50 border-teal-200 text-teal-900" },
+  { key: "crrt_dose", label: "CRRT", colorHeader: "bg-teal-800", colorBody: "bg-teal-50 border-teal-300 text-teal-900" },
+  { key: "iv_preparation_instructions", label: "IV Preparation", colorHeader: "bg-blue-800", colorBody: "bg-blue-50 border-blue-300 text-blue-900" },
+  { key: "contraindications", label: "Contraindications", colorHeader: "bg-red-700", colorBody: "bg-red-50 border-red-200 text-red-900" },
+  { key: "key_interactions", label: "Key Drug Interactions", colorHeader: "bg-orange-700", colorBody: "bg-orange-50 border-orange-200 text-orange-900" },
+  { key: "monitoring", label: "Monitoring Required", colorHeader: "bg-green-700", colorBody: "bg-green-50 border-green-200 text-green-900" },
+  { key: "monitoring_frequency", label: "Monitoring Frequency", colorHeader: "bg-green-800", colorBody: "bg-green-50 border-green-300 text-green-900" },
+  { key: "pre_treatment_workup", label: "Pre-treatment Workup", colorHeader: "bg-violet-700", colorBody: "bg-violet-50 border-violet-200 text-violet-900" },
+  { key: "post_treatment_monitoring", label: "Post-treatment Monitoring", colorHeader: "bg-violet-800", colorBody: "bg-violet-50 border-violet-300 text-violet-900" },
+  { key: "target_trough_level", label: "Target Trough / TDM Level", colorHeader: "bg-blue-900", colorBody: "bg-blue-50 border-blue-300 text-blue-900" },
+  { key: "adverse_effects", label: "Adverse Effects", colorHeader: "bg-red-800", colorBody: "bg-red-50 border-red-300 text-red-900" },
+  { key: "vaccination_guidance", label: "Vaccination Guidance", colorHeader: "bg-rose-700", colorBody: "bg-rose-50 border-rose-200 text-rose-900" },
+  { key: "special_precautions", label: "Special Precautions", colorHeader: "bg-yellow-700", colorBody: "bg-yellow-50 border-yellow-200 text-yellow-900" },
+  { key: "clinical_pearls", label: "Clinical Pearls", colorHeader: "bg-emerald-700", colorBody: "bg-emerald-50 border-emerald-200 text-emerald-900" },
+  { key: "evidence_summary", label: "Evidence Summary", colorHeader: "bg-indigo-800", colorBody: "bg-indigo-50 border-indigo-300 text-indigo-900" },
+  { key: "guideline_source", label: "Guideline Source", colorHeader: "bg-slate-600", colorBody: "bg-slate-50 border-slate-200 text-slate-800" },
+  { key: "dose_duration", label: "Standard Treatment Duration", colorHeader: "bg-teal-600", colorBody: "bg-teal-50 border-teal-200 text-teal-800" },
+];
+
 function DrugFullMonograph({ drug }) {
   if (!drug) return null;
-  const fields = [
-    { label: "Description", value: drug.description },
-    { label: "Category / Class", value: [drug.category, drug.therapeutic_class].filter(Boolean).join(" · ") },
-    { label: "Indian Brands", value: drug.brands_indian },
-    { label: "Indications", value: drug.indications },
-    { label: "Weight-based Dose", value: drug.dose_weight_based },
-    { label: "Age-based / Fixed Dose", value: drug.dose_age_based },
-    { label: "Neonatal Dose", value: drug.neonatal_dose },
-    { label: "Max Dose/Day", value: drug.max_dose_per_day },
-    { label: "Frequency", value: drug.frequency },
-    { label: "Route", value: drug.route },
-    { label: "IV Preparation", value: drug.iv_preparation_instructions },
-    { label: "Renal Adjustment", value: drug.renal_adjust },
-    { label: "HD Adjustment", value: drug.hd_adjust },
-    { label: "PD Adjustment", value: drug.pd_adjust },
-    { label: "CRRT Dose", value: drug.crrt_dose },
-    { label: "Hepatic Adjustment", value: drug.hepatic_adjust },
-    { label: "Monitoring", value: drug.monitoring },
-    { label: "Monitoring Frequency", value: drug.monitoring_frequency },
-    { label: "Pre-treatment Workup", value: drug.pre_treatment_workup },
-    { label: "Post-treatment Monitoring", value: drug.post_treatment_monitoring },
-    { label: "Target Trough Level", value: drug.target_trough_level },
-    { label: "Dose Duration", value: drug.dose_duration },
-    { label: "Vaccination Guidance", value: drug.vaccination_guidance },
-    { label: "Adverse Effects", value: drug.adverse_effects },
-    { label: "Key Interactions", value: drug.key_interactions },
-    { label: "Contraindications", value: drug.contraindications },
-    { label: "Clinical Pearls", value: drug.clinical_pearls },
-    { label: "Evidence Summary", value: drug.evidence_summary },
-    { label: "Guideline Source", value: drug.guideline_source },
-    { label: "Special Precautions", value: drug.special_precautions },
-  ].filter(f => f.value);
 
   const costInfo = [
     drug.approx_cost_per_unit_inr ? `₹${drug.approx_cost_per_unit_inr}/unit` : null,
-    drug.jan_aushadhi_available ? "Jan Aushadhi ✓" : null,
-    drug.pmjay_covered ? "PMJAY ✓" : null,
+    drug.jan_aushadhi_available ? "✅ Jan Aushadhi available" : null,
+    drug.pmjay_covered ? "✅ PMJAY covered" : null,
     drug.biosimilar_available ? `Biosimilar: ${drug.biosimilar_brands || "available"}` : null,
   ].filter(Boolean).join("  ·  ");
 
+  const visibleSections = MONOGRAPH_SECTIONS.filter(s => drug[s.key]);
+
   return (
     <div className="space-y-2">
-      {fields.map(({ label, value }) => (
-        <div key={label} className="bg-white rounded-xl border border-slate-200 px-3 py-2.5">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">{label}</p>
-          <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-line">{value}</p>
+      {/* Summary card */}
+      {drug.description && (
+        <div className="bg-gradient-to-r from-slate-700 to-slate-800 rounded-xl p-4 text-white">
+          <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wide mb-1">Summary</p>
+          <p className="text-xs text-slate-100 leading-relaxed">{drug.description}</p>
         </div>
-      ))}
+      )}
+
+      {visibleSections.map(({ key, label, colorHeader, colorBody }) => {
+        const value = drug[key];
+        if (!value) return null;
+        return (
+          <div key={key} className={`rounded-xl border ${colorBody} overflow-hidden`}>
+            <div className={`${colorHeader} px-3 py-1.5`}>
+              <p className="text-[10px] font-bold text-white uppercase tracking-wide">{label}</p>
+            </div>
+            <div className="px-3 py-2.5">
+              <p className="text-xs leading-relaxed whitespace-pre-line">{value}</p>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Formulations */}
       {drug.formulations?.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 px-3 py-2.5">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Formulations</p>
-          <div className="space-y-1">
+        <div className="bg-purple-50 border border-purple-200 rounded-xl overflow-hidden">
+          <div className="bg-purple-700 px-3 py-1.5">
+            <p className="text-[10px] font-bold text-white uppercase tracking-wide">Available Formulations (India)</p>
+          </div>
+          <div className="p-3 space-y-1.5">
             {drug.formulations.map((f, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs text-slate-700">
-                <span className="font-semibold">{f.form}</span>
-                <span className="text-teal-700">{f.strength}</span>
-                {f.pack_info && <span className="text-slate-400">{f.pack_info}</span>}
+              <div key={i} className="bg-white rounded-lg px-3 py-2 border border-purple-100 flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-slate-700">{f.form}</span>
+                <span className="text-xs font-semibold text-purple-700">{f.strength}</span>
+                {f.pack_info && <span className="text-xs text-slate-400">{f.pack_info}</span>}
               </div>
             ))}
           </div>
         </div>
       )}
+
+      {/* Cost */}
       {costInfo && (
-        <div className="bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
-          <p className="text-[10px] font-bold text-green-600 uppercase mb-0.5">Cost & Availability</p>
-          <p className="text-xs text-green-800">{costInfo}</p>
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl overflow-hidden">
+          <div className="bg-emerald-700 px-3 py-1.5">
+            <p className="text-[10px] font-bold text-white uppercase tracking-wide">Cost & Availability (India)</p>
+          </div>
+          <div className="px-3 py-2.5">
+            <p className="text-xs text-emerald-900">{costInfo}</p>
+          </div>
         </div>
       )}
-      {fields.length === 0 && (
-        <p className="text-center text-xs text-slate-400 py-8">No detailed monograph data available for this drug.</p>
+
+      {visibleSections.length === 0 && !drug.description && (
+        <p className="text-center text-xs text-slate-400 py-8">No detailed monograph data available.</p>
       )}
     </div>
   );
@@ -1034,6 +1059,7 @@ function DrugFullMonograph({ drug }) {
                     <RxIndicationBuilder
                       drug={selectedDrug}
                       weight={weight}
+                      height={height}
                       patientAge={age}
                       onClose={() => { setShowIndicationBuilder(false); setRxBuilderDrug(null); }}
                       onAddToRxList={handleIndicationAdd}
@@ -1249,6 +1275,7 @@ function DrugFullMonograph({ drug }) {
               <RxIndicationBuilder
                 drug={rxBuilderDrug}
                 weight={weight}
+                height={height}
                 patientAge={age}
                 onClose={() => { setShowIndicationBuilder(false); setRxBuilderDrug(null); }}
                 onAddToRxList={handleIndicationAdd}
