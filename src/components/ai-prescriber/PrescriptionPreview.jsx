@@ -25,6 +25,12 @@ export default function PrescriptionPreview({ patientState, pathwayKey, activeDr
    ${dose.capped ? `⚠️ Capped at max dose` : ""}`;
     }).join("\n\n");
 
+    // Calc trail block
+    const trails = activeDrugs.filter(d => d.calcTrail).map((d, i) => `${i + 1}. ${d.calcTrail}`);
+    const trailBlock = trails.length > 0
+      ? `\n${"─".repeat(43)}\nDOSE CALCULATION TRAIL\n${trails.join("\n\n")}`
+      : "";
+
     return `PEDIATRIC NEPHROLOGY PRESCRIPTION
 ═══════════════════════════════════════════
 ${template ? `Protocol: ${template.label}` : ""}
@@ -51,7 +57,7 @@ Reference: ${template?.reference || "CliniCals by Swarnim"}
 
 Prescriber: _________________________   Date: ${date}
 ─────────────────────────────────────────
-CliniCals by Swarnim | Verify all calculations independently`;
+CliniCals by Swarnim | Verify all calculations independently${trailBlock}`;
   };
 
   const printRx = () => {

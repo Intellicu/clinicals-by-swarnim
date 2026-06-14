@@ -330,10 +330,19 @@ export default function IndicationPickerEngine({ drug, weight, bsa, egfr, onRule
         if (drug.id) {
           found = await base44.entities.DoseRule.filter({ drug_id: drug.id });
         }
-        // Fallback: match by drug_name (denormalised field)
+        // Fallback 1: match by drug_name (denormalised field, exact)
         if (found.length === 0 && drug.generic_name) {
-          const byName = await base44.entities.DoseRule.filter({ drug_name: drug.generic_name });
-          found = byName;
+          found = await base44.entities.DoseRule.filter({ drug_name: drug.generic_name });
+        }
+        // Fallback 2: load all rules and do a client-side case-insensitive match
+        if (found.length === 0 && drug.generic_name) {
+          const all = await base44.entities.DoseRule.list("indication", 500);
+          const nameNorm = drug.generic_name.toLowerCase().replace(/\s+/g,"");
+          found = all.filter(r => {
+            const rn = (r.drug_name || "").toLowerCase().replace(/\s+/g,"");
+            const ri = (r.drug_id || "");
+            return rn === nameNorm || rn.includes(nameNorm) || nameNorm.includes(rn) || ri === drug.id;
+          });
         }
         if (!cancelled) setRules(found);
       } catch (e) {

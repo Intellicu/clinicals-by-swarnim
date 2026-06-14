@@ -65,6 +65,18 @@ function DrugRxCard({ drug, weight, bsa, egfr, onFinalized, onRemove }) {
       toast.error("Enter dose and frequency before confirming");
       return;
     }
+    // Build calc trail if we have a rule + calc
+    let calcTrail = "";
+    if (rxState?.rule && rxState?.calc) {
+      const { rule, calc } = rxState;
+      calcTrail = `${drug.generic_name || drug.name} — ${rule.indication}\n`;
+      calcTrail += `  ${calc.basisLabel} = ${calc.finalDose} mg`;
+      if (calc.capped) calcTrail += `\n  Max cap ${calc.capVal} mg → ${calc.finalDose} mg`;
+      if (rule.rounding_strategy && rule.rounding_strategy !== "exact") calcTrail += `\n  Rounded (${rule.rounding_strategy.replace("_"," ")}) → ${calc.finalDose} mg`;
+      calcTrail += `\n  Frequency: ${rule.frequency || "—"}`;
+      if (rule.duration_days > 0) calcTrail += ` × ${rule.duration_days} days`;
+      if (rule.guideline_source) calcTrail += `  (${rule.guideline_source})`;
+    }
     onFinalized({
       drug_name: drug.generic_name || drug.name,
       indication: overrides.indicationName,
@@ -74,6 +86,7 @@ function DrugRxCard({ drug, weight, bsa, egfr, onFinalized, onRemove }) {
       route: overrides.route,
       duration: overrides.duration,
       instructions: overrides.instructions,
+      calcTrail,
       isManual: !!rxState?.manual,
     });
     setPhase("done");
@@ -340,7 +353,8 @@ export default function DrugRxBuilder({ weight, bsa, egfr, onDrugsChange }) {
 
   const notifyParent = (drugList, map) => {
     const names = drugList.filter(d => map[d.drug.id]).map(d => d.drug.generic_name);
-    const finalized = drugList.filter(d => map[d.drug.id]).map(d => map[d.drug.id]);
+    // Include calcTrail in each finalized entry for prescription output
+    const finalized = drugList.filter(d => map[d.drug.id]).map(d => ({ ...map[d.drug.id] }));
     onDrugsChange?.(names, finalized);
   };
 

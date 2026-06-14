@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import DrugDetailCard from "../components/drugs/DrugDetailCard";
 import RxIndicationBuilder from "../components/drugs/RxIndicationBuilder";
+import IndicationPickerEngine from "../components/drugs/IndicationPickerEngine";
+import FormularyCategoryStrips from "../components/drugs/FormularyCategoryStrips";
 import SteroidEquivalenceEngine from "../components/drugs/SteroidEquivalenceEngine";
 import SteroidSparingAgents from "../components/drugs/SteroidSparingAgents";
 import IndicationPrescribeWizard from "../components/drugs/IndicationPrescribeWizard";
@@ -322,7 +324,7 @@ export default function DrugsDosing() {
   // Main workspace modes
   const [mode, setMode] = useState("formulary"); // "formulary" | "search" | "drug" | "rx" | ...
   const [selectedDrug, setSelectedDrug] = useState(null);
-  const [drugSubTab, setDrugSubTab] = useState("dose");
+  const [drugSubTab, setDrugSubTab] = useState("monograph");
 
   // Search
   const [query, setQuery] = useState(urlDrug || "");
@@ -391,7 +393,7 @@ export default function DrugsDosing() {
 
   const selectDrug = (drug) => {
     setSelectedDrug(drug);
-    setDrugSubTab("dose");
+    setDrugSubTab("monograph");
     setMode("drug");
     // Update recents
     const updated = [drug, ...recentDrugs.filter(r => r.id !== drug.id)].slice(0, 8);
@@ -412,7 +414,7 @@ export default function DrugsDosing() {
     setShowIndicationBuilder(true);
   };
 
-  const handleIndicationAdd = ({ drug: d, indication, dose, freq, route, duration, formulation, prescriptionText }) => {
+  const handleIndicationAdd = ({ drug: d, indication, dose, freq, route, duration, formulation, prescriptionText, calcTrail }) => {
     const mapped = {
       id: d.id,
       generic_name: d.generic_name,
@@ -426,6 +428,7 @@ export default function DrugsDosing() {
       dose_calculation_type: "per_day",
       _indication: indication,
       _prescriptionText: prescriptionText,
+      _calcTrail: calcTrail,
       _formulation: formulation,
       _duration: duration,
     };
@@ -463,7 +466,14 @@ export default function DrugsDosing() {
       const brandInfo = drug.brands_indian ? `\n   Brands (India): ${drug.brands_indian.split(",").slice(0,2).join(", ")}` : "";
       return `${i + 1}. ${drug.generic_name}\n   Dose: ${doseStr}  |  ${drug.frequency || dose?.freq || "—"}  |  ${drug.route || "PO"}${durationInfo}${brandInfo}`;
     }).join("\n\n");
-    return `PEDIATRIC Rx\n${"─".repeat(40)}\nAge: ${age || "—"} y  |  Wt: ${weight || "—"} kg  |  BSA: ${bsa ? bsa + " m²" : "—"}  |  eGFR: ${effectiveEgfr || "—"}\n\n${lines}\n\n${"─".repeat(40)}\n${interactions.length ? `⚠️ Interactions: ${interactions.map(ix => `${ix.a}+${ix.b}`).join("; ")}` : "✅ No major interactions"}\nCliniCals by Swarnim | Verify all doses`;
+    // Build calculation trail for drugs that have it
+    const trailLines = rxDrugs
+      .filter(d => d._calcTrail)
+      .map((d, i) => `${i + 1}. ${d._calcTrail}`);
+    const trailBlock = trailLines.length > 0
+      ? `\n${"─".repeat(40)}\nDOSE CALCULATION TRAIL\n${trailLines.join("\n\n")}`
+      : "";
+    return `PEDIATRIC Rx\n${"─".repeat(40)}\nAge: ${age || "—"} y  |  Wt: ${weight || "—"} kg  |  BSA: ${bsa ? bsa + " m²" : "—"}  |  eGFR: ${effectiveEgfr || "—"}\n\n${lines}\n\n${"─".repeat(40)}\n${interactions.length ? `⚠️ Interactions: ${interactions.map(ix => `${ix.a}+${ix.b}`).join("; ")}` : "✅ No major interactions"}\nCliniCals by Swarnim | Verify all doses${trailBlock}`;
   };
 
   // AI Drug Addition
@@ -560,6 +570,105 @@ export default function DrugsDosing() {
   };
 
   const CATS = ["All", "Immunosuppressant", "Corticosteroid", "Antihypertensive", "Diuretic", "Antibiotic", "CKD", "Emergency"];
+
+// ── Build prescription text from DoseRule + calc ──────────────────────────────
+function buildDrugPrescriptionText(drug, rule, calc) {
+  const doseStr = calc?.finalDose != null ? `${calc.finalDose} mg` : `${rule.dose_value} ${rule.dose_unit}`;
+  const brands = drug.brands_indian ? `\n   Brands: ${drug.brands_indian.split(",").slice(0,2).join(", ")}` : "";
+  const dur = rule.duration_days > 0 ? ` × ${rule.duration_days} days` : rule.duration_notes ? ` (${rule.duration_notes})` : "";
+  return `${drug.generic_name} [${rule.indication}]\n   Dose: ${doseStr}  |  ${rule.frequency || "—"}  |  ${rule.route || "PO"}${dur}${brands}`;
+}
+
+// ── Build calc trail string ────────────────────────────────────────────────────
+function buildCalcTrail(drug, rule, calc) {
+  if (!calc) return "";
+  let trail = `${drug.generic_name} — ${rule.indication}\n`;
+  trail += `  ${calc.basisLabel} = ${calc.finalDose} mg`;
+  if (calc.capped) trail += `\n  Max cap ${calc.capVal} mg → ${calc.finalDose} mg (within limit)`;
+  if (rule.rounding_strategy && rule.rounding_strategy !== "exact") trail += `\n  Rounded (${rule.rounding_strategy.replace("_", " ")}) → ${calc.finalDose} mg`;
+  trail += `\n  Frequency: ${rule.frequency || "—"}`;
+  if (rule.duration_days > 0) trail += ` × ${rule.duration_days} days`;
+  if (rule.guideline_source) trail += `  (${rule.guideline_source})`;
+  return trail;
+}
+
+// ── Full drug monograph component ─────────────────────────────────────────────
+function DrugFullMonograph({ drug }) {
+  if (!drug) return null;
+  const fields = [
+    { label: "Description", value: drug.description },
+    { label: "Category / Class", value: [drug.category, drug.therapeutic_class].filter(Boolean).join(" · ") },
+    { label: "Indian Brands", value: drug.brands_indian },
+    { label: "Indications", value: drug.indications },
+    { label: "Weight-based Dose", value: drug.dose_weight_based },
+    { label: "Age-based / Fixed Dose", value: drug.dose_age_based },
+    { label: "Neonatal Dose", value: drug.neonatal_dose },
+    { label: "Max Dose/Day", value: drug.max_dose_per_day },
+    { label: "Frequency", value: drug.frequency },
+    { label: "Route", value: drug.route },
+    { label: "IV Preparation", value: drug.iv_preparation_instructions },
+    { label: "Renal Adjustment", value: drug.renal_adjust },
+    { label: "HD Adjustment", value: drug.hd_adjust },
+    { label: "PD Adjustment", value: drug.pd_adjust },
+    { label: "CRRT Dose", value: drug.crrt_dose },
+    { label: "Hepatic Adjustment", value: drug.hepatic_adjust },
+    { label: "Monitoring", value: drug.monitoring },
+    { label: "Monitoring Frequency", value: drug.monitoring_frequency },
+    { label: "Pre-treatment Workup", value: drug.pre_treatment_workup },
+    { label: "Post-treatment Monitoring", value: drug.post_treatment_monitoring },
+    { label: "Target Trough Level", value: drug.target_trough_level },
+    { label: "Dose Duration", value: drug.dose_duration },
+    { label: "Vaccination Guidance", value: drug.vaccination_guidance },
+    { label: "Adverse Effects", value: drug.adverse_effects },
+    { label: "Key Interactions", value: drug.key_interactions },
+    { label: "Contraindications", value: drug.contraindications },
+    { label: "Clinical Pearls", value: drug.clinical_pearls },
+    { label: "Evidence Summary", value: drug.evidence_summary },
+    { label: "Guideline Source", value: drug.guideline_source },
+    { label: "Special Precautions", value: drug.special_precautions },
+  ].filter(f => f.value);
+
+  const costInfo = [
+    drug.approx_cost_per_unit_inr ? `₹${drug.approx_cost_per_unit_inr}/unit` : null,
+    drug.jan_aushadhi_available ? "Jan Aushadhi ✓" : null,
+    drug.pmjay_covered ? "PMJAY ✓" : null,
+    drug.biosimilar_available ? `Biosimilar: ${drug.biosimilar_brands || "available"}` : null,
+  ].filter(Boolean).join("  ·  ");
+
+  return (
+    <div className="space-y-2">
+      {fields.map(({ label, value }) => (
+        <div key={label} className="bg-white rounded-xl border border-slate-200 px-3 py-2.5">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">{label}</p>
+          <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-line">{value}</p>
+        </div>
+      ))}
+      {drug.formulations?.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 px-3 py-2.5">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Formulations</p>
+          <div className="space-y-1">
+            {drug.formulations.map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs text-slate-700">
+                <span className="font-semibold">{f.form}</span>
+                <span className="text-teal-700">{f.strength}</span>
+                {f.pack_info && <span className="text-slate-400">{f.pack_info}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {costInfo && (
+        <div className="bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
+          <p className="text-[10px] font-bold text-green-600 uppercase mb-0.5">Cost & Availability</p>
+          <p className="text-xs text-green-800">{costInfo}</p>
+        </div>
+      )}
+      {fields.length === 0 && (
+        <p className="text-center text-xs text-slate-400 py-8">No detailed monograph data available for this drug.</p>
+      )}
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -935,11 +1044,12 @@ export default function DrugsDosing() {
                 {/* Sub-tabs */}
                 <div className="flex gap-0 border-b border-slate-100 -mx-4 px-4">
                   {[
+                    { id: "monograph", label: "Full Monograph" },
+                    { id: "indications", label: "Indications & Doses" },
                     { id: "dose", label: "Dose" },
                     { id: "formulation", label: "Formulation" },
                     { id: "monitoring", label: "Monitoring" },
                     { id: "interactions", label: "Interactions" },
-                    { id: "monograph", label: "Full Monograph" },
                   ].map(t => (
                     <button key={t.id} onClick={() => setDrugSubTab(t.id)}
                       className={`px-3 py-2 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${drugSubTab === t.id ? "border-teal-600 text-teal-700" : "border-transparent text-slate-400 hover:text-slate-600"}`}>
@@ -1065,7 +1175,60 @@ export default function DrugsDosing() {
               )}
 
               {drugSubTab === "monograph" && (
-                <FormularyBrowser weight={weight} height={height} egfr={effectiveEgfr} initialSearch={selectedDrug.generic_name} />
+                <DrugFullMonograph drug={selectedDrug} />
+              )}
+
+              {drugSubTab === "indications" && (
+                <div className="space-y-3">
+                  <Alert className="bg-blue-50 border-blue-200 py-2">
+                    <AlertDescription className="text-blue-800 text-xs">
+                      Live indication table from dosing rules database. Patient: {weight || "—"} kg{bsa ? `, BSA ${bsa} m²` : ""}{effectiveEgfr ? `, eGFR ${effectiveEgfr}` : ""}.
+                    </AlertDescription>
+                  </Alert>
+                  <IndicationPickerEngine
+                    drug={selectedDrug}
+                    weight={weight}
+                    bsa={bsa}
+                    egfr={effectiveEgfr}
+                    onRuleSelected={(rule, calc) => {
+                      const mapped = {
+                        id: selectedDrug.id,
+                        generic_name: selectedDrug.generic_name,
+                        category: selectedDrug.category,
+                        therapeutic_class: selectedDrug.therapeutic_class,
+                        route: rule.route || selectedDrug.route || "PO",
+                        dose_weight_based: `${calc?.finalDose ?? rule.dose_value} mg`,
+                        frequency: rule.frequency || selectedDrug.frequency || "OD",
+                        brands_indian: selectedDrug.brands_indian || "",
+                        renal_adjust: selectedDrug.renal_adjust || "",
+                        dose_calculation_type: "per_day",
+                        _indication: rule.indication,
+                        _prescriptionText: buildDrugPrescriptionText(selectedDrug, rule, calc),
+                        _calcTrail: buildCalcTrail(selectedDrug, rule, calc),
+                        _duration: rule.duration_notes || (rule.duration_days > 0 ? `${rule.duration_days} days` : ""),
+                      };
+                      addToRx(mapped);
+                      setMode("rx");
+                    }}
+                    onManualSelected={(manual) => {
+                      const mapped = {
+                        id: selectedDrug.id,
+                        generic_name: selectedDrug.generic_name,
+                        category: selectedDrug.category,
+                        route: manual.route || "PO",
+                        dose_weight_based: `${manual.dose} ${manual.unit}`,
+                        frequency: manual.frequency || "OD",
+                        brands_indian: selectedDrug.brands_indian || "",
+                        renal_adjust: selectedDrug.renal_adjust || "",
+                        dose_calculation_type: "per_day",
+                        _indication: manual.indication || "Manual entry",
+                        _duration: manual.duration || "",
+                      };
+                      addToRx(mapped);
+                      setMode("rx");
+                    }}
+                  />
+                </div>
               )}
             </div>
           );
@@ -1265,32 +1428,10 @@ export default function DrugsDosing() {
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900">Pediatric Nephrology Formulary</h2>
-                <p className="text-xs text-indigo-600 mt-0.5">Full monographs · Indian formulations & brands · Renal dose adjustments · Administration guidance</p>
+                <p className="text-xs text-indigo-600 mt-0.5">Tap a drug class strip to browse · Click a drug to view monograph & indications</p>
               </div>
             </div>
-            <FormularyBrowser
-              weight={weight}
-              height={height}
-              egfr={effectiveEgfr?.toString()}
-              initialSearch=""
-              onAddToRx={(formularyDrug) => {
-                // Map formulary drug shape → DB drug shape for Rx builder
-                const mapped = {
-                  id: formularyDrug.generic,
-                  generic_name: formularyDrug.generic,
-                  category: formularyDrug.class || "Formulary",
-                  therapeutic_class: formularyDrug.class,
-                  route: formularyDrug.formulations?.[0]?.form?.includes("IV") ? "IV" : "PO",
-                  dose_weight_based: formularyDrug.peds_dose || formularyDrug.dose || "",
-                  frequency: formularyDrug.freq || "OD",
-                  brands_indian: formularyDrug.formulations?.map(f => f.brands).filter(Boolean).join(", ") || "",
-                  renal_adjust: formularyDrug.renal_adjust || "",
-                  dose_calculation_type: "per_day",
-                };
-                addToRx(mapped);
-                setMode("rx");
-              }}
-            />
+            <FormularyCategoryStrips onSelectDrug={(drug) => { selectDrug(drug); }} />
           </div>
         )}
 

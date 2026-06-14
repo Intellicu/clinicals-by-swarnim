@@ -32,11 +32,11 @@ import TodaySnapshot from "../components/hub/TodaySnapshot";
 
 // ── AI Analyser Tools ── (url = full path, or page for createPageUrl)
 const AI_TOOLS = [
+{ name: "Urine/UDS AI", icon: TestTube, color: "bg-teal-600", page: "ClinicalAIHub", tab: "uds", desc: "Urine & UDS analysis" },
 { name: "Lab Analyzer", icon: Microscope, color: "bg-rose-600", page: "ClinicalAIHub", tab: "labs", desc: "Interpret labs with AI" },
 { name: "Biopsy AI", icon: Layers, color: "bg-violet-700", page: "ClinicalAIHub", tab: "biopsy", desc: "Renal biopsy patterns" },
-{ name: "Genetic Agent", icon: Dna, color: "bg-violet-600", page: "GeneticReportAnalyzer", desc: "Genetic report analysis" },
-{ name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "UrologyNephrologyHub", tab: "uroflow", desc: "Uroflowmetry analysis" },
-{ name: "Urine/UDS AI", icon: TestTube, color: "bg-teal-600", page: "ClinicalAIHub", tab: "uds", desc: "Urine & UDS analysis" },
+{ name: "Genetics AI", icon: Dna, color: "bg-violet-600", page: "ClinicalAIHub", tab: "genetics", desc: "Genetic report analysis" },
+{ name: "Uroflow AI", icon: Activity, color: "bg-teal-700", page: "ClinicalAIHub", tab: "uroflow", desc: "Uroflowmetry analysis" },
 { name: "Differential Dx", icon: Brain, color: "bg-indigo-600", page: "DifferentialEngine", desc: "AI differential diagnosis" },
 { name: "AI Prescriber", icon: Sparkles, color: "bg-indigo-700", page: "AIPrescriber", desc: "Smart prescription builder" },
 { name: "Case Analyzer", icon: BookOpen, color: "bg-emerald-700", page: "ClinicalAIHub", tab: "case", desc: "Full case AI analysis" }];
