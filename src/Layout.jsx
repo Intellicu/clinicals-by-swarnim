@@ -314,12 +314,12 @@ export default function Layout({ children, currentPageName }) {
         </main>
 
         <NotificationEngine />
-        {/* Feedback button — offset left of the AI FAB to avoid overlap */}
+        {/* Feedback/Report button — bottom-left, clear of nav bar */}
         <div
           className="fixed z-40"
           style={{
             bottom: "calc(var(--tab-bar-height, 64px) + 8px)",
-            right: "80px",
+            left: "max(16px, env(safe-area-inset-left, 16px))",
           }}
         >
           <FeedbackReportButton pageName={currentPageName || window.location.pathname} />

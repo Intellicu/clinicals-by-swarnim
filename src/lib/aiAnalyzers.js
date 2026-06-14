@@ -4,7 +4,7 @@
 
 import {
   Microscope, Layers, BookOpen, Brain, TestTube,
-  Activity, Dna, HeartPulse
+  Activity, Dna, HeartPulse, FlaskConical
 } from "lucide-react";
 
 export const CLINICAL_AI_ANALYZERS = [
@@ -85,8 +85,8 @@ export const CLINICAL_AI_ANALYZERS = [
     name: "Genetics AI",
     icon: Dna,
     color: "bg-violet-600",
-    page: "GeneticReportAnalyzer",
-    tab: null,
+    page: "ClinicalAIHub",
+    tab: "genetics",
     desc: "Genetic report interpretation, variant classification, counselling",
   },
 ];

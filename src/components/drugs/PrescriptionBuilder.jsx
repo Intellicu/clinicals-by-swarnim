@@ -20,11 +20,12 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   FileText, Printer, Copy, CheckCircle, AlertTriangle,
-  ShieldAlert, X, Plus, ChevronDown, ChevronUp, Info, Layers, TrendingUp
+  X, Plus, ChevronDown, ChevronUp, Info, Layers, TrendingUp
 } from "lucide-react";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { TreatmentTemplatePanel } from "./TreatmentTemplates";
+import IndicationPickerEngine from "./IndicationPickerEngine";
 
 // ── Multi-indication drugs: show dosing table, require indication selection ──
 const MULTI_INDICATION_DRUGS = {
@@ -356,21 +357,30 @@ function MultiIndicationDosingPanel({ drugKey, drug, weight, bsa, onSelectIndica
 }
 
 // ── Simple Rx Draft Panel (after indication selected, or simple drug) ─────────
-function RxDraftPanel({ drug, weight, indication, bsa, patientName, patientId, encounterId, onPrescriptionSaved, onBack }) {
+// Accepts either a legacy `indication` (from MULTI_INDICATION_DRUGS) or a `rule`+`calc` from DoseRule
+function RxDraftPanel({ drug, weight, indication, rule, calcResult, bsa, patientName, patientId, encounterId, onPrescriptionSaved, onBack, isManual }) {
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [overrides, setOverrides] = useState({
-    dose: indication ? (() => {
+
+  // Build initial overrides from DoseRule calc, legacy indication, or empty
+  const getInitialDose = () => {
+    if (calcResult?.finalDose != null) return String(calcResult.finalDose);
+    if (indication) {
       const calc = calcForIndication(indication, weight, bsa);
       if (calc) return calc.hi ? `${calc.lo}–${calc.hi}` : String(calc.lo);
       return indication.dose || "";
-    })() : "",
-    unit: "mg",
-    frequency: indication?.freq || drug?.frequency || "",
-    route: indication?.route || "PO",
-    duration: indication?.duration || "",
-    instructions: indication?.notes || "",
-    indicationName: indication?.name || "",
+    }
+    return "";
+  };
+
+  const [overrides, setOverrides] = useState({
+    dose: getInitialDose(),
+    unit: indication?.unit || rule?.dose_unit?.replace(/\/.*/, "") || "mg",
+    frequency: rule?.frequency || indication?.freq || drug?.frequency || "",
+    route: rule?.route || indication?.route || "PO",
+    duration: rule?.duration_days ? `${rule.duration_days} days` : indication?.duration || "",
+    instructions: rule?.duration_notes || indication?.notes || "",
+    indicationName: rule?.indication || indication?.name || "",
   });
 
   const prescriptionText = [
@@ -423,11 +433,20 @@ function RxDraftPanel({ drug, weight, indication, bsa, patientName, patientId, e
         </button>
       )}
 
-      {indication && (
-        <div className="bg-emerald-50 rounded-xl px-3 py-2 border border-emerald-200">
-          <p className="text-xs text-emerald-700 font-bold">Draft Prescription — {indication.name}</p>
-          {indication.trough && indication.trough !== "N/A" && (
-            <p className="text-xs text-indigo-700 font-semibold mt-0.5">🎯 Target: {indication.trough}</p>
+      {(rule || indication) && (
+        <div className="bg-emerald-50 rounded-xl px-3 py-2 border border-emerald-200 space-y-0.5">
+          <p className="text-xs text-emerald-700 font-bold">Draft Prescription — {overrides.indicationName}</p>
+          {rule?.target_trough && (
+            <p className="text-xs text-indigo-700 font-semibold">🎯 Target: {rule.target_trough}</p>
+          )}
+          {indication?.trough && indication.trough !== "N/A" && (
+            <p className="text-xs text-indigo-700 font-semibold">🎯 Target: {indication.trough}</p>
+          )}
+          {isManual && (
+            <p className="text-xs text-orange-700 font-semibold">⚠ Manually entered — not system-calculated</p>
+          )}
+          {calcResult && (
+            <p className="text-[10px] text-teal-600">{calcResult.basisLabel}{calcResult.capped ? ` (capped at ${calcResult.capVal})` : ""}</p>
           )}
         </div>
       )}
@@ -499,19 +518,15 @@ function RxDraftPanel({ drug, weight, indication, bsa, patientName, patientId, e
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function PrescriptionBuilder({ drug, weight, bsa, patientName, patientId, encounterId, onPrescriptionSaved }) {
+export default function PrescriptionBuilder({ drug, weight, bsa, egfr, patientName, patientId, encounterId, onPrescriptionSaved }) {
   const [open, setOpen] = useState(false);
-  const [selectedIndication, setSelectedIndication] = useState(null);
+  // rxState: null | { type: 'rule', rule, calc } | { type: 'legacy', indication } | { type: 'manual', manual }
+  const [rxState, setRxState] = useState(null);
   const [activeTab, setActiveTab] = useState("dosing"); // "dosing" | "templates"
 
   if (!drug) return null;
 
-  const generic = drug.generic_name || drug.generic || "";
-  const multiKey = getMultiIndicationKey(generic);
-  const blocked = isBlockedBiologic(generic);
-  const isSimpleDrug = !multiKey && !blocked;
-
-  const handleClose = () => { setOpen(false); setSelectedIndication(null); setActiveTab("dosing"); };
+  const handleClose = () => { setOpen(false); setRxState(null); setActiveTab("dosing"); };
 
   return (
     <div className="mt-3">
@@ -519,8 +534,7 @@ export default function PrescriptionBuilder({ drug, weight, bsa, patientName, pa
         <div className="flex gap-2">
           <Button onClick={() => { setOpen(true); setActiveTab("dosing"); }} size="sm"
             className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
-            <FileText className="w-4 h-4" />
-            {multiKey || blocked ? "Dosing Guide" : "Add to Prescription"}
+            <FileText className="w-4 h-4" /> Prescribe
           </Button>
           <Button onClick={() => { setOpen(true); setActiveTab("templates"); }} size="sm" variant="outline"
             className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 gap-2">
@@ -532,7 +546,7 @@ export default function PrescriptionBuilder({ drug, weight, bsa, patientName, pa
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-wrap">
               <FileText className="w-4 h-4 text-emerald-700" />
-              <span className="font-bold text-sm text-emerald-800">Clinical Dosing Assistant</span>
+              <span className="font-bold text-sm text-emerald-800">Prescriber — Indication Required</span>
               {weight && <Badge className="bg-emerald-100 text-emerald-800 text-xs">{weight} kg</Badge>}
               {bsa && <Badge className="bg-indigo-100 text-indigo-800 text-xs">BSA {bsa} m²</Badge>}
             </div>
@@ -559,54 +573,64 @@ export default function PrescriptionBuilder({ drug, weight, bsa, patientName, pa
               weight={weight}
               bsa={bsa}
               onSelectTemplate={(template) => {
-                toast.success(`Template "${template.name}" copied to clipboard!`);
-                // Also switch to dosing tab
+                toast.success(`Template "${template.name}" ready!`);
                 setActiveTab("dosing");
               }}
             />
           )}
 
-          {/* Dosing tab */}
+          {/* Dosing tab — IndicationPickerEngine is the primary flow for ALL drugs */}
           {activeTab === "dosing" && (
             <>
-              {/* Biologic blocked */}
-              {blocked && !multiKey && (
-                <Alert className="bg-red-50 border-red-400">
-                  <ShieldAlert className="w-4 h-4 text-red-600" />
-                  <AlertDescription className="text-red-800 text-sm">
-                    <strong>{generic}</strong> requires a validated indication-specific DoseRule. Use the <strong>Prescriber Wizard</strong> tab for guideline-driven prescribing.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {/* Simple drug: show dose range banner too */}
-              {isSimpleDrug && (
-                <DoseRangeBanner drug={drug} weight={weight} bsa={bsa} />
-              )}
-
-              {/* Multi-indication drug */}
-              {multiKey && !selectedIndication && (
-                <MultiIndicationDosingPanel
-                  drugKey={multiKey}
+              {/* Step 1: No indication selected yet → show picker */}
+              {!rxState && (
+                <IndicationPickerEngine
                   drug={drug}
                   weight={weight}
                   bsa={bsa}
-                  onSelectIndication={setSelectedIndication}
+                  egfr={egfr}
+                  onRuleSelected={(rule, calc) => setRxState({ type: "rule", rule, calc })}
+                  onManualSelected={(manual) => setRxState({ type: "manual", manual })}
                 />
               )}
 
-              {/* Draft mode: after indication selected or simple drug */}
-              {(selectedIndication || isSimpleDrug) && (
+              {/* Step 2: Rule-based prescription draft */}
+              {rxState?.type === "rule" && (
                 <RxDraftPanel
                   drug={drug}
                   weight={weight}
                   bsa={bsa}
-                  indication={selectedIndication}
+                  rule={rxState.rule}
+                  calcResult={rxState.calc}
                   patientName={patientName}
                   patientId={patientId}
                   encounterId={encounterId}
                   onPrescriptionSaved={() => { onPrescriptionSaved?.(); handleClose(); }}
-                  onBack={selectedIndication ? () => setSelectedIndication(null) : undefined}
+                  onBack={() => setRxState(null)}
+                />
+              )}
+
+              {/* Step 3: Manual entry draft */}
+              {rxState?.type === "manual" && (
+                <RxDraftPanel
+                  drug={drug}
+                  weight={weight}
+                  bsa={bsa}
+                  indication={{
+                    name: rxState.manual.indication,
+                    freq: rxState.manual.frequency,
+                    route: rxState.manual.route,
+                    duration: rxState.manual.duration,
+                    notes: "",
+                    dose: rxState.manual.dose,
+                    unit: rxState.manual.unit,
+                  }}
+                  isManual={true}
+                  patientName={patientName}
+                  patientId={patientId}
+                  encounterId={encounterId}
+                  onPrescriptionSaved={() => { onPrescriptionSaved?.(); handleClose(); }}
+                  onBack={() => setRxState(null)}
                 />
               )}
             </>
