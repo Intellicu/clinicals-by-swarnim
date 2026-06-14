@@ -453,6 +453,7 @@ export default function Hub() {
   const [sectionQuery, setSectionQuery] = useState("");
   const [showAllKnowledge, setShowAllKnowledge] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(null);
+  const [searchAiMode, setSearchAiMode] = useState(false);
 
   // Load DB-generated engines to append to the engine strip
   const { data: dbEngineRecords = [] } = useQuery({
@@ -512,6 +513,18 @@ export default function Hub() {
             </Link>
             <HubMoreMenu />
           </div>
+        </div>
+
+        {/* ── Search Mode Toggle ── */}
+        <div className="flex items-center gap-1.5">
+          <button onClick={() => setSearchAiMode(false)}
+            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${!searchAiMode ? "bg-indigo-600 text-white shadow-sm" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"}`}>
+            🔍 Search
+          </button>
+          <button onClick={() => setSearchAiMode(true)}
+            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${searchAiMode ? "bg-purple-600 text-white shadow-sm" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"}`}>
+            🤖 Ask AI
+          </button>
         </div>
 
         {/* ── Quick Actions ── */}
@@ -589,7 +602,10 @@ export default function Hub() {
         {/* ── Search ── */}
         <GlobalSearch
           placeholder="Search calculators, pathways, drugs, AI tools…"
-          className="bg-white shadow-sm rounded-xl border border-slate-200" />
+          className="bg-white shadow-sm rounded-xl border border-slate-200"
+          externalAiMode={searchAiMode}
+          onAiModeChange={setSearchAiMode}
+          hideToggle={true} />
         
 
         {/* ── Quick Patient Entry ── */}
