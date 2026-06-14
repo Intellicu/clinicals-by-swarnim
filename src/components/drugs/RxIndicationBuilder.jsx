@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   ChevronDown, ChevronRight, FlaskConical, CheckCircle, AlertTriangle,
-  Printer, Copy, MessageCircle, ShieldAlert, X
+  Printer, Copy, MessageCircle, ShieldAlert, X, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
@@ -123,12 +123,64 @@ function calcVolume(formulation, dosePerAdmin_mg) {
   return null;
 }
 
+// Convert a DoseRule DB record into an INDICATION_PRESETS-compatible object
+function doseRuleToPreset(rule) {
+  const unit = rule.dose_unit || "";
+  // Determine if weight-based
+  const isWeightBased = unit.includes("kg");
+  const isBSA = unit.includes("m2") || unit.includes("m²");
+  return {
+    label: rule.indication + (rule.phase ? ` (${rule.phase})` : ""),
+    dose_mgkg_day: isWeightBased ? rule.dose_value : null,
+    dose_bsa: isBSA ? rule.dose_value : null,
+    fixedDose: (!isWeightBased && !isBSA) ? `${rule.dose_value} ${unit}` : null,
+    freq: rule.frequency || "OD",
+    duration: rule.duration_days > 0 ? `${rule.duration_days} days` : (rule.duration_notes || "As indicated"),
+    route: rule.route || "PO",
+    max_mg_day: rule.max_total_mg || null,
+    note: [rule.guideline_source, rule.duration_notes].filter(Boolean).join(" · ") || null,
+    isTDM: !!rule.tdm_required,
+    fromDB: true,
+  };
+}
+
 export default function RxIndicationBuilder({ drug, weight, patientAge, patientName, onClose, onAddToRxList }) {
   const drugKey = (drug?.generic_name || drug?.generic || "").toLowerCase().replace(/[^a-z\s]/g, "").replace(/\s+/g, "").trim();
-  // Try exact key match then partial
-  const indications = INDICATION_PRESETS[drugKey]
+  // Static presets (always available immediately, no loading)
+  const staticIndications = INDICATION_PRESETS[drugKey]
     || INDICATION_PRESETS[Object.keys(INDICATION_PRESETS).find(k => drugKey.startsWith(k) || k.startsWith(drugKey)) || ""]
     || [];
+
+  // DB-loaded dose rules as fallback
+  const [dbIndications, setDbIndications] = useState([]);
+  const [dbLoading, setDbLoading] = useState(false);
+
+  useEffect(() => {
+    if (staticIndications.length > 0 || !drug?.id) return; // Static presets exist — skip DB
+    let cancelled = false;
+    setDbLoading(true);
+    (async () => {
+      try {
+        let found = await base44.entities.DoseRule.filter({ drug_id: drug.id });
+        if (found.length === 0 && drug.generic_name) {
+          found = await base44.entities.DoseRule.filter({ drug_name: drug.generic_name });
+        }
+        if (found.length === 0 && drug.generic_name) {
+          const all = await base44.entities.DoseRule.list("indication", 500);
+          const nameNorm = drug.generic_name.toLowerCase().replace(/\s+/g, "");
+          found = all.filter(r => {
+            const rn = (r.drug_name || "").toLowerCase().replace(/\s+/g, "");
+            return rn === nameNorm || rn.includes(nameNorm) || nameNorm.includes(rn);
+          });
+        }
+        if (!cancelled) setDbIndications(found.map(doseRuleToPreset));
+      } catch { /* ignore */ }
+      if (!cancelled) setDbLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [drug?.id, drug?.generic_name]);
+
+  const indications = staticIndications.length > 0 ? staticIndications : dbIndications;
 
   const [selectedIndication, setSelectedIndication] = useState(null);
   const [overrideDose, setOverrideDose] = useState("");
@@ -140,11 +192,16 @@ export default function RxIndicationBuilder({ drug, weight, patientAge, patientN
   const wt = parseFloat(weight) || null;
 
   const calcResult = useMemo(() => {
-    if (!selectedIndication || !wt) return null;
+    if (!selectedIndication) return null;
     const ind = selectedIndication;
     if (ind.isTDM) return { type: "TDM", note: ind.note };
 
-    if (!ind.dose_mgkg_day) return { type: "manual", note: ind.note };
+    // Fixed dose from DB rule (not weight-based)
+    if (ind.fixedDose) return { type: "fixed", note: ind.fixedDose + (ind.note ? ` — ${ind.note}` : "") };
+
+    if (!ind.dose_mgkg_day && !ind.dose_bsa) return { type: "manual", note: ind.note };
+
+    if (!wt) return { type: "manual", note: (ind.note || "") + " — Enter patient weight to calculate." };
 
     const rawDay = ind.dose_mgkg_day * wt;
     const cappedDay = ind.max_mg_day ? Math.min(rawDay, ind.max_mg_day) : rawDay;
@@ -271,7 +328,7 @@ export default function RxIndicationBuilder({ drug, weight, patientAge, patientN
     onClose?.();
   };
 
-  const noIndications = indications.length === 0;
+  const noIndications = indications.length === 0 && !dbLoading;
 
   return (
     <div className="bg-white rounded-2xl border-2 border-teal-300 shadow-xl overflow-hidden">
@@ -300,7 +357,12 @@ export default function RxIndicationBuilder({ drug, weight, patientAge, patientN
         {/* Indication selector */}
         <div>
           <p className="text-xs font-bold text-slate-600 mb-2 uppercase tracking-wide">Select Indication</p>
-          {noIndications ? (
+          {dbLoading ? (
+            <div className="flex items-center justify-center gap-2 py-4 text-slate-400">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-xs">Loading indications...</span>
+            </div>
+          ) : noIndications ? (
             <p className="text-xs text-slate-400 bg-slate-50 rounded-xl px-3 py-4 text-center">
               No indication presets available for this drug. Use manual entry below or refer to the monograph.
             </p>
@@ -387,6 +449,11 @@ export default function RxIndicationBuilder({ drug, weight, patientAge, patientN
                   <strong>TDM-guided dosing.</strong> {calcResult.note}
                 </AlertDescription>
               </Alert>
+            ) : calcResult?.type === "fixed" ? (
+              <div className="bg-white rounded-xl border border-teal-200 p-3 text-center">
+                <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Fixed Dose</p>
+                <p className="text-lg font-bold text-teal-800">{calcResult.note}</p>
+              </div>
             ) : (
               <p className="text-xs text-slate-500 bg-white px-3 py-2 rounded-lg border">
                 {calcResult?.note || "Refer to drug monograph for specific dosing."}

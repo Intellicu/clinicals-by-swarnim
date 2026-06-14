@@ -5,6 +5,7 @@ import RadiologyAnalyzer from '../components/clinical-ai/RadiologyAnalyzer';
 import LabReportAnalyzer from '../components/clinical-ai/LabReportAnalyzer';
 import ClinicalCaseAnalyzer from '../components/clinical-ai/ClinicalCaseAnalyzer';
 import UDSAnalyzer from '../components/clinical-ai/UDSAnalyzer';
+import UDSInterpreter from '../components/urology/UDSInterpreter';
 import UroflowAnalyzer from '../components/clinical-ai/UroflowAnalyzer';
 import ECGAnalyzer from '../components/clinical-ai/ECGAnalyzer';
 import GeneticReportAnalyzerInline from '../components/clinical-ai/GeneticReportAnalyzerInline';
@@ -13,6 +14,7 @@ import { CLINICAL_AI_ANALYZERS } from '@/lib/aiAnalyzers';
 // Tab value → component map — single source of truth
 const TAB_COMPONENTS = {
   uds: <UDSAnalyzer />,
+  uds_interpreter: <UDSInterpreter />,
   uroflow: <UroflowAnalyzer />,
   biopsy: <BiopsyAnalyzer />,
   radiology: <RadiologyAnalyzer />,
@@ -59,8 +61,8 @@ export default function ClinicalAIHub() {
               const Icon = tool.icon;
               const shortName = tool.name
                 .replace(' Analyzer', '').replace(' AI', '').replace('Renal Biopsy', 'Biopsy')
-                .replace('Case Discussion', 'Case').replace('Urine / UDS', 'Urine').replace('Uroflowmetry', 'Uroflow')
-                .replace(' (Educational)', '');
+                .replace('Case Discussion', 'Case').replace('Urine Pattern', 'Urine').replace('Uroflowmetry', 'Uroflow')
+                .replace('Pediatric UDS Interpreter', 'UDS AI').replace(' (Educational)', '');
               const isBeta = tool.status === 'beta';
               return (
                 <TabsTrigger

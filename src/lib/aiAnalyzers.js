@@ -4,20 +4,30 @@
 
 import {
   Microscope, Layers, BookOpen, Brain, TestTube,
-  Activity, Dna, HeartPulse, FlaskConical
+  Activity, Dna, HeartPulse, FlaskConical, Waves
 } from "lucide-react";
 
 // status: "active" = shown as fully functional; "beta" = shown with Educational/Beta badge
 export const CLINICAL_AI_ANALYZERS = [
   {
     id: "urine",
-    name: "Urine / UDS Analyzer",
+    name: "Urine Pattern Analyzer",
     icon: TestTube,
     color: "bg-teal-600",
     page: "ClinicalAIHub",
     tab: "uds",
     status: "active",
-    desc: "Urine dipstick, microscopy, UDS pattern recognition",
+    desc: "Urine dipstick, microscopy & pattern recognition — nephrotic, nephritic, UTI, tubular",
+  },
+  {
+    id: "uds_interpreter",
+    name: "Pediatric UDS Interpreter",
+    icon: Waves,
+    color: "bg-violet-700",
+    page: "ClinicalAIHub",
+    tab: "uds_interpreter",
+    status: "active",
+    desc: "ICCS-based urodynamics · Bladder hostility grading · Renal risk · Full management outputs",
   },
   {
     id: "lab",
