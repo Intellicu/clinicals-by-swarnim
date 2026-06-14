@@ -11,7 +11,7 @@ import {
   ClipboardList, UtensilsCrossed, Dna, X, ChevronRight, ChevronDown,
   Settings, Shield, LogOut, Trash2, Microscope, Zap, BarChart2,
   BookMarked, Clock, Star, RefreshCw, Beaker, Wind,
-  Syringe, Radio, FileSearch, Edit3, Database, Cpu, Flag
+  Syringe, Radio, FileSearch, Edit3, Database, Cpu, Flag, TrendingUp
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -184,6 +184,7 @@ const CLINIC_NAV = [
       { title: "OCR Uploads", url: createPageUrl("AIPrescriber"), icon: FileSearch },
       { title: "Clinical AI", url: createPageUrl("AIClinicalPathway"), icon: Brain },
       { title: "Lab Results", url: createPageUrl("LabResults"), icon: TestTube },
+      { title: "TDM Trend Dashboard", url: "/TDMTrendDashboard", icon: TrendingUp },
     ]
   },
   {

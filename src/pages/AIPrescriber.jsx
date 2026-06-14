@@ -17,6 +17,7 @@ import { usePatient } from "../components/PatientContext";
 import PatientInputForm from "../components/ai-prescriber/PatientInputForm";
 import TemplatePrescriberOutput from "../components/ai-prescriber/TemplatePrescriberOutput";
 import PrescriptionPreview from "../components/ai-prescriber/PrescriptionPreview";
+import DrugRxBuilder from "../components/drugs/DrugRxBuilder";
 import OCRInputPanel from "../components/ai-prescriber/OCRInputPanel";
 import { PATHWAY_TEMPLATES, matchPathway } from "../components/ai-prescriber/PathwayTemplates";
 import { calcBSA, calcSchwartzEgfr } from "../components/ai-prescriber/DoseEngine";
@@ -129,7 +130,7 @@ Be concise and practical for Indian pediatric nephrology. Prioritise ISKDC/IPNA 
 
   const canProceed = {
     input: !!weight && !!symptoms,
-    ai: !!selectedPathway,
+    ai: true,
     template: activeDrugs.length > 0,
   };
 
@@ -323,9 +324,9 @@ Be concise and practical for Indian pediatric nephrology. Prioritise ISKDC/IPNA 
                   </Card>
                 )}
 
-                <Button onClick={() => setStep("template")} disabled={!selectedPathway}
+                <Button onClick={() => setStep("template")}
                   className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3">
-                  <Pill className="w-5 h-5 mr-2" /> Load Drug Template & Calculate Doses
+                  <Pill className="w-5 h-5 mr-2" /> Build Drug Plan
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </>
@@ -333,28 +334,19 @@ Be concise and practical for Indian pediatric nephrology. Prioritise ISKDC/IPNA 
           </div>
         )}
 
-        {/* ── STEP 3: TEMPLATE + DOSES ── */}
-        {step === "template" && selectedPathway && (
+        {/* ── STEP 3: DRUG PLAN — indication-driven ── */}
+        {step === "template" && (
           <div className="space-y-4">
-            <Alert className="bg-blue-50 border-blue-200 py-2">
-              <AlertDescription className="text-blue-800 text-xs">
-                ✓ Check/uncheck drugs to include in prescription. Doses auto-calculated for <strong>{weight} kg</strong>{bsa ? `, BSA ${bsa} m²` : ""}.
-              </AlertDescription>
-            </Alert>
-
-            <TemplatePrescriberOutput
-              pathwayKey={selectedPathway}
+            <DrugRxBuilder
               weight={weight}
-              height={height}
               bsa={bsa}
               egfr={effectiveEgfr}
-              age={age}
               onDrugsChange={(names, drugs) => setActiveDrugs(drugs)}
             />
 
             <Button onClick={() => setStep("prescription")} disabled={activeDrugs.length === 0}
               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3">
-              <FileText className="w-5 h-5 mr-2" /> Generate Prescription
+              <FileText className="w-5 h-5 mr-2" /> Generate Prescription ({activeDrugs.length} drug{activeDrugs.length !== 1 ? "s" : ""})
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
