@@ -156,45 +156,45 @@ export default function FormularyBrowser({ weight, height, egfr, initialSearch =
       {/* Selected drug monograph */}
       {selected && (
         <Card className="bg-white border-2 border-indigo-300 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-3 px-4 rounded-t-lg">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <CardTitle className="text-base font-bold">{selected.generic}</CardTitle>
-                <p className="text-indigo-200 text-xs mt-0.5">{selected.class}</p>
-              </div>
-              <button onClick={() => setSelected(null)} className="text-white/70 hover:text-white mt-0.5">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-4">
-            {/* Brief summary / description */}
-            {(selected.description || selected.mechanism) && (
-              <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 mb-2">
-                <p className="text-xs font-semibold text-slate-600 mb-0.5">SUMMARY</p>
-                <p className="text-xs text-slate-700 leading-relaxed">
-                  {selected.description || selected.mechanism}
-                </p>
-              </div>
-            )}
+         <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-3 px-4 rounded-t-lg">
+           <div className="flex items-start justify-between gap-2">
+             <div>
+               <CardTitle className="text-base font-bold">{selected.generic}</CardTitle>
+               <p className="text-indigo-200 text-xs mt-0.5">{selected.class}</p>
+             </div>
+             <button onClick={() => setSelected(null)} className="text-white/70 hover:text-white mt-0.5">
+               <X className="w-5 h-5" />
+             </button>
+           </div>
+         </CardHeader>
+         <CardContent className="p-4">
+           {/* Brief summary / description */}
+           {(selected.description || selected.mechanism) && (
+             <div className="bg-gradient-to-r from-slate-50 to-indigo-50 border border-indigo-200 rounded-xl px-3 py-2.5 mb-2">
+               <p className="text-xs font-bold text-indigo-700 mb-0.5 uppercase tracking-wide">Summary</p>
+               <p className="text-xs text-slate-700 leading-relaxed">
+                 {selected.description || selected.mechanism}
+               </p>
+             </div>
+           )}
 
-            {selected.indications && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-3">
-                <p className="text-xs font-semibold text-blue-700 mb-0.5">INDICATIONS</p>
-                <p className="text-xs text-blue-800">{selected.indications}</p>
-              </div>
-            )}
+           {selected.indications && (
+             <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-300 rounded-xl px-3 py-2.5 mb-3">
+               <p className="text-xs font-bold text-blue-700 mb-0.5 uppercase tracking-wide">Indications</p>
+               <p className="text-xs text-blue-900 leading-relaxed">{selected.indications}</p>
+             </div>
+           )}
 
-            {/* Key dosing info at a glance */}
-            {selected.peds_dose && (
-              <div className="bg-purple-50 border border-purple-200 rounded-lg px-3 py-2 mb-3">
-                <p className="text-xs font-semibold text-purple-700 mb-0.5">PEDIATRIC DOSE</p>
-                <p className="text-xs text-purple-800">{selected.peds_dose}</p>
-                {selected.frequency && (
-                  <p className="text-xs text-purple-600 mt-0.5">Frequency: <span className="font-semibold">{selected.frequency}</span></p>
-                )}
-              </div>
-            )}
+           {/* Key dosing info at a glance */}
+           {selected.peds_dose && (
+             <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-300 rounded-xl px-3 py-2.5 mb-3">
+               <p className="text-xs font-bold text-purple-700 mb-0.5 uppercase tracking-wide">Pediatric Dose</p>
+               <p className="text-xs text-purple-900 font-medium leading-relaxed">{selected.peds_dose}</p>
+               {selected.frequency && (
+                 <p className="text-xs text-purple-600 mt-1">Frequency: <span className="font-bold">{selected.frequency}</span></p>
+               )}
+             </div>
+           )}
 
             {/* Add Rx button — matches Drug Search section */}
             {onAddToRx && (

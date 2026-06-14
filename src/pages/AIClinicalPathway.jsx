@@ -15,7 +15,7 @@ import { createPageUrl } from "@/utils";
 import {
   Brain, ArrowLeft, Loader2, AlertTriangle, CheckCircle, Pill, Activity,
   FileText, Zap, Shield, Stethoscope, ClipboardList, Printer, MessageCircle,
-  ChevronRight, Info
+  ChevronRight, Info, Beaker, Star, StarOff, Plus, X, Trash2
 } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -94,6 +94,45 @@ const DISEASE_DRUG_RULES = {
   },
 };
 
+// ─── Lab Test Templates by Condition ────────────────────────────────────────
+const LAB_TEMPLATES = {
+  "nephrotic_syndrome_ssns": {
+    label: "Nephrotic Syndrome (1st Episode)",
+    icon: "🧪",
+    labs: ["Urine dipstick (protein)", "Urine Protein:Creatinine ratio", "Serum albumin", "Serum cholesterol", "Serum creatinine", "eGFR", "CBC", "Serum electrolytes (Na/K)", "HBsAg", "Anti-HCV", "C3 complement", "ANA (if atypical)"],
+  },
+  "ckd": {
+    label: "CKD Monitoring",
+    icon: "🩺",
+    labs: ["Serum creatinine + eGFR", "Urine ACR (albumin:creatinine)", "Serum electrolytes", "Hemoglobin", "Ferritin + TSAT", "Serum PTH", "Serum calcium + phosphate", "25-OH Vitamin D", "Bicarbonate (acid-base)", "Uric acid", "HbA1c (if diabetic)"],
+  },
+  "aki": {
+    label: "AKI Workup",
+    icon: "⚡",
+    labs: ["Serum creatinine (serial)", "BUN", "Serum electrolytes (K+, Na+, HCO3)", "Urine output (hourly)", "Urine dipstick", "Urine sodium + creatinine (FENa)", "CBC", "ABG/VBG", "Urine microscopy", "Renal ultrasound"],
+  },
+  "uti": {
+    label: "UTI / Pyelonephritis",
+    icon: "🦠",
+    labs: ["Urine dipstick", "Urine microscopy", "Urine culture + sensitivity (MSU)", "CBC", "CRP", "Serum creatinine", "Renal ultrasound", "DMSA scan (febrile UTI, first episode)", "VCUG (if VUR suspected)"],
+  },
+  "htn": {
+    label: "Hypertension Workup",
+    icon: "❤️",
+    labs: ["Serum creatinine + eGFR", "Urine ACR", "Serum electrolytes", "Renin + Aldosterone (secondary HTN)", "Thyroid function tests", "Renal Doppler USS", "Urine catecholamines/metanephrines", "Echocardiogram", "Retinal examination"],
+  },
+  "hus": {
+    label: "HUS / TMA Workup",
+    icon: "🔴",
+    labs: ["CBC + peripheral smear (schistocytes)", "Platelets", "LDH", "Serum creatinine", "Serum haptoglobin", "Direct Coombs test", "ADAMTS13 activity", "Complement (C3, C4, CH50)", "Stool STEC culture + VTEC PCR", "Anti-FH antibody"],
+  },
+  "nephritic": {
+    label: "Nephritic Syndrome / GN",
+    icon: "🔬",
+    labs: ["Urine microscopy (RBC casts)", "Urine protein:creatinine", "Serum creatinine", "C3, C4 complement", "ASO titre, Anti-DNase B", "ANA, anti-dsDNA", "ANCA (pANCA/cANCA)", "Anti-GBM antibody", "HBsAg, Anti-HCV", "Renal biopsy (if indicated)"],
+  },
+};
+
 // ─── Drug Interaction Database ──────────────────────────────────────────────
 const DRUG_INTERACTIONS = [
   { drug1: "tacrolimus", drug2: "fluconazole", severity: "critical", effect: "Fluconazole significantly increases Tacrolimus levels (CYP3A4 inhibition) — risk of nephrotoxicity and toxicity" },
@@ -147,6 +186,13 @@ export default function AIClinicalPathway() {
   const [aiOutput, setAiOutput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("input");
+  const [labSet, setLabSet] = useState([]);
+  const [customLab, setCustomLab] = useState("");
+  const [savedLabTemplates, setSavedLabTemplates] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("lab_templates") || "[]"); } catch { return []; }
+  });
+  const [saveLabName, setSaveLabName] = useState("");
+  const [showSaveLab, setShowSaveLab] = useState(false);
 
   const { data: dbDrugs = [] } = useQuery({
     queryKey: ['drugs'],
@@ -259,10 +305,11 @@ Be concise, evidence-based, and practical for an Indian pediatric nephrology set
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-3 mb-4">
-            <TabsTrigger value="input">📝 Patient Input</TabsTrigger>
+          <TabsList className="w-full grid grid-cols-4 mb-4">
+            <TabsTrigger value="input">📝 Patient</TabsTrigger>
             <TabsTrigger value="output">🧠 AI Pathway</TabsTrigger>
-            <TabsTrigger value="drugs">💊 Drug Safety</TabsTrigger>
+            <TabsTrigger value="drugs">💊 Drugs</TabsTrigger>
+            <TabsTrigger value="labs">🧪 Lab Sets</TabsTrigger>
           </TabsList>
 
           {/* ── INPUT TAB ── */}
@@ -558,6 +605,130 @@ Be concise, evidence-based, and practical for an Indian pediatric nephrology set
                 </Button>
               </Link>
             </div>
+          </TabsContent>
+
+          {/* ── LAB SETS TAB ── */}
+          <TabsContent value="labs" className="space-y-4">
+            {/* Condition quick-load */}
+            <Card className="bg-white shadow-md border border-teal-200">
+              <CardHeader className="bg-teal-50 border-b py-3 px-5">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Beaker className="w-4 h-4 text-teal-600" /> Condition-Based Lab Sets
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <p className="text-xs text-slate-500">Tap a condition to load the recommended lab panel.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.entries(LAB_TEMPLATES).map(([key, tpl]) => (
+                    <button key={key}
+                      onClick={() => {
+                        setLabSet(prev => {
+                          const merged = [...new Set([...prev, ...tpl.labs])];
+                          return merged;
+                        });
+                        toast.success(`Loaded ${tpl.label} labs`);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2.5 bg-white border-2 border-teal-200 rounded-xl hover:border-teal-400 hover:bg-teal-50 text-left transition-all">
+                      <span className="text-lg">{tpl.icon}</span>
+                      <span className="text-xs font-semibold text-slate-700 leading-tight">{tpl.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Current lab set */}
+            <Card className="bg-white shadow-md border border-slate-200">
+              <CardHeader className="bg-slate-50 border-b py-3 px-5">
+                <CardTitle className="text-sm flex items-center justify-between">
+                  <span className="flex items-center gap-2"><Beaker className="w-4 h-4 text-indigo-600" /> Current Lab Set ({labSet.length})</span>
+                  {labSet.length > 0 && (
+                    <button onClick={() => setLabSet([])} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1">
+                      <Trash2 className="w-3.5 h-3.5" /> Clear
+                    </button>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                {/* Add custom lab */}
+                <div className="flex gap-2">
+                  <Input value={customLab} onChange={e => setCustomLab(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && customLab.trim()) { setLabSet(p => [...new Set([...p, customLab.trim()])]); setCustomLab(""); }}}
+                    placeholder="Add custom lab test..." className="text-sm flex-1" />
+                  <Button size="sm" onClick={() => { if (customLab.trim()) { setLabSet(p => [...new Set([...p, customLab.trim()])]); setCustomLab(""); }}}
+                    className="bg-teal-600 hover:bg-teal-700 text-white"><Plus className="w-4 h-4" /></Button>
+                </div>
+
+                {labSet.length === 0 ? (
+                  <p className="text-xs text-slate-400 text-center py-4">No labs selected. Load a condition template above or add manually.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {labSet.map(lab => (
+                      <div key={lab} className="flex items-center gap-1 bg-teal-50 border border-teal-200 rounded-lg px-2.5 py-1 text-xs text-teal-800 font-medium">
+                        {lab}
+                        <button onClick={() => setLabSet(p => p.filter(l => l !== lab))} className="text-teal-400 hover:text-red-500 ml-0.5"><X className="w-3 h-3" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {labSet.length > 0 && (
+                  <div className="flex gap-2 pt-1">
+                    <button onClick={() => { navigator.clipboard.writeText(labSet.join("\n")); toast.success("Copied!"); }}
+                      className="flex-1 text-xs border border-slate-200 rounded-lg py-2 hover:bg-slate-50 transition-colors text-slate-600">
+                      📋 Copy List
+                    </button>
+                    <button onClick={() => setShowSaveLab(v => !v)}
+                      className="flex-1 text-xs bg-indigo-600 text-white rounded-lg py-2 hover:bg-indigo-700 transition-colors">
+                      <Star className="w-3.5 h-3.5 inline mr-1" /> Save as Template
+                    </button>
+                  </div>
+                )}
+
+                {showSaveLab && (
+                  <div className="flex gap-2">
+                    <Input value={saveLabName} onChange={e => setSaveLabName(e.target.value)}
+                      placeholder="Template name (e.g. NS Follow-up)" className="text-sm flex-1" />
+                    <Button size="sm" onClick={() => {
+                      if (!saveLabName.trim()) { toast.error("Enter a name"); return; }
+                      const updated = [...savedLabTemplates, { id: Date.now(), name: saveLabName, labs: labSet }];
+                      setSavedLabTemplates(updated);
+                      localStorage.setItem("lab_templates", JSON.stringify(updated));
+                      setSaveLabName(""); setShowSaveLab(false);
+                      toast.success("Template saved!");
+                    }} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs">Save</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Saved templates */}
+            {savedLabTemplates.length > 0 && (
+              <Card className="bg-white shadow-md border border-amber-200">
+                <CardHeader className="bg-amber-50 border-b py-3 px-5">
+                  <CardTitle className="text-sm flex items-center gap-2"><Star className="w-4 h-4 text-amber-500 fill-amber-400" /> Saved Lab Templates</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-2">
+                  {savedLabTemplates.map(tpl => (
+                    <div key={tpl.id} className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">{tpl.name}</p>
+                        <p className="text-xs text-slate-500">{tpl.labs.length} tests</p>
+                      </div>
+                      <div className="flex gap-1.5">
+                        <button onClick={() => { setLabSet([...new Set([...labSet, ...tpl.labs])]); toast.success(`Loaded ${tpl.name}`); }}
+                          className="text-xs bg-teal-600 text-white px-2.5 py-1 rounded-lg hover:bg-teal-700">Load</button>
+                        <button onClick={() => {
+                          const updated = savedLabTemplates.filter(t => t.id !== tpl.id);
+                          setSavedLabTemplates(updated);
+                          localStorage.setItem("lab_templates", JSON.stringify(updated));
+                        }} className="text-xs text-red-400 hover:text-red-600 px-1.5"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>

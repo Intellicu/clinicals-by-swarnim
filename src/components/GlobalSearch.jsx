@@ -239,6 +239,9 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(0);
   const [isListening, setIsListening] = useState(false);
+  const [aiMode, setAiMode] = useState(false);
+  const [aiAnswer, setAiAnswer] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const navigate = useNavigate();
   const containerRef = useRef();
   const flatResults = useRef([]);
@@ -252,13 +255,44 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     rec.lang = "en-IN";
     rec.interimResults = false;
     rec.maxAlternatives = 1;
-    rec.onresult = (e) => { setQuery(e.results[0][0].transcript); setIsListening(false); };
+    rec.onresult = (e) => {
+      const t = e.results[0][0].transcript;
+      setQuery(t);
+      setIsListening(false);
+      // If AI mode active, run AI answer
+      if (aiMode) runAiAnswer(t);
+    };
     rec.onerror = () => setIsListening(false);
     rec.onend = () => setIsListening(false);
     recognitionRef.current = rec;
     rec.start();
     setIsListening(true);
-  }, [isListening]);
+  }, [isListening, aiMode]);
+
+  const runAiAnswer = useCallback(async (q) => {
+    if (!q?.trim()) return;
+    setAiLoading(true);
+    setAiAnswer(null);
+    setOpen(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are a pediatric nephrology clinical assistant for the CliniCals Hub app. Answer the following clinical question concisely and accurately. After your answer, list 2-4 specific sections/pages within the app where the user can find more details (from: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches). Format as JSON with keys "answer" (markdown string, max 200 words) and "links" (array of {label, page, params}).
+
+Question: ${q}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            answer: { type: "string" },
+            links: { type: "array", items: { type: "object", properties: { label: { type: "string" }, page: { type: "string" }, params: { type: "string" } } } }
+          }
+        }
+      });
+      setAiAnswer(result);
+    } catch {
+      setAiAnswer({ answer: "Sorry, I couldn't answer that right now. Try searching below.", links: [] });
+    }
+    setAiLoading(false);
+  }, []);
 
   // ── Debounce ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -470,6 +504,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
 
   // ── Keyboard nav ──────────────────────────────────────────────────────────
   const handleKeyDown = (e) => {
+    if (e.key === "Enter" && aiMode && query.trim()) { runAiAnswer(query); return; }
     if (!open) return;
     const flat = flatResults.current;
     if (e.key === "ArrowDown") { e.preventDefault(); setFocused(f => Math.min(f + 1, flat.length - 1)); }
@@ -497,34 +532,89 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     runningIdx += groups[key].length;
   }
 
+  // Import ReactMarkdown inline to avoid circular
+  const ReactMarkdown = React.lazy(() => import("react-markdown"));
+
   return (
     <div ref={containerRef} className={`relative ${className}`}>
+      {/* Mode toggle */}
+      <div className="flex items-center gap-1 mb-1">
+        <button onClick={() => { setAiMode(false); setAiAnswer(null); }}
+          className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${!aiMode ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+          🔍 Search
+        </button>
+        <button onClick={() => { setAiMode(true); setOpen(false); }}
+          className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${aiMode ? "bg-purple-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+          🤖 Ask AI
+        </button>
+      </div>
+
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
         <Input
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={e => { setQuery(e.target.value); if (!aiMode) {} }}
           onKeyDown={handleKeyDown}
-          onFocus={() => { if (debouncedQuery && Object.keys(groups).length > 0) setOpen(true); }}
-          placeholder={placeholder}
-          className="pl-9 pr-16 text-sm h-9"
+          onFocus={() => { if (!aiMode && debouncedQuery && Object.keys(groups).length > 0) setOpen(true); }}
+          placeholder={aiMode ? "Ask a clinical question... (Enter to answer)" : placeholder}
+          className={`pl-9 pr-16 text-sm h-9 ${aiMode ? "border-purple-300 focus:ring-purple-400" : ""}`}
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {query && (
-            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); flatResults.current = []; }}
+            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); setAiAnswer(null); flatResults.current = []; }}
               className="text-slate-400 hover:text-slate-600">
               <X className="w-4 h-4" />
             </button>
           )}
-          <button onClick={startVoiceSearch}
-            className={`p-1 rounded-full transition-colors ${isListening ? "text-red-500 bg-red-50 animate-pulse" : "text-slate-400 hover:text-blue-500"}`}
-            title="Voice search">
+          <button onClick={aiMode && query.trim() ? () => runAiAnswer(query) : startVoiceSearch}
+            className={`p-1 rounded-full transition-colors ${isListening ? "text-red-500 bg-red-50 animate-pulse" : aiMode ? "text-purple-500 hover:text-purple-700 bg-purple-50" : "text-slate-400 hover:text-blue-500"}`}
+            title={aiMode ? "Ask AI" : "Voice search"}>
             {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {open && debouncedQuery && (
+      {/* AI Answer Panel */}
+      {aiMode && (aiLoading || aiAnswer) && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[500px] overflow-y-auto">
+          {aiLoading && (
+            <div className="px-4 py-6 text-center">
+              <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-sm text-slate-500">AI is thinking...</p>
+            </div>
+          )}
+          {!aiLoading && aiAnswer && (
+            <div className="p-4 space-y-3">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-base">🤖</span>
+                <span className="text-xs font-bold text-purple-700 uppercase tracking-wide">AI Clinical Answer</span>
+              </div>
+              <div className="prose prose-sm max-w-none text-slate-800 text-sm leading-relaxed">
+                <React.Suspense fallback={<p className="text-sm text-slate-700 whitespace-pre-wrap">{aiAnswer.answer}</p>}>
+                  <ReactMarkdown>{aiAnswer.answer}</ReactMarkdown>
+                </React.Suspense>
+              </div>
+              {aiAnswer.links?.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Find More In App</p>
+                  <div className="flex flex-wrap gap-2">
+                    {aiAnswer.links.map((link, i) => (
+                      <button key={i}
+                        onClick={() => { navigate(createPageUrl(link.page) + (link.params || "")); setQuery(""); setAiAnswer(null); }}
+                        className="flex items-center gap-1.5 text-xs bg-purple-50 text-purple-700 border border-purple-200 rounded-lg px-2.5 py-1.5 hover:bg-purple-100 transition-colors">
+                        {link.label} <ArrowRight className="w-3 h-3" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <p className="text-[10px] text-slate-400 border-t border-slate-100 pt-2">AI-generated — verify clinically. Ask another question or search below.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!aiMode && open && debouncedQuery && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[480px] overflow-y-auto">
           {loading && (
             <div className="px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
