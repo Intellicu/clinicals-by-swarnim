@@ -231,7 +231,7 @@ const ENTITY_GROUP_META = {
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
-export default function GlobalSearch({ placeholder = "Search drugs, guidelines, pathways...", className = "", externalAiMode, onAiModeChange, hideToggle = false }) {
+export default function GlobalSearch({ placeholder = "Search drugs, guidelines, pathways...", className = "" }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [groups, setGroups] = useState({});
@@ -239,16 +239,9 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(0);
   const [isListening, setIsListening] = useState(false);
-  const [internalAiMode, setInternalAiMode] = useState(false);
+  const [aiMode, setAiMode] = useState(false);
   const [aiAnswer, setAiAnswer] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
-
-  // Support external control of aiMode
-  const aiMode = externalAiMode !== undefined ? externalAiMode : internalAiMode;
-  const setAiMode = (val) => {
-    setInternalAiMode(val);
-    onAiModeChange?.(val);
-  };
   const navigate = useNavigate();
   const containerRef = useRef();
   const flatResults = useRef([]);
@@ -544,8 +537,8 @@ Question: ${q}`,
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      {/* Mode toggle — hidden when controlled externally */}
-      {!hideToggle && <div className="flex items-center gap-1 mb-1">
+      {/* Mode toggle */}
+      <div className="flex items-center gap-1 mb-1">
         <button onClick={() => { setAiMode(false); setAiAnswer(null); }}
           className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${!aiMode ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
           🔍 Search
@@ -554,7 +547,7 @@ Question: ${q}`,
           className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${aiMode ? "bg-purple-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
           🤖 Ask AI
         </button>
-      </div>}
+      </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
