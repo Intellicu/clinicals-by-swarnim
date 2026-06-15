@@ -21,7 +21,7 @@ export const CLINICAL_AI_ANALYZERS = [
   },
   {
     id: "uds_interpreter",
-    name: "Pediatric UDS Interpreter",
+    name: "UDS AI Interpreter",
     icon: Waves,
     color: "bg-violet-700",
     page: "ClinicalAIHub",

@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers, Mic, MicOff } from "lucide-react";
+import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers, Mic, MicOff, ExternalLink } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { searchFormulary } from "@/lib/formulary/nephrology-drugs";
+import { resolveAILink, resolveReference } from "@/lib/appRouteRegistry";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATIC KNOWLEDGE INDEX (pages / pathways / calculators)
@@ -165,6 +166,143 @@ const SEARCH_INDEX = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
+// PREDICTIVE SUGGESTIONS (instant, no DB call needed)
+// ─────────────────────────────────────────────────────────────────────────────
+const PREDICTIVE_SUGGESTIONS = [
+  // Lupus / SLE
+  { trigger: ["lupus", "ln", "sle"], suggestions: [
+    { label: "Lupus Nephritis Management", page: "GlomerularDiseases", params: "?tab=lupus-nephritis" },
+    { label: "ISN/RPS Classification (Class III-VI)", page: "GlomerularDiseases", params: "?tab=lupus-nephritis" },
+    { label: "MMF / Cyclophosphamide Dosing", page: "DrugsDosing", params: "?search=mycophenolate" },
+    { label: "SLEDAI Calculator", page: "PediatricRheumatology", params: "?tab=calculators" },
+    { label: "Lupus Nephritis Guidelines (KDIGO)", page: "GuidelinesLibrary", params: "?search=lupus" },
+    { label: "Biopsy Interpretation", page: "ClinicalAIHub", params: "?tab=biopsy" },
+    { label: "Monitoring Protocol", page: "ClinicalSupport", params: "?tab=pathways&scenario=rheumatology-engine" },
+  ]},
+  // Nephrotic Syndrome
+  { trigger: ["nephrotic", "ns ", "nephrosis", "ssns", "frns", "sdns", "srns", "inss", "iskdc"], suggestions: [
+    { label: "Nephrotic Syndrome Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=ns-engine" },
+    { label: "ISKDC Protocol (SSNS)", page: "ClinicalSupport", params: "?tab=pathways&scenario=ns-engine" },
+    { label: "SRNS — Steroid Resistant NS", page: "GlomerularDiseases", params: "?tab=srns" },
+    { label: "Prednisolone Protocol", page: "DrugsDosing", params: "?search=prednisolone" },
+    { label: "Rituximab Dosing (FRNS/SDNS)", page: "DrugsDosing", params: "?search=rituximab" },
+    { label: "MMF for NS", page: "DrugsDosing", params: "?search=mycophenolate" },
+    { label: "Severe Oedema Management", page: "EmergencyHub", params: "" },
+  ]},
+  // Tacrolimus
+  { trigger: ["tacrolimus", "fk506", "fk 506", "tacro"], suggestions: [
+    { label: "Tacrolimus Dosing (SRNS)", page: "DrugsDosing", params: "?search=tacrolimus" },
+    { label: "Tacrolimus Trough Targets", page: "DrugsDosing", params: "?search=tacrolimus" },
+    { label: "Tacrolimus Monitoring & Toxicity", page: "DrugsDosing", params: "?search=tacrolimus" },
+    { label: "Tacrolimus Drug Interactions", page: "DrugsDosing", params: "?search=tacrolimus" },
+    { label: "Transplant Protocols", page: "ClinicalSupport", params: "?tab=pathways&scenario=rrt-engine" },
+  ]},
+  // AKI
+  { trigger: ["aki", "acute kidney injury", "prifle"], suggestions: [
+    { label: "AKI Engine (KDIGO Staging)", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-engine" },
+    { label: "AKI Stager Calculator", page: "AKIStager", params: "" },
+    { label: "RRT Indications (AEIOU)", page: "ClinicalSupport", params: "?tab=pathways&scenario=rrt-engine" },
+    { label: "Nephrotoxin Prevention", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-engine" },
+    { label: "Fluid Management in AKI", page: "FluidCalculator", params: "" },
+  ]},
+  // CKD
+  { trigger: ["ckd", "chronic kidney", "egfr", "schwartz"], suggestions: [
+    { label: "CKD Engine (KDIGO Staging)", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-engine" },
+    { label: "Schwartz GFR Calculator", page: "SchwartzGFR", params: "" },
+    { label: "CKD-MBD — Mineral Bone Disease", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-mbd" },
+    { label: "Anaemia of CKD (EPO/Iron)", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-anemia-mbd" },
+    { label: "CKD Nutrition & Diet", page: "NutritionHub", params: "" },
+    { label: "Renal Diet Generator", page: "NutritionHub", params: "" },
+  ]},
+  // Hypertension
+  { trigger: ["hypertension", "htn", "blood pressure", "bp ", "nicardipine", "labetalol"], suggestions: [
+    { label: "Pediatric HTN Engine (2017 AAP)", page: "ClinicalSupport", params: "?tab=pathways&scenario=htn-engine" },
+    { label: "BP Percentile Calculator", page: "BPPercentiles", params: "" },
+    { label: "Hypertensive Emergency Protocol", page: "EmergencyHub", params: "" },
+    { label: "Antihypertensive Drug Dosing", page: "DrugsDosing", params: "?search=amlodipine" },
+    { label: "Secondary HTN Investigation", page: "ClinicalSupport", params: "?tab=pathways&scenario=htn-engine" },
+  ]},
+  // aHUS / TMA / Eculizumab
+  { trigger: ["ahus", "a-hus", "tma", "eculizumab", "ravulizumab", "complement", "c3g", "c3 glomerulo"], suggestions: [
+    { label: "aHUS / TMA Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hus-engine" },
+    { label: "Eculizumab Dosing", page: "DrugsDosing", params: "?search=eculizumab" },
+    { label: "Ravulizumab Dosing", page: "DrugsDosing", params: "?search=ravulizumab" },
+    { label: "C3 Glomerulopathy Pathway", page: "GlomerularDiseases", params: "?tab=c3g" },
+    { label: "Meningococcal Vaccination Guide", page: "GeneralPediatricsHub", params: "" },
+    { label: "Complement Genetics Testing", page: "GeneticReportAnalyzer", params: "" },
+  ]},
+  // Dialysis / RRT
+  { trigger: ["dialysis", "haemodialysis", "hemodialysis", "peritoneal dialysis", "crrt", "pd ", "rrt", "kdigo dialysis"], suggestions: [
+    { label: "RRT / Dialysis Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=rrt-engine" },
+    { label: "RRT Assistant", page: "RRTAssistant", params: "" },
+    { label: "HD Protocol", page: "RRTAssistant", params: "?tab=hd" },
+    { label: "PD Protocol", page: "RRTAssistant", params: "?tab=pd" },
+    { label: "CRRT / Continuous Dialysis", page: "RRTAssistant", params: "?tab=crrt" },
+    { label: "Dialysis Drug Dosing", page: "DrugsDosing", params: "?formulary_category=Dialysis+Medications" },
+  ]},
+  // Transplant
+  { trigger: ["transplant", "immunosuppression", "rejection", "dsas", "abmr", "tacrolimus transplant", "basiliximab", "atg"], suggestions: [
+    { label: "Transplant Immunosuppression Pathway", page: "UrologyNephrologyHub", params: "" },
+    { label: "Tacrolimus Dosing (Transplant)", page: "DrugsDosing", params: "?search=tacrolimus" },
+    { label: "Transplant Rejection Engine", page: "ClinicalSupport", params: "?tab=pathways" },
+    { label: "Transplant Drug Formulary", page: "DrugsDosing", params: "?formulary_category=Transplant+Medications" },
+    { label: "Vaccination Pre-Transplant", page: "GeneralPediatricsHub", params: "" },
+  ]},
+  // Genetics
+  { trigger: ["genetic", "exome", "srns genetic", "nphs1", "nphs2", "wt1", "col4", "alport", "hnf1b", "acmg", "variant", "vus"], suggestions: [
+    { label: "Genetic Report Analyzer (ACMG)", page: "GeneticReportAnalyzer", params: "" },
+    { label: "Alport / HNF1B Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hnf1b-alport-engine" },
+    { label: "Genetic SRNS Pathway", page: "GlomerularDiseases", params: "?tab=srns" },
+    { label: "Rare Disease Module", page: "RareDiseaseModule", params: "" },
+    { label: "Fabry Disease Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=fabry-engine" },
+  ]},
+  // Biopsy
+  { trigger: ["biopsy", "renal biopsy", "histology", "lm ", "if staining", "em ", "fsgs biopsy", "igan biopsy"], suggestions: [
+    { label: "Biopsy AI Analyzer", page: "ClinicalAIHub", params: "?tab=biopsy" },
+    { label: "Renal Biopsy Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=renal-biopsy-engine" },
+    { label: "Biopsy Patterns Database", page: "GlomerularDiseases", params: "" },
+    { label: "Lupus Biopsy Classes (ISN/RPS)", page: "GlomerularDiseases", params: "?tab=lupus-nephritis" },
+  ]},
+  // Rituxmab
+  { trigger: ["rituximab", "rtx", "anti-cd20", "cd19", "b cell"], suggestions: [
+    { label: "Rituximab Dosing (FRNS/SDNS)", page: "DrugsDosing", params: "?search=rituximab" },
+    { label: "Rituximab in ANCA Vasculitis", page: "GlomerularDiseases", params: "?tab=anca-vasculitis" },
+    { label: "Rituximab Monitoring Protocol", page: "DrugsDosing", params: "?search=rituximab" },
+    { label: "Pre-Rituximab Workup", page: "DrugsDosing", params: "?search=rituximab" },
+  ]},
+  // Cystinosis
+  { trigger: ["cystinosis", "cysteamine", "ctns", "fanconi cystinosis"], suggestions: [
+    { label: "Cystinosis Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=cystinosis-engine" },
+    { label: "Cysteamine Dosing", page: "DrugsDosing", params: "?search=cysteamine" },
+    { label: "Rare Disease Module", page: "RareDiseaseModule", params: "" },
+  ]},
+  // Proteinuria
+  { trigger: ["proteinuria", "upcr", "acr", "nephrotic range", "microalbuminuria"], suggestions: [
+    { label: "Proteinuria Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=proteinuria-engine" },
+    { label: "Nephrotic Syndrome Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=ns-engine" },
+    { label: "Proteinuria Investigation Guide", page: "Proteinuria", params: "" },
+    { label: "Renal Biopsy Indications", page: "ClinicalSupport", params: "?tab=pathways&scenario=renal-biopsy-engine" },
+  ]},
+  // UTI / VUR
+  { trigger: ["uti", "urinary tract infection", "pyelonephritis", "vur", "reflux", "dmsa", "vcug"], suggestions: [
+    { label: "VUR / Recurrent UTI Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=vur-uti-engine" },
+    { label: "Urology & Nephrology Hub", page: "UrologyNephrologyHub", params: "" },
+    { label: "UTI Antibiotic Protocol", page: "EmergencyHub", params: "" },
+  ]},
+];
+
+function getPredictiveSuggestions(query) {
+  if (!query || query.length < 3) return [];
+  const ql = query.toLowerCase();
+  for (const entry of PREDICTIVE_SUGGESTIONS) {
+    if (entry.trigger.some(t => ql.includes(t))) {
+      return entry.suggestions;
+    }
+  }
+  return [];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 function includes(haystack, needle) {
@@ -235,6 +373,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [groups, setGroups] = useState({});
+  const [predictiveSuggestions, setPredictiveSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(0);
@@ -372,7 +511,18 @@ Question: ${q}`,
     setAiLoading(false);
   }, []);
 
-  // ── Debounce ──────────────────────────────────────────────────────────────
+  // ── Instant predictive suggestions ────────────────────────────────────────
+  useEffect(() => {
+    const q = query.trim();
+    if (!q || q.length < 3) {
+      setPredictiveSuggestions([]);
+      return;
+    }
+    setPredictiveSuggestions(getPredictiveSuggestions(q));
+    if (q.length >= 3) setOpen(true);
+  }, [query]);
+
+  // ── Debounce (for DB search) ───────────────────────────────────────────────
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 300);
     return () => clearTimeout(t);
@@ -382,7 +532,7 @@ Question: ${q}`,
   useEffect(() => {
     if (!debouncedQuery) {
       setGroups({});
-      setOpen(false);
+      if (!predictiveSuggestions.length) setOpen(false);
       flatResults.current = [];
       setLoading(false);
       return;
@@ -676,23 +826,41 @@ Question: ${q}`,
                 <div>
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Find More In App</p>
                   <div className="flex flex-wrap gap-2">
-                    {aiAnswer.links.map((link, i) => (
-                      <button key={i}
-                        onClick={() => { navigate(createPageUrl(link.page) + (link.params || "")); setQuery(""); setAiAnswer(null); }}
-                        className="flex items-center gap-1.5 text-xs bg-purple-50 text-purple-700 border border-purple-200 rounded-lg px-2.5 py-1.5 hover:bg-purple-100 transition-colors">
-                        {link.label} <ArrowRight className="w-3 h-3" />
-                      </button>
-                    ))}
+                    {aiAnswer.links.map((link, i) => {
+                      const resolved = resolveAILink(link.label, link.page);
+                      if (!resolved) return null; // hide unresolvable links
+                      return (
+                        <button key={i}
+                          onClick={() => { navigate(createPageUrl(resolved.page) + (resolved.params || link.params || "")); setQuery(""); setAiAnswer(null); }}
+                          className="flex items-center gap-1.5 text-xs bg-purple-50 text-purple-700 border border-purple-200 rounded-lg px-2.5 py-1.5 hover:bg-purple-100 transition-colors">
+                          {resolved.label} <ArrowRight className="w-3 h-3" />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
               {aiAnswer.references?.length > 0 && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5">
                   <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide mb-1.5">📚 References</p>
-                  <ul className="space-y-0.5">
-                    {aiAnswer.references.map((ref, i) => (
-                      <li key={i} className="text-[10px] text-amber-800">• {ref}</li>
-                    ))}
+                  <ul className="space-y-1">
+                    {aiAnswer.references.map((ref, i) => {
+                      const resolved = resolveReference(ref);
+                      return (
+                        <li key={i} className="text-[10px] text-amber-800 flex items-start gap-1.5">
+                          <span>•</span>
+                          <span className="flex-1">
+                            {resolved?.url ? (
+                              <a href={resolved.url} target="_blank" rel="noopener noreferrer"
+                                className="underline text-amber-900 hover:text-amber-700 inline-flex items-center gap-1">
+                                {ref}
+                                <ExternalLink className="w-2.5 h-2.5 inline shrink-0" />
+                              </a>
+                            ) : ref}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}

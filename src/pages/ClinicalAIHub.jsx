@@ -62,7 +62,7 @@ export default function ClinicalAIHub() {
               const shortName = tool.name
                 .replace(' Analyzer', '').replace(' AI', '').replace('Renal Biopsy', 'Biopsy')
                 .replace('Case Discussion', 'Case').replace('Urine Pattern', 'Urine').replace('Uroflowmetry', 'Uroflow')
-                .replace('Pediatric UDS Interpreter', 'UDS AI').replace(' (Educational)', '');
+                .replace('UDS AI Interpreter', 'UDS AI').replace('Pediatric UDS Interpreter', 'UDS AI').replace(' (Educational)', '');
               const isBeta = tool.status === 'beta';
               return (
                 <TabsTrigger
