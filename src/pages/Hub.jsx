@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import KidneyCarePatientSync from "../components/kidneycare/KidneyCarePatientSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -486,31 +487,37 @@ export default function Hub() {
       <div className="w-full px-3 py-3 space-y-4">
 
         {/* ── Hero strip ── */}
-        <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 shadow">
-          <div>
-            <h1 className="text-base font-bold text-white leading-tight">CliniCals Hub</h1>
-            <p className="text-blue-100 text-xs font-semibold">by Swarnim</p>
-            <p className="text-blue-200 text-xs">Pediatrics Bedside Assistant — Pediatric Nephrology & Others</p>
+        <div className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-4 pt-3 pb-4 shadow space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-base font-bold text-white leading-tight">CliniCals Hub</h1>
+              <p className="text-blue-200 text-xs">by Swarnim · Pediatrics Bedside Assistant</p>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
+              </span>
+              <button
+                onClick={() => setEmergencyProtocolOpen(true)}
+                className="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white rounded-lg h-7 px-2.5 text-xs font-bold transition-colors shadow-sm"
+                aria-label="Emergency Protocols">
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Emergency</span>
+              </button>
+              <Link to={createPageUrl("ClinicalAIHub")}>
+                <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  <span className="hidden sm:inline">AI Hub</span>
+                </Button>
+              </Link>
+              <HubMoreMenu />
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${isOnline ? "bg-green-400/20 text-green-100" : "bg-amber-400/20 text-amber-100"}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-green-300" : "bg-amber-300"}`} />
-              <span className="hidden xs:inline">{isOnline ? "Online" : "Offline"}</span>
-            </span>
-            <button
-              onClick={() => setEmergencyProtocolOpen(true)}
-              className="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white rounded-lg h-7 px-2.5 text-xs font-bold transition-colors shadow-sm"
-              aria-label="Emergency Protocols">
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Emergency</span>
-            </button>
-            <Link to={createPageUrl("ClinicalAIHub")}>
-              <Button size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 border text-xs h-7 px-2.5 gap-1">
-                <Sparkles className="w-3 h-3" />
-                <span className="hidden sm:inline">AI Hub</span>
-              </Button>
-            </Link>
-            <HubMoreMenu />
+          {/* ── Prominent Search Hero ── */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-2">
+            <GlobalSearch
+              placeholder="🔍  Search drugs, pathways, calculators, AI tools…"
+              className="w-full" />
           </div>
         </div>
 
@@ -586,14 +593,13 @@ export default function Hub() {
           </div>
         </div>
 
-        {/* ── Search ── */}
-        <GlobalSearch
-          placeholder="Search calculators, pathways, drugs, AI tools…"
-          className="bg-white shadow-sm rounded-xl border border-slate-200" />
-        
+
 
         {/* ── Quick Patient Entry ── */}
         <QuickPatientEntry />
+
+        {/* ── KidneyCare Patient Sync ── */}
+        <KidneyCarePatientSync />
 
         {/* ── Drug Dosing Calculator (inline) ── */}
         <HubDrugSearch />

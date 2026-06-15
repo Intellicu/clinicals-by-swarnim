@@ -74,10 +74,12 @@ function doseRuleToPreset(rule) {
   const freqDivisor = (freq) => {
     if (!freq) return 1;
     const f = freq.toUpperCase();
-    if (f.includes("QID") || f.includes("Q6H") || f === "4X" || f.includes("FOUR")) return 4;
-    if (f.includes("TDS") || f.includes("TID") || f.includes("Q8H") || f === "3X") return 3;
-    if (f.includes("BD") || f.includes("BID") || f.includes("Q12H") || f === "2X" || f.includes("TWICE")) return 2;
+    if (f.includes("QID") || f.includes("Q6H") || f.includes("4X") || f.includes("FOUR TIME")) return 4;
+    if (f.includes("TDS") || f.includes("TID") || f.includes("Q8H") || f.includes("3X") || f.includes("THREE TIME") || f.includes("3 TIME")) return 3;
+    if (f.includes("BD") || f.includes("BID") || f.includes("Q12H") || f.includes("2X") || f.includes("TWICE") || f.includes("TWO TIME")) return 2;
     if (f.includes("ALT") || f.includes("ALTERNATE") || f.includes("EOD")) return 0.5;
+    if (f.includes("WEEKLY") || f.includes("1/WEEK")) return 1 / 7;
+    if (f.includes("3") && f.includes("WEEK")) return 3 / 7;
     return 1; // OD
   };
 
@@ -113,13 +115,17 @@ function calculateDose(ind, wt, bsa, activeFreq) {
   if (ind.fixedDose) return { type: "fixed", display: ind.fixedDose };
   if (ind.dose_infusion) return { type: "infusion", display: `${ind.dose_infusion} ${ind.dose_unit_raw}` };
 
-  const freqMap = {
-    "OD": 1, "BD": 2, "BID": 2, "TDS": 3, "TID": 3, "QID": 4,
-    "Q6H": 4, "Q8H": 3, "Q12H": 2, "Alternate days": 0.5, "EOD": 0.5,
-    "Single dose": 1, "STAT": 1, "3×/week": 3 / 7, "Weekly": 1 / 7,
-  };
   const freq = activeFreq || ind.freq;
-  const dosesPerDay = freqMap[freq] ?? 1;
+  const fu = (freq || "").toUpperCase();
+  let dosesPerDay;
+  if (fu.includes("QID") || fu.includes("Q6H") || fu.includes("4X") || fu.includes("FOUR TIME")) dosesPerDay = 4;
+  else if (fu.includes("TDS") || fu.includes("TID") || fu.includes("Q8H") || fu.includes("3X") || fu.includes("THREE TIME") || fu.includes("3 TIME")) dosesPerDay = 3;
+  else if (fu.includes("BD") || fu.includes("BID") || fu.includes("Q12H") || fu.includes("2X") || fu.includes("TWICE") || fu.includes("TWO TIME")) dosesPerDay = 2;
+  else if (fu.includes("ALT") || fu.includes("EOD") || fu.includes("ALTERNATE") || fu.includes("EVERY OTHER")) dosesPerDay = 0.5;
+  else if (fu.includes("WEEKLY") || fu.includes("ONCE A WEEK") || fu.includes("1/WEEK")) dosesPerDay = 1 / 7;
+  else if (fu.includes("3") && fu.includes("WEEK")) dosesPerDay = 3 / 7;
+  else if (fu.includes("SINGLE") || fu.includes("STAT") || fu.includes("ONCE")) dosesPerDay = 1;
+  else dosesPerDay = 1; // OD or unknown
 
   if (ind.dose_mgkg_day && wt) {
     const rawDay = ind.dose_mgkg_day * wt;

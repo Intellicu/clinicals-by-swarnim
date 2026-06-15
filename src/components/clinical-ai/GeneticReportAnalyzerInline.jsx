@@ -8,7 +8,9 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Dna, Loader2, Upload, BookOpen, Stethoscope } from "lucide-react";
+import { AlertTriangle, Dna, Loader2, Upload, BookOpen, Stethoscope, Heart, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -132,6 +134,12 @@ Use paediatric nephrology context where relevant. Flag urgent management implica
           className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${activeTab === "clinical" ? "bg-white text-violet-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
           <Stethoscope className="w-3.5 h-3.5" /> Clinical Analysis
         </button>
+        <Link to={createPageUrl("GeneticReportAnalyzer") + "?tab=counseling"} className="flex-1">
+          <button
+            className="w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">
+            <Heart className="w-3.5 h-3.5" /> Counseling
+          </button>
+        </Link>
         <button onClick={() => setActiveTab("education")}
           className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${activeTab === "education" ? "bg-white text-blue-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
           <BookOpen className="w-3.5 h-3.5" /> Educational Mode

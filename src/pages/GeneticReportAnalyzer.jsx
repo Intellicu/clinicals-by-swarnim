@@ -83,7 +83,8 @@ const EXAMPLE_QUERIES = [
 ];
 
 export default function GeneticReportAnalyzer() {
-  const [activeMainTab, setActiveMainTab] = useState("analyzer");
+  const _urlParams = new URLSearchParams(window.location.search);
+  const [activeMainTab, setActiveMainTab] = useState(_urlParams.get("tab") || "analyzer");
   const [acmgTab, setAcmgTab] = useState("pathogenic");
   const activeSubRef = useRef(null);
   const [conversation, setConversation] = useState(null);
@@ -320,12 +321,17 @@ export default function GeneticReportAnalyzer() {
                        {isUploading ? "Uploading..." : "Upload Report"}
                       </Button>
                     <Button variant="ghost" size="sm" className="text-xs h-7 text-slate-500"
-                      onClick={() => { navigator.clipboard.writeText(userMessages.map(m => `${m.role === "user" ? "CLINICIAN" : "AI"}: ${m.content}`).join("\n\n")); toast.success("Copied"); }}
-                      disabled={!messages.length}>
-                      <Copy className="w-3 h-3 mr-1" />Copy
-                    </Button>
-                  </div>
-                  <Button onClick={() => sendMessage()} disabled={isLoading || !conversation || (!input.trim() && !uploadedFile)} className="bg-purple-600 hover:bg-purple-700 h-8 px-4 text-sm">
+                        onClick={() => { navigator.clipboard.writeText(userMessages.map(m => `${m.role === "user" ? "CLINICIAN" : "AI"}: ${m.content}`).join("\n\n")); toast.success("Copied"); }}
+                        disabled={!messages.length}>
+                        <Copy className="w-3 h-3 mr-1" />Copy
+                       </Button>
+                      <Button variant="ghost" size="sm" className="text-xs h-7 text-rose-600 border border-rose-200 bg-rose-50 hover:bg-rose-100"
+                        onClick={() => setActiveMainTab("counseling")}
+                        title="Open Genetic Counseling Generator">
+                        <Heart className="w-3 h-3 mr-1" />Counseling
+                      </Button>
+                    </div>
+                    <Button onClick={() => sendMessage()} disabled={isLoading || !conversation || (!input.trim() && !uploadedFile)} className="bg-purple-600 hover:bg-purple-700 h-8 px-4 text-sm">
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </Button>
                 </div>

@@ -538,13 +538,13 @@ Question: ${q}`,
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Mode toggle */}
-      <div className="flex items-center gap-1 mb-1">
+      <div className="flex items-center gap-1 mb-1.5">
         <button onClick={() => { setAiMode(false); setAiAnswer(null); }}
-          className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${!aiMode ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+          className={`text-[10px] font-bold px-2.5 py-1 rounded-full transition-all ${!aiMode ? "bg-white text-indigo-700 shadow-sm" : "bg-white/20 text-white hover:bg-white/30"}`}>
           🔍 Search
         </button>
         <button onClick={() => { setAiMode(true); setOpen(false); }}
-          className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${aiMode ? "bg-purple-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+          className={`text-[10px] font-bold px-2.5 py-1 rounded-full transition-all ${aiMode ? "bg-white text-purple-700 shadow-sm" : "bg-white/20 text-white hover:bg-white/30"}`}>
           🤖 Ask AI
         </button>
       </div>
@@ -557,7 +557,7 @@ Question: ${q}`,
           onKeyDown={handleKeyDown}
           onFocus={() => { if (!aiMode && debouncedQuery && Object.keys(groups).length > 0) setOpen(true); }}
           placeholder={aiMode ? "Ask a clinical question... (Enter to answer)" : placeholder}
-          className={`pl-9 pr-16 text-sm h-9 ${aiMode ? "border-purple-300 focus:ring-purple-400" : ""}`}
+          className={`pl-9 pr-16 text-sm h-10 bg-white shadow-sm ${aiMode ? "border-purple-300 focus:ring-purple-400" : "border-white/80"}`}
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {query && (
