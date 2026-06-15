@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import KidneyCarePatientSync from "../components/kidneycare/KidneyCarePatientSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +13,7 @@ import {
   UtensilsCrossed, GraduationCap, Layers, FlaskConical, ClipboardList,
   Beaker, Wind, Waves, Microscope, GitBranch, Users, Dna, ChevronRight,
   RefreshCw, Shield, BarChart2, Star,
-  Database, TrendingUp, LineChart, Search, X, Camera, ScanLine,
+  Database, TrendingUp, LineChart, Search, X, Camera,
   ChevronDown, ChevronUp, Thermometer, Cpu } from
 "lucide-react";
 import QuickPatientEntry from "../components/QuickPatientEntry";
@@ -453,7 +452,7 @@ export default function Hub() {
   const isAdmin = user?.role === "admin";
   const [sectionQuery, setSectionQuery] = useState("");
   const [showAllKnowledge, setShowAllKnowledge] = useState(false);
-  const [ocrLoading, setOcrLoading] = useState(null);
+
 
   // Load DB-generated engines to append to the engine strip
   const { data: dbEngineRecords = [] } = useQuery({
@@ -598,71 +597,17 @@ export default function Hub() {
         {/* ── Quick Patient Entry ── */}
         <QuickPatientEntry />
 
-        {/* ── KidneyCare Patient Sync ── */}
-        <KidneyCarePatientSync />
-
-        {/* ── Drug Dosing Calculator (inline) ── */}
-        <HubDrugSearch />
-
         {/* ── Auto Calculations ── */}
         <QuickCalculations />
+
+        {/* ── Drug Dosing Calculator (inline) — below Quick Calcs ── */}
+        <HubDrugSearch />
 
         {/* ── Contextual Suggestions from patient data ── */}
         <ContextualSuggestions patientData={patientData} />
 
         {/* ── Frequency-based Quick Access + Workspace ── */}
         <FrequencyQuickAccess />
-
-        {/* ── Quick Scan OCR ── */}
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <ScanLine className="w-4 h-4 text-green-600" />
-            <h2 className="text-sm font-bold text-slate-700">Quick Scan</h2>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
-            {OCR_CARDS.map((card, i) => {
-              const Icon = card.icon;
-              const inputId = `ocr-scan-${i}`;
-              return (
-                <div key={card.name}>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    id={inputId}
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setOcrLoading(card.name);
-                      try {
-                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                        await base44.integrations.Core.InvokeLLM({
-                          prompt: `Extract clinical values from this ${card.name.toLowerCase()} image.`,
-                          file_urls: [file_url],
-                          response_json_schema: { type: "object", properties: { values: { type: "string" } } }
-                        });
-                      } finally {
-                        setOcrLoading(null);
-                        e.target.value = '';
-                      }
-                    }} />
-                  
-                  <label htmlFor={inputId} className="cursor-pointer block">
-                    <div className={`${card.color} rounded-xl p-3 flex flex-col items-center gap-1.5 active:scale-95 transition-transform shadow-sm`}>
-                      {ocrLoading === card.name ?
-                      <RefreshCw className="w-5 h-5 text-white animate-spin" /> :
-                      <Icon className="w-5 h-5 text-white" />
-                      }
-                      <span className="text-white text-xs font-semibold text-center leading-tight">{card.name}</span>
-                      <span className="text-white/70 text-xs text-center leading-tight hidden sm:block">{card.desc}</span>
-                    </div>
-                  </label>
-                </div>);
-
-            })}
-          </div>
-        </div>
 
         {/* ── Quick Calculators ── */}
         <div>

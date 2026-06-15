@@ -315,16 +315,18 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     setOpen(true);
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a pediatric nephrology clinical assistant for the CliniCals Hub app. You serve clinicians in India, so use Indian brand names where relevant and context appropriate to Indian medical practice.
+        prompt: `You are a senior pediatric nephrology clinical assistant for CliniCals Hub, serving clinicians in India. Answer the following clinical question accurately and concisely (max 300 words). 
 
-Answer the following clinical question concisely and accurately in max 250 words. Include specific KDIGO/IPNA/AAP/IAP guideline references where applicable. After your answer, list 2-4 specific sections/pages within the app where the user can find more details (from: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches).
+Requirements:
+- Include specific guideline references (KDIGO, IPNA, AAP, IAP) inline e.g. [KDIGO 2022]
+- Use Indian brand names where relevant
+- After the answer, suggest 2-4 app sections for further reading from: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches
+- If Hindi/regional language, answer in that language with English medical terms
 
-Format as JSON with keys:
-- "answer" (markdown string with guideline citations e.g. [KDIGO 2022], [IPNA 2023])  
-- "references" (array of strings: specific guideline/paper citations)
-- "links" (array of {label, page, params})
-
-If the question is in Hindi or a regional language, answer in that language with English medical terms.
+Return JSON with:
+- "answer": markdown string with inline citations
+- "references": array of specific citations (guideline name, year, section)
+- "links": array of {label, page, params}
 
 Question: ${q}`,
         model: "gemini_3_flash",
@@ -338,9 +340,34 @@ Question: ${q}`,
           }
         }
       });
-      setAiAnswer(result);
-    } catch {
-      setAiAnswer({ answer: "Sorry, I couldn't answer that right now. Try searching below.", links: [] });
+      // Handle both direct object and nested result
+      const parsed = result?.answer ? result : (result?.data?.answer ? result.data : null);
+      if (parsed?.answer) {
+        setAiAnswer(parsed);
+      } else {
+        // Fallback: try without internet context
+        const fallback = await base44.integrations.Core.InvokeLLM({
+          prompt: `You are a pediatric nephrology clinical assistant. Answer this clinical question in max 200 words with guideline references. Return JSON with keys: answer (string), references (array of strings), links (array of {label, page} where page is one of: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub).\n\nQuestion: ${q}`,
+          model: "gemini_3_flash",
+          response_json_schema: {
+            type: "object",
+            properties: {
+              answer: { type: "string" },
+              references: { type: "array", items: { type: "string" } },
+              links: { type: "array", items: { type: "object", properties: { label: { type: "string" }, page: { type: "string" }, params: { type: "string" } } } }
+            }
+          }
+        });
+        setAiAnswer(fallback?.answer ? fallback : { answer: fallback || "No answer available.", references: [], links: [] });
+      }
+    } catch (err) {
+      // Try a simple non-structured fallback
+      try {
+        const simple = await base44.integrations.Core.InvokeLLM({ prompt: `Answer this pediatric nephrology question briefly with key guideline references: ${q}` });
+        setAiAnswer({ answer: typeof simple === "string" ? simple : JSON.stringify(simple), references: [], links: [] });
+      } catch {
+        setAiAnswer({ answer: "Sorry, the AI assistant is temporarily unavailable. Please use the search bar below to find relevant pathways and guidelines.", links: [], references: [] });
+      }
     }
     setAiLoading(false);
   }, []);
