@@ -1114,6 +1114,367 @@ export const FORMULARY = {
     clinical_pearls: "10% calcium gluconate = 9 mg/mL elemental calcium. 10% calcium chloride = 27 mg/mL (3× more elemental Ca — higher arrhythmia risk). Gluconate preferred over chloride peripherally. PICC/central line preferred (tissue necrosis with extravasation)."
   },
 
+  // ─────────────────────────── ANTICOAGULANTS ───────────────────────────────
+  enoxaparin: {
+    generic: "Enoxaparin",
+    class: "Low Molecular Weight Heparin (LMWH)",
+    mechanism: "Inhibits Factor Xa and IIa via antithrombin III → anticoagulant effect. Predictable pharmacokinetics vs unfractionated heparin.",
+    indications: "DVT prophylaxis/treatment in nephrotic syndrome (high thrombotic risk), renal vein thrombosis, post-transplant thrombosis, pulmonary embolism, VTE treatment.",
+    peds_dose: "Treatment: 1 mg/kg/dose BD SC. Prophylaxis: 0.5 mg/kg OD SC. Neonates/infants (<2 months): 1.5 mg/kg/dose BD. Target anti-Xa: 0.5–1.0 IU/mL (treatment), 0.2–0.4 (prophylaxis). Adjust by 25% increments.",
+    neonatal_dose: "Treatment: 1.5 mg/kg BD SC. Prophylaxis: 0.75 mg/kg OD. TDM (anti-Xa) essential — unpredictable PK in neonates.",
+    renal_adjust: "eGFR 30–60: monitor anti-Xa levels closely. eGFR <30: reduce dose 50% or switch to UFH with aPTT monitoring. eGFR <15: UFH preferred.",
+    hd_adjust: "Anti-Xa monitoring mandatory. Standard prophylaxis dose during HD.",
+    pd_adjust: "Standard dosing — anti-Xa monitoring.",
+    contraindications: "Active major bleeding, heparin-induced thrombocytopenia (HIT), endocarditis, thrombocytopenia <50,000.",
+    monitoring: "Anti-Xa 4h post-dose (peak). CBC for HIT surveillance (platelets weekly). Creatinine.",
+    timing: "SC injection. BD for treatment.",
+    food: "SC injection — food irrelevant.",
+    storage: "Room temperature. Do not freeze. Single-dose prefilled syringes.",
+    counselling: "SC injection technique for families. Report unusual bruising/bleeding. Do not stop without doctor advice.",
+    formulations: [
+      { form: "SC injection", strength: "40 mg/0.4 mL", brands: "Clexane 40 mg (Sanofi), Enoxalow 40 mg (Sun)" },
+      { form: "SC injection", strength: "60 mg/0.6 mL", brands: "Clexane 60 mg (Sanofi), Enoxalow 60 mg" },
+      { form: "SC injection", strength: "80 mg/0.8 mL", brands: "Clexane 80 mg (Sanofi)" },
+      { form: "SC injection", strength: "20 mg/0.2 mL", brands: "Clexane 20 mg (Sanofi) — paediatric use" },
+    ],
+    clinical_pearls: "Nephrotic syndrome: thrombotic risk highest when albumin <20 g/L or serum albumin <25 g/L with additional risk factors (immobility, dehydration). LMWH preferred over UFH for outpatient management. Anti-Xa monitoring essential in children < 2 years or CKD.",
+    references: ["ISTH Pediatric Thrombosis Guidelines 2017", "KIDIGO AKI 2012", "ACCP Antithrombotic Guidelines 2012"]
+  },
+
+  warfarin: {
+    generic: "Warfarin",
+    class: "Vitamin K Antagonist (VKA) Anticoagulant",
+    mechanism: "Inhibits vitamin K epoxide reductase → reduces synthesis of factors II, VII, IX, X, protein C and S.",
+    indications: "Long-term anticoagulation post-DVT/PE in nephrotic syndrome, mechanical heart valves, atrial fibrillation.",
+    peds_dose: "Loading: 0.2 mg/kg OD × 1–2 days. Maintenance: 0.1 mg/kg/day OD, adjusted by INR. Target INR: 2–3 (standard); 2.5–3.5 (mechanical valves). INR monitoring essential.",
+    neonatal_dose: "Not commonly used in neonates. Specialist only.",
+    renal_adjust: "Proceed carefully in CKD — increased bleeding risk. No dose change but more frequent INR monitoring.",
+    hd_adjust: "Standard dosing — INR guided.",
+    pd_adjust: "Standard dosing — INR guided.",
+    contraindications: "Active bleeding, severe liver disease, pregnancy (first trimester and near term), recent surgery.",
+    monitoring: "INR: daily until stable, then weekly/monthly. CBC. Drug-interaction review at every visit.",
+    timing: "Evening dose (consistent timing).",
+    food: "Consistent vitamin K intake (no sudden change in leafy greens). Avoid grapefruit.",
+    crush: "Tablets can be crushed.",
+    storage: "Room temperature.",
+    counselling: "Consistent diet (vitamin K). Report any unusual bleeding. Carry anticoagulant card. Many drug interactions — check before adding any new medicine.",
+    formulations: [
+      { form: "Tablet", strength: "1 mg", brands: "Warf 1 mg (Cipla), Warfarin 1 mg (generic)" },
+      { form: "Tablet", strength: "2 mg", brands: "Warf 2 mg (Cipla), Coumadin 2 mg (BMS — older)" },
+      { form: "Tablet", strength: "5 mg", brands: "Warf 5 mg (Cipla), Warfarin 5 mg" },
+    ],
+    clinical_pearls: "Very narrow therapeutic index. DOACs increasingly preferred in adults. VKA still widely used in paediatric nephrology where DOACs are not approved. Bridging with LMWH for procedures."
+  },
+
+  // ─────────────────────────── MODERN K+ BINDERS ────────────────────────────
+  sodiumZirconiumCyclosilicate: {
+    generic: "Sodium Zirconium Cyclosilicate (SZC)",
+    class: "Novel Potassium Binder (ZS-9)",
+    mechanism: "Microporous zirconium silicate crystal selectively traps K+ in GI tract → rapid, selective potassium removal. Onset within 1 hour.",
+    indications: "Hyperkalaemia in CKD, hyperkalaemia in dialysis patients, emergency hyperkalaemia management.",
+    peds_dose: "Adult dosing (paediatric data limited): Acute: 10 g TDS × 48h. Maintenance: 5–10 g OD. Paediatric: dose not established — use under specialist guidance.",
+    neonatal_dose: "Not established.",
+    renal_adjust: "No dose adjustment for eGFR. Use with caution as ongoing K+ lowering can cause hypokalemia.",
+    hd_adjust: "5 g OD on non-dialysis days.",
+    pd_adjust: "5 g OD.",
+    contraindications: "Severe hypokalemia (K+ <3.5 mEq/L), bowel obstruction.",
+    monitoring: "K+ at 24–48h, then weekly until stable. Na+ (sodium content ~400 mg/dose — monitor in fluid-restricted patients).",
+    timing: "OD maintenance. TDS for acute correction.",
+    food: "With or without food.",
+    storage: "Room temperature sachets.",
+    counselling: "Dissolve powder in water (150 mL minimum). Mix well and drink immediately. Tasteless — can be mixed with food.",
+    formulations: [
+      { form: "Oral suspension sachet", strength: "5 g", brands: "Lokelma 5 g (AstraZeneca) — imported/hospital access" },
+      { form: "Oral suspension sachet", strength: "10 g", brands: "Lokelma 10 g (AstraZeneca)" },
+    ],
+    clinical_pearls: "Faster onset (1h) vs patiromer (7h) and Kayexalate. HARMONIZE trial showed significant K reduction in CKD. Preferred for acute hyperkalaemia. Sodium content matters in fluid-restricted patients — monitor Na+."
+  },
+
+  patiromer: {
+    generic: "Patiromer",
+    class: "Novel Potassium Binder",
+    mechanism: "Non-absorbed polymer exchanges K+ for calcium in colon → removes K+ via faeces. Selective for K+ with minimal calcium loading.",
+    indications: "Chronic hyperkalaemia in CKD (stages 3–5), hyperkalaemia in patients on RAAS blockers, dialysis-associated hyperkalaemia.",
+    peds_dose: "Adult dosing: 8.4 g OD. Titrate by 4.2 g increments. Paediatric dosing not established — specialist use.",
+    neonatal_dose: "Not established.",
+    renal_adjust: "No eGFR-based adjustment.",
+    hd_adjust: "Standard dosing.",
+    contraindications: "Severe hypokalemia, bowel obstruction.",
+    monitoring: "K+ at 1 week, then monthly. Mg2+ (patiromer may lower Mg).",
+    timing: "OD. Onset ~7 hours — not for acute emergencies.",
+    food: "With food. Separate from other medications by 3 hours (binds other drugs).",
+    storage: "Store in refrigerator. Can be at room temperature up to 3 months.",
+    counselling: "Dissolve in 40–120 mL water. Do not take within 3 hours of other medications.",
+    formulations: [
+      { form: "Oral suspension sachet", strength: "8.4 g", brands: "Veltassa 8.4 g (Vifor/ARCA) — imported" },
+      { form: "Oral suspension sachet", strength: "16.8 g", brands: "Veltassa 16.8 g (Vifor)" },
+    ],
+    clinical_pearls: "AMETHYST-DN trial: patiromer enabled continued RAAS blockade in CKD patients. Not for acute hyperK management. Drug interactions important — separate from all other medications by 3 hours."
+  },
+
+  // ─────────────────────────── DIALYSIS LOCK SOLUTIONS ─────────────────────
+  alteplase: {
+    generic: "Alteplase (rt-PA)",
+    class: "Thrombolytic / Catheter Lock Solution",
+    mechanism: "Recombinant tissue plasminogen activator → converts plasminogen to plasmin → clot lysis. Restores catheter patency.",
+    indications: "CVC/dialysis catheter thrombus/dysfunction (intraluminal lock), tunnelled catheter salvage, DVT treatment (systemic — hospital only).",
+    peds_dose: "Catheter lock: Instil volume to fill catheter lumen (1–2 mg/mL, typically 1–2 mg in 1–2 mL per lumen). Dwell 30–120 min then aspirate. Systemic DVT: 0.5 mg/kg/hr × 6h (max 10 mg/hr) — PICU only.",
+    neonatal_dose: "Catheter lock: 0.5 mg/lumen. Dwell 30–60 min. Systemic: NICU specialist protocol.",
+    renal_adjust: "No adjustment for catheter lock. Systemic: standard.",
+    hd_adjust: "Catheter lock standard for HD catheters.",
+    pd_adjust: "Peritoneal catheter: fibrin — use fibrinolytic irrigation.",
+    contraindications: "Systemic: active internal bleeding, recent stroke/surgery. Catheter lock: evidence of systemic sepsis (flush after aspirating — do not instil into blood stream).",
+    monitoring: "Catheter patency (blood return). Systemic: continuous neurological assessment, BP.",
+    timing: "Catheter lock: 30–120 min dwell.",
+    food: "IV/catheter use only.",
+    storage: "Reconstituted solution: 4h at room temperature.",
+    counselling: "Hospital/nursing use only.",
+    formulations: [
+      { form: "Cathflo/Lyophilised powder", strength: "2 mg/vial (Cathflo Activase)", brands: "Cathflo Activase 2 mg (Genentech) — imported", note: "For catheter clearing" },
+      { form: "IV powder", strength: "10 mg vial", brands: "Actilyse 10 mg (Boehringer) — systemic use" },
+      { form: "IV powder", strength: "50 mg vial", brands: "Actilyse 50 mg (Boehringer)" },
+    ],
+    clinical_pearls: "Cathflo Activase (2 mg/2 mL) specifically designed for catheter clearing. Dwell 30–120 min. Aspire and discard before connecting patient — never flush thrombus into bloodstream. If catheter still non-functional after 2 doses — consider catheter exchange."
+  },
+
+  heparinLock: {
+    generic: "Heparin Lock Solution",
+    class: "Catheter Lock / Anticoagulant",
+    mechanism: "Heparin fills catheter lumen → prevents clot formation during catheter dwell periods. Does not enter systemic circulation if aspired before use.",
+    indications: "Tunnelled HD/PD catheter maintenance between sessions, CVC locking.",
+    peds_dose: "Volume equal to catheter lumen volume (printed on catheter). Concentration: 1000–5000 units/mL (HD catheters). Low-dose: 10–100 units/mL for non-HD CVCs.",
+    neonatal_dose: "10 units/mL heparin lock for CVC maintenance. Total daily systemic exposure must be calculated.",
+    renal_adjust: "No adjustment — catheter-based.",
+    hd_adjust: "HD catheter: 1000–5000 IU/mL per lumen. Instil volume = lumen volume only.",
+    pd_adjust: "PD catheter: 500–1000 IU added to PD bags if fibrin.",
+    contraindications: "HIT (heparin-induced thrombocytopenia) — switch to citrate lock.",
+    monitoring: "Platelet count weekly (HIT surveillance). Always aspirate and discard lock before connecting patient.",
+    storage: "Pre-filled syringes or vials — room temperature.",
+    formulations: [
+      { form: "Pre-filled syringe", strength: "5000 IU/5 mL", brands: "Heplock 5000 IU (Sun), Heparin flush syringe (multiple)" },
+      { form: "Vial", strength: "5000 IU/mL", brands: "Heparin sodium 5000 IU/mL (Cipla, Intas)" },
+    ],
+    clinical_pearls: "Aspirate 2× lumen volume before use to remove heparin. Never flush into patient — especially with high concentrations. Citrate lock (4% trisodium citrate) preferred when HIT suspected or documented — equal efficacy, no HIT risk."
+  },
+
+  // ─────────────────────────── PD SOLUTIONS ─────────────────────────────────
+  pdDianeal: {
+    generic: "Dianeal PD Solution (1.36% / 2.27% / 3.86% Glucose)",
+    class: "Peritoneal Dialysis Solution",
+    mechanism: "Hypertonic glucose-based PD fluid — osmotic gradient drives water removal. Buffered with lactate (pH 5.2).",
+    indications: "Peritoneal dialysis for AKI, ESRD in children. Available in 1.36% (mild UF), 2.27% (moderate), 3.86% (high UF).",
+    peds_dose: "Fill volume: 800–1100 mL/m² per exchange (max 1200 mL/m²). Concentration by residual fluid balance. CAPD: 3–4 exchanges/day. APD: automated cycling (8–12h overnight).",
+    neonatal_dose: "Neonatal PD: 10–30 mL/kg per exchange. Specialist NICU PD.",
+    renal_adjust: "Primary renal therapy — not applicable.",
+    contraindications: "Abdominal adhesions, peritonitis, recent abdominal surgery, diaphragmatic defects (relative).",
+    monitoring: "Fluid balance (UF), body weight, glucose. Electrolytes daily (inpatients). Blood glucose (hyperglycaemia with 3.86%).",
+    storage: "Room temperature. Warm to body temperature before infusion (37°C). Check for turbidity before use.",
+    counselling: "Warm bags before use. Report cloudy effluent immediately (peritonitis).",
+    formulations: [
+      { form: "PD bag", strength: "1.36% glucose, 1.5 L", brands: "Dianeal 1.36% 1.5L (Baxter)" },
+      { form: "PD bag", strength: "2.27% glucose, 2 L", brands: "Dianeal 2.27% 2L (Baxter)" },
+      { form: "PD bag", strength: "3.86% glucose, 2 L", brands: "Dianeal 3.86% 2L (Baxter)" },
+    ],
+    clinical_pearls: "Lactate buffer: use Physioneal (bicarbonate buffer) for patients with lactic acidosis or liver disease. 3.86% glucose only for 1–2 exchanges to limit glucose load. Prolonged 3.86% → hyperglycaemia, glycated peritoneum."
+  },
+
+  pdPhysioneal: {
+    generic: "Physioneal PD Solution (Bicarbonate-buffered)",
+    class: "Peritoneal Dialysis Solution (pH-neutral)",
+    mechanism: "Bicarbonate/lactate dual-buffered PD solution (physiological pH 7.4). Reduced membrane inflammation compared to standard lactate PD fluid. Longer peritoneal survival.",
+    indications: "PD (preferred over Dianeal in children and patients with lactic acidosis). Better peritoneal membrane biocompatibility.",
+    peds_dose: "Same fill volumes as Dianeal. Preferred for all paediatric PD — especially infants and those on long-term PD.",
+    formulations: [
+      { form: "PD bag", strength: "1.36% glucose, 2 L", brands: "Physioneal 1.36% 2L (Baxter)" },
+      { form: "PD bag", strength: "2.27% glucose, 2 L", brands: "Physioneal 2.27% 2L (Baxter)" },
+      { form: "PD bag", strength: "3.86% glucose, 2 L", brands: "Physioneal 3.86% 2L (Baxter)" },
+    ],
+    clinical_pearls: "Neutral pH reduces infusion pain. Better long-term peritoneal membrane preservation vs standard Dianeal. Preferred for paediatric PD programmes."
+  },
+
+  pdExtraneal: {
+    generic: "Extraneal (Icodextrin 7.5%)",
+    class: "Peritoneal Dialysis Solution (Non-glucose Osmotic Agent)",
+    mechanism: "Glucose polymer (icodextrin) osmotic agent → sustained ultrafiltration over long dwell (8–14h). No glucose load. Maintains oncotic gradient.",
+    indications: "Long-dwell PD exchange (overnight CAPD, daytime dwell in APD). High-transport patients with poor glucose-based UF. Ultrafiltration failure.",
+    peds_dose: "Single exchange per 24h only (accumulates if more frequent). Fill volume as per standard PD. Used for long dwell — not for all exchanges.",
+    contraindications: "Maltose intolerance, icodextrin hypersensitivity, cornstarch allergy. Use ONE exchange per 24h only.",
+    monitoring: "Glucose monitoring with icodextrin: raises maltose → falsely elevated glucose on certain glucose oxidase methods. Must use glucose dehydrogenase method for BG monitoring.",
+    formulations: [
+      { form: "PD bag", strength: "7.5% icodextrin, 2 L", brands: "Extraneal 7.5% 2L (Baxter)" },
+    ],
+    clinical_pearls: "Critical: Patient/family must know that standard glucometers (glucose oxidase method) will give FALSE HIGH glucose readings — switch to glucose-specific meter using glucose dehydrogenase. One bag per 24h maximum."
+  },
+
+  // ─────────────────────────── CKD-MBD ADDITIONS ────────────────────────────
+  calcitriolErgocalciferol: {
+    generic: "Ergocalciferol (Vitamin D2)",
+    class: "Vitamin D Supplement (Nutritional)",
+    mechanism: "Precursor to active vitamin D. Hepatic hydroxylation → 25-OH D2. Renal hydroxylation → 1,25-OH D2. Replenishes depleted stores.",
+    indications: "Nutritional vitamin D deficiency, CKD-associated vitamin D deficiency (25-OH D <20 ng/mL), rickets prevention/treatment.",
+    peds_dose: "Deficiency treatment: 60,000 IU once weekly × 8 weeks (stoss therapy). Maintenance: 1000–2000 IU/day. Infants: 400–1000 IU/day (prophylaxis). CKD: 2000–4000 IU/day.",
+    neonatal_dose: "400 IU/day supplementation (all infants). Deficiency: 1000 IU/day × 3 months.",
+    renal_adjust: "In CKD stages 3–5: replete 25-OH D first with cholecalciferol/ergocalciferol. Then add calcitriol for PTH management.",
+    hd_adjust: "Supplement as for CKD — 25-OH D monitoring.",
+    contraindications: "Hypercalcaemia, hypervitaminosis D.",
+    monitoring: "25-OH vitamin D level at baseline and 3 months. Calcium, phosphate.",
+    timing: "Weekly (stoss) or daily.",
+    food: "With food (fat-soluble vitamin — better absorbed with meals).",
+    storage: "Room temperature, away from light.",
+    counselling: "Fat-soluble vitamin — take with meals. Sunlight (20 min/day of sun exposure) is also important.",
+    formulations: [
+      { form: "Capsule", strength: "60,000 IU", brands: "Calcirol 60K (Cadila), D-Rise 60K (USV), Arachitol 60K (Abbott)" },
+      { form: "Oral solution", strength: "400 IU/mL (drops)", brands: "D-Vit drops (Elder), Vitamin D3 drops (many brands)" },
+      { form: "Oral solution", strength: "1000 IU/mL", brands: "D-Rise 1000 IU drops (USV), Calcirol drops" },
+    ],
+    clinical_pearls: "India: widespread Vit D deficiency (>70% of children in studies). In CKD: replete stores first, then add active Vit D. Do not use ergocalciferol alone for CKD-MBD — calcitriol needed for PTH suppression."
+  },
+
+  calciumCitrate: {
+    generic: "Calcium Citrate",
+    class: "Calcium Supplement / Phosphate Binder",
+    mechanism: "Provides elemental calcium (21% by weight vs 40% for CaCO3). Citrate increases calcium absorption. Better absorbed than CaCO3 in achlorhydria.",
+    indications: "Hypocalcaemia (distal RTA adjunct — citrate also alkalinises urine), CKD-MBD calcium supplementation, osteoporosis prevention.",
+    peds_dose: "Hypocalcaemia: 45–65 mg/kg/day elemental calcium ÷ TDS. Calcium citrate 950 mg = 200 mg elemental Ca. Supplement: 500–1000 mg elemental Ca/day.",
+    renal_adjust: "Monitor calcium carefully. Citrate moiety may increase aluminium absorption — avoid with aluminium-containing compounds.",
+    contraindications: "Hypercalcaemia, hypercalciuria, urinary calcium oxalate stones (citrate helps but Ca load may worsen).",
+    monitoring: "Calcium, phosphate, urinary calcium.",
+    timing: "With meals (phosphate binder) or between meals (supplement).",
+    food: "Can be taken without food — better absorbed than CaCO3 even without acid.",
+    crush: "Tablets can be crushed.",
+    counselling: "Better tolerated GI-wise than calcium carbonate. Avoid with aluminium preparations (increases Al absorption).",
+    formulations: [
+      { form: "Tablet", strength: "950 mg (200 mg elemental Ca)", brands: "Citracal (Bayer), Calcium citrate generic (Cipla)" },
+      { form: "Tablet", strength: "500 mg elemental Ca", brands: "Cipcal-Forte (Cipla), Caldikind (Mankind)" },
+    ],
+    clinical_pearls: "Preferred over CaCO3 in patients on PPIs or with achlorhydria (CaCO3 needs acid for absorption — citrate does not). In distal RTA: citrate supplementation also alkalinises urine — dual benefit."
+  },
+
+  sucroferricOxyhydroxide: {
+    generic: "Sucroferric Oxyhydroxide",
+    class: "Iron-based Phosphate Binder",
+    mechanism: "Polynuclear iron(III)-oxyhydroxide binds dietary phosphate in GI tract → reduces phosphate absorption. No calcium loading. Iron-based.",
+    indications: "Hyperphosphataemia in CKD/dialysis — alternative to calcium and aluminium binders.",
+    peds_dose: "Adult: 500 mg TDS with meals. Titrate. Paediatric dosing not established — specialist use only.",
+    renal_adjust: "No eGFR adjustment — primary renal indication.",
+    contraindications: "Haemochromatosis, iron accumulation disorders, severe GI disease.",
+    monitoring: "Phosphate monthly. Serum iron, ferritin (if concerns about iron absorption — low with sucroferric).",
+    timing: "WITH each main meal (3 times daily).",
+    food: "WITH food only.",
+    storage: "Room temperature. Chewable tablets.",
+    counselling: "Chew tablets thoroughly before swallowing. Black/dark stools — normal (iron-based).",
+    formulations: [
+      { form: "Chewable tablet", strength: "500 mg", brands: "Velphoro 500 mg (Vifor) — imported/hospital access" },
+    ],
+    clinical_pearls: "Pill burden advantage: 1–3 tablets/day vs 6–9 sevelamer tablets. No calcium load. Preferred in patients with hypercalcaemia or adynamic bone disease. Stool darkening — reassure patients."
+  },
+
+  // ─────────────────────────── RARE DISEASE / TRANSPLANT ADDITIONS ──────────
+  nedosiran: {
+    generic: "Nedosiran",
+    class: "RNA Interference (RNAi) Therapy — Hyperoxaluria",
+    mechanism: "siRNA targeting LDHA (lactate dehydrogenase A) in hepatocytes → reduces hepatic oxalate production. For Primary Hyperoxaluria Type 1, 2, and 3.",
+    indications: "Primary Hyperoxaluria Types 1, 2, and 3 (FDA approved 2023). Reduces urinary oxalate.",
+    peds_dose: "≥9 years, weight >15 kg: 160 mg SC monthly. Weight-based for children <15 kg — consult specialist.",
+    renal_adjust: "CKD: standard dosing. Dialysis: standard — hyperoxaluria continues despite RRT without treatment.",
+    contraindications: "Hypersensitivity to nedosiran.",
+    monitoring: "24-h urinary oxalate monthly. Plasma oxalate. Renal function.",
+    timing: "Monthly SC injection.",
+    food: "SC injection.",
+    storage: "2–8°C refrigerated.",
+    formulations: [
+      { form: "SC injection", strength: "160 mg/0.8 mL", brands: "Rivfloza 160 mg (Dicerna/Novo Nordisk) — imported" },
+    ],
+    clinical_pearls: "Targets all three types of PH (PH1, PH2, PH3) unlike lumasiran (PH1 only). Monthly dosing vs monthly lumasiran (also monthly but hepatocyte-targeting differs). PHYOX trial data: significant urinary oxalate reduction. Early treatment preserves kidney function."
+  },
+
+  agalsidaseBeta: {
+    generic: "Agalsidase Beta",
+    class: "Enzyme Replacement Therapy (ERT) — Fabry Disease",
+    mechanism: "Recombinant human alpha-galactosidase A → replaces deficient enzyme in Fabry disease → reduces lysosomal Gb3 accumulation.",
+    indications: "Fabry disease (GLA gene mutations) — enzyme replacement therapy.",
+    peds_dose: "1 mg/kg IV q2 weeks. Infusion over 2–4 hours. Start at 0.1 mg/kg/min.",
+    neonatal_dose: "Not typically used before diagnosis.",
+    renal_adjust: "No dose adjustment — primary renal indication.",
+    contraindications: "Hypersensitivity to agalsidase (anaphylaxis risk — premedication protocol).",
+    monitoring: "Lyso-Gb3 plasma, 24-h urine Gb3. eGFR, urine protein. Echocardiogram annually. Anti-agalsidase antibodies.",
+    timing: "Biweekly IV infusion. Start slow.",
+    storage: "2–8°C. Reconstituted solution: use within 3 hours.",
+    counselling: "Premedication 1h before: antihistamine + paracetamol. Infusion reactions common initially — report any breathing difficulty.",
+    formulations: [
+      { form: "IV powder", strength: "35 mg/vial", brands: "Fabrazyme 35 mg (Sanofi Genzyme) — imported via REMS" },
+    ],
+    clinical_pearls: "Agalsidase beta (1 mg/kg) vs agalsidase alfa (0.2 mg/kg): different regulatory approvals globally. Fabrazyme (beta) approved in US/India specialist centres. Antibody formation may reduce efficacy — monitor titre. Migalastat alternative for amenable mutations."
+  },
+
+  agalsidasealfa: {
+    generic: "Agalsidase Alfa",
+    class: "Enzyme Replacement Therapy (ERT) — Fabry Disease",
+    mechanism: "Recombinant alpha-galactosidase A → enzyme replacement for Fabry disease.",
+    indications: "Fabry disease — enzyme replacement.",
+    peds_dose: "0.2 mg/kg IV q2 weeks.",
+    renal_adjust: "No dose adjustment.",
+    formulations: [
+      { form: "IV powder", strength: "3.5 mg/vial", brands: "Replagal 3.5 mg (Takeda) — imported" },
+    ],
+    clinical_pearls: "Agalsidase alfa (European approval, 0.2 mg/kg) vs beta (USA, 1 mg/kg) — both equally approved globally. Choose based on availability. Monitoring same as agalsidase beta."
+  },
+
+  avacopan: {
+    generic: "Avacopan",
+    class: "Complement C5a Receptor Antagonist",
+    mechanism: "Selective small-molecule C5aR1 blocker → reduces neutrophil/macrophage activation by complement → reduces ANCA vasculitis tissue injury.",
+    indications: "ANCA vasculitis (PR3-ANCA or MPO-ANCA) — as adjunct to rituximab or cyclophosphamide. Steroid-sparing.",
+    peds_dose: "Adult: 30 mg BD PO. Paediatric dosing not established — specialist use only (emerging paediatric ANCA data).",
+    renal_adjust: "No dose adjustment.",
+    contraindications: "Strong CYP3A4 inhibitors or inducers.",
+    monitoring: "ANCA titres, eGFR, urine protein. LFT (hepatotoxicity in trials — monitor monthly for first 4 months).",
+    timing: "Twice daily PO.",
+    food: "With food.",
+    storage: "Room temperature.",
+    formulations: [
+      { form: "Capsule", strength: "30 mg", brands: "Tavneos 30 mg (AstraZeneca) — imported/hospital access" },
+    ],
+    clinical_pearls: "ADVOCATE trial: avacopan non-inferior to prednisolone at 26 weeks, superior at 52 weeks — allows steroid tapering. First ANCA vasculitis-specific drug. Reduces glucocorticoid toxicity. Liver toxicity monitoring mandatory (monthly LFT first 4 months)."
+  },
+
+  alemtuzumab: {
+    generic: "Alemtuzumab",
+    class: "Anti-CD52 Monoclonal Antibody",
+    mechanism: "Anti-CD52 mAb → depletes T and B lymphocytes → profound immunosuppression. Used for T-cell depletion in transplant conditioning.",
+    indications: "Renal transplant (induction immunosuppression — lymphocyte depletion). Desensitisation protocols. Some centres use for SRNS (experimental).",
+    peds_dose: "Transplant induction: 0.3–0.4 mg/kg IV (max 30 mg) × 1–2 doses. Premedication essential.",
+    renal_adjust: "No dose adjustment.",
+    contraindications: "Active infection, HIV, unvaccinated patients. Premedication required.",
+    monitoring: "CBC (lymphopenia expected for months). CMV/EBV PCR. Autoimmune disease surveillance (thyroid, ITP — long-term).",
+    timing: "IV infusion over 4 hours.",
+    storage: "2–8°C.",
+    formulations: [
+      { form: "IV infusion", strength: "30 mg/1 mL", brands: "Lemtrada 30 mg (Sanofi) — hospital import" },
+    ],
+    clinical_pearls: "Profound T and B cell depletion months after single course — delayed autoimmune phenomena (thyroid, ITP) up to 3 years post-dose. Used in low-dose desensitisation protocols for highly sensitised recipients in select transplant centres."
+  },
+
+  tacrolimusXR: {
+    generic: "Tacrolimus Extended Release (Tacrolimus XR)",
+    class: "Calcineurin Inhibitor — Extended Release",
+    mechanism: "Same as standard tacrolimus (FK506) but once-daily extended-release formulation — more consistent trough levels, potentially improved adherence.",
+    indications: "Renal transplant maintenance immunosuppression. Conversion from standard BD tacrolimus.",
+    peds_dose: "Adult: OD dosing — conversion ratio 1:1 from BD tacrolimus. Paediatric: conversion 0.85× BD total daily dose OD (per limited paediatric data). TDM essential.",
+    renal_adjust: "TDM-guided — same target troughs as standard tacrolimus.",
+    contraindications: "Same as standard tacrolimus.",
+    monitoring: "C24 trough (not C12) — correlation different from standard tacrolimus. TDM mandatory at conversion and 1 week post-switch.",
+    timing: "Once daily, morning. Consistent timing.",
+    food: "Empty stomach for consistent absorption.",
+    counselling: "IMPORTANT: Do NOT confuse with standard tacrolimus capsules. Check formulation at every dispensing. Dose different from BD tacrolimus — pharmacist to verify.",
+    formulations: [
+      { form: "Capsule (extended release)", strength: "0.5 mg", brands: "Advagraf 0.5 mg (Astellas), Envarsus XR (Veloxis) — imported" },
+      { form: "Capsule (extended release)", strength: "1 mg", brands: "Advagraf 1 mg (Astellas)" },
+      { form: "Capsule (extended release)", strength: "5 mg", brands: "Advagraf 5 mg (Astellas)" },
+    ],
+    clinical_pearls: "OD dosing improves compliance vs BD standard tacrolimus. Envarsus (LCPT formulation) uses different technology from Advagraf — conversion ratios differ. Never switch formulations without TDM plan. India availability: mainly via hospital import channels."
+  },
+
   sodiumPolystyreneSulfonate: {
     generic: "Sodium Polystyrene Sulfonate (Kayexalate)",
     class: "Cation Exchange Resin (Potassium Binder)",
@@ -1177,12 +1538,15 @@ export const FORMULARY_COLLECTIONS = [
   { id: "biologics", label: "Biologics", keys: ["rituximab", "belimumab", "eculizumab", "ravulizumab"] },
   { id: "raas", label: "RAAS Blockers", keys: ["enalapril", "ramipril", "losartan"] },
   { id: "diuretics", label: "Diuretics", keys: ["furosemide", "spironolactone", "hydrochlorothiazide"] },
-  { id: "ckdmbd", label: "CKD-MBD", keys: ["calcitriol", "calciumCarbonate", "sevelamer", "sodiumBicarbonate"] },
+  { id: "ckdmbd", label: "CKD-MBD", keys: ["calcitriol", "calciumCarbonate", "calciumCitrate", "calcitriolErgocalciferol", "sevelamer", "sucroferricOxyhydroxide", "sodiumBicarbonate"] },
   { id: "immunization", label: "Immunization & Infection Prophylaxis", keys: ["cotrimoxazole", "nitrofurantoin", "acyclovir", "fluconazole"] },
-  { id: "dialysis", label: "Dialysis Medications", keys: ["epoetin", "darbepoetin", "ironSucrose", "ironPolymaltose", "vancomycin"] },
-  { id: "transplant", label: "Transplant Medications", keys: ["tacrolimus", "cyclosporine", "mycophenolate", "azathioprine", "methylprednisolone"] },
+  { id: "dialysis", label: "Dialysis Medications", keys: ["epoetin", "darbepoetin", "ironSucrose", "ironPolymaltose", "vancomycin", "alteplase", "heparinLock", "pdDianeal", "pdPhysioneal", "pdExtraneal"] },
+  { id: "transplant", label: "Transplant Medications", keys: ["tacrolimus", "tacrolimusXR", "cyclosporine", "mycophenolate", "azathioprine", "methylprednisolone", "alemtuzumab"] },
   { id: "immunomodulators", label: "Immunomodulators", keys: ["levamisole"] },
-  { id: "emergency", label: "Emergency", keys: ["labetalol", "sodiumNitroprusside", "calciumGluconate", "sodiumPolystyreneSulfonate", "nifedipine"] },
+  { id: "emergency", label: "Emergency", keys: ["labetalol", "sodiumNitroprusside", "calciumGluconate", "sodiumPolystyreneSulfonate", "sodiumZirconiumCyclosilicate", "patiromer", "nifedipine"] },
+  { id: "anticoagulants", label: "Anticoagulants", keys: ["enoxaparin", "warfarin"] },
+  { id: "raredisease", label: "Rare Disease Nephrology", keys: ["nedosiran", "agalsidaseBeta", "agalsidasealfa", "avacopan", "tolvaptan"] },
+  { id: "vasculitis", label: "Vasculitis & LN", keys: ["avacopan", "cyclophosphamide", "rituximab", "mycophenolate", "azathioprine", "belimumab", "voclosporin"] },
 ];
 
 export const FORMULARY_CATEGORIES = [

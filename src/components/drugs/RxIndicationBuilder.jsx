@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,7 +111,7 @@ function doseRuleToPreset(rule) {
 
 // ── Dose calculation ──────────────────────────────────────────────────────────
 function calculateDose(ind, wt, bsa, activeFreq) {
-  if (ind.isTDM) return { type: "TDM" };
+  // TDM drugs: still calculate weight-based starting dose, but flag TDM requirement
   if (ind.fixedDose) return { type: "fixed", display: ind.fixedDose };
   if (ind.dose_infusion) return { type: "infusion", display: `${ind.dose_infusion} ${ind.dose_unit_raw}` };
 
@@ -292,7 +292,8 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
     let doseStr = overrideDose || "";
     if (!doseStr) {
       if (calc?.type === "weight" || calc?.type === "bsa") doseStr = `${calc.perAdminMg} mg`;
-      else if (calc?.type === "TDM") doseStr = "(TDM-guided)";
+      else if (calc?.type === "TDM" && calc.perAdminMg) doseStr = `${calc.perAdminMg} mg (starting; adjust by TDM)`;
+      else if (calc?.type === "TDM") doseStr = "(TDM-guided — enter dose)";
       else if (calc?.type === "fixed") doseStr = calc.display;
       else doseStr = selectedInd.note || "—see monograph";
     }
@@ -308,13 +309,71 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
     ].filter(Boolean).join("\n");
   }, [selectedInd, calc, overrideDose, overrideFreq, overrideDuration, overrideRoute, drug, wt]);
 
+  const handleExportPDF = useCallback(() => {
+    const drugName = drug?.generic_name || drug?.generic || "";
+    const freq = overrideFreq || selectedInd?.freq;
+    const duration = overrideDuration || selectedInd?.duration;
+    const route = overrideRoute || selectedInd?.route;
+    let doseStr = overrideDose || "";
+    if (!doseStr && (calc?.type === "weight" || calc?.type === "bsa")) doseStr = `${calc.perAdminMg} mg`;
+    else if (calc?.type === "fixed") doseStr = calc.display;
+    else if (calc?.type === "TDM") doseStr = `Starting: ${calc?.perAdminMg ? calc.perAdminMg + " mg" : "—"} (TDM-guided)`;
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+    const lines = [
+      "PRESCRIPTION — CliniCals Hub by Swarnim",
+      "─────────────────────────────────────────────",
+      `Date: ${dateStr}`,
+      "",
+      "PATIENT DETAILS",
+      `Weight: ${wt ? wt + " kg" : "Not entered"}`,
+      `BSA: ${bsa ? bsa + " m²" : "Not calculated"}`,
+      `Height: ${parseFloat(height) ? parseFloat(height) + " cm" : "Not entered"}`,
+      "",
+      "PRESCRIPTION",
+      `Drug: ${drugName}`,
+      `Indication: ${selectedInd?._aliases ? selectedInd._aliases.join(" / ") : selectedInd?.label}`,
+      `Dose: ${doseStr}`,
+      `Frequency: ${freq}`,
+      `Route: ${route}`,
+      `Duration: ${duration}`,
+      "",
+      "DOSE CALCULATION",
+      calc?.trail ? `${calc.trail}` : "Manual dose — verify independently",
+      calc?.capped ? `⚠ Capped at max ${calc.cappedAt} mg/day` : "",
+      selectedInd?.isTDM ? `🎯 TDM required — Target: ${selectedInd.note || "see monograph"}` : "",
+      "",
+      "MONITORING REQUIREMENTS",
+      selectedInd?.monitoring || "As per drug monograph",
+      selectedInd?.note ? `Note: ${selectedInd.note}` : "",
+      "",
+      "─────────────────────────────────────────────",
+      "⚠ For decision support only. Verify all doses against institutional protocol.",
+      "CliniCals Hub — Pediatric Clinical Intelligence",
+    ].filter(l => l !== undefined && l !== null);
+
+    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Rx_${drugName.replace(/\s+/g,"_")}_${dateStr.replace(/\s/g,"-")}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Prescription exported");
+  }, [selectedInd, calc, overrideDose, overrideFreq, overrideDuration, overrideRoute, drug, wt, bsa, height]);
+
   const handleAddToRxList = () => {
     if (!selectedInd) return;
     const freq = overrideFreq || selectedInd.freq;
     const duration = overrideDuration || selectedInd.duration;
     const route = overrideRoute || selectedInd.route;
     let doseStr = overrideDose || "";
-    if (!doseStr && (calc?.type === "weight" || calc?.type === "bsa")) doseStr = `${calc.perAdminMg} mg`;
+    if (!doseStr) {
+      if (calc?.type === "weight" || calc?.type === "bsa") doseStr = `${calc.perAdminMg} mg`;
+      else if (calc?.type === "TDM" && calc.perAdminMg) doseStr = `${calc.perAdminMg} mg (starting; adjust by TDM)`;
+    }
     onAddToRxList?.({ drug, indication: selectedInd.label, dose: doseStr, freq, route, duration, prescriptionText, calcTrail: calc?.trail });
     toast.success(`${drug?.generic_name || drug?.generic} added to Rx`);
     onClose?.();
@@ -378,10 +437,31 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
                   </Alert>
                 )}
               </>
+            ) : calc?.type === "TDM" && (calc.perAdminMg || calc.dailyMg) ? (
+              <>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-white rounded-xl border border-blue-200 p-3 text-center">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Starting Per Dose</p>
+                    <p className="text-xl font-bold text-blue-800">{calc.perAdminMg} mg</p>
+                  </div>
+                  <div className="bg-white rounded-xl border border-blue-200 p-3 text-center">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Starting Daily</p>
+                    <p className="text-xl font-bold text-blue-800">{calc.dailyMg} mg</p>
+                  </div>
+                </div>
+                <div className="bg-slate-800 rounded-lg px-3 py-2">
+                  <p className="text-[10px] text-slate-400 mb-0.5">Calculation</p>
+                  <p className="text-xs text-green-400 font-mono">{calc.trail}</p>
+                </div>
+                <Alert className="bg-blue-50 border-blue-200 py-2">
+                  <FlaskConical className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <AlertDescription className="text-blue-800 text-xs"><strong>🎯 TDM required.</strong> Adjust dose to target: {selectedInd.note || "see monograph"}</AlertDescription>
+                </Alert>
+              </>
             ) : calc?.type === "TDM" ? (
               <Alert className="bg-blue-50 border-blue-200 py-2">
-                <FlaskConical className="w-4 h-4 text-blue-600" />
-                <AlertDescription className="text-blue-800 text-xs"><strong>TDM-guided dosing.</strong> {selectedInd.note}</AlertDescription>
+                <FlaskConical className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                <AlertDescription className="text-blue-800 text-xs"><strong>🎯 TDM-guided dosing.</strong> {selectedInd.note} — Enter dose manually or refer monograph.</AlertDescription>
               </Alert>
             ) : calc?.type === "fixed" ? (
               <div className="bg-white rounded-xl border border-teal-200 p-3 text-center">
@@ -466,9 +546,9 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
                     {inds.map((ind, i) => {
                       const isSelected = selectedInd?.label === ind.label;
                       const quickCalc = calculateDose(ind, wt, bsa, null);
-                      const dosePreview = quickCalc?.type === "weight" || quickCalc?.type === "bsa"
-                        ? `${quickCalc.perAdminMg} mg` : quickCalc?.type === "fixed"
-                        ? quickCalc.display : quickCalc?.type === "TDM" ? "TDM" : "—";
+                      const dosePreview = quickCalc?.type === "weight" || quickCalc?.type === "bsa" || quickCalc?.type === "TDM"
+                        ? `${quickCalc.perAdminMg} mg${quickCalc?.type === "TDM" ? "*" : ""}` : quickCalc?.type === "fixed"
+                        ? quickCalc.display : "—";
                       return (
                         <button key={i}
                           onClick={() => { setSelectedInd(ind); setOverrideFreq(""); setOverrideDuration(""); setOverrideRoute(""); setOverrideDose(""); }}
@@ -487,6 +567,9 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
                               <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isSelected ? "bg-teal-200 text-teal-800" : "bg-slate-100 text-slate-600"}`}>
                                 {dosePreview}
                               </span>
+                            )}
+                            {ind.isTDM && (
+                              <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-semibold">TDM</span>
                             )}
                             {isSelected && <CheckCircle className="w-4 h-4 text-teal-600" />}
                           </div>
@@ -539,10 +622,19 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
 
         {/* Prescription preview */}
         {prescriptionText && (
-          <div className="bg-slate-900 rounded-xl p-3">
-            <p className="text-[10px] text-slate-400 mb-1 uppercase tracking-wide">Prescription Preview</p>
-            <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap leading-relaxed">{prescriptionText}</pre>
-          </div>
+        <div className="bg-slate-900 rounded-xl p-3">
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-[10px] text-slate-400 uppercase tracking-wide">Prescription Preview</p>
+          <button
+            onClick={handleExportPDF}
+            className="flex items-center gap-1 text-[10px] text-emerald-400 hover:text-emerald-300 bg-emerald-900/40 px-2 py-0.5 rounded-full transition-colors"
+            title="Export as PDF"
+          >
+            📄 Export PDF
+          </button>
+        </div>
+        <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap leading-relaxed">{prescriptionText}</pre>
+        </div>
         )}
 
         {/* Actions */}

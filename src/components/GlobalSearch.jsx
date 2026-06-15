@@ -247,22 +247,61 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const flatResults = useRef([]);
   const recognitionRef = useRef(null);
 
+  // ── Indian medical term corrections ─────────────────────────────────────────
+  const normaliseVoiceQuery = (text) => {
+    // Common misrecognitions for Indian English medical terms
+    const corrections = {
+      "capital": "catheter", "cathedra": "catheter", "capitol": "catheter",
+      "peritoneum": "peritoneal", "dialyses": "dialysis",
+      "proteinuria": "proteinuria", "hematuria": "haematuria",
+      "nephritic": "nephritic", "nephritis": "nephritis",
+      "hypertensive": "hypertensive", "egfr": "eGFR",
+      "tacrolimus": "tacrolimus", "tackle limus": "tacrolimus",
+      "prednisolone": "prednisolone", "prendisolone": "prednisolone",
+      "cyclosporine": "cyclosporine", "cyclosporin": "cyclosporine",
+      "rituximab": "rituximab", "ritual exam": "rituximab",
+      "furosemide": "furosemide", "frusemide": "furosemide",
+      "mycophenolate": "mycophenolate", "micro phenolate": "mycophenolate",
+      "azathioprine": "azathioprine", "aza thioprine": "azathioprine",
+      "शकर": "diabetes", "मधुमेह": "diabetes",
+      "गुर्दा": "kidney", "किडनी": "kidney",
+      "पेशाब": "urine", "मूत्र": "urine",
+      "उच्च रक्तचाप": "hypertension", "blood pressure high": "hypertension",
+    };
+    let result = text;
+    for (const [wrong, right] of Object.entries(corrections)) {
+      const regex = new RegExp(wrong, "gi");
+      result = result.replace(regex, right);
+    }
+    return result;
+  };
+
   const startVoiceSearch = useCallback(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) { alert("Voice search not supported in this browser"); return; }
     if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return; }
     const rec = new SpeechRecognition();
+    // Prefer Indian English; fall back gracefully to other Indian languages
     rec.lang = "en-IN";
     rec.interimResults = false;
-    rec.maxAlternatives = 1;
+    rec.maxAlternatives = 5; // get more alternatives for better matching
+    rec.continuous = false;
     rec.onresult = (e) => {
-      const t = e.results[0][0].transcript;
+      // Pick best alternative after applying medical term corrections
+      const transcripts = Array.from({ length: e.results[0].length }, (_, i) => e.results[0][i].transcript);
+      const corrected = transcripts.map(normaliseVoiceQuery);
+      const t = corrected[0]; // use best (highest confidence) after correction
       setQuery(t);
       setIsListening(false);
-      // If AI mode active, run AI answer
       if (aiMode) runAiAnswer(t);
     };
-    rec.onerror = () => setIsListening(false);
+    rec.onerror = (e) => {
+      setIsListening(false);
+      // If language not supported, retry with default
+      if (e.error === "language-not-supported") {
+        console.warn("Voice language not supported — try typing");
+      }
+    };
     rec.onend = () => setIsListening(false);
     recognitionRef.current = rec;
     rec.start();
@@ -276,13 +315,25 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     setOpen(true);
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a pediatric nephrology clinical assistant for the CliniCals Hub app. Answer the following clinical question concisely and accurately. After your answer, list 2-4 specific sections/pages within the app where the user can find more details (from: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches). Format as JSON with keys "answer" (markdown string, max 200 words) and "links" (array of {label, page, params}).
+        prompt: `You are a pediatric nephrology clinical assistant for the CliniCals Hub app. You serve clinicians in India, so use Indian brand names where relevant and context appropriate to Indian medical practice.
+
+Answer the following clinical question concisely and accurately in max 250 words. Include specific KDIGO/IPNA/AAP/IAP guideline references where applicable. After your answer, list 2-4 specific sections/pages within the app where the user can find more details (from: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches).
+
+Format as JSON with keys:
+- "answer" (markdown string with guideline citations e.g. [KDIGO 2022], [IPNA 2023])  
+- "references" (array of strings: specific guideline/paper citations)
+- "links" (array of {label, page, params})
+
+If the question is in Hindi or a regional language, answer in that language with English medical terms.
 
 Question: ${q}`,
+        model: "gemini_3_flash",
+        add_context_from_internet: true,
         response_json_schema: {
           type: "object",
           properties: {
             answer: { type: "string" },
+            references: { type: "array", items: { type: "string" } },
             links: { type: "array", items: { type: "object", properties: { label: { type: "string" }, page: { type: "string" }, params: { type: "string" } } } }
           }
         }
@@ -606,6 +657,16 @@ Question: ${q}`,
                       </button>
                     ))}
                   </div>
+                </div>
+              )}
+              {aiAnswer.references?.length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                  <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide mb-1.5">📚 References</p>
+                  <ul className="space-y-0.5">
+                    {aiAnswer.references.map((ref, i) => (
+                      <li key={i} className="text-[10px] text-amber-800">• {ref}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
               <p className="text-[10px] text-slate-400 border-t border-slate-100 pt-2">AI-generated — verify clinically. Ask another question or search below.</p>
