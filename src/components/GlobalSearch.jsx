@@ -459,13 +459,17 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
 Requirements:
 - Include specific guideline references (KDIGO, IPNA, AAP, IAP) inline e.g. [KDIGO 2022]
 - Use Indian brand names where relevant
-- After the answer, suggest 2-4 app sections for further reading from: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches
 - If Hindi/regional language, answer in that language with English medical terms
+
+For the "links" field, ONLY use these exact page values (case-sensitive):
+DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches, RareDiseaseModule, PediatricRheumatology, RRTAssistant, ClinicalAIHub, GeneticReportAnalyzer, NutritionHub, AKIStager, SchwartzGFR, BPPercentiles
+
+For the "links" label, use descriptive names like "Lupus Nephritis Management", "Tacrolimus Dosing", "AKI Engine", "Nephrotic Syndrome Engine" etc.
 
 Return JSON with:
 - "answer": markdown string with inline citations
-- "references": array of specific citations (guideline name, year, section)
-- "links": array of {label, page, params}
+- "references": array of specific citations (guideline name, year) — e.g. "KDIGO 2022 AKI Guideline", "IPNA 2020 Nephrotic Syndrome", "ISN/RPS 2018 Classification"
+- "links": array of {label, page, params} — max 4 links, only from the allowed page list above
 
 Question: ${q}`,
         model: "gemini_3_flash",
@@ -747,6 +751,7 @@ Question: ${q}`,
     setOpen(false);
     flatResults.current = [];
     setGroups({});
+    setPredictiveSuggestions([]);
   };
 
   const hasResults = Object.values(groups).some(g => g.length > 0);
@@ -789,7 +794,7 @@ Question: ${q}`,
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {query && (
-            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); setAiAnswer(null); flatResults.current = []; }}
+            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); setPredictiveSuggestions([]); setAiAnswer(null); flatResults.current = []; }}
               className="text-slate-400 hover:text-slate-600">
               <X className="w-4 h-4" />
             </button>
@@ -870,8 +875,27 @@ Question: ${q}`,
         </div>
       )}
 
-      {!aiMode && open && debouncedQuery && (
+      {!aiMode && open && query.trim().length >= 3 && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[480px] overflow-y-auto">
+
+          {/* Predictive suggestions (instant, shown immediately while typing) */}
+          {predictiveSuggestions.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 border-b border-indigo-100 sticky top-0">
+                <Search className="w-3.5 h-3.5 text-indigo-500" />
+                <span className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Quick Access</span>
+              </div>
+              {predictiveSuggestions.map((s, i) => (
+                <button key={i}
+                  onClick={() => { navigate(createPageUrl(s.page) + (s.params || "")); setQuery(""); setOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-indigo-50 transition-colors border-b border-slate-50">
+                  <span className="text-sm text-slate-800 flex-1">{s.label}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
+
           {loading && (
             <div className="px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
               <div className="w-3 h-3 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
