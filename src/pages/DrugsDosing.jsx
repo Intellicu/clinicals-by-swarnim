@@ -22,6 +22,7 @@ import IndicationPrescribeWizard from "../components/drugs/IndicationPrescribeWi
 import EculizumabGuidance from "../components/drugs/EculizumabGuidance";
 import PlasmapheresisModule from "../components/drugs/PlasmapheresisModule";
 import FormularyBrowser from "../components/drugs/FormularyBrowser";
+import EquipmentReference from "../components/drugs/EquipmentReference";
 import { toast } from "sonner";
 import { usePatient } from "../components/PatientContext";
 import { FORMULARY, getFormularyDrug } from "@/lib/formulary/nephrology-drugs";
@@ -732,6 +733,7 @@ function DrugFullMonograph({ drug }) {
               { id: "eculizumab", label: "Eculizumab" },
               { id: "plasmapheresis", label: "Plasmapheresis" },
               { id: "ckd", label: "CKD Doses" },
+              { id: "equipment", label: "🔧 Equipment" },
             ].map(m => (
               <button key={m.id} onClick={() => setMode(m.id)}
                 className={`flex-shrink-0 px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${mode === m.id ? "border-teal-600 text-teal-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
@@ -1465,6 +1467,7 @@ function DrugFullMonograph({ drug }) {
         {mode === "steroids" && <SteroidEquivalenceEngine />}
         {mode === "eculizumab" && <EculizumabGuidance />}
         {mode === "plasmapheresis" && <PlasmapheresisModule />}
+        {mode === "equipment" && <EquipmentReference />}
 
         {mode === "formulary" && (
           <div className="space-y-4">

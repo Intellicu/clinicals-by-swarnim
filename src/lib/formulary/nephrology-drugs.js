@@ -1546,7 +1546,9 @@ export const FORMULARY_COLLECTIONS = [
   { id: "immunomodulators", label: "Immunomodulators", keys: ["levamisole"] },
   { id: "emergency", label: "Emergency", keys: ["labetalol", "sodiumNitroprusside", "calciumGluconate", "sodiumPolystyreneSulfonate", "sodiumZirconiumCyclosilicate", "patiromer", "nifedipine"] },
   { id: "anticoagulants", label: "Anticoagulants", keys: ["enoxaparin", "warfarin"] },
-  { id: "raredisease", label: "Rare Disease Nephrology", keys: ["nedosiran", "agalsidaseBeta", "agalsidasealfa", "avacopan", "tolvaptan"] },
+  { id: "raredisease", label: "Rare Disease Nephrology", keys: ["nedosiran", "agalsidaseBeta", "agalsidasealfa", "avacopan", "tolvaptan", "lumasiran", "migalastat", "cysteamine", "cysteamineEyeDrops", "pegcetacoplan", "iptacopan", "crovalimab"] },
+  { id: "anticoagulants", label: "Anticoagulation & Thrombosis", keys: ["enoxaparin", "dalteparin", "warfarin", "heparin", "alteplase"] },
+  { id: "pddrugs", label: "Peritoneal Dialysis Drugs", keys: ["intraperitonealVancomycin", "intraperitonealCeftazidime", "intraperitonealGentamicin", "heparinLock", "pdDianeal", "pdPhysioneal", "pdExtraneal"] },
   { id: "vasculitis", label: "Vasculitis & LN", keys: ["avacopan", "cyclophosphamide", "rituximab", "mycophenolate", "azathioprine", "belimumab", "voclosporin"] },
 ];
 

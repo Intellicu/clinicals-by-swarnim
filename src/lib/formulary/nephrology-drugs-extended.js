@@ -1271,7 +1271,236 @@ export const FORMULARY_EXTENDED = {
     clinical_pearls: "First disease-modifying treatment for XLH (vs conventional phosphate + calcitriol). STOP calcitriol before starting burosumab (risk of hyperphosphataemia). Available via compassionate use/REMS in India."
   },
 
-  // ─── ADDITIONAL DRUGS H-Z ─────────────────────────────────────────────────
+  // ─────────────────────────── RARE DISEASE & TRANSPLANT ───────────────────
+  tolvaptan: {
+    generic: "Tolvaptan",
+    class: "Vasopressin V2 Receptor Antagonist (Aquaretic)",
+    mechanism: "Selective oral V2 receptor antagonist → blocks ADH-mediated water reabsorption in collecting duct → excretes free water without sodium loss → slows cyst growth in ADPKD.",
+    indications: "ADPKD (rapid progression — TEMPO 3:4 criteria), SIADH (euvolaemic/hypervolaemic hyponatraemia), autosomal recessive PKD (select cases).",
+    peds_dose: "ADPKD (≥18y standard): 45 mg AM + 15 mg PM, titrate to 90/30 mg. Paediatric (off-label, emerging data): 0.5–1 mg/kg/day split BD. SIADH: 15–30 mg OD, titrate by sodium.",
+    renal_adjust: "eGFR <25: AVOID (insufficient data, possible benefit in ADPKD varies). SIADH use: standard dosing.",
+    hd_adjust: "Not dialysed — avoid in ESRD ADPKD.",
+    contraindications: "Inability to sense/respond to thirst (hypernatraemia risk), anuria, urgent correction of severe hyponatraemia, hepatotoxicity risk (REMS required).",
+    monitoring: "Serum sodium at 2–4h, 4–8h after first dose (hypernatraemia risk). Sodium daily first week. LFT monthly — serious hepatotoxicity (REMS). Fluid intake/output. Urine osmolality.",
+    timing: "AM + PM split dosing. Must have access to fluids at all times.",
+    food: "With or without food. Must drink when thirsty.",
+    storage: "Room temperature.",
+    counselling: "MUST drink when thirsty — dehydration/hypernatraemia risk. Report jaundice (hepatotoxicity). Do not restrict fluid intake.",
+    formulations: [
+      { form: "Tablet", strength: "15 mg", brands: "Jynarque 15 mg (Otsuka) — imported/REMS", note: "REMS programme mandatory in many countries" },
+      { form: "Tablet", strength: "30 mg", brands: "Jynarque 30 mg (Otsuka)" },
+      { form: "Tablet", strength: "45 mg", brands: "Jynarque 45 mg (Otsuka)" },
+      { form: "Tablet", strength: "60 mg", brands: "Jynarque 60 mg (Otsuka)" },
+      { form: "Tablet", strength: "90 mg", brands: "Jynarque 90 mg (Otsuka)" },
+    ],
+    clinical_pearls: "TEMPO 3:4 trial: tolvaptan slowed eGFR decline and kidney growth in ADPKD. REPRISE trial: confirmed benefit in broader population. Serious hepatotoxicity (REMS): LFT monthly. Available through compassionate use in India."
+  },
+
+  lumasiran: {
+    generic: "Lumasiran",
+    class: "RNA Interference (RNAi) — Primary Hyperoxaluria Type 1",
+    mechanism: "siRNA targeting HAOAC (hydroxy acid oxidase 1 / glycolate oxidase) in hepatocytes → reduces glyoxylate → reduces hepatic oxalate synthesis. PH1-specific.",
+    indications: "Primary Hyperoxaluria Type 1 (PH1) — reduces urinary oxalate. FDA/EMA approved 2020.",
+    peds_dose: "≥20 kg: 3 mg/kg SC monthly × 3 loading doses, then 3 mg/kg q3 months maintenance. 10–<20 kg: 6 mg/kg monthly × 3, then 6 mg/kg q3 months. <10 kg: 6 mg/kg monthly × 3, then 3 mg/kg monthly.",
+    renal_adjust: "Dialysis: 6 mg/kg monthly regardless of weight (increased oxalate burden post-dialysis). Standard dosing otherwise.",
+    hd_adjust: "6 mg/kg SC monthly — continued through dialysis to reduce oxalate production.",
+    contraindications: "Hypersensitivity to lumasiran.",
+    monitoring: "24-hour urinary oxalate (target <0.5 mmol/1.73m²/24h). Plasma oxalate. Urinary oxalate:creatinine ratio. eGFR, urine protein, renal imaging.",
+    timing: "SC monthly (loading) then quarterly.",
+    storage: "2–8°C refrigerated.",
+    counselling: "Regular SC injections required. High fluid intake maintained. Urinary oxalate monitoring essential.",
+    formulations: [
+      { form: "SC injection", strength: "94.5 mg/0.5 mL", brands: "Oxlumo 94.5 mg/0.5 mL (Alnylam) — imported" },
+    ],
+    clinical_pearls: "ILLUMINATE-A/B trials: lumasiran reduced urinary oxalate to near-normal in PH1. PH1-specific (targets AGXT upstream substrate). Nedosiran targets all three PH types via LDHA. Early treatment (even pre-symptomatic) prevents renal damage."
+  },
+
+  migalastat: {
+    generic: "Migalastat",
+    class: "Pharmacological Chaperone — Fabry Disease",
+    mechanism: "Small molecule pharmacological chaperone → stabilises misfolded α-galactosidase A → restores lysosomal trafficking and enzyme activity. Only for amenable GLA mutations.",
+    indications: "Fabry disease with an amenable GLA mutation (confirmed by validated in-vitro assay). Age ≥12 years.",
+    peds_dose: "≥12y: 123 mg oral on alternate days (every other day). Adults: same dose.",
+    renal_adjust: "eGFR <30: limited data — use with caution. ERT (agalsidase) preferred in advanced CKD.",
+    contraindications: "Non-amenable GLA mutations (must test first). Concomitant ERT (avoid combination).",
+    monitoring: "GLA enzyme activity, lyso-Gb3 (plasma/urine) q6 months. eGFR, urine protein q6 months. Echocardiogram, cardiac MRI annually. Hearing assessment annually.",
+    timing: "Every other day (alternate days). Same time each dose.",
+    food: "Fasting — 2h before and 2h after any food.",
+    storage: "Room temperature.",
+    counselling: "Must take on alternate days — not daily. Fasting required for absorption. Test for amenable mutation before prescribing.",
+    formulations: [
+      { form: "Capsule", strength: "123 mg", brands: "Galafold 123 mg (Amicus Therapeutics) — imported" },
+    ],
+    clinical_pearls: "First oral treatment for Fabry disease. ~35–50% of GLA mutations are amenable. Check amenability using Amicus-validated in-vitro assay. FACETS trial: comparable to ERT for stabilising eGFR in amenable patients. Oral convenience vs biweekly IV ERT."
+  },
+
+  cysteamine: {
+    generic: "Cysteamine",
+    class: "Cystine-depleting Agent — Cystinosis",
+    mechanism: "Reacts with cystine (in lysosomes) → forms cysteamine-cysteine mixed disulfide → efflux via PQLC2 transporter → depletes lysosomal cystine accumulation.",
+    indications: "Nephropathic cystinosis (first-line disease-modifying therapy — lifelong). Ophthalmic form for corneal crystals.",
+    peds_dose: "Immediate release (Cystagon): Start 10 mg/kg/day ÷ QID; increase to 60–90 mg/kg/day ÷ QID over 4–6 weeks. Target WBC cystine <1 nmol half-cystine/mg protein (measured 5–6h post-dose). Extended release (Procysbi): 1.3× total daily IR dose ÷ BD.",
+    neonatal_dose: "Start as soon as diagnosed. Infant: 10 mg/kg/day QID — titrate by WBC cystine.",
+    renal_adjust: "Dose by WBC cystine — not eGFR. Continue even on dialysis (systemic disease).",
+    hd_adjust: "Continue cysteamine — HD does not remove cystine. Standard dosing.",
+    contraindications: "Hypersensitivity to cysteamine or penicillamine. Pregnancy (embryotoxic).",
+    monitoring: "WBC cystine level (target <1 nmol/mg protein) 5–6h post-dose, every 3 months. TFTs (thyroid involvement). Growth parameters, phosphate (Fanconi progress). Ophthalmology for corneal crystals.",
+    timing: "IR: QID (every 6h — strict). ER: BD (every 12h). EYE DROPS: hourly initially (corneal), then q2h while awake.",
+    food: "IR: empty stomach (1h before meals) — food reduces absorption. ER: with food.",
+    storage: "2–8°C refrigerated for some formulations. Room temperature for capsules.",
+    counselling: "Strong sulphurous smell/taste — may affect compliance. Gastric tube for infants if vomiting. NEVER miss doses (cystine accumulates). Annual ophthalmology for corneal crystals.",
+    formulations: [
+      { form: "Capsule (IR)", strength: "50 mg", brands: "Cystagon 50 mg (Mylan/Horizon) — imported" },
+      { form: "Capsule (IR)", strength: "150 mg", brands: "Cystagon 150 mg (Mylan/Horizon)" },
+      { form: "Capsule (ER)", strength: "25 mg", brands: "Procysbi 25 mg (Horizon) — imported delayed-release" },
+      { form: "Capsule (ER)", strength: "75 mg", brands: "Procysbi 75 mg (Horizon)" },
+      { form: "Ophthalmic drops", strength: "0.44%", brands: "Cystadrops 0.44% (Recordati) — corneal crystals" },
+    ],
+    clinical_pearls: "Lifelong therapy — compliance essential. WBC cystine monitoring every 3 months guides dose. Fanconi syndrome (proximal RTA) persists despite cysteamine but renal progression slowed. ER formulation (Procysbi) BD dosing improves compliance."
+  },
+
+  cysteamineEyeDrops: {
+    generic: "Cysteamine Eye Drops (0.44%)",
+    class: "Ophthalmic Cystine-depleting Agent",
+    mechanism: "Topical cysteamine dissolves corneal cystine crystals → reduces corneal haze and photophobia in cystinosis.",
+    indications: "Corneal cystine crystals in cystinosis (all forms — including ocular-only non-nephropathic). Adjunct to systemic cysteamine.",
+    peds_dose: "Initially 1 drop per eye q1h while awake (acute). Maintenance: 1 drop q2h. Continue lifelong.",
+    renal_adjust: "Topical — no systemic adjustment.",
+    monitoring: "Slit-lamp examination q6–12 months. Photophobia symptoms.",
+    timing: "Hourly instillation while awake.",
+    storage: "2–8°C refrigerated. Discard 7 days after opening.",
+    counselling: "Cold drops cause discomfort — warm briefly in hand. Use gel-tears as lubricant. Regular ophthalmic follow-up essential.",
+    formulations: [
+      { form: "Eye drops", strength: "0.44% w/v", brands: "Cystadrops 0.44% (Recordati Rare Disease) — imported" },
+    ],
+    clinical_pearls: "Corneal crystals cause photophobia and progressive keratopathy. Cysteamine eye drops are the only approved treatment. Must be used in addition to systemic cysteamine. Photophobia often improves within months."
+  },
+
+  pegcetacoplan: {
+    generic: "Pegcetacoplan",
+    class: "Complement C3 Inhibitor (PEGylated C3b/C3c binding peptide)",
+    mechanism: "Binds C3 and C3b → blocks central complement pathway at C3 level → inhibits both C3a and C5 products → broader inhibition than anti-C5 drugs (eculizumab/ravulizumab).",
+    indications: "C3 Glomerulopathy (C3GN, DDD) — emerging indication. Paroxysmal Nocturnal Haemoglobinuria (PNH) — approved 2021.",
+    peds_dose: "PNH (adults/adolescents ≥18y): 1080 mg SC twice weekly × 4 weeks then weekly. C3G: clinical trial dosing — specialist centres only.",
+    renal_adjust: "No dose adjustment by eGFR.",
+    contraindications: "Unresolved Encapsulated bacterial infection. Vaccination required before initiation (same as eculizumab).",
+    monitoring: "Haematocrit, LDH (PNH monitoring). C3 level, urine protein, eGFR (C3G). Meningococcal antibody titres.",
+    timing: "SC twice weekly (PNH).",
+    storage: "2–8°C refrigerated.",
+    vaccine_notes: "Same mandatory vaccination as eculizumab (MenACWY, MenB, Hib, pneumococcal).",
+    formulations: [
+      { form: "SC injection", strength: "1080 mg/54 mL", brands: "Empaveli 1080 mg/54 mL (Apellis) — imported" },
+    ],
+    clinical_pearls: "PEGASUS trial: pegcetacoplan superior to eculizumab in PNH. C3-level inhibition addresses extravascular haemolysis that anti-C5 misses. C3G trials ongoing — promising early data. SC route advantage over IV eculizumab."
+  },
+
+  iptacopan: {
+    generic: "Iptacopan",
+    class: "Complement Factor B Inhibitor (Alternative Pathway)",
+    mechanism: "Oral small-molecule complement factor B inhibitor → blocks alternative pathway at Bb → prevents C3 convertase formation → reduces C3 deposition and downstream effectors.",
+    indications: "C3 Glomerulopathy (C3GN, DDD) — clinical use. PNH — FDA approved 2023. IgA nephropathy (IGAN Compass trial).",
+    peds_dose: "Adults/adolescents: 200 mg BD oral. Paediatric data emerging.",
+    renal_adjust: "No dose adjustment required.",
+    contraindications: "Encapsulated bacterial infection. Vaccination as per anti-complement agents.",
+    monitoring: "Complement levels (C3, C4, FB activity). eGFR, urine protein q3 months. Encapsulated bacterial infection vigilance.",
+    timing: "Twice daily oral.",
+    food: "With or without food.",
+    storage: "Room temperature.",
+    vaccine_notes: "Meningococcal, Hib, pneumococcal vaccines required before initiation.",
+    formulations: [
+      { form: "Capsule", strength: "200 mg", brands: "Fabhalta 200 mg (Novartis) — imported" },
+    ],
+    clinical_pearls: "IGAN Compass trial: iptacopan reduced proteinuria significantly in IgAN. C3G evidence from case series and ACCELERATE trial. ORAL route significant advantage. Alternative pathway-specific — preserves lectin/classical pathway for immune function."
+  },
+
+  crovalimab: {
+    generic: "Crovalimab",
+    class: "Anti-C5 Monoclonal Antibody (SC formulation)",
+    mechanism: "Novel anti-C5 mAb with recycling mechanism (FcRn-mediated) → extended half-life. SC administration. Targets C5 → blocks C5a + C5b-9 (MAC).",
+    indications: "Paroxysmal Nocturnal Haemoglobinuria (PNH). Emerging: aHUS, C5-mediated conditions.",
+    peds_dose: "Adults/adolescents ≥12y, ≥40 kg: 340 mg IV × 1 loading, then 680 mg SC monthly (COMMODORE-2 regimen). Paediatric data ongoing.",
+    renal_adjust: "No dose adjustment.",
+    contraindications: "Unresolved meningococcal infection. Unvaccinated patients.",
+    monitoring: "Same as eculizumab/ravulizumab.",
+    timing: "Monthly SC maintenance (after IV loading).",
+    storage: "2–8°C refrigerated.",
+    vaccine_notes: "Same mandatory meningococcal, Hib, pneumococcal vaccines.",
+    formulations: [
+      { form: "SC/IV injection", strength: "340 mg/2 mL", brands: "Piasky 340 mg (Roche) — imported/hospital" },
+    ],
+    clinical_pearls: "COMMODORE trial: non-inferior to eculizumab. SC monthly maintenance — significant patient convenience over biweekly IV eculizumab. Novel recycling antibody technology. Available via Roche compassionate use programmes."
+  },
+
+  dalteparin: {
+    generic: "Dalteparin",
+    class: "Low Molecular Weight Heparin (LMWH)",
+    mechanism: "Anti-Xa > anti-IIa activity via antithrombin III. Predictable pharmacokinetics.",
+    indications: "DVT/PE prevention and treatment, thrombosis in nephrotic syndrome, renal vein thrombosis, VTE prophylaxis post-surgery.",
+    peds_dose: "Treatment: <2m: 150 units/kg BD SC. ≥2m: 100 units/kg BD SC. Prophylaxis: 75 units/kg OD SC. Target anti-Xa 0.5–1.0 units/mL (treatment), 0.2–0.4 (prophylaxis).",
+    neonatal_dose: "Treatment: 100–150 units/kg q12h — TDM essential.",
+    renal_adjust: "eGFR <30: reduce dose — anti-Xa monitoring. eGFR <15: switch to UFH.",
+    hd_adjust: "Anti-Xa monitoring. Regional citrate anticoagulation preferred for CRRT.",
+    contraindications: "HIT, active bleeding, thrombocytopenia <50,000.",
+    monitoring: "Anti-Xa 4h post-dose. CBC weekly (HIT). Creatinine.",
+    timing: "SC BD for treatment.",
+    formulations: [
+      { form: "SC injection", strength: "2500 units/0.2 mL", brands: "Fragmin 2500 units (Pfizer)" },
+      { form: "SC injection", strength: "5000 units/0.2 mL", brands: "Fragmin 5000 units (Pfizer)" },
+      { form: "SC injection", strength: "10000 units/mL", brands: "Fragmin 10000 units/mL multidose vial" },
+    ],
+    clinical_pearls: "Alternative LMWH to enoxaparin. Multidose vial useful for small paediatric doses. Anti-Xa monitoring same as enoxaparin. Available in some Indian centres as alternative."
+  },
+
+  intraperitonealVancomycin: {
+    generic: "Vancomycin (Intraperitoneal)",
+    class: "Glycopeptide Antibiotic — Peritoneal Dialysis Use",
+    mechanism: "IP administration achieves therapeutic intraperitoneal and systemic levels. Treats gram-positive PD peritonitis (MRSA, CoNS, S. aureus).",
+    indications: "Peritoneal dialysis peritonitis (gram-positive pathogens). IP route achieves high local levels.",
+    peds_dose: "IP: 25–30 mg/kg IP in long dwell (≥6h dwell) per exchange × 1 dose. Repeat every 4–5 days guided by serum levels (target trough 15–20 mcg/mL). Continuous dosing: 30 mg/L in each bag.",
+    renal_adjust: "IP administration — systemic accumulation occurs in anuric PD patients. TDM mandatory.",
+    hd_adjust: "If transitioning from HD to PD peritonitis: IP route preferred.",
+    monitoring: "Serum vancomycin trough every 4–5 days. Peritoneal effluent cell count. Clinical response.",
+    timing: "Added to long dwell PD bag (6h dwell minimum). Red Man Syndrome possible with rapid IP absorption.",
+    storage: "Reconstituted solution stable 24h refrigerated.",
+    formulations: [
+      { form: "IV injection (for IP use)", strength: "500 mg/vial", brands: "Vancocin 500 mg (Eli Lilly), Vancomycin 500 mg (Cipla)" },
+      { form: "IV injection (for IP use)", strength: "1 g/vial", brands: "Vancocin 1 g, Vancomycin 1 g (Cipla)" },
+    ],
+    clinical_pearls: "ISPD 2022 guidelines: vancomycin for gram-positive PD peritonitis. Dose every 5–7 days (slow dialytic clearance). Always check sensitivities — VISA/VRSA: use linezolid or daptomycin IP. Rifampicin can be added for S. aureus peritonitis (add-on IP)."
+  },
+
+  intraperitonealCeftazidime: {
+    generic: "Ceftazidime (Intraperitoneal)",
+    class: "3rd-Generation Cephalosporin — Peritoneal Dialysis Use",
+    mechanism: "IP ceftazidime provides local and systemic gram-negative coverage. Covers Pseudomonas aeruginosa.",
+    indications: "PD peritonitis (gram-negative, Pseudomonas coverage).",
+    peds_dose: "IP: 125 mg/L in each dwell (maintenance dose). Loading dose: 250 mg/L in first dwell. Duration: 14 days minimum for gram-negatives; 21 days for Pseudomonas.",
+    monitoring: "Clinical response at 48h. Repeat effluent cell count at 5 days.",
+    timing: "Added to each PD bag (continuous dosing in each dwell).",
+    storage: "Added to PD bag — use within 6h.",
+    formulations: [
+      { form: "IV powder (for IP use)", strength: "500 mg/vial", brands: "Fortaz 500 mg (GSK), Ceftazidime 500 mg (Cipla)" },
+      { form: "IV powder (for IP use)", strength: "1 g/vial", brands: "Fortaz 1 g (GSK), Ceftazidime 1 g" },
+    ],
+    clinical_pearls: "ISPD 2022: first-line gram-negative peritonitis. Combine with IP vancomycin empirically (covers both gram-positive and gram-negative while cultures pending). Pseudomonas: extended 21-day course essential."
+  },
+
+  intraperitonealGentamicin: {
+    generic: "Gentamicin (Intraperitoneal)",
+    class: "Aminoglycoside — Peritoneal Dialysis Use",
+    mechanism: "IP gentamicin: gram-negative coverage including some Pseudomonas. Alternative to ceftazidime for non-Pseudomonas gram-negatives.",
+    indications: "PD peritonitis (gram-negative, alternative to ceftazidime). Caution: ototoxicity and nephrotoxicity risk.",
+    peds_dose: "IP: 0.6 mg/kg/bag OD in long dwell. Loading: 1 mg/kg/bag × 1 first dose.",
+    monitoring: "Serum gentamicin trough (target <2 mcg/mL to limit toxicity). Audiology if prolonged. Clinical response.",
+    timing: "Long dwell exchange (6–8h). Once daily in long dwell.",
+    storage: "Added to PD bag — use promptly.",
+    formulations: [
+      { form: "IV injection (for IP use)", strength: "40 mg/mL (2 mL = 80 mg)", brands: "Genticyn 80 mg (Cipla), Gentamicin IV 80 mg" },
+    ],
+    clinical_pearls: "ISPD: gentamicin alternative for gram-negative peritonitis. Ototoxicity risk with prolonged use — limit to 2 weeks if possible. Residual renal function may be preserved better with ceftazidime. Monitor trough levels."
+  },
+
+  // ─────────────────────────── ADDITIONAL DRUGS H-Z ─────────────────────────
   hydroxyurea: {
     generic: "Hydroxyurea",
     class: "Cytoreductive Agent / Sickle Cell Disease Drug",

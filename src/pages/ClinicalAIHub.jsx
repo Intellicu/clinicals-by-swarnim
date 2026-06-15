@@ -55,8 +55,9 @@ export default function ClinicalAIHub() {
         </div>
 
         <Tabs defaultValue={defaultTab} className="w-full">
-          {/* Tab bar — uses CLINICAL_AI_ANALYZERS as single source of truth */}
-          <TabsList className="flex w-full h-auto overflow-x-auto bg-white border border-slate-200 rounded-xl p-1 gap-0.5">
+          {/* Tab bar — scrollable on mobile */}
+          <div className="w-full overflow-x-auto" style={{WebkitOverflowScrolling:'touch', scrollbarWidth:'none', msOverflowStyle:'none'}}>
+            <TabsList className="flex h-auto bg-white border border-slate-200 rounded-xl p-1 gap-0.5" style={{width:'max-content', minWidth:'100%'}}>
             {CLINICAL_AI_ANALYZERS.filter(a => a.tab && a.page === 'ClinicalAIHub').map(tool => {
               const Icon = tool.icon;
               const shortName = tool.name
@@ -76,7 +77,8 @@ export default function ClinicalAIHub() {
                 </TabsTrigger>
               );
             })}
-          </TabsList>
+            </TabsList>
+          </div>
 
           {/* Tab content */}
           <div className="mt-4">

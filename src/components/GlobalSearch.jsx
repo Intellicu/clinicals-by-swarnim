@@ -447,6 +447,15 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     setIsListening(true);
   }, [isListening, aiMode]);
 
+  // ── Smart query routing: detect drug/calc queries before calling AI ──────────
+  function detectQueryType(q) {
+    const ql = q.toLowerCase();
+    if (/(dose|dosing|mg\/kg|how much|frequency|trough|level|tdm|iv dose|oral dose)/.test(ql)) return "drug";
+    if (/(gfr|egfr|schwartz|creatinine calculator|bp percentile|bmi|bsa|fluid|anion gap|fena)/.test(ql)) return "calculator";
+    if (/(staging|classify|stage|definition|criteria|kdigo stage|aki stage|ckd stage)/.test(ql)) return "guideline";
+    return "clinical";
+  }
+
   const runAiAnswer = useCallback(async (q) => {
     if (!q?.trim()) return;
     setAiLoading(true);
@@ -454,26 +463,24 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     setOpen(true);
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a senior pediatric nephrology clinical assistant for CliniCals Hub, serving clinicians in India. Answer the following clinical question accurately and concisely (max 300 words). 
+        prompt: `You are a senior pediatric nephrology clinical assistant for CliniCals Hub (India). Answer the following clinical question accurately and concisely in max 250 words.
 
-Requirements:
-- Include specific guideline references (KDIGO, IPNA, AAP, IAP) inline e.g. [KDIGO 2022]
-- Use Indian brand names where relevant
-- If Hindi/regional language, answer in that language with English medical terms
+Rules:
+- Cite guidelines inline: [KDIGO 2022], [IPNA 2023], [AAP 2017], [IAP 2023]
+- Use Indian brand names (e.g., Wysolone, Pangraf, Reditux)
+- Be specific and clinically actionable
+- For drug doses: state mg/kg/day, route, frequency, max dose
+- For guidelines: state specific recommendation and grade
 
-For the "links" field, ONLY use these exact page values (case-sensitive):
-DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches, RareDiseaseModule, PediatricRheumatology, RRTAssistant, ClinicalAIHub, GeneticReportAnalyzer, NutritionHub, AKIStager, SchwartzGFR, BPPercentiles
+ONLY use these page values in "links" (case-sensitive): DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches, RareDiseaseModule, PediatricRheumatology, RRTAssistant, ClinicalAIHub, GeneticReportAnalyzer, NutritionHub, AKIStager, SchwartzGFR, BPPercentiles
 
-For the "links" label, use descriptive names like "Lupus Nephritis Management", "Tacrolimus Dosing", "AKI Engine", "Nephrotic Syndrome Engine" etc.
-
-Return JSON with:
-- "answer": markdown string with inline citations
-- "references": array of specific citations (guideline name, year) — e.g. "KDIGO 2022 AKI Guideline", "IPNA 2020 Nephrotic Syndrome", "ISN/RPS 2018 Classification"
-- "links": array of {label, page, params} — max 4 links, only from the allowed page list above
+Return JSON:
+- "answer": markdown with inline citations (bold key doses/values)
+- "references": array of citation strings (e.g. "KDIGO 2022 AKI Guideline, Section 2.1")
+- "links": array of {label, page, params} — max 3, descriptive labels only
 
 Question: ${q}`,
         model: "gemini_3_flash",
-        add_context_from_internet: true,
         response_json_schema: {
           type: "object",
           properties: {
@@ -483,34 +490,14 @@ Question: ${q}`,
           }
         }
       });
-      // Handle both direct object and nested result
       const parsed = result?.answer ? result : (result?.data?.answer ? result.data : null);
       if (parsed?.answer) {
         setAiAnswer(parsed);
       } else {
-        // Fallback: try without internet context
-        const fallback = await base44.integrations.Core.InvokeLLM({
-          prompt: `You are a pediatric nephrology clinical assistant. Answer this clinical question in max 200 words with guideline references. Return JSON with keys: answer (string), references (array of strings), links (array of {label, page} where page is one of: DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub).\n\nQuestion: ${q}`,
-          model: "gemini_3_flash",
-          response_json_schema: {
-            type: "object",
-            properties: {
-              answer: { type: "string" },
-              references: { type: "array", items: { type: "string" } },
-              links: { type: "array", items: { type: "object", properties: { label: { type: "string" }, page: { type: "string" }, params: { type: "string" } } } }
-            }
-          }
-        });
-        setAiAnswer(fallback?.answer ? fallback : { answer: fallback || "No answer available.", references: [], links: [] });
+        setAiAnswer({ answer: "No answer available. Please try a more specific clinical question.", references: [], links: [] });
       }
-    } catch (err) {
-      // Try a simple non-structured fallback
-      try {
-        const simple = await base44.integrations.Core.InvokeLLM({ prompt: `Answer this pediatric nephrology question briefly with key guideline references: ${q}` });
-        setAiAnswer({ answer: typeof simple === "string" ? simple : JSON.stringify(simple), references: [], links: [] });
-      } catch {
-        setAiAnswer({ answer: "Sorry, the AI assistant is temporarily unavailable. Please use the search bar below to find relevant pathways and guidelines.", links: [], references: [] });
-      }
+    } catch {
+      setAiAnswer({ answer: "Sorry, the AI assistant is temporarily unavailable. Use the search bar to find relevant pathways and guidelines.", links: [], references: [] });
     }
     setAiLoading(false);
   }, []);

@@ -416,42 +416,49 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
             {calc?.type === "weight" || calc?.type === "bsa" ? (
               <>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white rounded-xl border border-teal-200 p-3 text-center">
-                    <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Per Dose</p>
-                    <p className="text-xl font-bold text-teal-800">{calc.perAdminMg} mg</p>
+                  <div className="bg-teal-600 rounded-xl p-3 text-center">
+                    <p className="text-[10px] text-teal-100 uppercase tracking-wide mb-1">Per Dose</p>
+                    <p className="text-2xl font-bold text-white">{calc.perAdminMg} mg</p>
                   </div>
-                  <div className="bg-white rounded-xl border border-teal-200 p-3 text-center">
+                  <div className="bg-white rounded-xl border-2 border-teal-300 p-3 text-center">
                     <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Daily Total</p>
-                    <p className="text-xl font-bold text-teal-800">{calc.dailyMg} mg</p>
+                    <p className="text-2xl font-bold text-teal-800">{calc.dailyMg} mg</p>
                   </div>
                 </div>
-                {/* Calculation trail */}
-                <div className="bg-slate-800 rounded-lg px-3 py-2">
-                  <p className="text-[10px] text-slate-400 mb-0.5">Calculation</p>
-                  <p className="text-xs text-green-400 font-mono">{calc.trail}</p>
+                {/* Prominent Calculation Math */}
+                <div className="bg-slate-900 rounded-xl px-4 py-3 border border-slate-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">📐 Dose Calculation</span>
+                    {wt && <span className="text-[10px] text-slate-400">Patient: {wt} kg{bsa ? ` · BSA ${bsa} m²` : ""}</span>}
+                  </div>
+                  <p className="text-sm text-green-400 font-mono leading-relaxed">{calc.trail}</p>
+                  {selectedInd.perKgDose && <p className="text-[10px] text-slate-500 mt-1">Dose range: {selectedInd.minDose || selectedInd.dose} {selectedInd.doseUnit} per dose</p>}
                 </div>
                 {calc.capped && (
                   <Alert className="bg-amber-50 border-amber-300 py-1.5">
                     <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
-                    <AlertDescription className="text-amber-700 text-xs">Capped at max {calc.cappedAt} mg/day</AlertDescription>
+                    <AlertDescription className="text-amber-700 text-xs font-semibold">⚠️ Max dose cap applied: {calc.cappedAt} mg/day — dose shown is the maximum safe dose</AlertDescription>
                   </Alert>
                 )}
               </>
             ) : calc?.type === "TDM" && (calc.perAdminMg || calc.dailyMg) ? (
               <>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white rounded-xl border border-blue-200 p-3 text-center">
-                    <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Starting Per Dose</p>
-                    <p className="text-xl font-bold text-blue-800">{calc.perAdminMg} mg</p>
+                  <div className="bg-blue-600 rounded-xl p-3 text-center">
+                    <p className="text-[10px] text-blue-100 uppercase tracking-wide mb-1">Starting Per Dose</p>
+                    <p className="text-2xl font-bold text-white">{calc.perAdminMg} mg</p>
                   </div>
-                  <div className="bg-white rounded-xl border border-blue-200 p-3 text-center">
+                  <div className="bg-white rounded-xl border-2 border-blue-300 p-3 text-center">
                     <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Starting Daily</p>
-                    <p className="text-xl font-bold text-blue-800">{calc.dailyMg} mg</p>
+                    <p className="text-2xl font-bold text-blue-800">{calc.dailyMg} mg</p>
                   </div>
                 </div>
-                <div className="bg-slate-800 rounded-lg px-3 py-2">
-                  <p className="text-[10px] text-slate-400 mb-0.5">Calculation</p>
-                  <p className="text-xs text-green-400 font-mono">{calc.trail}</p>
+                <div className="bg-slate-900 rounded-xl px-4 py-3 border border-slate-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">📐 Dose Calculation</span>
+                    {wt && <span className="text-[10px] text-slate-400">Patient: {wt} kg{bsa ? ` · BSA ${bsa} m²` : ""}</span>}
+                  </div>
+                  <p className="text-sm text-green-400 font-mono">{calc.trail}</p>
                 </div>
                 <Alert className="bg-blue-50 border-blue-200 py-2">
                   <FlaskConical className="w-4 h-4 text-blue-600 flex-shrink-0" />
