@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers, Mic, MicOff, ExternalLink } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { searchFormulary } from "@/lib/formulary/nephrology-drugs";
-import { resolveAILink, resolveReference } from "@/lib/appRouteRegistry";
+import { resolveReference } from "@/lib/appRouteRegistry";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATIC KNOWLEDGE INDEX (pages / pathways / calculators)
@@ -357,6 +357,7 @@ const CATEGORY_COLORS = {
 };
 
 const ENTITY_GROUP_META = {
+  dbIndex:    { label: "Pathways & Tools",        icon: Layers,        color: "text-blue-600" },
   formulary:  { label: "Formulary (Monographs)", icon: Pill,          color: "text-indigo-600" },
   drugs:      { label: "Drug Database",          icon: Pill,          color: "text-violet-600" },
   guidelines: { label: "Guidelines",             icon: BookOpen,      color: "text-amber-600" },
@@ -381,6 +382,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const [aiMode, setAiMode] = useState(false);
   const [aiAnswer, setAiAnswer] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [synonymChips, setSynonymChips] = useState([]);
   const navigate = useNavigate();
   const containerRef = useRef();
   const flatResults = useRef([]);
@@ -462,6 +464,19 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     setAiAnswer(null);
     setOpen(true);
     try {
+      // Fetch AppRoute records and SearchIndex context in parallel to inject into prompt
+      const [appRoutes, searchIndexResults] = await Promise.allSettled([
+        base44.entities.AppRoute.filter({ is_active: true }, "-search_rank", 27),
+        base44.entities.SearchIndex.filter({ is_active: true }, "-rank", 8),
+      ]);
+
+      const routeContext = appRoutes.status === "fulfilled"
+        ? appRoutes.value.map(r => `- ${r.display_name}: ${r.route_full_url}`).join("\n")
+        : "";
+      const indexContext = searchIndexResults.status === "fulfilled"
+        ? searchIndexResults.value.map(r => `- ${r.title} (${r.type}): ${r.app_url}`).join("\n")
+        : "";
+
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `You are a senior pediatric nephrology clinical assistant for CliniCals Hub (India). Answer the following clinical question accurately and concisely in max 250 words.
 
@@ -470,14 +485,17 @@ Rules:
 - Use Indian brand names (e.g., Wysolone, Pangraf, Reditux)
 - Be specific and clinically actionable
 - For drug doses: state mg/kg/day, route, frequency, max dose
-- For guidelines: state specific recommendation and grade
 
-ONLY use these page values in "links" (case-sensitive): DrugsDosing, ClinicalSupport, GuidelinesLibrary, EmergencyHub, CalculatorsHub, GlomerularDiseases, UrologyNephrologyHub, GeneralPediatricsHub, AIPrescriber, ClinicalApproaches, RareDiseaseModule, PediatricRheumatology, RRTAssistant, ClinicalAIHub, GeneticReportAnalyzer, NutritionHub, AKIStager, SchwartzGFR, BPPercentiles
+Available in-app routes (use route_full_url VERBATIM as href):
+${routeContext}
+
+Available tools/pathways in-app:
+${indexContext}
 
 Return JSON:
 - "answer": markdown with inline citations (bold key doses/values)
 - "references": array of citation strings (e.g. "KDIGO 2022 AKI Guideline, Section 2.1")
-- "links": array of {label, page, params} — max 3, descriptive labels only
+- "appLinks": array of {label, href} — max 4, pick from the routes above, use href EXACTLY as listed, descriptive label
 
 Question: ${q}`,
         model: "gemini_3_flash",
@@ -486,7 +504,7 @@ Question: ${q}`,
           properties: {
             answer: { type: "string" },
             references: { type: "array", items: { type: "string" } },
-            links: { type: "array", items: { type: "object", properties: { label: { type: "string" }, page: { type: "string" }, params: { type: "string" } } } }
+            appLinks: { type: "array", items: { type: "object", properties: { label: { type: "string" }, href: { type: "string" } } } }
           }
         }
       });
@@ -494,10 +512,10 @@ Question: ${q}`,
       if (parsed?.answer) {
         setAiAnswer(parsed);
       } else {
-        setAiAnswer({ answer: "No answer available. Please try a more specific clinical question.", references: [], links: [] });
+        setAiAnswer({ answer: "No answer available. Please try a more specific clinical question.", references: [], appLinks: [] });
       }
     } catch {
-      setAiAnswer({ answer: "Sorry, the AI assistant is temporarily unavailable. Use the search bar to find relevant pathways and guidelines.", links: [], references: [] });
+      setAiAnswer({ answer: "Sorry, the AI assistant is temporarily unavailable. Use the search bar to find relevant pathways and guidelines.", appLinks: [], references: [] });
     }
     setAiLoading(false);
   }, []);
@@ -523,6 +541,7 @@ Question: ${q}`,
   useEffect(() => {
     if (!debouncedQuery) {
       setGroups({});
+      setSynonymChips([]);
       if (!predictiveSuggestions.length) setOpen(false);
       flatResults.current = [];
       setLoading(false);
@@ -535,16 +554,60 @@ Question: ${q}`,
     setLoading(true);
     const ql = q.toLowerCase();
 
-    // 1. Static index (pathways / calculators)
+    // 0. Synonym expansion — query SearchSynonym entity before anything else
+    let expandedTerms = [ql];
+    let synonymChips = [];
+    try {
+      const normalised = q.trim().toUpperCase().replace(/\s+/g, "");
+      const synonymMatches = await base44.entities.SearchSynonym.filter({ synonym: normalised }, undefined, 1);
+      if (synonymMatches?.length > 0) {
+        const syn = synonymMatches[0];
+        if (syn.canonical_term) expandedTerms.push(syn.canonical_term.toLowerCase());
+        if (syn.expands_to) {
+          syn.expands_to.split(",").forEach(t => expandedTerms.push(t.trim().toLowerCase()));
+        }
+        if (syn.route_suggestions) {
+          try { synonymChips = JSON.parse(syn.route_suggestions); } catch { synonymChips = []; }
+        }
+      }
+    } catch { /* silent — synonym lookup failure shouldn't block search */ }
+
+    // Helper: check if any expanded term matches
+    const matchesAny = (text) => expandedTerms.some(t => String(text || "").toLowerCase().includes(t));
+
+    // 1. SearchIndex entity (DB-backed, sorted by rank)
+    let dbIndexResults = [];
+    try {
+      const dbItems = await base44.entities.SearchIndex.filter({ is_active: true }, "-rank", 50);
+      dbIndexResults = dbItems
+        .filter(item => expandedTerms.some(t =>
+          String(item.keywords || "").toLowerCase().includes(t) ||
+          String(item.title || "").toLowerCase().includes(t)
+        ))
+        .slice(0, 8)
+        .map(item => ({
+          _type: "static",
+          title: item.title,
+          snippet: item.description || "",
+          category: item.type || "Pathway",
+          _score: String(item.title || "").toLowerCase().includes(ql) ? 3 : 2,
+          navigate: () => item.app_url,
+        }));
+    } catch { /* fall through to static index */ }
+
+    // 2. Static index (pathways / calculators) — used as fallback/supplement
     const staticMatches = SEARCH_INDEX
-      .map(item => ({ ...item, _score: scoreStaticItem(item, ql) }))
+      .map(item => {
+        const score = expandedTerms.reduce((s, t) => s + scoreStaticItem(item, t), 0);
+        return { ...item, _score: score };
+      })
       .filter(item => item._score > 0)
       .sort((a, b) => b._score - a._score)
       .slice(0, 8)
       .map(item => ({
         _type: "static",
         title: item.title,
-        snippet: item.tags.filter(t => t.toLowerCase().includes(ql)).slice(0, 4).join(" · ") || item.tags.slice(0, 4).join(" · "),
+        snippet: item.tags.filter(t => expandedTerms.some(et => t.toLowerCase().includes(et))).slice(0, 4).join(" · ") || item.tags.slice(0, 4).join(" · "),
         category: item.category,
         _score: item._score,
         navigate: () => {
@@ -574,14 +637,18 @@ Question: ${q}`,
       searchBiopsy(q, ql),
     ]);
 
+    setSynonymChips(synonymChips);
+
     const newGroups = {};
+    if (dbIndexResults.length) newGroups.dbIndex = dbIndexResults;
     if (formularyMatches.length) newGroups.formulary = formularyMatches;
     if (drugs.status === "fulfilled" && drugs.value.length) newGroups.drugs = drugs.value;
     if (guidelines.status === "fulfilled" && guidelines.value.length) newGroups.guidelines = guidelines.value;
     if (protocols.status === "fulfilled" && protocols.value.length) newGroups.protocols = protocols.value;
     if (teaching.status === "fulfilled" && teaching.value.length) newGroups.teaching = teaching.value;
     if (biopsy.status === "fulfilled" && biopsy.value.length) newGroups.biopsy = biopsy.value;
-    if (staticMatches.length) newGroups.static = staticMatches;
+    // Only add static if dbIndex didn't already cover those results
+    if (staticMatches.length && dbIndexResults.length < 4) newGroups.static = staticMatches;
 
     // Build flat list for keyboard nav
     flatResults.current = Object.values(newGroups).flat();
@@ -781,7 +848,7 @@ Question: ${q}`,
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {query && (
-            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); setPredictiveSuggestions([]); setAiAnswer(null); flatResults.current = []; }}
+            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); setPredictiveSuggestions([]); setSynonymChips([]); setAiAnswer(null); flatResults.current = []; }}
               className="text-slate-400 hover:text-slate-600">
               <X className="w-4 h-4" />
             </button>
@@ -814,18 +881,17 @@ Question: ${q}`,
                   <ReactMarkdown>{aiAnswer.answer}</ReactMarkdown>
                 </React.Suspense>
               </div>
-              {aiAnswer.links?.length > 0 && (
+              {aiAnswer.appLinks?.length > 0 && (
                 <div>
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Find More In App</p>
                   <div className="flex flex-wrap gap-2">
-                    {aiAnswer.links.map((link, i) => {
-                      const resolved = resolveAILink(link.label, link.page);
-                      if (!resolved) return null; // hide unresolvable links
+                    {aiAnswer.appLinks.map((link, i) => {
+                      if (!link?.href || !link?.label) return null;
                       return (
                         <button key={i}
-                          onClick={() => { navigate(createPageUrl(resolved.page) + (resolved.params || link.params || "")); setQuery(""); setAiAnswer(null); }}
+                          onClick={() => { navigate(link.href); setQuery(""); setAiAnswer(null); }}
                           className="flex items-center gap-1.5 text-xs bg-purple-50 text-purple-700 border border-purple-200 rounded-lg px-2.5 py-1.5 hover:bg-purple-100 transition-colors">
-                          {resolved.label} <ArrowRight className="w-3 h-3" />
+                          {link.label} <ArrowRight className="w-3 h-3" />
                         </button>
                       );
                     })}
@@ -864,6 +930,22 @@ Question: ${q}`,
 
       {!aiMode && open && query.trim().length >= 3 && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[480px] overflow-y-auto">
+
+          {/* Synonym expansion chips — instant route suggestions */}
+          {synonymChips.length > 0 && (
+            <div className="px-3 py-2 border-b border-slate-100 bg-teal-50">
+              <p className="text-[10px] font-bold text-teal-600 uppercase tracking-wide mb-1.5">Expanded Suggestions</p>
+              <div className="flex flex-wrap gap-1.5">
+                {synonymChips.map((chip, i) => (
+                  <button key={i}
+                    onClick={() => { navigate(chip.href || chip.url || "#"); setQuery(""); setOpen(false); }}
+                    className="text-xs bg-teal-100 text-teal-800 border border-teal-200 rounded-full px-2.5 py-1 hover:bg-teal-200 transition-colors flex items-center gap-1">
+                    {chip.label} <ArrowRight className="w-3 h-3" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Predictive suggestions (instant, shown immediately while typing) */}
           {predictiveSuggestions.length > 0 && (

@@ -1,0 +1,38 @@
+{
+  "description": "Clinical synonym and abbreviation table for the instant search layer. When a user types an abbreviation or alternate term, the search engine expands it before querying. Example: NS -> Nephrotic Syndrome. This enables accurate search retrieval without requiring the user to type the full medical term.",
+  "name": "SearchSynonym",
+  "properties": {
+    "canonical_term": {
+      "description": "The full medical term that the synonym maps to (e.g. Nephrotic Syndrome)",
+      "type": "string"
+    },
+    "expands_to": {
+      "description": "Additional expanded terms to also include in the search when this abbreviation is matched (comma-separated)",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "route_suggestions": {
+      "description": "AppRoute display_names to suggest when this synonym is matched",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "specialty": {
+      "description": "Clinical specialty this synonym belongs to",
+      "type": "string"
+    },
+    "synonym": {
+      "description": "The abbreviation, alternate name, or common usage term the user might type (e.g. NS, SSNS, nephrotic)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "synonym",
+    "canonical_term"
+  ],
+  "type": "object"
+}

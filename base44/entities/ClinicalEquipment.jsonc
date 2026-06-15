@@ -1,0 +1,102 @@
+{
+  "description": "Reference guide for clinical equipment and consumables used in paediatric nephrology and dialysis. Covers sizing, Indian brands, appropriate patient weights/ages, and procedure-specific guidance. No costs listed. For reference only \u2014 actual product selection requires clinical judgement.",
+  "name": "ClinicalEquipment",
+  "properties": {
+    "category": {
+      "description": "Equipment category",
+      "enum": [
+        "Vascular_Access",
+        "Peritoneal_Access",
+        "Biopsy",
+        "Dialysis_Consumable",
+        "BP_Monitoring",
+        "Imaging",
+        "Urine_Collection",
+        "Other"
+      ],
+      "type": "string"
+    },
+    "clinical_notes": {
+      "description": "Clinical pearls and important considerations for this equipment",
+      "type": "string"
+    },
+    "complications": {
+      "description": "Known complications relevant to paediatric use",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "contraindications": {
+      "description": "Contraindications to use",
+      "type": "string"
+    },
+    "equipment_name": {
+      "description": "Equipment name (e.g. Hemodialysis catheter, PD catheter, Biopsy gun)",
+      "type": "string"
+    },
+    "equipment_type": {
+      "description": "Specific type within category (e.g. Double-lumen non-tunnelled, Tenckhoff, Spring-loaded biopsy gun)",
+      "type": "string"
+    },
+    "indian_brands": {
+      "description": "Indian manufacturer or brand names available in India (no cost, no endorsement)",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "insertion_technique": {
+      "description": "Brief insertion technique note (refer to procedural guidelines for full detail)",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "preferred_site": {
+      "description": "Recommended insertion/access site (e.g. Right internal jugular, Left iliac fossa)",
+      "type": "string"
+    },
+    "references": {
+      "description": "Key guidelines or references for sizing and use",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sizing_guide": {
+      "description": "Patient weight or age-based sizing guidance (the most important field for clinical use)",
+      "items": {
+        "properties": {
+          "french_size": {
+            "type": "string"
+          },
+          "length_cm": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "patient_age": {
+            "type": "string"
+          },
+          "patient_weight_kg": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "subcategory": {
+      "description": "More specific classification (e.g. Tunnelled, Non-tunnelled, Coiled PD)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "equipment_name",
+    "category"
+  ],
+  "type": "object"
+}

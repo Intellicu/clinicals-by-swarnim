@@ -1,0 +1,58 @@
+{
+  "description": "Pre-built flat search index for Layer 1 instant search. Every searchable item in CliniCals is represented as one record here. The search bar queries this entity directly (no AI, no Claude) for the first 100ms response. Records are created/updated whenever source content changes. Type field drives the result chip colour and icon in the search dropdown.",
+  "name": "SearchIndex",
+  "properties": {
+    "app_url": {
+      "description": "Exact navigable URL within the app. Copied verbatim from AppRoute.route_full_url. NEVER constructed programmatically.",
+      "type": "string"
+    },
+    "content_id": {
+      "description": "ID of the source record (Drug.id, Guideline.id, AppRoute.id etc) for deduplication",
+      "type": "string"
+    },
+    "description": {
+      "description": "One-line description shown in the search result chip",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "keywords": {
+      "description": "Space-separated lowercase keywords for text matching. Include synonyms, abbreviations, alternate spellings.",
+      "type": "string"
+    },
+    "rank": {
+      "description": "Sort order in results. Higher = shown first. Exact match scores: drug=90, pathway=100, calculator=85, guideline=80, ai_tool=75.",
+      "type": "number"
+    },
+    "source_entity": {
+      "description": "Which entity this record came from: Drug, Guideline, AppRoute, BiopsyPattern, TeachingModule etc",
+      "type": "string"
+    },
+    "title": {
+      "description": "Display title shown in search results. For drugs: generic_name. For pathways: display_name. For calculators: tool name.",
+      "type": "string"
+    },
+    "type": {
+      "description": "Category label shown on the result chip. Controls icon and colour in the UI.",
+      "enum": [
+        "Pathway",
+        "Drug",
+        "Calculator",
+        "AI_Tool",
+        "Guideline",
+        "Reference",
+        "Equipment",
+        "Education"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "type",
+    "keywords"
+  ],
+  "type": "object"
+}

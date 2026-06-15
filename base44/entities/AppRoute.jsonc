@@ -1,0 +1,65 @@
+{
+  "description": "Registry of every navigable page in CliniCals with its correct URL path and query parameters. Used by the AI assistant to generate accurate in-app links. When the assistant returns 'Find More In App' links, it must query this entity and use route_full_url \u2014 never construct URLs itself.",
+  "name": "AppRoute",
+  "properties": {
+    "ai_search_terms": {
+      "description": "Terms the AI assistant should match to this route. Used for intent-to-route mapping in the search layer.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "category": {
+      "description": "Route category for grouping in search results",
+      "enum": [
+        "Pathway",
+        "Calculator",
+        "Drug",
+        "AI_Hub",
+        "Education",
+        "Guidelines",
+        "Reference",
+        "Patient",
+        "Research",
+        "Settings",
+        "Equipment"
+      ],
+      "type": "string"
+    },
+    "display_name": {
+      "description": "Human-readable name shown in the 'Find More In App' link chips",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "route_full_url": {
+      "description": "The complete correct URL path including any required query parameters. This is the ONLY field the AI should use when generating links. Example: /GlomerularDiseases?disease_type=LupusNephritis",
+      "type": "string"
+    },
+    "route_param_key": {
+      "description": "Query parameter key if this route accepts params (e.g. disease_type)",
+      "type": "string"
+    },
+    "route_param_value": {
+      "description": "Default query parameter value (e.g. LupusNephritis)",
+      "type": "string"
+    },
+    "route_path": {
+      "description": "Base URL path without query params (e.g. /GlomerularDiseases)",
+      "type": "string"
+    },
+    "search_rank": {
+      "description": "Priority rank in search results. Higher = shows first. Exact match scores highest.",
+      "type": "number"
+    }
+  },
+  "required": [
+    "route_path",
+    "route_full_url",
+    "display_name",
+    "category"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,31 @@
+{
+  "description": "Runtime configuration for the CliniCals AI assistant. The app reads this entity at startup and uses its fields to build the system prompt, configure search layers, and control link generation. Editing records here changes AI behaviour without any code changes.",
+  "name": "AIAssistantConfig",
+  "properties": {
+    "config_key": {
+      "description": "Unique key identifying this config block. The app reads specific keys: 'system_prompt', 'link_generation_rule', 'search_layer1_instruction', 'synonym_expansion_rule', 'model_config'",
+      "type": "string"
+    },
+    "config_value": {
+      "description": "The configuration value \u2014 can be a string, JSON object, or instruction block depending on config_key",
+      "type": "string"
+    },
+    "description": {
+      "description": "Human-readable description of what this config does",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "priority": {
+      "description": "Lower number = applied first when multiple configs of the same key exist",
+      "type": "number"
+    }
+  },
+  "required": [
+    "config_key",
+    "config_value"
+  ],
+  "type": "object"
+}
