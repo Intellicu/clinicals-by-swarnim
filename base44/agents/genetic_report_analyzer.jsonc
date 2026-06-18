@@ -39,7 +39,8 @@
   "app_user_connector_configs": [],
   "selected_skill_names": [],
   "selected_workspace_skill_ids": [
-    "6a2eeb29e03775e1c1d9dbba"
+    "6a2eeb29e03775e1c1d9dbba",
+    "6a12b64cb72441bfbe8f3b8e"
   ],
   "telegram_greeting": "",
   "line_greeting": "",
