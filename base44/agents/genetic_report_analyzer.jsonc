@@ -38,7 +38,9 @@
   "context_files": [],
   "app_user_connector_configs": [],
   "selected_skill_names": [],
-  "selected_workspace_skill_ids": [],
+  "selected_workspace_skill_ids": [
+    "6a2eeb29e03775e1c1d9dbba"
+  ],
   "telegram_greeting": "",
   "line_greeting": "",
   "name": "genetic_report_analyzer"
