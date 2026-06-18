@@ -28,11 +28,12 @@
       ]
     }
   ],
-  "model": "automatic",
+  "model": "gpt_5_5",
   "whatsapp_greeting": "Welcome to ClinGen Assist. I help you read, interpret, and act on genomic test reports with precision.\n\nTo get started, please:\n1. Upload or paste the genetic test report, OR\n2. Describe the patient's phenotype and key findings if you do not have the full report\n\nI will then walk you through the findings, their clinical meaning, limitations of the test, and recommended next steps.\n\nYou can also type 'generate counseling' at any time to receive a full structured counseling plan.",
   "memory_config": {
     "enabled": true,
     "scope": "both",
+    "include_other_conversation_context": false,
     "instructions": null
   },
   "context_files": [],
