@@ -259,6 +259,106 @@ const SRNS_BRANCHES = {
   'DN-21': () => null,
 };
 
+// ── Interactive Pathway Graph — stepwise traversal for the CDS UI ────────────
+// Same clinical logic as the 21-node audit graph above, but each QUESTION /
+// ASSESSMENT node carries explicit branch options so the engine can be
+// traversed one node at a time, evaluating each branch against clinician input
+// and the patient context vector (true PathwayExecutionEngine behaviour).
+export const SRNS_PATHWAY = {
+  entry: 'DN-01',
+  nodes: {
+    'DN-01': { id: 'DN-01', type: 'QUESTION', critical: true, source: 'GS-ISPN-2021-SRNS',
+      question: 'Has the patient failed 8 weeks of standard prednisolone therapy?',
+      detail: 'SRNS (ISPN 2021): no remission after 8 weeks of standard-dose prednisolone.',
+      options: [
+        { label: 'Yes — steroid resistance confirmed', set: { steroid_resistant: true }, next: 'DN-02' },
+        { label: 'No — still within steroid course', set: { steroid_resistant: false }, next: 'TERM-NOT-SRNS', tone: 'muted' },
+      ] },
+    'DN-02': { id: 'DN-02', type: 'ASSESSMENT', source: 'GS-ISPN-2021-SRNS',
+      question: 'Age at disease onset?',
+      detail: 'Onset <12 months substantially raises monogenic (single-gene) yield.',
+      options: [
+        { label: '< 12 months (infantile — high genetic yield)', set: { age_band: 'infantile' }, next: 'DN-03' },
+        { label: '≥ 12 months', set: { age_band: 'child' }, next: 'DN-03' },
+      ] },
+    'DN-03': { id: 'DN-03', type: 'ACTION', source: 'GS-ISPN-2021-GENETICS',
+      action: 'Order genetic panel: NPHS1, NPHS2, WT1, LAMB2, PLCE1, TRPC6, INF2',
+      next: 'DN-04' },
+    'DN-04': { id: 'DN-04', type: 'ACTION', source: 'GS-ISPN-2021-SRNS',
+      action: 'Order renal biopsy (light microscopy + immunofluorescence + electron microscopy)',
+      next: 'DN-05' },
+    'DN-05': { id: 'DN-05', type: 'QUESTION', critical: true, source: 'GS-ISPN-2021-GENETICS',
+      question: 'Genetic result: is a variant PATHOGENIC or LIKELY PATHOGENIC (ACMG)?',
+      detail: 'A pathogenic variant defines monogenic SRNS — CNI therapy is not indicated.',
+      options: [
+        { label: 'Yes — Pathogenic / Likely Pathogenic', set: { genetic_variant_status: 'PATHOGENIC', acmg_class: 'Pathogenic' }, next: 'DN-07', tone: 'danger' },
+        { label: 'No — VUS / Benign / negative', set: { genetic_variant_status: 'NEGATIVE' }, next: 'DN-06' },
+      ] },
+    'DN-06': { id: 'DN-06', type: 'ASSESSMENT', source: 'GS-ISPN-2021-SRNS',
+      question: 'Renal biopsy histology?',
+      options: [
+        { label: 'FSGS (focal segmental glomerulosclerosis)', set: { biopsy_histology: 'FSGS' }, next: 'DN-09' },
+        { label: 'MCD / mesangioproliferative / other', set: { biopsy_histology: 'MCD' }, next: 'DN-10' },
+      ] },
+    'DN-07': { id: 'DN-07', type: 'ACTION', critical: true, source: 'GS-ISPN-2021-GENETICS', tone: 'danger',
+      action: 'Monogenic SRNS confirmed — CNI CONTRAINDICATED. Supportive care + RAAS blockade + genetic counselling; evaluate for transplantation.',
+      next: 'DN-16' },
+    'DN-09': { id: 'DN-09', type: 'ACTION', source: 'GS-ISPN-2021-SRNS', prescribes: 'tacrolimus',
+      action: 'Initiate Tacrolimus 0.1–0.2 mg/kg/day (target trough 5–10 ng/mL) + low-dose prednisolone',
+      next: 'DN-11' },
+    'DN-10': { id: 'DN-10', type: 'ACTION', source: 'GS-KDIGO-2021-GD', prescribes: 'cyclosporine',
+      action: 'Initiate Cyclosporine 4–5 mg/kg/day (target trough 100–200 ng/mL) + low-dose prednisolone',
+      next: 'DN-11' },
+    'DN-11': { id: 'DN-11', type: 'MONITORING', source: 'GS-TDM-CNI',
+      action: 'CNI therapeutic drug monitoring — check trough level at Week 2', next: 'DN-12' },
+    'DN-12': { id: 'DN-12', type: 'QUESTION', critical: true, source: 'GS-TDM-CNI',
+      question: 'Is the CNI trough within the target range?',
+      options: [
+        { label: 'Yes — within target', set: { tdm_in_range: true }, next: 'DN-14' },
+        { label: 'No — out of range', set: { tdm_in_range: false }, next: 'DN-13' },
+      ] },
+    'DN-13': { id: 'DN-13', type: 'ACTION', source: 'GS-TDM-CNI',
+      action: 'Adjust CNI dose — recheck trough in 1 week', next: 'DN-12' },
+    'DN-14': { id: 'DN-14', type: 'ASSESSMENT', critical: true, source: 'GS-ISPN-2021-SRNS',
+      question: 'CNI treatment response assessed at 6 months?',
+      options: [
+        { label: 'Complete or partial remission', set: { cni_response: 'RESPONSE' }, next: 'DN-19' },
+        { label: 'No response (CNI failure)', set: { cni_response: 'FAILURE' }, next: 'DN-15', tone: 'danger' },
+      ] },
+    'DN-15': { id: 'DN-15', type: 'ACTION', critical: true, source: 'GS-ISPN-2021-SRNS',
+      action: 'CNI failure — switch to Rituximab 375 mg/m² × 4 weekly doses', next: 'DN-20' },
+    'DN-16': { id: 'DN-16', type: 'ACTION', source: 'GS-IPNA-2021-NS',
+      action: 'Add ACE inhibitor (enalapril 0.1–0.5 mg/kg/day) for anti-proteinuric effect', next: 'DN-17' },
+    'DN-17': { id: 'DN-17', type: 'ASSESSMENT', critical: true, source: 'GS-ISPN-2021-SRNS',
+      question: 'Has the patient progressed to ESRD / dialysis?',
+      options: [
+        { label: 'Yes — ESRD / on dialysis', set: { dialysis_status: true }, next: 'DN-18', tone: 'danger' },
+        { label: 'No — renal function preserved', set: { dialysis_status: false }, next: 'DN-20' },
+      ] },
+    'DN-18': { id: 'DN-18', type: 'ACTION', critical: true, source: 'GS-ISPN-2021-SRNS',
+      action: 'ESRD — prepare for renal replacement therapy / transplant evaluation', next: 'DN-21' },
+    'DN-19': { id: 'DN-19', type: 'ACTION', source: 'GS-ISPN-2021-SRNS',
+      action: 'Continue CNI + ACE-I maintenance — clinic review every 3 months', next: 'DN-20' },
+    'DN-20': { id: 'DN-20', type: 'MONITORING', source: 'GS-ISPN-2021-SRNS',
+      action: 'Ongoing surveillance: UPCR monthly + eGFR quarterly + TDM per schedule', next: 'DN-21' },
+    'DN-21': { id: 'DN-21', type: 'TERMINAL', source: 'GS-ISPN-2021-SRNS',
+      action: 'Pathway complete — recommendations, monitoring schedule and audit trail generated.' },
+    'TERM-NOT-SRNS': { id: 'TERM-NOT-SRNS', type: 'TERMINAL', source: 'GS-IPNA-2021-NS',
+      action: 'Criteria for SRNS not met — continue the steroid course and reassess at 8 weeks.' },
+  },
+};
+
+export function getPathwayNode(id) { return SRNS_PATHWAY.nodes[id]; }
+
+export function nodeEvidence(node) {
+  const gs = node ? GUIDELINE_SOURCES[node.source] : null;
+  return gs ? { grade: gs.evidence_grade, name: gs.guideline_name, section: gs.guideline_section, pmid: gs.pmid, strength: gs.recommendation_strength } : null;
+}
+
+export function isPrescriptionNode(node) {
+  return !!(node && node.prescribes);
+}
+
 export function executeSRNSPathway(patientContextInput) {
   const ctx = buildContextVector(patientContextInput);
   const pathway_output = [];

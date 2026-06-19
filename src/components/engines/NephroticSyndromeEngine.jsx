@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import {
   buildTraceabilityLink, checkPrescriptionSuppressor,
-  executeSRNSPathway, generateMonitoringRules, GUIDELINE_SOURCES
+  generateMonitoringRules, GUIDELINE_SOURCES,
+  SRNS_PATHWAY, getPathwayNode, nodeEvidence, isPrescriptionNode
 } from "@/lib/CIEEEngine";
 
 // ── CIEE Sub-components ───────────────────────────────────────────────────────
@@ -95,90 +96,265 @@ function CIEEMonitoringPanel({ drugs = [], cieeCtx = {} }) {
   );
 }
 
-const NODE_COLORS = {
-  QUESTION: 'bg-blue-50 border-blue-200 text-blue-800',
-  ACTION: 'bg-green-50 border-green-200 text-green-800',
-  ASSESSMENT: 'bg-amber-50 border-amber-200 text-amber-800',
-  MONITORING: 'bg-purple-50 border-purple-200 text-purple-800',
-  TERMINAL: 'bg-slate-100 border-slate-300 text-slate-700',
-  SUPPRESSED: 'bg-red-50 border-red-300 text-red-800',
+const NODE_TYPE_META = {
+  QUESTION: { label: 'Decision', card: 'border-blue-200', chip: 'bg-blue-100 text-blue-700', text: 'text-blue-600' },
+  ASSESSMENT: { label: 'Assessment', card: 'border-amber-200', chip: 'bg-amber-100 text-amber-700', text: 'text-amber-600' },
+  ACTION: { label: 'Action', card: 'border-green-200', chip: 'bg-green-100 text-green-700', text: 'text-green-600' },
+  MONITORING: { label: 'Monitoring', card: 'border-purple-200', chip: 'bg-purple-100 text-purple-700', text: 'text-purple-600' },
+  TERMINAL: { label: 'Complete', card: 'border-slate-300', chip: 'bg-slate-100 text-slate-700', text: 'text-slate-600' },
 };
 
-function CIEEPathwayOutput({ result }) {
-  if (!result) return null;
-  const hasSuppression = result.suppression_log?.length > 0;
+function EvidenceLine({ node }) {
+  const ev = nodeEvidence(node);
+  if (!ev) return null;
+  return (
+    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+      <ShieldCheck className="w-3 h-3 text-slate-400 flex-shrink-0" />
+      {ev.grade && <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold">Grade {ev.grade}</span>}
+      <span className="text-[10px] text-slate-500">{ev.name} §{ev.section}</span>
+      {ev.pmid && <span className="text-[9px] text-slate-400">PMID {ev.pmid}</span>}
+    </div>
+  );
+}
+
+// Context-driven option recommendation (patent: context-divergent execution).
+// Highlights the option that the entered PatientContext vector implies.
+function recommendIndex(node, ctx) {
+  if (node.id === 'DN-05' && ctx.acmg_class) {
+    const p = ctx.acmg_class === 'Pathogenic' || ctx.acmg_class === 'Likely Pathogenic' || ctx.genetic_variant_status === 'PATHOGENIC';
+    return p ? 0 : 1;
+  }
+  if (node.id === 'DN-06' && ctx.biopsy_histology && ctx.biopsy_histology !== 'Unknown') {
+    return (ctx.biopsy_histology || '').toUpperCase().includes('FSGS') ? 0 : 1;
+  }
+  if (node.id === 'DN-12' && typeof ctx.tdm_in_range === 'boolean') return ctx.tdm_in_range ? 0 : 1;
+  if (node.id === 'DN-17' && typeof ctx.dialysis_status === 'boolean') return ctx.dialysis_status ? 0 : 1;
+  return -1;
+}
+
+/**
+ * CIEEStepper — interactive PathwayExecutionEngine.
+ * Traverses the SRNS decision graph ONE node at a time, evaluating each
+ * node's branch conditions against clinician input + the patient context
+ * vector. Prescription nodes are intercepted by the PrescriptionSuppressor.
+ */
+function CIEEStepper({ initialCtx, onReset }) {
+  const [nodeId, setNodeId] = useState(SRNS_PATHWAY.entry);
+  const [ctx, setCtx] = useState(initialCtx);
+  const [history, setHistory] = useState([]);
+  const [monitoring, setMonitoring] = useState([]);
+  const [suppressions, setSuppressions] = useState([]);
+
+  const node = getPathwayNode(nodeId);
+  const meta = NODE_TYPE_META[node.type] || NODE_TYPE_META.ACTION;
+  const supp = isPrescriptionNode(node) ? checkPrescriptionSuppressor(node.prescribes, ctx) : { suppressed: false };
+
+  const restart = () => {
+    setNodeId(SRNS_PATHWAY.entry); setCtx(initialCtx);
+    setHistory([]); setMonitoring([]); setSuppressions([]);
+  };
+
+  const choose = (opt) => {
+    const newCtx = { ...ctx, ...(opt.set || {}) };
+    setCtx(newCtx);
+    setHistory(h => [...h, { node, choiceLabel: opt.label }]);
+    setNodeId(opt.next);
+  };
+
+  const advance = () => {
+    if (isPrescriptionNode(node) && supp.suppressed) {
+      setSuppressions(s => [...s, supp.suppression_event]);
+      setHistory(h => [...h, { node, suppressed: true, reason: supp.reason }]);
+      setNodeId('DN-16');
+      return;
+    }
+    if (isPrescriptionNode(node)) {
+      const rules = generateMonitoringRules([node.prescribes], ctx);
+      setMonitoring(m => {
+        const merged = [...m, ...rules];
+        return [...new Map(merged.map(r => [r.rule_id, r])).values()];
+      });
+    }
+    setHistory(h => [...h, { node }]);
+    setNodeId(node.next);
+  };
+
+  const isQuestion = node.type === 'QUESTION' || node.type === 'ASSESSMENT';
+  const isTerminal = node.type === 'TERMINAL';
+  const recIdx = isQuestion ? recommendIndex(node, ctx) : -1;
+  const stepNo = history.length + 1;
+
   return (
     <div className="space-y-3">
-      {/* Header */}
-      <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FlaskConical className="w-4 h-4 text-indigo-700" />
-            <span className="text-sm font-bold text-indigo-800">CIEE — {result.pathway_name}</span>
+      {/* CIEE engine header */}
+      <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FlaskConical className="w-4 h-4 text-indigo-700" />
+          <div>
+            <p className="text-sm font-bold text-indigo-800">CIEE Pathway Engine</p>
+            <p className="text-[10px] text-indigo-600">SRNS Management · ISPN 2021 · interactive node traversal</p>
           </div>
-          <Badge className={result.completed ? 'bg-green-600' : 'bg-amber-600'}>
-            {result.completed ? 'Complete' : 'In Progress'}
-          </Badge>
         </div>
-        <p className="text-[11px] text-indigo-600 mt-0.5">
-          Pathway ID: {result.pathway_id} · {result.pathway_output?.length} nodes traversed
-        </p>
+        <Badge className={isTerminal ? 'bg-green-600' : 'bg-indigo-600'}>
+          {isTerminal ? 'Complete' : `Step ${stepNo}`}
+        </Badge>
       </div>
 
-      {/* Suppression alert */}
-      {hasSuppression && (
-        <div className="bg-red-50 border-2 border-red-400 rounded-xl px-4 py-3 flex items-start gap-2">
-          <ShieldAlert className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-bold text-red-800">PrescriptionSuppressor Triggered</p>
-            {result.suppression_log.map((ev, i) => (
-              <p key={i} className="text-xs text-red-700 mt-0.5">
-                {ev.drug} blocked — {ev.acmg_class} variant in {ev.gene} · Rule: {ev.rule_id}
-              </p>
-            ))}
-          </div>
+      {/* Decision trail */}
+      {history.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1">
+          {history.map((h, i) => (
+            <React.Fragment key={i}>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border ${h.suppressed ? 'bg-red-50 border-red-200 text-red-700' : 'bg-white border-slate-200 text-slate-600'}`}>
+                <span className="font-bold">{h.node.id}</span>{h.choiceLabel ? ` · ${h.choiceLabel}` : h.suppressed ? ' · CNI blocked' : ''}
+              </span>
+              <ChevronRight className="w-3 h-3 text-slate-300" />
+            </React.Fragment>
+          ))}
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-600 text-white font-bold">{node.id}</span>
         </div>
       )}
 
-      {/* Pathway nodes */}
-      <div className="space-y-1.5">
-        {result.pathway_output?.map((step, i) => (
-          <div key={i} className={`border rounded-lg px-3 py-2 ${NODE_COLORS[step.type] || NODE_COLORS.ACTION}`}>
-            <div className="flex items-start gap-2">
-              <span className="text-[9px] font-bold bg-white/60 px-1.5 py-0.5 rounded mt-0.5 flex-shrink-0">{step.node_id}</span>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[9px] font-bold uppercase opacity-60">{step.type}</span>
-                  {step.type === 'SUPPRESSED' && <ShieldAlert className="w-3 h-3 text-red-600" />}
-                </div>
-                <p className="text-[11px] font-medium mt-0.5 leading-snug">{step.action}</p>
-                {step.reason && <p className="text-[10px] opacity-70 mt-0.5">{step.reason}</p>}
-                {step.trace?.evidence_grade && (
-                  <span className="text-[9px] opacity-60">Grade {step.trace.evidence_grade} · {step.trace.guideline_name}</span>
-                )}
-              </div>
+      {/* Current node card */}
+      {!isTerminal && (
+        <Card className={`border-2 ${meta.card}`}>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className={`text-[9px] font-bold ${meta.chip} px-1.5 py-0.5 rounded`}>{node.id}</span>
+              <span className={`text-[10px] font-bold uppercase tracking-wide ${meta.text}`}>{meta.label}</span>
+              {node.critical && <Badge variant="outline" className="text-[8px] py-0 border-rose-300 text-rose-600">critical branch</Badge>}
             </div>
-          </div>
-        ))}
-      </div>
 
-      {/* Critical branch evaluations */}
-      {result.evaluation_log?.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl p-3">
-          <div className="flex items-center gap-1.5 mb-2">
-            <BookOpen className="w-3.5 h-3.5 text-slate-500" />
-            <span className="text-xs font-bold text-slate-700">Critical Branch Log</span>
-            <Badge variant="outline" className="text-[9px] py-0">PathwayExecutionEngine</Badge>
+            <p className="text-sm font-semibold text-slate-800">{node.question || node.action}</p>
+            {node.detail && <p className="text-xs text-slate-500">{node.detail}</p>}
+
+            {/* PrescriptionSuppressor interception */}
+            {isPrescriptionNode(node) && supp.suppressed && (
+              <div className="bg-red-50 border-2 border-red-400 rounded-lg px-3 py-2.5 flex items-start gap-2">
+                <ShieldAlert className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-red-800">PrescriptionSuppressor — CNI BLOCKED</p>
+                  <p className="text-[11px] text-red-700 mt-0.5">{supp.reason}</p>
+                </div>
+              </div>
+            )}
+
+            {/* QUESTION / ASSESSMENT → branch options */}
+            {isQuestion && (
+              <div className="space-y-2 pt-1">
+                {node.options.map((opt, i) => (
+                  <button key={i} onClick={() => choose(opt)}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg border-2 transition-all flex items-center justify-between gap-2
+                      ${opt.tone === 'danger' ? 'border-rose-200 hover:border-rose-400 hover:bg-rose-50'
+                        : opt.tone === 'muted' ? 'border-slate-200 hover:border-slate-400 hover:bg-slate-50'
+                        : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'}
+                      ${i === recIdx ? 'ring-2 ring-indigo-300 bg-indigo-50/40' : ''}`}>
+                    <span className="text-sm font-medium text-slate-700">{opt.label}</span>
+                    <span className="flex items-center gap-1 flex-shrink-0">
+                      {i === recIdx && <span className="text-[9px] bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-bold">context</span>}
+                      <ArrowRight className="w-4 h-4 text-slate-400" />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* ACTION / MONITORING → advance */}
+            {!isQuestion && (
+              <Button onClick={advance} className={`w-full ${supp.suppressed ? 'bg-rose-600 hover:bg-rose-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white text-sm h-9`}>
+                {supp.suppressed ? 'Continue → supportive pathway' : 'Continue'}
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            )}
+
+            <EvidenceLine node={node} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* TERMINAL → summary */}
+      {isTerminal && (
+        <div className="space-y-3">
+          <Card className="border-2 border-green-200 bg-green-50/40">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <p className="text-sm font-bold text-green-800">Pathway Complete</p>
+              </div>
+              <p className="text-xs text-slate-600">{node.action}</p>
+              <EvidenceLine node={node} />
+            </CardContent>
+          </Card>
+
+          {/* Recommendation summary — the executed pathway */}
+          <div className="bg-white border border-slate-200 rounded-xl p-3">
+            <div className="flex items-center gap-1.5 mb-2">
+              <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+              <span className="text-xs font-bold text-slate-700">Executed Pathway</span>
+              <Badge variant="outline" className="text-[9px] py-0">TraceabilityLinker</Badge>
+            </div>
+            <div className="space-y-1.5">
+              {history.map((h, i) => {
+                const ev = nodeEvidence(h.node);
+                return (
+                  <div key={i} className={`text-[11px] border-l-2 pl-2 ${h.suppressed ? 'border-red-400' : 'border-indigo-300'}`}>
+                    <span className="font-semibold text-slate-700">{h.node.id}</span>
+                    <span className="text-slate-600"> · {h.suppressed ? `[SUPPRESSED] ${h.node.action}` : (h.choiceLabel || h.node.action)}</span>
+                    {ev?.grade && <span className="text-[9px] text-slate-400 ml-1">(Grade {ev.grade})</span>}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          {result.evaluation_log.map((ev, i) => (
-            <div key={i} className="text-[10px] text-slate-600 border-l-2 border-indigo-300 pl-2 mb-1.5">
-              <span className="font-semibold">{ev.node_id}</span> · {ev.clinical_question}
-              <div className="text-[9px] text-slate-400 mt-0.5">
-                ACMG: {ev.context_snapshot?.acmg_class || '—'} · Biopsy: {ev.context_snapshot?.biopsy_histology || '—'}
+
+          {/* Suppression log */}
+          {suppressions.length > 0 && (
+            <div className="bg-red-50 border-2 border-red-300 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
+                <span className="text-xs font-bold text-red-800">PrescriptionSuppressor Log</span>
+              </div>
+              {suppressions.map((ev, i) => (
+                <p key={i} className="text-[11px] text-red-700">
+                  {ev.drug} blocked — {ev.acmg_class} variant{ev.gene ? ` in ${ev.gene}` : ''} · {ev.rule_id} · {new Date(ev.ts).toLocaleString()}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {/* Generated monitoring schedule */}
+          {monitoring.length > 0 && (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Activity className="w-3.5 h-3.5 text-slate-500" />
+                <span className="text-xs font-bold text-slate-700">Generated Monitoring Schedule</span>
+                <Badge variant="outline" className="text-[9px] py-0">MonitoringRuleGenerator</Badge>
+              </div>
+              <div className="space-y-1.5">
+                {monitoring.map((r, i) => (
+                  <div key={i} className="bg-white rounded p-2 border border-slate-100">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-slate-800">{r.monitoring_parameter}</span>
+                      <span className="text-[10px] text-slate-500">{r.frequency}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-600">Target: {r.target_value}</p>
+                    {r.alert_condition && <p className="text-[9px] text-red-600">⚠ {r.alert_condition} → {r.alert_action}</p>}
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+          )}
+
+          <Button variant="outline" size="sm" className="w-full" onClick={onReset || restart}>
+            Run Another Pathway
+          </Button>
         </div>
+      )}
+
+      {!isTerminal && (
+        <button onClick={restart} className="w-full text-[11px] text-slate-400 underline text-center">
+          Restart pathway
+        </button>
       )}
     </div>
   );
@@ -295,7 +471,6 @@ export default function NephroticSyndromeEngine() {
   const [state, setState] = useState(INITIAL);
   const [cieeCtx, setCieeCtx] = useState(INITIAL_CIEE_CTX);
   const [showCtxPanel, setShowCtxPanel] = useState(true);
-  const [cieeResult, setCieeResult] = useState(null);
   const { step, answers, trail } = state;
 
   const ans = (key, val, label) => setState(s => ({
@@ -303,23 +478,19 @@ export default function NephroticSyndromeEngine() {
     answers: { ...s.answers, [key]: val },
     trail: [...s.trail, label]
   }));
-  const reset = () => { setState(INITIAL); setCieeResult(null); setShowCtxPanel(true); };
+  const reset = () => { setState(INITIAL); setShowCtxPanel(true); };
 
-  const runSRNSPathway = (extraCtx = {}) => {
-    const result = executeSRNSPathway({
-      age_months: parseFloat(cieeCtx.age_months) || null,
-      weight_kg: parseFloat(cieeCtx.weight_kg) || null,
-      height_cm: parseFloat(cieeCtx.height_cm) || null,
-      creatinine_mg_dL: parseFloat(cieeCtx.creatinine_mg_dL) || null,
-      acmg_class: cieeCtx.acmg_class || 'Unknown',
-      genetic_gene: cieeCtx.genetic_gene || null,
-      genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
-      biopsy_histology: cieeCtx.biopsy_histology || 'Unknown',
-      ...extraCtx,
-    });
-    setCieeResult(result);
-    return result;
-  };
+  // Seed the pathway context vector from the PatientContextLayer inputs.
+  const buildStepperCtx = () => ({
+    age_months: parseFloat(cieeCtx.age_months) || null,
+    weight_kg: parseFloat(cieeCtx.weight_kg) || null,
+    height_cm: parseFloat(cieeCtx.height_cm) || null,
+    creatinine_mg_dL: parseFloat(cieeCtx.creatinine_mg_dL) || null,
+    acmg_class: cieeCtx.acmg_class || '',
+    genetic_gene: cieeCtx.genetic_gene || null,
+    genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
+    biopsy_histology: cieeCtx.biopsy_histology || 'Unknown',
+  });
 
   // ── CIEE PatientContextPanel (shown first) ────────────────────────────────
   if (showCtxPanel) return (
@@ -631,79 +802,45 @@ export default function NephroticSyndromeEngine() {
     );
   }
 
-  // ── SRNS + Atypical NS ─────────────────────────────────────────────────────
+  // ── SRNS + Atypical NS → interactive CIEE Pathway Engine ────────────────────
   if (answers.relapse_type === "srns" || (step === 3 && answers.atypical === true)) {
     const isSRNS = answers.relapse_type === "srns";
-    const pathwayResult = cieeResult || (() => { const r = runSRNSPathway(); return r; })();
-    const hasSuppression = pathwayResult?.suppression_log?.length > 0;
-
     return (
       <div className="space-y-3">
-        <EngineHeader title="SRNS / Atypical NS Engine" color="red" subtitle="CIEE Pathway Engine — Full Decision Support" onReset={reset} />
+        <EngineHeader title="SRNS / Atypical NS Engine" color="red" subtitle="CIEE Pathway Engine — step-by-step decision support" onReset={reset} />
         <EmergencyBanner text="SRNS: Renal biopsy + genetic panel MANDATORY before starting CNI therapy." />
-        <PathwayTrail steps={[...trail, isSRNS ? "SRNS" : "Atypical NS", "CIEE Pathway Active"]} />
+        <PathwayTrail steps={[...trail, isSRNS ? "SRNS" : "Atypical NS", "CIEE Pathway"]} />
         <ResultHeader diagnosis={isSRNS ? "Steroid-Resistant NS (SRNS)" : "Atypical NS — Biopsy Required"} risk="red" urgent />
 
-        {/* CIEE PathwayExecutionEngine output */}
-        <CIEEPathwayOutput result={pathwayResult} />
+        {/* Interactive PathwayExecutionEngine — traverses the SRNS decision graph node by node */}
+        <CIEEStepper initialCtx={buildStepperCtx()} />
 
-        <DifferentialTable rows={[
-          { dx: "FSGS (focal segmental glomerulosclerosis)", pct: 50, label: "Most Common" },
-          { dx: "MCD (minimal change disease, steroid-resistant subset)", pct: 20, label: "Possible" },
-          { dx: "DMS (diffuse mesangial sclerosis — genetic)", pct: 10, label: "Consider if <1yr" },
-          { dx: "Genetic NS (NPHS1/2, WT1, PLCE1, COQ mutations)", pct: 15, label: "Test all SRNS" },
-          { dx: "Lupus nephritis class V", pct: 3, label: "If ANA +" },
-          { dx: "Membranous nephropathy", pct: 2, label: "Rare in children" },
-        ]} />
-
-        <InvestigationPanel
-          mustOrder={[
-            "Genetic panel: NPHS1, NPHS2, PLCE1, WT1, LAMB2, CD2AP, TRPC6, INF2",
-            "COQ2, COQ6, COQ8B (mitochondrial) — if extra-renal features or neonatal",
-            "Renal biopsy: LM + IF + EM — classify FSGS variant (Columbia classification)",
-            "ANA, anti-dsDNA, C3, C4, anti-GBM (secondary NS exclusion)",
-            "HBsAg, anti-HCV, HIV serology",
-            "Ophthalmology (WT1 → DDS + Wilms; LAMB2 → Pierson + microcoria)"
-          ]}
-          shouldOrder={["24h urine protein / UPCR daily", "Tacrolimus trough BEFORE CNI start", "USG kidneys"]}
-          advanced={["WES (whole exome) if targeted panel negative + onset <5yr", "Lyso-Gb3 if Fabry suspected"]}
-        />
-
-        <TreatmentPanel title="SRNS Protocol (KDIGO 2012 + IPNA 2021)" items={[
-          "Await genetic results AND biopsy before starting CNI",
-          hasSuppression
-            ? "⛔ CNI BLOCKED by CIEE PrescriptionSuppressor — genetic cause confirmed — NO CNI"
-            : "IF MCD or FSGS without genetic cause: Tacrolimus 0.1–0.2 mg/kg/day (trough 5–10 ng/mL)",
-          hasSuppression
-            ? "→ ACEi/ARB + supportive care + transplant evaluation (genetic SRNS)"
-            : "Tacrolimus + low-dose prednisolone × 6 months — assess response (CR/PR at 6 months)",
-          "CR (complete remission): continue tacrolimus 1–2 years, slow taper",
-          "PR (>50% reduction): maintain + add ACEi/ARB",
-          "No response at 6 months: Rituximab OR CYC IV × 6 pulses (FSGS variant)",
-          "ACEi + ARB: all SRNS (reduce proteinuria, renoprotective) — monitor K+ + creatinine"
-        ]} />
-
-        <ReasoningPanel reasons={[
-          "SRNS = no remission after 4 weeks of full-dose prednisolone",
-          "CNI cannot be started without biopsy (cannot give tacrolimus to non-proliferative FSGS blindly)",
-          "Genetic cause present in ~30% SRNS → CNI ineffective in genetic SRNS (podocin mutations)",
-          "FSGS has 5 variants (Columbia): tip lesion has better prognosis; collapsing FSGS worst",
-          ...(hasSuppression ? ["CIEE PrescriptionSuppressor has blocked CNI therapy — redirect to supportive/transplant pathway"] : [])
-        ]} />
-
-        <CIEEMonitoringPanel drugs={hasSuppression ? [] : ['tacrolimus']} cieeCtx={cieeCtx} />
-
-        <MonitoringPanel items={[
-          "Tacrolimus trough every 2 weeks initially, then monthly",
-          "eGFR + creatinine monthly (CNI nephrotoxicity)",
-          "Annual renal biopsy if on CsA >2 years (nephrotoxicity surveillance)",
-          "UPCR monthly — target CR or PR",
-          "Growth, BP, lipids every 3 months",
-          "Transplant evaluation if ESKD trajectory"
-        ]} />
-
-        <GuidelineSource text="KDIGO 2012 · IPNA 2021 SRNS Recommendations · FSGS Columbia Classification (D'Agati 2004) · ESCAPE trial (ACEi in CKD)" />
-        <TraceabilityBadge sourceId="GS-ISPN-2021-SRNS" />
+        {/* Reference differential (collapsed below the live pathway) */}
+        <details className="bg-white border border-slate-200 rounded-xl">
+          <summary className="px-3 py-2 text-xs font-semibold text-slate-600 cursor-pointer">Reference — SRNS differential & workup</summary>
+          <div className="p-3 pt-0 space-y-3">
+            <DifferentialTable rows={[
+              { dx: "FSGS (focal segmental glomerulosclerosis)", pct: 50, label: "Most Common" },
+              { dx: "MCD (minimal change disease, steroid-resistant subset)", pct: 20, label: "Possible" },
+              { dx: "DMS (diffuse mesangial sclerosis — genetic)", pct: 10, label: "Consider if <1yr" },
+              { dx: "Genetic NS (NPHS1/2, WT1, PLCE1, COQ mutations)", pct: 15, label: "Test all SRNS" },
+              { dx: "Lupus nephritis class V", pct: 3, label: "If ANA +" },
+              { dx: "Membranous nephropathy", pct: 2, label: "Rare in children" },
+            ]} />
+            <InvestigationPanel
+              mustOrder={[
+                "Genetic panel: NPHS1, NPHS2, PLCE1, WT1, LAMB2, CD2AP, TRPC6, INF2",
+                "Renal biopsy: LM + IF + EM — classify FSGS variant (Columbia classification)",
+                "ANA, anti-dsDNA, C3, C4, anti-GBM (secondary NS exclusion)",
+                "HBsAg, anti-HCV, HIV serology",
+              ]}
+              shouldOrder={["24h urine protein / UPCR daily", "CNI trough BEFORE start", "USG kidneys"]}
+              advanced={["WES if targeted panel negative + onset <5yr"]}
+            />
+            <GuidelineSource text="KDIGO 2021 · IPNA/ISPN 2021 SRNS Recommendations · FSGS Columbia Classification (D'Agati 2004)" />
+            <TraceabilityBadge sourceId="GS-ISPN-2021-SRNS" />
+          </div>
+        </details>
       </div>
     );
   }
