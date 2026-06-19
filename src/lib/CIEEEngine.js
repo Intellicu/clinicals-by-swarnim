@@ -350,8 +350,8 @@ export const SRNS_PATHWAY = {
 
 export function getPathwayNode(id) { return SRNS_PATHWAY.nodes[id]; }
 
-export function nodeEvidence(node) {
-  const gs = node ? GUIDELINE_SOURCES[node.source] : null;
+export function nodeEvidence(node, sources = GUIDELINE_SOURCES) {
+  const gs = node ? sources[node.source] : null;
   return gs ? { grade: gs.evidence_grade, name: gs.guideline_name, section: gs.guideline_section, pmid: gs.pmid, strength: gs.recommendation_strength } : null;
 }
 

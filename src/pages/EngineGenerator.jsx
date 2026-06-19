@@ -14,6 +14,8 @@ import {
   Search, Eye, EyeOff, FlaskConical, FileText
 } from "lucide-react";
 import { toast } from "sonner";
+import { generateCIEEPathway, validatePathway } from "@/lib/CIEEGenerator";
+import CIEEEngineRunner from "@/components/clinical-ai/CIEEEngineRunner";
 
 const GROUPS = [
   "Emergency & Electrolytes", "Glomerular Disease", "CKD & Genetics",
@@ -109,6 +111,9 @@ function recordToEngine(rec) {
     summary: c.summary || "",
     keys: c.keys || [],
     references: c.references || "",
+    ciee_pathway: c.ciee_pathway || null,
+    ciee_sources: c.ciee_sources || null,
+    guideline_source: c.guideline_source || null,
     is_active: rec.status === "published",
   };
 }
@@ -131,6 +136,10 @@ function engineToRecord(engine) {
       summary: engine.summary || "",
       keys: engine.keys || [],
       references: engine.references || "",
+      // CIEE executable decision graph (Component 2 output)
+      ciee_pathway: engine.ciee_pathway || null,
+      ciee_sources: engine.ciee_sources || null,
+      guideline_source: engine.guideline_source || null,
     },
   };
 }
@@ -146,6 +155,12 @@ export default function EngineGenerator() {
   const [expanded, setExpanded] = useState(null);
   const [llmTestResult, setLlmTestResult] = useState(null);
   const [llmTesting, setLlmTesting] = useState(false);
+  // CIEE decision-graph generation
+  const [cieeMode, setCieeMode] = useState(false);
+  const [cieeGen, setCieeGen] = useState(null);        // { guideline_source, sources, engine, pathway }
+  const [cieeValidation, setCieeValidation] = useState(null);
+  const [cieeGenLoading, setCieeGenLoading] = useState(false);
+  const [runnerGraph, setRunnerGraph] = useState(null); // graph being run live
 
   const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60000 });
   const isAdmin = user?.role === "admin";
@@ -242,6 +257,45 @@ Return ONLY valid JSON, no explanation.`;
     } finally {
       setAiLoading(false);
     }
+  };
+
+  // ── Build an executable CIEE decision graph from the guideline (Component 2) ──
+  const generateCIEEEngine = async () => {
+    if (!aiTopic.trim() && !aiDocText.trim()) { toast.error("Enter a topic or upload a guideline first"); return; }
+    setCieeGenLoading(true);
+    setCieeGen(null); setCieeValidation(null);
+    try {
+      toast.info("Parsing guideline into a decision graph…");
+      const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText });
+      if (!res.success) { toast.error("Generation failed: " + res.error); return; }
+      setCieeGen(res.data);
+      setCieeValidation(res.validation);
+      if (res.validation?.valid) toast.success(`Decision graph generated — ${res.validation.nodeCount} nodes`);
+      else toast.warning(`Generated with ${res.validation?.errors?.length || 0} graph issue(s) — review below`);
+    } catch (err) {
+      toast.error("Generation failed: " + err.message);
+    } finally {
+      setCieeGenLoading(false);
+    }
+  };
+
+  const saveCIEEEngine = () => {
+    if (!cieeGen) return;
+    const eng = cieeGen.engine || {};
+    createMutation.mutate({
+      ...EMPTY_ENGINE,
+      label: eng.label || cieeGen.guideline_source?.guideline_name || "Generated Engine",
+      desc: eng.desc || cieeGen.guideline_source?.guideline_name || "",
+      scenario: (eng.scenario || (eng.label || "engine").toLowerCase().replace(/\s+/g, "-")),
+      group: eng.group || "General Pediatrics",
+      references: cieeGen.guideline_source ? `${cieeGen.guideline_source.issuing_body} ${cieeGen.guideline_source.year || ""}` : "",
+      summary: `CIEE decision engine · ${Object.keys(cieeGen.pathway.nodes).length} nodes`,
+      tags: ["ciee", "decision-engine"],
+      is_active: true,
+      ciee_pathway: cieeGen.pathway,
+      ciee_sources: cieeGen.sources,
+      guideline_source: cieeGen.guideline_source,
+    });
   };
 
   const runLLMTest = async () => {
@@ -393,7 +447,11 @@ Return ONLY valid JSON, no explanation.`;
           </Button>
           <Button onClick={() => setAiMode(v => !v)} variant="outline"
             className="border-violet-300 text-violet-700 hover:bg-violet-50 gap-1.5 text-sm">
-            <Sparkles className="w-4 h-4" /> {aiMode ? "Hide" : "Generate with AI"}
+            <Sparkles className="w-4 h-4" /> {aiMode ? "Hide" : "Generate Metadata (AI)"}
+          </Button>
+          <Button onClick={() => setCieeMode(v => !v)} variant="outline"
+            className="border-indigo-300 text-indigo-700 hover:bg-indigo-50 gap-1.5 text-sm">
+            <FlaskConical className="w-4 h-4" /> {cieeMode ? "Hide" : "Build Decision Engine (CIEE)"}
           </Button>
         </div>
 
@@ -442,6 +500,98 @@ Return ONLY valid JSON, no explanation.`;
           </Card>
         )}
 
+        {/* CIEE Decision-Graph Builder */}
+        {cieeMode && (
+          <Card className="border-indigo-200 bg-indigo-50">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm flex items-center gap-2 text-indigo-900">
+                <FlaskConical className="w-4 h-4" /> CIEE Decision-Engine Builder
+              </CardTitle>
+              <p className="text-xs text-indigo-600">
+                Parses an uploaded guideline into an <strong>executable decision graph</strong> (GuidelineSource + DecisionNode processor) — runnable by the same PathwayExecutionEngine, with prescription suppression, monitoring schedules and node-level evidence traceability.
+              </p>
+            </CardHeader>
+            <CardContent className="px-4 pb-4 space-y-3">
+              <div>
+                <Label className="text-xs font-semibold text-indigo-800">Clinical Topic</Label>
+                <Input value={aiTopic} onChange={e => setAiTopic(e.target.value)}
+                  placeholder="e.g. KDIGO AKI 2023, IPNA SRNS, Bartter Syndrome…"
+                  className="mt-1 bg-white border-indigo-200 text-sm" />
+              </div>
+              <div>
+                <Label className="text-xs font-semibold text-indigo-800">Guideline text (paste or upload PDF/doc)</Label>
+                <Textarea value={aiDocText} onChange={e => setAiDocText(e.target.value)}
+                  placeholder="Paste guideline content, or use Upload below…"
+                  className="mt-1 bg-white border-indigo-200 text-sm h-24 resize-none" />
+              </div>
+              <div className="flex gap-2 items-center flex-wrap">
+                <label className={`flex items-center gap-1.5 cursor-pointer px-3 py-2 border rounded-lg text-xs font-medium transition-colors ${pdfUploading ? "border-indigo-200 bg-indigo-50 text-indigo-400 cursor-not-allowed" : "border-indigo-300 bg-white text-indigo-700 hover:bg-indigo-50"}`}>
+                  {pdfUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileUp className="w-3.5 h-3.5" />}
+                  {pdfUploading ? "Extracting PDF…" : "Upload Guideline PDF / Doc"}
+                  <input type="file" accept=".txt,.md,.csv,.pdf" className="hidden" onChange={handleDocUpload} disabled={pdfUploading} />
+                </label>
+                {pdfFileName && !pdfUploading && (
+                  <div className="flex items-center gap-1 text-xs text-indigo-700 bg-indigo-100 px-2 py-1 rounded-full border border-indigo-200">
+                    <FileText className="w-3 h-3" /> {pdfFileName}
+                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); }} className="ml-1 text-indigo-400 hover:text-indigo-700"><X className="w-3 h-3" /></button>
+                  </div>
+                )}
+              </div>
+              <Button onClick={generateCIEEEngine} disabled={cieeGenLoading}
+                className="w-full bg-indigo-700 hover:bg-indigo-800 gap-2">
+                {cieeGenLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing guideline → decision graph…</> : <><Cpu className="w-4 h-4" /> Generate CIEE Decision Graph</>}
+              </Button>
+
+              {/* Generated graph preview */}
+              {cieeGen && (
+                <div className="space-y-2 pt-1">
+                  {/* validation */}
+                  <div className={`rounded-lg p-2 text-xs border ${cieeValidation?.valid ? "bg-green-50 border-green-200 text-green-800" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
+                    <div className="flex items-center gap-1.5 font-semibold">
+                      {cieeValidation?.valid ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                      {cieeValidation?.valid ? `Valid runnable graph · ${cieeValidation.nodeCount} nodes` : `Graph has ${cieeValidation?.errors?.length || 0} issue(s)`}
+                    </div>
+                    {(cieeValidation?.errors || []).map((e, i) => <p key={i} className="mt-0.5">• {e}</p>)}
+                    {(cieeValidation?.warnings || []).map((w, i) => <p key={i} className="mt-0.5 text-amber-600">⚠ {w}</p>)}
+                  </div>
+
+                  {/* guideline source */}
+                  <div className="bg-white rounded-lg p-2 border border-indigo-100 text-xs">
+                    <p className="font-semibold text-indigo-900">{cieeGen.guideline_source?.guideline_name}</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      <Badge variant="outline" className="text-[9px] py-0">{cieeGen.guideline_source?.issuing_body} {cieeGen.guideline_source?.year}</Badge>
+                      {cieeGen.guideline_source?.evidence_grade && <Badge variant="outline" className="text-[9px] py-0">Grade {cieeGen.guideline_source.evidence_grade}</Badge>}
+                      {cieeGen.guideline_source?.pmid && <span className="text-[9px] text-slate-400 self-center">PMID {cieeGen.guideline_source.pmid}</span>}
+                    </div>
+                  </div>
+
+                  {/* node list */}
+                  <div className="bg-white rounded-lg p-2 border border-indigo-100 max-h-48 overflow-y-auto">
+                    {Object.values(cieeGen.pathway.nodes).map((n) => (
+                      <div key={n.id} className="text-[11px] flex items-start gap-1.5 py-0.5 border-b border-slate-50 last:border-0">
+                        <span className="font-bold text-indigo-700 shrink-0">{n.id}</span>
+                        <span className="text-[8px] font-bold uppercase text-slate-400 shrink-0 mt-0.5">{n.type}</span>
+                        <span className="text-slate-700">{n.question || n.action}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button onClick={() => setRunnerGraph(cieeGen)} variant="outline"
+                      className="flex-1 border-indigo-300 text-indigo-700 hover:bg-indigo-50 gap-1.5 text-sm">
+                      <Eye className="w-4 h-4" /> Run / Preview Pathway
+                    </Button>
+                    <Button onClick={saveCIEEEngine} disabled={createMutation.isPending || !cieeValidation?.valid}
+                      className="flex-1 bg-indigo-700 hover:bg-indigo-800 gap-1.5 text-sm">
+                      {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />} Save Engine
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Search */}
         {engines.length > 0 && (
           <div className="relative">
@@ -478,6 +628,7 @@ Return ONLY valid JSON, no explanation.`;
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                      {eng.ciee_pathway && <Badge className="text-xs bg-indigo-100 text-indigo-700">CIEE</Badge>}
                       <Badge variant="outline" className="text-xs">{eng.group}</Badge>
                       <Badge className={`text-xs ${eng.is_active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
                         {eng.is_active ? "Active" : "Hidden"}
@@ -505,6 +656,12 @@ Return ONLY valid JSON, no explanation.`;
                         </div>
                       )}
                       <div className="flex gap-2 pt-1 flex-wrap">
+                        {eng.ciee_pathway && (
+                          <Button size="sm" variant="outline" className="text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50 h-7"
+                            onClick={() => setRunnerGraph({ pathway: eng.ciee_pathway, sources: eng.ciee_sources || {}, guideline_source: eng.guideline_source, engine: { label: eng.label } })}>
+                            <FlaskConical className="w-3 h-3 mr-1" /> Run Pathway
+                          </Button>
+                        )}
                         <Button size="sm" variant="outline"
                           className={`text-xs h-7 ${eng.is_active ? "border-slate-200 text-slate-600 hover:bg-slate-50" : "border-green-200 text-green-700 hover:bg-green-50"}`}
                           onClick={() => toggleVisibility(eng)}
@@ -542,6 +699,31 @@ Return ONLY valid JSON, no explanation.`;
           </CardContent>
         </Card>
       </div>
+
+      {/* CIEE Pathway Runner Modal */}
+      {runnerGraph && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-3 pb-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <FlaskConical className="w-4 h-4 text-indigo-600" />
+                {runnerGraph.engine?.label || runnerGraph.guideline_source?.guideline_name || "CIEE Pathway"}
+              </h3>
+              <button onClick={() => setRunnerGraph(null)} className="p-1 text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="p-4">
+              <CIEEEngineRunner
+                pathway={runnerGraph.pathway}
+                sources={runnerGraph.sources || {}}
+                initialCtx={{}}
+                title={runnerGraph.engine?.label || "CIEE Pathway Engine"}
+                subtitle={runnerGraph.guideline_source?.guideline_name}
+                onReset={() => setRunnerGraph({ ...runnerGraph })}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Modal */}
       {modal && (
