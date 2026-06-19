@@ -52,6 +52,7 @@ import ClinicalReferenceLibrary from './pages/ClinicalReferenceLibrary';
 import MonitoringTasksDashboard from './pages/MonitoringTasksDashboard';
 import KidneyCarealertInbox from './pages/KidneyCarealertInbox';
 import EngineGenerator from './pages/EngineGenerator';
+import CIEEEngines from './pages/CIEEEngines';
 import DailySummary from './pages/DailySummary';
 import OncologyHub from './pages/OncologyHub';
 import OncologyAdmin from './pages/OncologyAdmin';
@@ -133,6 +134,7 @@ const AuthenticatedApp = () => {
         <Route path="/MonitoringTasksDashboard" element={<LayoutWrapper currentPageName="MonitoringTasksDashboard"><MonitoringTasksDashboard /></LayoutWrapper>} />
         <Route path="/KidneyCarealertInbox" element={<LayoutWrapper currentPageName="KidneyCarealertInbox"><KidneyCarealertInbox /></LayoutWrapper>} />
         <Route path="/EngineGenerator" element={<LayoutWrapper currentPageName="EngineGenerator"><EngineGenerator /></LayoutWrapper>} />
+        <Route path="/CIEEEngines" element={<LayoutWrapper currentPageName="CIEEEngines"><CIEEEngines /></LayoutWrapper>} />
         <Route path="/DailySummary" element={<LayoutWrapper currentPageName="DailySummary"><DailySummary /></LayoutWrapper>} />
         <Route path="/OncologyHub" element={<LayoutWrapper currentPageName="OncologyHub"><OncologyHub /></LayoutWrapper>} />
         <Route path="/OncologyAdmin" element={<LayoutWrapper currentPageName="OncologyAdmin"><OncologyAdmin /></LayoutWrapper>} />

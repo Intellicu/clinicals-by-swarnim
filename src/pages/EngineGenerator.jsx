@@ -407,9 +407,11 @@ Return ONLY valid JSON, no explanation.`;
                 <p className="text-violet-200 text-xs">Admin tool — Add, edit, toggle &amp; delete clinical intelligence engines (saved to database)</p>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-1">
+            <div className="flex flex-col items-end gap-1.5">
+              <a href="/CIEEEngines" className="text-[11px] font-semibold bg-white/20 hover:bg-white/30 border border-white/30 rounded-full px-2.5 py-1 flex items-center gap-1">
+                <FlaskConical className="w-3 h-3" /> CIEE Engines Hub
+              </a>
               <Badge className="bg-white/20 text-white text-xs border border-white/30">{engines.length} Total</Badge>
-              <Badge className="bg-green-400/30 text-green-100 text-xs border border-green-300/40">{activeCount} Active</Badge>
             </div>
           </div>
         </div>
