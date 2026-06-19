@@ -42,7 +42,6 @@ export async function invokeBiopsyAnalyzer({ biopsyText = '', biopsyFile = null 
     return wrap(await withRetry(async () => {
       const fileUrl = await uploadIfPresent(biopsyFile);
       return base44.integrations.Core.InvokeLLM({
-        model: 'claude_sonnet_4_6',
         prompt: `You are a senior nephropathologist with expertise in paediatric renal biopsies. Analyse the provided biopsy report/image with expert-level histopathological analysis.
 
 ${biopsyText ? `Report text:\n${biopsyText}` : ''}
@@ -89,7 +88,6 @@ export async function invokeLabAnalyzer({ labText = '', labFile = null, labType 
     return wrap(await withRetry(async () => {
       const fileUrl = await uploadIfPresent(labFile);
       return base44.integrations.Core.InvokeLLM({
-        model: 'claude_sonnet_4_6',
         prompt: `You are an expert paediatric nephrologist analysing laboratory results.
 
 Lab Type: ${labType}
@@ -167,7 +165,6 @@ export async function invokeGeneticsAnalyzer({ reportText = '', reportFile = nul
     return wrap(await withRetry(async () => {
       const fileUrl = await uploadIfPresent(reportFile);
       return base44.integrations.Core.InvokeLLM({
-        model: 'claude_sonnet_4_6',
         prompt: `You are a paediatric clinical geneticist specialising in nephrology.
 
 ${clinicalContext ? `Clinical context: ${clinicalContext}` : ''}
@@ -220,7 +217,6 @@ export async function invokeCaseAnalyzer({ caseDetails = {} }) {
   try {
     return wrap(await withRetry(async () => {
       return base44.integrations.Core.InvokeLLM({
-        model: 'claude_sonnet_4_6',
         prompt: `You are a senior consultant paediatric nephrologist conducting attending-level clinical case analysis.
 
 Patient: ${caseDetails.age || '?'} years old ${caseDetails.gender || ''}
