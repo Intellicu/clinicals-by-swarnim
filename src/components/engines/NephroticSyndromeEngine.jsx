@@ -1,6 +1,8 @@
 /**
- * Nephrotic Syndrome Intelligence Engine
+ * Nephrotic Syndrome Intelligence Engine — CIEE Integrated
  * Full LEILA-style: First episode → relapse → FRNS → SDNS → SRNS → Congenital
+ * CIEE: 7-component patent architecture (PatientContextLayer, PrescriptionSuppressor,
+ *        TraceabilityLinker, MonitoringRuleGenerator, PathwayExecutionEngine)
  */
 import React, { useState } from "react";
 import {
@@ -9,12 +11,291 @@ import {
   GuidelineSource, RiskBadge, ResultHeader, ReasoningPanel, TreatmentPanel, EmergencyBanner
 } from "./EngineShell";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  AlertTriangle, ArrowRight, CheckCircle2, ShieldCheck, ShieldAlert,
+  Activity, Dna, FlaskConical, ChevronRight, AlertCircle, BookOpen
+} from "lucide-react";
+import {
+  buildTraceabilityLink, checkPrescriptionSuppressor,
+  executeSRNSPathway, generateMonitoringRules, GUIDELINE_SOURCES
+} from "@/lib/CIEEEngine";
+
+// ── CIEE Sub-components ───────────────────────────────────────────────────────
+
+function TraceabilityBadge({ sourceId }) {
+  const gs = GUIDELINE_SOURCES[sourceId];
+  if (!gs) return null;
+  return (
+    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+      <ShieldCheck className="w-3 h-3 text-slate-400 flex-shrink-0" />
+      <span className="text-[10px] text-slate-500">{gs.guideline_name}</span>
+      {gs.evidence_grade && (
+        <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold">
+          Grade {gs.evidence_grade}
+        </span>
+      )}
+      {gs.pmid && (
+        <span className="text-[9px] text-slate-400">PMID {gs.pmid}</span>
+      )}
+    </div>
+  );
+}
+
+function SuppressionBanner({ drug, cieeCtx }) {
+  const check = checkPrescriptionSuppressor(drug, {
+    ...cieeCtx,
+    genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
+  });
+  if (!check.suppressed) return null;
+  return (
+    <div className="bg-red-50 border-2 border-red-400 rounded-xl px-4 py-3 flex items-start gap-2">
+      <ShieldAlert className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+      <div>
+        <p className="text-sm font-bold text-red-800">CIEE PrescriptionSuppressor — CNI BLOCKED</p>
+        <p className="text-xs text-red-700 mt-0.5">{check.reason}</p>
+        <TraceabilityBadge sourceId={check.guideline_source_id} />
+      </div>
+    </div>
+  );
+}
+
+function CIEEMonitoringPanel({ drugs = [], cieeCtx = {} }) {
+  const rules = generateMonitoringRules(drugs, cieeCtx);
+  if (!rules.length) return null;
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+      <div className="flex items-center gap-1.5 mb-2">
+        <Activity className="w-3.5 h-3.5 text-slate-500" />
+        <span className="text-xs font-bold text-slate-700">CIEE Monitoring Rules</span>
+        <Badge variant="outline" className="text-[9px] py-0">MonitoringRuleGenerator</Badge>
+      </div>
+      <div className="space-y-1.5">
+        {rules.map((r, i) => (
+          <div key={i} className="bg-white rounded p-2 border border-slate-100">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-slate-800">{r.monitoring_parameter}</span>
+              <span className="text-[10px] text-slate-500">{r.frequency}</span>
+            </div>
+            <div className="flex gap-1 mt-0.5 flex-wrap">
+              <span className="text-[10px] text-slate-600">Target: {r.target_value}</span>
+              {r.alert_condition && (
+                <span className="text-[9px] text-red-600">⚠ {r.alert_condition}</span>
+              )}
+            </div>
+            {r.evidence_grade && (
+              <span className="text-[9px] bg-slate-100 text-slate-600 px-1 rounded">Grade {r.evidence_grade}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const NODE_COLORS = {
+  QUESTION: 'bg-blue-50 border-blue-200 text-blue-800',
+  ACTION: 'bg-green-50 border-green-200 text-green-800',
+  ASSESSMENT: 'bg-amber-50 border-amber-200 text-amber-800',
+  MONITORING: 'bg-purple-50 border-purple-200 text-purple-800',
+  TERMINAL: 'bg-slate-100 border-slate-300 text-slate-700',
+  SUPPRESSED: 'bg-red-50 border-red-300 text-red-800',
+};
+
+function CIEEPathwayOutput({ result }) {
+  if (!result) return null;
+  const hasSuppression = result.suppression_log?.length > 0;
+  return (
+    <div className="space-y-3">
+      {/* Header */}
+      <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FlaskConical className="w-4 h-4 text-indigo-700" />
+            <span className="text-sm font-bold text-indigo-800">CIEE — {result.pathway_name}</span>
+          </div>
+          <Badge className={result.completed ? 'bg-green-600' : 'bg-amber-600'}>
+            {result.completed ? 'Complete' : 'In Progress'}
+          </Badge>
+        </div>
+        <p className="text-[11px] text-indigo-600 mt-0.5">
+          Pathway ID: {result.pathway_id} · {result.pathway_output?.length} nodes traversed
+        </p>
+      </div>
+
+      {/* Suppression alert */}
+      {hasSuppression && (
+        <div className="bg-red-50 border-2 border-red-400 rounded-xl px-4 py-3 flex items-start gap-2">
+          <ShieldAlert className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-bold text-red-800">PrescriptionSuppressor Triggered</p>
+            {result.suppression_log.map((ev, i) => (
+              <p key={i} className="text-xs text-red-700 mt-0.5">
+                {ev.drug} blocked — {ev.acmg_class} variant in {ev.gene} · Rule: {ev.rule_id}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Pathway nodes */}
+      <div className="space-y-1.5">
+        {result.pathway_output?.map((step, i) => (
+          <div key={i} className={`border rounded-lg px-3 py-2 ${NODE_COLORS[step.type] || NODE_COLORS.ACTION}`}>
+            <div className="flex items-start gap-2">
+              <span className="text-[9px] font-bold bg-white/60 px-1.5 py-0.5 rounded mt-0.5 flex-shrink-0">{step.node_id}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[9px] font-bold uppercase opacity-60">{step.type}</span>
+                  {step.type === 'SUPPRESSED' && <ShieldAlert className="w-3 h-3 text-red-600" />}
+                </div>
+                <p className="text-[11px] font-medium mt-0.5 leading-snug">{step.action}</p>
+                {step.reason && <p className="text-[10px] opacity-70 mt-0.5">{step.reason}</p>}
+                {step.trace?.evidence_grade && (
+                  <span className="text-[9px] opacity-60">Grade {step.trace.evidence_grade} · {step.trace.guideline_name}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Critical branch evaluations */}
+      {result.evaluation_log?.length > 0 && (
+        <div className="bg-white border border-slate-200 rounded-xl p-3">
+          <div className="flex items-center gap-1.5 mb-2">
+            <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+            <span className="text-xs font-bold text-slate-700">Critical Branch Log</span>
+            <Badge variant="outline" className="text-[9px] py-0">PathwayExecutionEngine</Badge>
+          </div>
+          {result.evaluation_log.map((ev, i) => (
+            <div key={i} className="text-[10px] text-slate-600 border-l-2 border-indigo-300 pl-2 mb-1.5">
+              <span className="font-semibold">{ev.node_id}</span> · {ev.clinical_question}
+              <div className="text-[9px] text-slate-400 mt-0.5">
+                ACMG: {ev.context_snapshot?.acmg_class || '—'} · Biopsy: {ev.context_snapshot?.biopsy_histology || '—'}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PatientContextPanel({ cieeCtx, setCieeCtx, onDone }) {
+  const field = (key, label, placeholder, type = 'text') => (
+    <div>
+      <label className="text-xs font-semibold text-slate-700 mb-1 block">{label}</label>
+      <Input
+        type={type}
+        value={cieeCtx[key] || ''}
+        onChange={e => setCieeCtx(c => ({ ...c, [key]: e.target.value }))}
+        placeholder={placeholder}
+        className="text-sm h-8"
+      />
+    </div>
+  );
+  return (
+    <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <FlaskConical className="w-4 h-4 text-indigo-700" />
+        <span className="text-sm font-bold text-indigo-800">CIEE PatientContextLayer</span>
+        <Badge className="bg-indigo-600 text-[10px]">Component 3</Badge>
+      </div>
+      <p className="text-[11px] text-indigo-600">
+        Enter patient parameters to enable CIEE PrescriptionSuppressor and TraceabilityLinker.
+        This context is threaded through all pathway decisions.
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        {field('age_months', 'Age (months)', 'e.g. 36', 'number')}
+        {field('weight_kg', 'Weight (kg)', 'e.g. 14.5', 'number')}
+        {field('height_cm', 'Height (cm)', 'e.g. 95 (Schwartz GFR)', 'number')}
+        {field('creatinine_mg_dL', 'Creatinine (mg/dL)', 'e.g. 0.4', 'number')}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="text-xs font-semibold text-slate-700 mb-1 block">ACMG Variant Class</label>
+          <select
+            value={cieeCtx.acmg_class || ''}
+            onChange={e => setCieeCtx(c => ({ ...c, acmg_class: e.target.value }))}
+            className="w-full text-sm h-8 px-2 border rounded-md bg-white"
+          >
+            <option value="">Unknown</option>
+            <option value="Pathogenic">Pathogenic</option>
+            <option value="Likely Pathogenic">Likely Pathogenic</option>
+            <option value="VUS">VUS</option>
+            <option value="Likely Benign">Likely Benign</option>
+            <option value="Benign">Benign</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs font-semibold text-slate-700 mb-1 block">Gene (if known)</label>
+          <select
+            value={cieeCtx.genetic_gene || ''}
+            onChange={e => setCieeCtx(c => ({ ...c, genetic_gene: e.target.value }))}
+            className="w-full text-sm h-8 px-2 border rounded-md bg-white"
+          >
+            <option value="">Unknown</option>
+            {['NPHS1','NPHS2','WT1','LAMB2','PLCE1','TRPC6','INF2','ACTN4','CD2AP','COL4A3','COL4A4','COL4A5'].map(g => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className="text-xs font-semibold text-slate-700 mb-1 block">Biopsy Histology</label>
+        <select
+          value={cieeCtx.biopsy_histology || ''}
+          onChange={e => setCieeCtx(c => ({ ...c, biopsy_histology: e.target.value }))}
+          className="w-full text-sm h-8 px-2 border rounded-md bg-white"
+        >
+          <option value="">Not yet done / Unknown</option>
+          <option value="MCD">MCD — Minimal Change Disease</option>
+          <option value="FSGS">FSGS — Focal Segmental Glomerulosclerosis</option>
+          <option value="FSGS-tip">FSGS — Tip Lesion variant</option>
+          <option value="FSGS-collapsing">FSGS — Collapsing variant</option>
+          <option value="DMS">DMS — Diffuse Mesangial Sclerosis</option>
+          <option value="MN">MN — Membranous Nephropathy</option>
+          <option value="MPGN">MPGN</option>
+          <option value="IgAN">IgA Nephropathy</option>
+        </select>
+      </div>
+      {cieeCtx.height_cm && cieeCtx.creatinine_mg_dL && (
+        <div className="bg-white rounded-lg p-2 border border-indigo-100">
+          <p className="text-[10px] text-indigo-600 font-semibold">
+            Schwartz eGFR = (0.413 × {cieeCtx.height_cm}) / {cieeCtx.creatinine_mg_dL} ={' '}
+            <span className="text-indigo-900 font-bold">
+              {((0.413 * parseFloat(cieeCtx.height_cm)) / parseFloat(cieeCtx.creatinine_mg_dL)).toFixed(1)} mL/min/1.73m²
+            </span>
+          </p>
+        </div>
+      )}
+      <Button onClick={onDone} className="w-full bg-indigo-600 text-white text-sm h-9">
+        <ChevronRight className="w-4 h-4 mr-1" />
+        Continue to Clinical Pathway
+      </Button>
+      <button onClick={onDone} className="w-full text-[11px] text-indigo-500 underline text-center">
+        Skip — start without patient context
+      </button>
+    </div>
+  );
+}
+
+// ── Main Engine ───────────────────────────────────────────────────────────────
 
 const INITIAL = { step: 0, answers: {}, trail: ["Edema / Proteinuria Query"] };
+const INITIAL_CIEE_CTX = {
+  age_months: '', weight_kg: '', height_cm: '', creatinine_mg_dL: '',
+  acmg_class: '', genetic_gene: '', biopsy_histology: '',
+};
 
 export default function NephroticSyndromeEngine() {
   const [state, setState] = useState(INITIAL);
+  const [cieeCtx, setCieeCtx] = useState(INITIAL_CIEE_CTX);
+  const [showCtxPanel, setShowCtxPanel] = useState(true);
+  const [cieeResult, setCieeResult] = useState(null);
   const { step, answers, trail } = state;
 
   const ans = (key, val, label) => setState(s => ({
@@ -22,7 +303,31 @@ export default function NephroticSyndromeEngine() {
     answers: { ...s.answers, [key]: val },
     trail: [...s.trail, label]
   }));
-  const reset = () => setState(INITIAL);
+  const reset = () => { setState(INITIAL); setCieeResult(null); setShowCtxPanel(true); };
+
+  const runSRNSPathway = (extraCtx = {}) => {
+    const result = executeSRNSPathway({
+      age_months: parseFloat(cieeCtx.age_months) || null,
+      weight_kg: parseFloat(cieeCtx.weight_kg) || null,
+      height_cm: parseFloat(cieeCtx.height_cm) || null,
+      creatinine_mg_dL: parseFloat(cieeCtx.creatinine_mg_dL) || null,
+      acmg_class: cieeCtx.acmg_class || 'Unknown',
+      genetic_gene: cieeCtx.genetic_gene || null,
+      genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
+      biopsy_histology: cieeCtx.biopsy_histology || 'Unknown',
+      ...extraCtx,
+    });
+    setCieeResult(result);
+    return result;
+  };
+
+  // ── CIEE PatientContextPanel (shown first) ────────────────────────────────
+  if (showCtxPanel) return (
+    <div className="space-y-3">
+      <EngineHeader title="Nephrotic Syndrome Engine" subtitle="First Episode · Relapse · FRNS · SDNS · SRNS · Congenital" color="violet" onReset={reset} />
+      <PatientContextPanel cieeCtx={cieeCtx} setCieeCtx={setCieeCtx} onDone={() => setShowCtxPanel(false)} />
+    </div>
+  );
 
   // ── Step 0: Confirm nephrotic syndrome ────────────────────────────────────
   if (step === 0) return (
@@ -53,6 +358,7 @@ export default function NephroticSyndromeEngine() {
         shouldOrder={["Renal function, electrolytes", "Complement C3/C4 (if haematuria)", "ANA, anti-dsDNA if systemic features"]}
       />
       <GuidelineSource text="Consider: orthostatic proteinuria, nephritic syndrome, non-renal causes of oedema (cardiac, hepatic)." />
+      <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
     </div>
   );
 
@@ -82,6 +388,7 @@ export default function NephroticSyndromeEngine() {
       <EmergencyBanner text="Congenital NS: massive proteinuria from birth. ALWAYS genetic — immediate workup required." />
       <PathwayTrail steps={[...trail, "Congenital NS → Genetic Emergency"]} />
       <ResultHeader diagnosis="Congenital Nephrotic Syndrome" risk="red" urgent />
+      <SuppressionBanner drug="tacrolimus" cieeCtx={cieeCtx} />
       <DifferentialTable rows={[
         { dx: "Finnish-type NS (NPHS1/nephrin)", pct: 80, label: "Most Common" },
         { dx: "Podocin mutation (NPHS2)", pct: 10, label: "Likely" },
@@ -110,7 +417,9 @@ export default function NephroticSyndromeEngine() {
         "6-monthly USG for Wilms (WT1 mutations) — until nephrectomy",
         "Genetics multidisciplinary team review"
       ]} />
+      <CIEEMonitoringPanel drugs={[]} cieeCtx={cieeCtx} />
       <GuidelineSource text="IPNA 2021 · KDIGO 2012 · ERKNet Congenital NS Pathway · Finnish-type: Patrakka J, JASN 2000" />
+      <TraceabilityBadge sourceId="GS-ISPN-2021-GENETICS" />
     </div>
   );
 
@@ -186,7 +495,9 @@ export default function NephroticSyndromeEngine() {
         "If no remission at 4 weeks: proceed to SRNS evaluation",
         "Follow-up 2 weeks after steroid taper complete"
       ]} />
+      <CIEEMonitoringPanel drugs={[]} cieeCtx={cieeCtx} />
       <GuidelineSource text="ISKDC 1981 (updated IPNA 2021) · Prednisolone dose per IPNA Clinical Practice Recommendations for NS · AAP 2009 UTI guidance adapted" />
+      <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
     </div>
   );
 
@@ -229,79 +540,113 @@ export default function NephroticSyndromeEngine() {
         "Document steroid course number — track cumulative steroid exposure"
       ]} />
       <MonitoringPanel items={["Daily dipstick during relapse", "Weekly weight + BP", "Reassess at 4 weeks — if no remission → consider SRNS pathway"]} />
+      <CIEEMonitoringPanel drugs={[]} cieeCtx={cieeCtx} />
+      <GuidelineSource text="IPNA 2021 — Infrequent relapse: standard prednisolone, no IS required" />
+      <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
     </div>
   );
 
   // ── FRNS ──────────────────────────────────────────────────────────────────
-  if (answers.relapse_type === "frns") return (
-    <div className="space-y-3">
-      <EngineHeader title="Frequent Relapsing NS (FRNS)" color="violet" subtitle="Steroid-sparing therapy" onReset={reset} />
-      <PathwayTrail steps={[...trail, "FRNS → IS Decision"]} />
-      <ResultHeader diagnosis="Frequent Relapsing NS — Steroid-Sparing IS Required" risk="orange" />
-      <TreatmentPanel title="IS Protocol (choose 1–2 agents)" items={[
-        "1st line: Levamisole 2.5 mg/kg alternate days × 12–24 months (reduce relapse rate, low toxicity)",
-        "OR: MMF (mycophenolate mofetil) 1200 mg/m²/day in 2 doses × 12–24 months",
-        "2nd line (if above fail): Cyclosporine 4–5 mg/kg/day in 2 doses (trough 80–120 ng/mL)",
-        "OR: Rituximab 375 mg/m² IV × 1–2 doses (anti-CD20 — highly effective for FRNS/SDNS)",
-        "Continue prednisolone: smallest dose maintaining remission (ideally <0.5 mg/kg/48h)",
-        "STOP if in sustained remission × 12–24 months on IS"
-      ]} />
-      <InvestigationPanel
-        mustOrder={["FBC (levamisole — agranulocytosis risk, check 3-monthly)", "LFT, RFT before and during MMF/CsA", "Hepatitis B, C, VZV, EBV serology before Rituximab"]}
-        shouldOrder={["Renal biopsy if: atypical features, CsA >12 months, declining GFR"]}
-        advanced={["Genetic panel if: syndromic features, SRNS episodes, onset <5 yrs"]}
-      />
-      <MonitoringPanel items={[
-        "Daily dipstick",
-        "3-monthly: FBC, creatinine, albumin, BP",
-        "Annual: growth, BMI, BP, urine dipstick",
-        "Varicella prophylaxis if VZV-naive on IS",
-        "Killed vaccines annually (influenza, pneumococcus) — NO live vaccines on IS"
-      ]} />
-      <GuidelineSource text="IPNA 2021 Clinical Practice Recommendations for FRNS/SDNS · KDIGO 2012" />
-    </div>
-  );
-
-  // ── SDNS ──────────────────────────────────────────────────────────────────
-  if (answers.relapse_type === "sdns") return (
-    <div className="space-y-3">
-      <EngineHeader title="Steroid Dependent NS (SDNS)" color="violet" subtitle="Rituximab / CNI / MMF" onReset={reset} />
-      <PathwayTrail steps={[...trail, "SDNS → IS Decision"]} />
-      <ResultHeader diagnosis="Steroid Dependent NS — Steroid-Sparing IS Mandatory" risk="orange" />
-      <TreatmentPanel title="SDNS Protocol" items={[
-        "Rituximab 375 mg/m² IV × 2–4 doses (4-weekly) — preferred for SDNS (PRISM trial evidence)",
-        "Pre-Rituximab: VZV/HBV/pneumococcal vaccine. Check IgG levels.",
-        "Tacrolimus 0.1 mg/kg/day (trough 5–8 ng/mL) if RTX not available/fails",
-        "OR: Cyclosporine 4–5 mg/kg/day (trough 80–120 ng/mL) — risk of nephrotoxicity long-term",
-        "MMF as adjunct or maintenance after RTX",
-        "Prednisolone: aim to wean to zero during sustained RTX remission",
-        "Monitor B-cell reconstitution (CD19+ >1%) — re-dose RTX before relapse"
-      ]} />
-      <InvestigationPanel
-        mustOrder={["CD19+ B cell count (flow cytometry — guide RTX re-dosing)", "IgG levels before and after RTX", "VZV/EBV/CMV/HBV serology before RTX"]}
-        shouldOrder={["Renal biopsy if any atypical features or CsA >1 yr"]}
-        advanced={["Genetic panel (NPHS2, WT1, PLCE1) if: syndromic, onset <5yr, recurrent severe relapses"]}
-      />
-      <MonitoringPanel items={[
-        "B-cell CD19+ monthly after RTX (reconstitution ~6 months)",
-        "IgG every 3 months (RTX → hypogammaglobulinaemia risk)",
-        "IVIG if IgG <400 mg/dL + recurrent infections",
-        "Annual renal function + eGFR",
-        "Annual pubertal assessment (steroid toxicity)"
-      ]} />
-      <GuidelineSource text="IPNA 2021 · PRISM trial (RTX for SDNS): Iijima K, NEJM 2014 · KDIGO 2012 NS chapter" />
-    </div>
-  );
-
-  // ── SRNS ──────────────────────────────────────────────────────────────────
-  if (answers.relapse_type === "srns" || (step === 3 && answers.atypical === true)) {
-    const isSRNS = answers.relapse_type === "srns";
+  if (answers.relapse_type === "frns") {
+    const cniSuppressed = checkPrescriptionSuppressor('tacrolimus', {
+      ...cieeCtx,
+      genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
+    }).suppressed;
     return (
       <div className="space-y-3">
-        <EngineHeader title="SRNS / Atypical NS Engine" color="red" subtitle="Genetic → Biopsy → CNI Decision" onReset={reset} />
+        <EngineHeader title="Frequent Relapsing NS (FRNS)" color="violet" subtitle="Steroid-sparing therapy" onReset={reset} />
+        <PathwayTrail steps={[...trail, "FRNS → IS Decision"]} />
+        <ResultHeader diagnosis="Frequent Relapsing NS — Steroid-Sparing IS Required" risk="orange" />
+        {cniSuppressed && <SuppressionBanner drug="tacrolimus" cieeCtx={cieeCtx} />}
+        <TreatmentPanel title="IS Protocol (choose 1–2 agents)" items={[
+          "1st line: Levamisole 2.5 mg/kg alternate days × 12–24 months (reduce relapse rate, low toxicity)",
+          "OR: MMF (mycophenolate mofetil) 1200 mg/m²/day in 2 doses × 12–24 months",
+          cniSuppressed
+            ? "⛔ CNI (Cyclosporine/Tacrolimus) BLOCKED by CIEE PrescriptionSuppressor — see genetic result"
+            : "2nd line (if above fail): Cyclosporine 4–5 mg/kg/day in 2 doses (trough 80–120 ng/mL)",
+          "OR: Rituximab 375 mg/m² IV × 1–2 doses (anti-CD20 — highly effective for FRNS/SDNS)",
+          "Continue prednisolone: smallest dose maintaining remission (ideally <0.5 mg/kg/48h)",
+          "STOP if in sustained remission × 12–24 months on IS"
+        ]} />
+        <InvestigationPanel
+          mustOrder={["FBC (levamisole — agranulocytosis risk, check 3-monthly)", "LFT, RFT before and during MMF/CsA", "Hepatitis B, C, VZV, EBV serology before Rituximab"]}
+          shouldOrder={["Renal biopsy if: atypical features, CsA >12 months, declining GFR"]}
+          advanced={["Genetic panel if: syndromic features, SRNS episodes, onset <5 yrs"]}
+        />
+        <MonitoringPanel items={[
+          "Daily dipstick",
+          "3-monthly: FBC, creatinine, albumin, BP",
+          "Annual: growth, BMI, BP, urine dipstick",
+          "Varicella prophylaxis if VZV-naive on IS",
+          "Killed vaccines annually (influenza, pneumococcus) — NO live vaccines on IS"
+        ]} />
+        <CIEEMonitoringPanel drugs={cniSuppressed ? [] : ['cyclosporine']} cieeCtx={cieeCtx} />
+        <GuidelineSource text="IPNA 2021 Clinical Practice Recommendations for FRNS/SDNS · KDIGO 2012" />
+        <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
+      </div>
+    );
+  }
+
+  // ── SDNS ──────────────────────────────────────────────────────────────────
+  if (answers.relapse_type === "sdns") {
+    const cniSuppressed = checkPrescriptionSuppressor('tacrolimus', {
+      ...cieeCtx,
+      genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
+    }).suppressed;
+    return (
+      <div className="space-y-3">
+        <EngineHeader title="Steroid Dependent NS (SDNS)" color="violet" subtitle="Rituximab / CNI / MMF" onReset={reset} />
+        <PathwayTrail steps={[...trail, "SDNS → IS Decision"]} />
+        <ResultHeader diagnosis="Steroid Dependent NS — Steroid-Sparing IS Mandatory" risk="orange" />
+        {cniSuppressed && <SuppressionBanner drug="tacrolimus" cieeCtx={cieeCtx} />}
+        <TreatmentPanel title="SDNS Protocol" items={[
+          "Rituximab 375 mg/m² IV × 2–4 doses (4-weekly) — preferred for SDNS (PRISM trial evidence)",
+          "Pre-Rituximab: VZV/HBV/pneumococcal vaccine. Check IgG levels.",
+          cniSuppressed
+            ? "⛔ Tacrolimus/Cyclosporine BLOCKED by CIEE PrescriptionSuppressor — genetic SRNS detected"
+            : "Tacrolimus 0.1 mg/kg/day (trough 5–8 ng/mL) if RTX not available/fails",
+          cniSuppressed
+            ? "→ Offer ACEi/ARB + supportive care per genetic SRNS pathway"
+            : "OR: Cyclosporine 4–5 mg/kg/day (trough 80–120 ng/mL) — risk of nephrotoxicity long-term",
+          "MMF as adjunct or maintenance after RTX",
+          "Prednisolone: aim to wean to zero during sustained RTX remission",
+          "Monitor B-cell reconstitution (CD19+ >1%) — re-dose RTX before relapse"
+        ]} />
+        <InvestigationPanel
+          mustOrder={["CD19+ B cell count (flow cytometry — guide RTX re-dosing)", "IgG levels before and after RTX", "VZV/EBV/CMV/HBV serology before RTX"]}
+          shouldOrder={["Renal biopsy if any atypical features or CsA >1 yr"]}
+          advanced={["Genetic panel (NPHS2, WT1, PLCE1) if: syndromic, onset <5yr, recurrent severe relapses"]}
+        />
+        <MonitoringPanel items={[
+          "B-cell CD19+ monthly after RTX (reconstitution ~6 months)",
+          "IgG every 3 months (RTX → hypogammaglobulinaemia risk)",
+          "IVIG if IgG <400 mg/dL + recurrent infections",
+          "Annual renal function + eGFR",
+          "Annual pubertal assessment (steroid toxicity)"
+        ]} />
+        <CIEEMonitoringPanel drugs={cniSuppressed ? [] : ['tacrolimus']} cieeCtx={cieeCtx} />
+        <GuidelineSource text="IPNA 2021 · PRISM trial (RTX for SDNS): Iijima K, NEJM 2014 · KDIGO 2012 NS chapter" />
+        <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
+      </div>
+    );
+  }
+
+  // ── SRNS + Atypical NS ─────────────────────────────────────────────────────
+  if (answers.relapse_type === "srns" || (step === 3 && answers.atypical === true)) {
+    const isSRNS = answers.relapse_type === "srns";
+    const pathwayResult = cieeResult || (() => { const r = runSRNSPathway(); return r; })();
+    const hasSuppression = pathwayResult?.suppression_log?.length > 0;
+
+    return (
+      <div className="space-y-3">
+        <EngineHeader title="SRNS / Atypical NS Engine" color="red" subtitle="CIEE Pathway Engine — Full Decision Support" onReset={reset} />
         <EmergencyBanner text="SRNS: Renal biopsy + genetic panel MANDATORY before starting CNI therapy." />
-        <PathwayTrail steps={[...trail, isSRNS ? "SRNS" : "Atypical NS", "Biopsy + Genetics Required"]} />
+        <PathwayTrail steps={[...trail, isSRNS ? "SRNS" : "Atypical NS", "CIEE Pathway Active"]} />
         <ResultHeader diagnosis={isSRNS ? "Steroid-Resistant NS (SRNS)" : "Atypical NS — Biopsy Required"} risk="red" urgent />
+
+        {/* CIEE PathwayExecutionEngine output */}
+        <CIEEPathwayOutput result={pathwayResult} />
+
         <DifferentialTable rows={[
           { dx: "FSGS (focal segmental glomerulosclerosis)", pct: 50, label: "Most Common" },
           { dx: "MCD (minimal change disease, steroid-resistant subset)", pct: 20, label: "Possible" },
@@ -310,6 +655,7 @@ export default function NephroticSyndromeEngine() {
           { dx: "Lupus nephritis class V", pct: 3, label: "If ANA +" },
           { dx: "Membranous nephropathy", pct: 2, label: "Rare in children" },
         ]} />
+
         <InvestigationPanel
           mustOrder={[
             "Genetic panel: NPHS1, NPHS2, PLCE1, WT1, LAMB2, CD2AP, TRPC6, INF2",
@@ -322,22 +668,31 @@ export default function NephroticSyndromeEngine() {
           shouldOrder={["24h urine protein / UPCR daily", "Tacrolimus trough BEFORE CNI start", "USG kidneys"]}
           advanced={["WES (whole exome) if targeted panel negative + onset <5yr", "Lyso-Gb3 if Fabry suspected"]}
         />
+
         <TreatmentPanel title="SRNS Protocol (KDIGO 2012 + IPNA 2021)" items={[
           "Await genetic results AND biopsy before starting CNI",
-          "IF genetic cause confirmed (NPHS1, NPHS2 homozygous): NO CNI — aim for transplant",
-          "IF MCD or FSGS without genetic cause: Tacrolimus 0.1–0.2 mg/kg/day (trough 5–10 ng/mL)",
-          "Tacrolimus + low-dose prednisolone × 6 months — assess response (CR/PR at 6 months)",
+          hasSuppression
+            ? "⛔ CNI BLOCKED by CIEE PrescriptionSuppressor — genetic cause confirmed — NO CNI"
+            : "IF MCD or FSGS without genetic cause: Tacrolimus 0.1–0.2 mg/kg/day (trough 5–10 ng/mL)",
+          hasSuppression
+            ? "→ ACEi/ARB + supportive care + transplant evaluation (genetic SRNS)"
+            : "Tacrolimus + low-dose prednisolone × 6 months — assess response (CR/PR at 6 months)",
           "CR (complete remission): continue tacrolimus 1–2 years, slow taper",
           "PR (>50% reduction): maintain + add ACEi/ARB",
           "No response at 6 months: Rituximab OR CYC IV × 6 pulses (FSGS variant)",
           "ACEi + ARB: all SRNS (reduce proteinuria, renoprotective) — monitor K+ + creatinine"
         ]} />
+
         <ReasoningPanel reasons={[
           "SRNS = no remission after 4 weeks of full-dose prednisolone",
           "CNI cannot be started without biopsy (cannot give tacrolimus to non-proliferative FSGS blindly)",
           "Genetic cause present in ~30% SRNS → CNI ineffective in genetic SRNS (podocin mutations)",
-          "FSGS has 5 variants (Columbia): tip lesion has better prognosis; collapsing FSGS worst"
+          "FSGS has 5 variants (Columbia): tip lesion has better prognosis; collapsing FSGS worst",
+          ...(hasSuppression ? ["CIEE PrescriptionSuppressor has blocked CNI therapy — redirect to supportive/transplant pathway"] : [])
         ]} />
+
+        <CIEEMonitoringPanel drugs={hasSuppression ? [] : ['tacrolimus']} cieeCtx={cieeCtx} />
+
         <MonitoringPanel items={[
           "Tacrolimus trough every 2 weeks initially, then monthly",
           "eGFR + creatinine monthly (CNI nephrotoxicity)",
@@ -346,7 +701,9 @@ export default function NephroticSyndromeEngine() {
           "Growth, BP, lipids every 3 months",
           "Transplant evaluation if ESKD trajectory"
         ]} />
+
         <GuidelineSource text="KDIGO 2012 · IPNA 2021 SRNS Recommendations · FSGS Columbia Classification (D'Agati 2004) · ESCAPE trial (ACEi in CKD)" />
+        <TraceabilityBadge sourceId="GS-ISPN-2021-SRNS" />
       </div>
     );
   }
