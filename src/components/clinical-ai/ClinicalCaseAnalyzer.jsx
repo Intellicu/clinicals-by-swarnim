@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Stethoscope, Brain } from 'lucide-react';
+import { Loader2, Stethoscope, Brain, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
+import { invokeCaseAnalyzer } from '@/lib/LLMService';
 
 export default function ClinicalCaseAnalyzer() {
   const [caseDetails, setCaseDetails] = useState({
@@ -20,81 +19,24 @@ export default function ClinicalCaseAnalyzer() {
   });
   const [analysis, setAnalysis] = useState(null);
 
-  const analyzeMutation = useMutation({
-    mutationFn: async () => {
-      const result = await base44.integrations.Core.InvokeLLM({
-        model: "claude_sonnet_4_6",
-        prompt: `You are a senior consultant pediatric nephrologist conducting a comprehensive, attending-level clinical case analysis. Provide the highest quality clinical reasoning.
-        
-        Patient: ${caseDetails.age} years old ${caseDetails.gender}
-        
-        Presenting Complaint: ${caseDetails.presentation}
-        
-        History: ${caseDetails.history}
-        
-        Examination: ${caseDetails.examination}
-        
-        Investigations: ${caseDetails.investigations}
-        
-        Provide comprehensive clinical analysis:
-        1. Case summary
-        2. Problem list
-        3. Differential diagnoses (ranked by probability with reasoning)
-        4. Most likely diagnosis with confidence level
-        5. Pathophysiology explanation
-        6. Additional investigations needed
-        7. Management plan (immediate, short-term, long-term)
-        8. Prognosis
-        9. Red flags and complications to watch for
-        10. Patient/family counseling points
-        11. Follow-up plan
-        12. Evidence-based guidelines applied
-        
-        Consider pediatric nephrology protocols, KDIGO guidelines, and best practices.`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            case_summary: { type: "string" },
-            problem_list: { type: "array", items: { type: "string" } },
-            differential_diagnoses: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  diagnosis: { type: "string" },
-                  probability: { type: "string" },
-                  reasoning: { type: "string" }
-                }
-              }
-            },
-            most_likely_diagnosis: { type: "string" },
-            confidence_level: { type: "string" },
-            pathophysiology: { type: "string" },
-            additional_investigations: { type: "array", items: { type: "string" } },
-            management_plan: {
-              type: "object",
-              properties: {
-                immediate: { type: "array", items: { type: "string" } },
-                short_term: { type: "array", items: { type: "string" } },
-                long_term: { type: "array", items: { type: "string" } }
-              }
-            },
-            prognosis: { type: "string" },
-            red_flags: { type: "array", items: { type: "string" } },
-            counseling_points: { type: "array", items: { type: "string" } },
-            follow_up_plan: { type: "string" },
-            guidelines_applied: { type: "array", items: { type: "string" } }
-          }
-        }
-      });
+  const [loading, setLoading] = useState(false);
 
-      return result;
-    },
-    onSuccess: (data) => {
-      setAnalysis(data);
+  const handleAnalyze = async () => {
+    setLoading(true);
+    try {
+      const result = await invokeCaseAnalyzer({ caseDetails });
+      if (!result.success) {
+        toast.error('Analysis failed — please try again');
+        return;
+      }
+      setAnalysis(result.data);
       toast.success('Case analysis complete!');
+    } catch {
+      toast.error('Analysis failed');
+    } finally {
+      setLoading(false);
     }
-  });
+  };
 
   return (
     <div className="space-y-6">
@@ -169,12 +111,12 @@ export default function ClinicalCaseAnalyzer() {
             />
           </div>
 
-          <Button 
-            onClick={() => analyzeMutation.mutate()}
-            disabled={!caseDetails.age || !caseDetails.presentation || analyzeMutation.isPending}
+          <Button
+            onClick={handleAnalyze}
+            disabled={!caseDetails.age || !caseDetails.presentation || loading}
             className="w-full bg-indigo-600"
           >
-            {analyzeMutation.isPending ? (
+            {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Analyzing Case...
@@ -325,6 +267,27 @@ export default function ClinicalCaseAnalyzer() {
                 <div className="flex flex-wrap gap-1">
                   {analysis.guidelines_applied.map((guideline, idx) => (
                     <Badge key={idx} variant="outline" className="text-xs">{guideline}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {analysis.traceability_links?.length > 0 && (
+              <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-slate-500" />
+                  <h5 className="text-xs font-semibold text-slate-600">Evidence Traceability (CIEE)</h5>
+                </div>
+                <div className="space-y-1.5">
+                  {analysis.traceability_links.slice(0, 5).map((link, idx) => (
+                    <div key={idx} className="bg-white rounded p-2 border border-slate-100">
+                      <p className="text-[11px] text-slate-700 font-medium">{link.recommendation}</p>
+                      <div className="flex gap-1 mt-1 flex-wrap">
+                        {link.evidence_grade && <Badge variant="outline" className="text-[9px] py-0">Grade {link.evidence_grade}</Badge>}
+                        {link.recommendation_strength && <Badge variant="outline" className="text-[9px] py-0">{link.recommendation_strength}</Badge>}
+                        {link.guideline && <span className="text-[9px] text-slate-400 self-center">{link.guideline} {link.section && `§${link.section}`}</span>}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

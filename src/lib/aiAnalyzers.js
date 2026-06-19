@@ -111,4 +111,14 @@ export const CLINICAL_AI_ANALYZERS = [
     status: "active",
     desc: "Symptom-based AI differential with probability ranking",
   },
+  {
+    id: "ciee",
+    name: "CIEE Pathway Engine",
+    icon: FlaskConical,
+    color: "bg-violet-800",
+    page: "ClinicalAIHub",
+    tab: "ciee",
+    status: "active",
+    desc: "Clinical Intelligence Execution Engine — SRNS pathway execution with PrescriptionSuppressor and TraceabilityLinker",
+  },
 ];

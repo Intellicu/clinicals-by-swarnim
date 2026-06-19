@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Upload, Loader2, Microscope, AlertCircle, BookOpen, ExternalLink, ArrowRight, Stethoscope } from 'lucide-react';
+import { Upload, Loader2, Microscope, AlertCircle, BookOpen, ArrowRight, Stethoscope, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
+import { invokeBiopsyAnalyzer } from '@/lib/LLMService';
+import { buildTraceabilityLink } from '@/lib/CIEEEngine';
 
 // ── Pattern → Pathway/Engine mappings ────────────────────────────────────────
 const PATTERN_LINKS = {
@@ -104,66 +104,29 @@ export default function BiopsyAnalyzer() {
   const [biopsyText, setBiopsyText] = useState('');
   const [analysis, setAnalysis] = useState(null);
   const [activeTab, setActiveTab] = useState('analyze');
+  const [loading, setLoading] = useState(false);
 
-  const analyzeMutation = useMutation({
-    mutationFn: async () => {
-      let imageUrl = null;
-      if (biopsyImage) {
-        const uploadResult = await base44.integrations.Core.UploadFile({ file: biopsyImage });
-        imageUrl = uploadResult.file_url;
+  const handleAnalyze = async () => {
+    if (!biopsyImage && !biopsyText.trim()) return;
+    setLoading(true);
+    try {
+      const result = await invokeBiopsyAnalyzer({ biopsyText, biopsyFile: biopsyImage });
+      if (!result.success) {
+        toast.error('Analysis failed — please try again');
+        return;
       }
-
-      const result = await base44.integrations.Core.InvokeLLM({
-        model: "claude_sonnet_4_6",
-        prompt: `You are a senior nephropathologist with expertise in paediatric renal biopsies. Provide expert-level histopathological analysis.
-        
-        ${biopsyText ? `Report text: ${biopsyText}` : ''}
-        
-        Provide comprehensive analysis including:
-        1. Primary diagnosis with confidence level
-        2. Key histopathological features (LM, IF, EM)
-        3. Severity grading and prognosis
-        4. Treatment recommendations (reference KDIGO/IPNA guidelines)
-        5. Differential diagnoses
-        6. Follow-up biopsy indications
-        7. Key references (specific guidelines/papers)
-        
-        Be specific with nephrology terminology and reference KDIGO guidelines where applicable.`,
-        file_urls: imageUrl ? [imageUrl] : undefined,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            primary_diagnosis: { type: "string" },
-            confidence_level: { type: "string" },
-            glomerular_findings: { type: "array", items: { type: "string" } },
-            tubular_findings: { type: "array", items: { type: "string" } },
-            interstitial_findings: { type: "array", items: { type: "string" } },
-            vascular_findings: { type: "array", items: { type: "string" } },
-            immunofluorescence: { type: "string" },
-            electron_microscopy: { type: "string" },
-            severity_grade: { type: "string" },
-            prognosis: { type: "string" },
-            treatment_recommendations: { type: "array", items: { type: "string" } },
-            differential_diagnoses: { type: "array", items: { type: "string" } },
-            follow_up_needed: { type: "boolean" },
-            key_references: { type: "array", items: { type: "string" } }
-          }
-        }
-      });
-
-      return result;
-    },
-    onSuccess: (data) => {
-      setAnalysis(data);
+      setAnalysis(result.data);
       setActiveTab('results');
       toast.success('Biopsy analysis complete!');
-    },
-    onError: () => {
+    } catch {
       toast.error('Analysis failed');
+    } finally {
+      setLoading(false);
     }
-  });
+  };
 
   const patternLinks = getPatternLinks(analysis?.primary_diagnosis);
+  const trace = analysis ? buildTraceabilityLink('GS-KDIGO-2021-GD', { histology_class: analysis.histology_class }) : null;
 
   return (
     <div className="space-y-4">
@@ -215,10 +178,10 @@ export default function BiopsyAnalyzer() {
                 placeholder="Paste histopathology report, immunofluorescence findings, electron microscopy details..." />
             </div>
 
-            <Button onClick={() => analyzeMutation.mutate()}
-              disabled={(!biopsyImage && !biopsyText) || analyzeMutation.isPending}
+            <Button onClick={handleAnalyze}
+              disabled={(!biopsyImage && !biopsyText) || loading}
               className="w-full bg-purple-600 hover:bg-purple-700">
-              {analyzeMutation.isPending ? (
+              {loading ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing Biopsy...</>
               ) : (
                 <><Microscope className="w-4 h-4 mr-2" /> Analyze Biopsy</>
@@ -310,6 +273,29 @@ export default function BiopsyAnalyzer() {
               <div className="bg-yellow-50 rounded-xl p-3 border border-yellow-200">
                 <AlertCircle className="w-4 h-4 text-yellow-600 inline mr-2" />
                 <span className="text-xs text-yellow-800 font-semibold">Follow-up biopsy may be indicated</span>
+              </div>
+            )}
+
+            {/* TraceabilityLinker */}
+            {trace && (
+              <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-slate-500" />
+                  <h4 className="font-semibold text-xs text-slate-600">Evidence & Traceability</h4>
+                </div>
+                <div className="flex flex-wrap gap-1.5 text-xs">
+                  {(analysis.evidence_grade || trace.evidence_grade) && (
+                    <Badge variant="outline" className="text-[10px]">Grade {analysis.evidence_grade || trace.evidence_grade}</Badge>
+                  )}
+                  {(analysis.recommendation_strength || trace.recommendation_strength) && (
+                    <Badge variant="outline" className="text-[10px]">{analysis.recommendation_strength || trace.recommendation_strength}</Badge>
+                  )}
+                  {(analysis.histology_class) && (
+                    <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700">{analysis.histology_class}</Badge>
+                  )}
+                  <span className="text-slate-500 text-[10px] self-center">{trace.guideline_name} §{trace.guideline_section}</span>
+                </div>
+                {trace.pmid && <p className="text-[10px] text-slate-400 mt-1">PMID: {trace.pmid} · DOI: {trace.doi}</p>}
               </div>
             )}
 
