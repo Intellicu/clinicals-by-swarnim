@@ -125,6 +125,10 @@ Return ONLY the JSON object matching the schema.`;
 // Robustly turn any InvokeLLM response into our parsed graph object.
 function coerceToObject(resp) {
   if (resp == null) return null;
+  // wrapper field carrying the graph as a (possibly stringified) JSON value
+  if (typeof resp === 'object' && resp.graph_json != null) {
+    return typeof resp.graph_json === 'string' ? coerceToObject(resp.graph_json) : resp.graph_json;
+  }
   // already the target object?
   if (typeof resp === 'object' && (resp.pathway || resp.guideline_source)) return resp;
   // unwrap common text wrappers
@@ -142,32 +146,54 @@ function coerceToObject(resp) {
   return JSON.parse(text);
 }
 
+// Single-string wrapper schema — Base44 reliably honours a flat schema, and we
+// parse the nested graph out of the string ourselves (the full graph schema with
+// free-form context objects is rejected by structured-output mode).
+const WRAPPER_SCHEMA = {
+  type: 'object',
+  properties: {
+    graph_json: { type: 'string', description: 'The full engine graph as a JSON string with keys: guideline_source, engine, pathway' },
+  },
+  required: ['graph_json'],
+};
+
 // ── Component 2 invocation ───────────────────────────────────────────────────
 export async function generateCIEEPathway({ topic = '', guidelineText = '', fileUrl = null }) {
-  try {
-    // Schema-less prompting + robust parsing — the graph contains free-form
-    // context objects and deep nesting that strict structured-output mode
-    // rejects, so we parse the JSON ourselves.
-    const raw = await base44.integrations.Core.InvokeLLM({
-      prompt: GEN_PROMPT(topic, guidelineText) + '\n\nReturn ONLY the JSON object — no markdown fences, no commentary.',
-      file_urls: fileUrl ? [fileUrl] : undefined,
-    });
-    let parsed;
+  const base = GEN_PROMPT(topic, guidelineText);
+  const attempts = [
+    {
+      label: 'wrapped',
+      opts: {
+        prompt: base + '\n\nReturn a JSON object with ONE field "graph_json" whose value is a JSON STRING containing the full object {guideline_source, engine, pathway}. Escape the inner JSON properly.',
+        response_json_schema: WRAPPER_SCHEMA,
+        ...(fileUrl ? { file_urls: [fileUrl] } : {}),
+      },
+    },
+    {
+      label: 'plain',
+      opts: {
+        prompt: base + '\n\nReturn ONLY the JSON object (keys: guideline_source, engine, pathway). No markdown, no commentary.',
+        ...(fileUrl ? { file_urls: [fileUrl] } : {}),
+      },
+    },
+  ];
+
+  const errors = [];
+  for (const a of attempts) {
     try {
-      parsed = coerceToObject(raw);
-    } catch (e) {
-      const preview = (typeof raw === 'string' ? raw : JSON.stringify(raw)).slice(0, 180);
-      return { success: false, data: null, validation: null, error: `Could not parse model output as JSON. ${preview}` };
+      const raw = await base44.integrations.Core.InvokeLLM(a.opts);
+      const parsed = coerceToObject(raw);
+      if (parsed && parsed.pathway) {
+        const normalized = normalizeGenerated(parsed);
+        const validation = validatePathway(normalized.pathway);
+        return { success: true, data: normalized, validation, error: null };
+      }
+      errors.push(`${a.label}: response had no pathway`);
+    } catch (err) {
+      errors.push(`${a.label}: ${err?.message || err}`);
     }
-    if (!parsed || !parsed.pathway) {
-      return { success: false, data: null, validation: null, error: 'Model did not return a pathway graph. Try again or add more guideline detail.' };
-    }
-    const normalized = normalizeGenerated(parsed);
-    const validation = validatePathway(normalized.pathway);
-    return { success: true, data: normalized, validation, error: null };
-  } catch (err) {
-    return { success: false, data: null, validation: null, error: err?.message || String(err) };
   }
+  return { success: false, data: null, validation: null, error: `Generation failed — ${errors.join(' | ')}` };
 }
 
 // Convert the LLM's array-of-nodes form into the runtime {entry, nodes:{id:node}} map

@@ -160,6 +160,7 @@ export default function EngineGenerator() {
   const [cieeGen, setCieeGen] = useState(null);        // { guideline_source, sources, engine, pathway }
   const [cieeValidation, setCieeValidation] = useState(null);
   const [cieeGenLoading, setCieeGenLoading] = useState(false);
+  const [cieeError, setCieeError] = useState(null);
   const [runnerGraph, setRunnerGraph] = useState(null); // graph being run live
 
   const { data: user } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60000 });
@@ -259,21 +260,22 @@ Return ONLY valid JSON, no explanation.`;
     }
   };
 
-  // ── Build an executable CIEE decision graph from the guideline (Component 2) ──
+  // ── Build an executable intelligence engine from the guideline (Component 2) ──
   const generateCIEEEngine = async () => {
     if (!aiTopic.trim() && !aiDocText.trim()) { toast.error("Enter a topic or upload a guideline first"); return; }
     setCieeGenLoading(true);
-    setCieeGen(null); setCieeValidation(null);
+    setCieeGen(null); setCieeValidation(null); setCieeError(null);
     try {
-      toast.info("Parsing guideline into a decision graph…");
+      toast.info("Parsing guideline into an intelligence engine…");
       const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText });
-      if (!res.success) { toast.error("Generation failed: " + res.error); return; }
+      if (!res.success) { setCieeError(res.error || "Unknown error"); toast.error("Generation failed"); return; }
       setCieeGen(res.data);
       setCieeValidation(res.validation);
-      if (res.validation?.valid) toast.success(`Decision graph generated — ${res.validation.nodeCount} nodes`);
+      if (res.validation?.valid) toast.success(`Intelligence engine generated — ${res.validation.nodeCount} nodes`);
       else toast.warning(`Generated with ${res.validation?.errors?.length || 0} graph issue(s) — review below`);
     } catch (err) {
-      toast.error("Generation failed: " + err.message);
+      setCieeError(err?.message || String(err));
+      toast.error("Generation failed");
     } finally {
       setCieeGenLoading(false);
     }
@@ -543,6 +545,17 @@ Return ONLY valid JSON, no explanation.`;
                 className="w-full bg-indigo-700 hover:bg-indigo-800 gap-2">
                 {cieeGenLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing guideline → intelligence engine…</> : <><Cpu className="w-4 h-4" /> Generate Intelligence Engine</>}
               </Button>
+
+              {/* Inline error (kept visible for diagnosis) */}
+              {cieeError && (
+                <div className="rounded-lg p-2 text-xs border bg-red-50 border-red-200 text-red-800 flex items-start gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-semibold">Generation error</p>
+                    <p className="mt-0.5 break-words">{cieeError}</p>
+                  </div>
+                </div>
+              )}
 
               {/* Generated graph preview */}
               {cieeGen && (
