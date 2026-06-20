@@ -10,9 +10,12 @@
  * node-level evidence via the TraceabilityLinker (Component 7).
  */
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import {
   FlaskConical, ShieldAlert, Activity, BookOpen, Flag, ChevronRight, ChevronLeft,
+  Pill, AlertTriangle, ExternalLink,
 } from "lucide-react";
 import {
   checkPrescriptionSuppressor, generateMonitoringRules,
@@ -129,30 +132,32 @@ export default function CIEEEngineRunner({
   const recIdx = isQuestion && recommend ? recommend(node, ctx) : -1;
 
   return (
-    <div className="space-y-3">
-      {/* slim header */}
-      <div className="flex items-center gap-2 px-1">
-        <FlaskConical className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+    <div className="space-y-4">
+      {/* header */}
+      <div className="flex items-center gap-2.5 px-1">
+        <div className="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+          <FlaskConical className="w-5 h-5 text-indigo-700" />
+        </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-slate-800 truncate">{title}</p>
-          {subtitle && <p className="text-[10px] text-slate-400 truncate">{subtitle}</p>}
+          <p className="text-base font-bold text-slate-900 truncate">{title}</p>
+          {subtitle && <p className="text-xs text-slate-500 truncate">{subtitle}</p>}
         </div>
       </div>
 
       {/* timeline */}
-      <div className="relative pl-7 pt-1">
-        <div className="absolute left-[9px] top-2 bottom-2 w-px bg-slate-200" />
+      <div className="relative pl-8 pt-1">
+        <div className="absolute left-[11px] top-3 bottom-3 w-0.5 bg-slate-200" />
 
-        {/* completed steps — collapsed one-liners, click to go back */}
+        {/* completed steps — collapsed, click to go back */}
         {history.map((h, i) => {
           const ans = h.suppressed ? 'Blocked' : (h.choiceLabel ? shortAnswer(h.choiceLabel) : null);
           return (
             <button key={i} onClick={() => goTo(i)} title="Go back to this step"
-              className="relative mb-2.5 block w-full text-left group">
-              <span className={`absolute -left-[22px] top-[5px] w-2.5 h-2.5 rounded-full ${h.suppressed ? 'bg-red-500' : 'bg-slate-400 group-hover:bg-indigo-500'}`} />
-              <div className="flex items-baseline gap-1.5 min-w-0">
-                <span className={`text-[13px] leading-snug truncate group-hover:text-indigo-700 ${h.suppressed ? 'text-red-700' : 'text-slate-500'}`}>{h.node.question || h.node.action}</span>
-                {ans && <span className={`text-[13px] font-bold leading-snug flex-shrink-0 ${h.suppressed ? 'text-red-700' : 'text-slate-700'}`}>{ans}</span>}
+              className="relative mb-3.5 block w-full text-left group">
+              <span className={`absolute -left-[27px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${h.suppressed ? 'bg-red-500' : 'bg-indigo-300 group-hover:bg-indigo-600'}`} />
+              <div className="flex items-baseline gap-2 min-w-0">
+                <span className={`text-[15px] leading-snug truncate group-hover:text-indigo-700 ${h.suppressed ? 'text-red-600' : 'text-slate-500'}`}>{h.node.question || h.node.action}</span>
+                {ans && <span className={`text-[15px] font-bold leading-snug flex-shrink-0 ${h.suppressed ? 'text-red-700' : 'text-slate-900'}`}>{ans}</span>}
               </div>
             </button>
           );
@@ -161,43 +166,100 @@ export default function CIEEEngineRunner({
         {/* current node — expanded */}
         {!isTerminal && (
           <div className="relative">
-            <span className="absolute -left-[23px] top-1 w-3 h-3 rounded-sm bg-slate-800" />
-            <p className="text-[17px] leading-snug font-medium text-slate-900">{node.question || node.action}</p>
-            {node.detail && <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">{node.detail}</p>}
+            <span className="absolute -left-[29px] top-1 w-4 h-4 rounded-full bg-indigo-600 ring-4 ring-indigo-100" />
+            <p className="text-[21px] leading-snug font-bold text-slate-900">{node.question || node.action}</p>
+            {node.detail && <p className="text-sm text-slate-500 mt-2 leading-relaxed">{node.detail}</p>}
 
             {isPrescriptionNode(node) && supp.suppressed && (
-              <div className="mt-3 bg-red-50 border border-red-300 rounded-lg px-3 py-2.5 flex items-start gap-2">
-                <ShieldAlert className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-[11px] text-red-700 leading-relaxed"><span className="font-bold">Prescription blocked. </span>{supp.reason}</p>
+              <div className="mt-4 bg-red-50 border-2 border-red-300 rounded-xl px-4 py-3 flex items-start gap-2.5">
+                <ShieldAlert className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700 leading-relaxed"><span className="font-bold">Prescription blocked. </span>{supp.reason}</p>
               </div>
             )}
 
             {isQuestion && (
-              <div className="flex flex-wrap gap-2 mt-4">
+              <div className="flex flex-col gap-2.5 mt-5">
                 {(node.options || []).map((opt, i) => (
                   <button key={i} onClick={() => choose(opt)}
-                    className={`px-4 py-2.5 rounded-lg border text-[15px] text-left transition-all
-                      ${opt.tone === 'danger' ? 'border-rose-300 text-rose-700 hover:bg-rose-50'
-                        : opt.tone === 'muted' ? 'border-slate-200 text-slate-500 hover:bg-slate-50'
-                        : 'border-slate-300 text-slate-700 hover:bg-slate-50'}
-                      ${i === recIdx ? 'ring-2 ring-indigo-300' : ''}`}>
-                    {opt.label}
-                    {i === recIdx && <span className="ml-1.5 text-[9px] bg-indigo-600 text-white px-1.5 py-0.5 rounded-full align-middle">context</span>}
+                    className={`px-5 py-3.5 rounded-xl border-2 text-[16px] font-medium text-left shadow-sm transition-all flex items-center justify-between gap-2
+                      ${opt.tone === 'danger' ? 'border-rose-200 text-rose-700 hover:border-rose-400 hover:bg-rose-50'
+                        : opt.tone === 'muted' ? 'border-slate-200 text-slate-500 hover:border-slate-400 hover:bg-slate-50'
+                        : 'border-slate-200 text-slate-800 hover:border-indigo-400 hover:bg-indigo-50'}
+                      ${i === recIdx ? 'border-indigo-400 bg-indigo-50' : ''}`}>
+                    <span>{opt.label}</span>
+                    <span className="flex items-center gap-1.5 flex-shrink-0">
+                      {i === recIdx && <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold">suggested</span>}
+                      <ChevronRight className="w-5 h-5 text-slate-300" />
+                    </span>
                   </button>
                 ))}
               </div>
             )}
 
             {!isQuestion && (
-              <Button onClick={advance} className={`mt-4 ${supp.suppressed ? 'bg-rose-600 hover:bg-rose-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white text-sm h-9 px-5`}>
+              <Button onClick={advance} className={`mt-5 ${supp.suppressed ? 'bg-rose-600 hover:bg-rose-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white text-base h-12 px-6 rounded-xl shadow-sm`}>
                 {supp.suppressed ? 'Continue → supportive pathway' : 'Continue'}
-                <ChevronRight className="w-4 h-4 ml-1" />
+                <ChevronRight className="w-5 h-5 ml-1" />
               </Button>
             )}
 
+            {/* Prescription (drug + dose) — links to the prescriber tool */}
+            {node.rx && !(isPrescriptionNode(node) && supp.suppressed) && (
+              <div className="mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Pill className="w-4 h-4 text-emerald-700" />
+                  <span className="text-sm font-bold text-emerald-900">Prescription</span>
+                </div>
+                <p className="text-[15px] font-semibold text-slate-900">{node.rx.drug}</p>
+                {node.rx.dose && <p className="text-sm text-slate-700 mt-0.5">{node.rx.dose}</p>}
+                <div className="flex gap-2 mt-1 flex-wrap">
+                  {node.rx.route && <span className="text-[11px] bg-white border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">{node.rx.route}</span>}
+                  {node.rx.duration && <span className="text-[11px] bg-white border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">{node.rx.duration}</span>}
+                </div>
+                <Link to={createPageUrl("DrugsDosing") + `?search=${encodeURIComponent(node.rx.drug)}`}
+                  className="inline-flex items-center gap-1 text-[13px] font-semibold text-emerald-700 hover:text-emerald-900 mt-2.5">
+                  Open dose calculator <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
+
+            {/* Safety constraints (suppressor rules: live vaccines, fertility, pregnancy) */}
+            {Array.isArray(node.safety) && node.safety.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {node.safety.map((s, i) => (
+                  <div key={i} className="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5 flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-[13px] text-amber-800 leading-relaxed"><span className="font-bold">{s.title}: </span>{s.detail}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Monitoring attached to this step */}
+            {Array.isArray(node.monitoring) && node.monitoring.length > 0 && (
+              <div className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Activity className="w-4 h-4 text-slate-500" />
+                  <span className="text-sm font-bold text-slate-700">Monitoring</span>
+                </div>
+                <div className="space-y-1.5">
+                  {node.monitoring.map((m, i) => (
+                    <div key={i} className="bg-white rounded-lg p-2.5 border border-slate-100">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[13px] font-semibold text-slate-800">{m.parameter}</span>
+                        <span className="text-[11px] text-slate-500 flex-shrink-0">{m.frequency}</span>
+                      </div>
+                      {m.target && <p className="text-[12px] text-slate-600 mt-0.5">Target: {m.target}</p>}
+                      {m.alert && <p className="text-[11px] text-red-600 mt-0.5">⚠ {m.alert}{m.alert_action ? ` → ${m.alert_action}` : ''}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {history.length > 0 && (
-              <button onClick={back} className="mt-3 ml-1 inline-flex items-center gap-1 text-[12px] text-slate-400 hover:text-slate-700">
-                <ChevronLeft className="w-3.5 h-3.5" /> Back
+              <button onClick={back} className="mt-4 ml-0.5 inline-flex items-center gap-1 text-[13px] font-medium text-slate-400 hover:text-indigo-700">
+                <ChevronLeft className="w-4 h-4" /> Back to previous step
               </button>
             )}
 
@@ -208,18 +270,18 @@ export default function CIEEEngineRunner({
         {/* terminal — flag + conclusion */}
         {isTerminal && (
           <div className="relative">
-            <span className="absolute -left-[26px] top-0 text-slate-700"><Flag className="w-4 h-4" /></span>
-            <p className="text-[17px] leading-snug text-slate-900">{node.action}</p>
+            <span className="absolute -left-[30px] -top-0.5 text-emerald-600"><Flag className="w-5 h-5" /></span>
+            <p className="text-[21px] leading-snug font-bold text-slate-900">{node.action}</p>
             <EvidenceLine node={node} sources={sources} />
           </div>
         )}
       </div>
 
-      {/* terminal — CIEE detail (collapsible, kept subtle) */}
+      {/* terminal — CIEE detail (collapsible) */}
       {isTerminal && (
         <details className="bg-white border border-slate-200 rounded-xl">
-          <summary className="px-3 py-2 text-xs font-semibold text-slate-600 cursor-pointer flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5 text-slate-400" /> Evidence, monitoring & audit trail
+          <summary className="px-3 py-2.5 text-sm font-semibold text-slate-700 cursor-pointer flex items-center gap-1.5">
+            <BookOpen className="w-4 h-4 text-slate-400" /> Evidence, monitoring &amp; audit trail
           </summary>
           <div className="p-3 pt-0 space-y-3">
             {/* executed pathway */}

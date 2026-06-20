@@ -90,6 +90,12 @@ export const IGA_IPNA_PATHWAY = {
     'DN-07': {
       id: 'DN-07', type: 'ACTION', source: C, prescribes: 'methylprednisolone',
       action: 'Treat RPGN-IgAN with IV glucocorticoid pulses + additional immunosuppression (cyclophosphamide or MMF), per the KDIGO 2021 ANCA-associated vasculitis regimen.',
+      rx: { drug: 'Methylprednisolone + cyclophosphamide or MMF', dose: 'IV MP 30 mg/kg/day (max 1 g) ×3 → oral prednisolone taper; + CYC or MMF per AAV regimen', route: 'IV then oral', duration: 'Induction 3–6 months' },
+      safety: [
+        { title: 'Live vaccines', detail: 'Suppress live vaccines during active immunosuppression — log and schedule post-treatment.' },
+        { title: 'Cyclophosphamide — fertility', detail: 'Mandatory fertility-preservation counselling documented before cyclophosphamide.' },
+        { title: 'PJP prophylaxis', detail: 'Add co-trimoxazole PJP prophylaxis during intensive immunosuppression.' },
+      ],
       monitoring: [
         { parameter: 'eGFR + serum creatinine', frequency: 'Weekly initially, then monthly', target: 'Stabilisation/recovery of eGFR', alert: 'Continued decline', alert_action: 'Escalate immunosuppression; nephrology MDT' },
         { parameter: 'Infection surveillance + steroid toxicity', frequency: 'Each visit', target: 'No serious infection', alert: 'Infection / glucocorticoid toxicity', alert_action: 'PJP prophylaxis; adjust therapy' },
@@ -122,6 +128,10 @@ export const IGA_IPNA_PATHWAY = {
     'DN-13': {
       id: 'DN-13', type: 'ACTION', source: C, prescribes: 'enalapril',
       action: 'Optimal supportive care: moderate salt <3–5 g/day; RASB (ACEi or ARB) at maximally tolerated dose aiming UPCR <0.2; BP target ≤50th percentile (if proteinuria) or ≤75th percentile (ABPM); healthy weight; regular exercise; no smoking/vaping. Tonsillectomy NOT recommended.',
+      rx: { drug: 'Enalapril (ACEi) or an ARB', dose: 'Enalapril 0.1–0.5 mg/kg/day, titrate to maximally tolerated dose', route: 'Oral', duration: 'Long-term while proteinuric' },
+      safety: [
+        { title: 'Pregnancy — fetopathy', detail: 'ACEi/ARB contraindicated in pregnancy. Counsel fertile patients; document.' },
+      ],
       monitoring: [
         { parameter: 'UPCR (first-morning)', frequency: 'Monthly until stable, then 3-monthly', target: 'UPCR <0.2 mg/mg', alert: 'UPCR >1 g/day persists at 3–6 months', alert_action: 'Consider glucocorticoids (risk–benefit)' },
         { parameter: 'BP, serum creatinine, potassium', frequency: '1–2 weeks after RASB start, then periodically', target: 'BP at target; stable eGFR/K+', alert: 'Rising K+ or falling eGFR', alert_action: 'Reduce/hold RASB' },
@@ -153,6 +163,11 @@ export const IGA_IPNA_PATHWAY = {
     'DN-18': {
       id: 'DN-18', type: 'ACTION', source: C, prescribes: 'prednisolone',
       action: 'Glucocorticoid course (~6 months): oral prednisone 0.8–1 mg/kg/day with taper, OR IV methylprednisolone pulses + alternate-day oral prednisone. Add PJP prophylaxis.',
+      rx: { drug: 'Prednisolone (± IV methylprednisolone)', dose: 'Oral 0.8–1 mg/kg/day with taper over 6 months, or IV MP pulses + alternate-day oral', route: 'Oral / IV', duration: '~6 months' },
+      safety: [
+        { title: 'Live vaccines', detail: 'Suppress live vaccines during glucocorticoid immunosuppression — log and schedule post-treatment.' },
+        { title: 'PJP prophylaxis', detail: 'Add co-trimoxazole PJP prophylaxis.' },
+      ],
       monitoring: [
         { parameter: 'Proteinuria (UPCR)', frequency: 'Monthly', target: 'UPCR <0.2', alert: 'No response by end of course', alert_action: 'Reassess; consider additional IS / trial' },
         { parameter: 'Glucocorticoid toxicity (growth, BP, glucose, eyes, mood)', frequency: 'Each visit', target: 'No significant toxicity', alert: 'Toxicity threshold reached', alert_action: 'Change treatment strategy' },
@@ -170,6 +185,25 @@ export const IGA_IPNA_PATHWAY = {
     'DN-30': {
       id: 'DN-30', type: 'ACTION', source: B,
       action: 'IgA vasculitis: treat extra-renal manifestations per SHARE. Do NOT use glucocorticoids to PREVENT nephritis, and do NOT use heparin/dipyridamole/aspirin/montelukast for prevention. Monitor urine + BP for the development of nephritis for ≥12 months even if initially normal.',
+      next: 'DN-43',
+    },
+    // ── Phase 6 — Extra-renal manifestations ──────────────────────────────
+    'DN-43': {
+      id: 'DN-43', type: 'QUESTION', source: B,
+      question: 'Severe extra-renal symptoms needing glucocorticoids?',
+      detail: 'Severe bowel symptoms (after excluding intussusception), severe arthritis, or orchitis. Note: extra-renal glucocorticoids do NOT prevent kidney involvement — renal monitoring continues regardless.',
+      options: [
+        { label: 'Yes — severe bowel / arthritis / orchitis', next: 'DN-44' },
+        { label: 'No', next: 'DN-31' },
+      ],
+    },
+    'DN-44': {
+      id: 'DN-44', type: 'ACTION', source: B, prescribes: 'prednisolone',
+      action: 'Short course of oral prednisolone for severe extra-renal symptoms (exclude intussusception before treating abdominal pain). Does NOT prevent nephritis — continue urine + BP monitoring.',
+      rx: { drug: 'Prednisolone', dose: '1–2 mg/kg/day (max 60 mg), short course with taper', route: 'Oral', duration: '~1–2 weeks' },
+      safety: [
+        { title: 'Live vaccines', detail: 'Defer live vaccines during/after significant glucocorticoid exposure; schedule once off immunosuppression.' },
+      ],
       next: 'DN-31',
     },
     'DN-31': {
@@ -198,9 +232,17 @@ export const IGA_IPNA_PATHWAY = {
     'DN-37': {
       id: 'DN-37', type: 'ACTION', source: D, prescribes: 'methylprednisolone',
       action: '3–6 month glucocorticoid course — IV methylprednisolone pulses followed by tapering oral prednisone, OR an oral course. Target UPCR <0.2.',
+      rx: { drug: 'Methylprednisolone → Prednisolone', dose: 'IV MP 30 mg/kg/day (max 1 g) ×3 pulses → oral prednisolone 1 mg/kg/day with taper', route: 'IV then oral', duration: '3–6 months' },
+      safety: [
+        { title: 'Live vaccines', detail: 'Suppress live vaccines during active immunosuppression — log and schedule post-treatment.' },
+        { title: 'Glucocorticoid toxicity', detail: 'If toxicity flag positive (growth, BP, glucose, mood) — consider dose reduction / change strategy.' },
+      ],
       monitoring: [
-        { parameter: 'Proteinuria (UPCR) + eGFR', frequency: 'Monthly', target: 'UPCR <0.2; stable eGFR', alert: 'UPCR >2 persists or insufficient response', alert_action: 'Add second-line immunosuppression' },
-        { parameter: 'Glucocorticoid toxicity', frequency: 'Each visit', target: 'No significant toxicity', alert: 'Toxicity', alert_action: 'Adjust strategy' },
+        { parameter: 'Urinalysis (UPCR + haematuria)', frequency: 'Monthly ×6, then per risk', target: 'UPCR <0.2 mg/mg', alert: 'UPCR ≥0.2 mg/mg', alert_action: 'Re-enter treatment decision' },
+        { parameter: 'eGFR (Schwartz)', frequency: 'Diagnosis, 4–8 weeks, quarterly', target: '≥90 mL/min/1.73m²', alert: 'Decline >25%', alert_action: 'Escalate to RPGN pathway' },
+        { parameter: 'BP', frequency: 'Monthly ×3, then quarterly', target: '<90th percentile', alert: '≥90th percentile', alert_action: 'Initiate/optimise RASB' },
+        { parameter: 'Serum albumin', frequency: 'At biopsy, then per clinical', target: '≥30 g/L', alert: '<30 g/L', alert_action: 'Nephrotic flag — escalate treatment' },
+        { parameter: 'Glucocorticoid toxicity (BP, height, weight, glucose)', frequency: 'Quarterly', target: 'No toxicity', alert: 'Toxicity', alert_action: 'Dose reduction' },
       ],
       next: 'DN-39',
     },
@@ -212,10 +254,29 @@ export const IGA_IPNA_PATHWAY = {
         { label: 'No — responding', next: 'DN-42' },
       ],
     },
-    'DN-41': { id: 'DN-41', type: 'ACTION', source: D, action: 'Add a second-line immunosuppressant (CNI, cyclophosphamide, MMF, or mizoribine where available) to reduce glucocorticoid dose / for UPCR >2 / insufficient response. Repeat kidney biopsy if proteinuria persists >4 weeks.', next: 'DN-40' },
+    'DN-41': {
+      id: 'DN-41', type: 'ACTION', source: D, prescribes: 'mycophenolate',
+      action: 'Add a second-line immunosuppressant (MMF, a CNI, cyclophosphamide, or mizoribine where available) to reduce the glucocorticoid dose / for UPCR >2 / insufficient response. Repeat kidney biopsy if proteinuria persists >4 weeks.',
+      rx: { drug: 'Mycophenolate mofetil (or CNI / cyclophosphamide)', dose: 'MMF 1200 mg/m²/day in 2 doses · Tacrolimus C0 3–7 ng/mL · Cyclosporine C0 60–100 ng/mL · CYC per protocol', route: 'Oral / IV (CYC)', duration: 'Min 8–12 weeks; taper after ≥4 weeks remission' },
+      safety: [
+        { title: 'Live vaccines', detail: 'Suppress live vaccines during active immunosuppression — log and schedule post-treatment.' },
+        { title: 'MMF — pregnancy/teratogenicity', detail: 'Block MMF in fertile patients without documented contraception counselling (teratogenic).' },
+        { title: 'Cyclophosphamide — fertility', detail: 'Mandatory fertility-preservation counselling documented before cyclophosphamide.' },
+      ],
+      monitoring: [
+        { parameter: 'MMF/MPA exposure + CBC', frequency: 'Monthly → quarterly', target: 'AUC ~30–60 mg·h/L; normal CBC', alert: 'Cytopenia / low AUC', alert_action: 'Dose adjust; consider MPS' },
+        { parameter: 'CNI trough (if used)', frequency: 'Quarterly', target: 'Tac 3–7 / CsA 60–100 ng/mL', alert: 'Out of range; creatinine ↑', alert_action: 'Dose adjust; biopsy at 2–3 yrs' },
+        { parameter: 'Cyclophosphamide (if used): CBC + urine', frequency: 'Every 14 days', target: 'Normal CBC; clear urine', alert: 'Leukopenia / haematuria', alert_action: 'Hold; urgent review' },
+      ],
+      next: 'DN-40',
+    },
     'DN-38': {
       id: 'DN-38', type: 'ACTION', source: D, prescribes: 'enalapril',
       action: 'RASB (ACEi or ARB) for proteinuria (UPCR ≥0.2). Maintain BP <90th percentile for age/sex/height; add non-RASB antihypertensives if target not met.',
+      rx: { drug: 'Enalapril (ACEi) or an ARB', dose: 'Enalapril 0.1–0.5 mg/kg/day, titrate to max tolerated', route: 'Oral', duration: 'Long-term while proteinuric' },
+      safety: [
+        { title: 'Pregnancy — fetopathy', detail: 'ACEi/ARB contraindicated in pregnancy (renal/skull fetopathy). Counsel fertile patients; document.' },
+      ],
       monitoring: [
         { parameter: 'UPCR + BP', frequency: 'Monthly initially', target: 'UPCR <0.2; BP <90th percentile', alert: 'Persistent proteinuria/HTN', alert_action: 'Escalate per pathway' },
         { parameter: 'Serum creatinine + potassium', frequency: 'After RASB start, then periodically', target: 'Stable', alert: 'Rising K+/falling eGFR', alert_action: 'Reduce/hold RASB' },
@@ -223,9 +284,30 @@ export const IGA_IPNA_PATHWAY = {
       next: 'DN-40',
     },
     'DN-42': { id: 'DN-42', type: 'ACTION', source: D, action: 'Continue RASB. Use immunosuppression for a minimum of 8–12 weeks; discontinue after ≥4 weeks of remission (UPCR <0.2, no gross haematuria, eGFR >90).', next: 'DN-40' },
+    // ── Phase 7 — Monitoring, remission, relapse ──────────────────────────
     'DN-40': {
       id: 'DN-40', type: 'MONITORING', source: X,
       action: 'Follow-up: monthly for 6 months, then every 3 months for a further 6 months, then every 6 months for ≥5 years. Yearly lifelong BP + urinalysis. Target UPCR <0.2.',
+      next: 'DN-46',
+    },
+    'DN-46': {
+      id: 'DN-46', type: 'QUESTION', critical: true, source: X,
+      question: 'On follow-up — remission or relapse?',
+      detail: 'Remission: UPCR <0.2 mg/mg ×2 samples ≥1 month apart with eGFR ≥90. Relapse: haematuria ≥2+ OR UPCR ≥0.2 ×2 samples with eGFR <90 or >25% decline.',
+      options: [
+        { label: 'Remission', set: { remission: true }, next: 'DN-47' },
+        { label: 'Relapse — restart treatment', set: { relapse: true }, tone: 'danger', next: 'DN-36' },
+        { label: 'Stable — continue monitoring', next: 'DN-48' },
+      ],
+    },
+    'DN-47': {
+      id: 'DN-47', type: 'ACTION', source: X,
+      action: 'Remission: continue RASB; taper/withdraw immunosuppression. Live vaccines may be scheduled once off immunosuppression.',
+      next: 'DN-48',
+    },
+    'DN-48': {
+      id: 'DN-48', type: 'MONITORING', source: X,
+      action: 'Lifelong yearly BP + urinalysis for all patients with a history of IgAVN (relapses can occur late). Re-enter the treatment algorithm on relapse.',
       next: 'TERM-IGAVN',
     },
 

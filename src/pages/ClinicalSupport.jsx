@@ -1541,10 +1541,15 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
 
     const scenario = clinicalScenarios.find((s) => s.id === selectedScenario);
 
+    // Friendly titles for engine ids that otherwise auto-format poorly
+    const ENGINE_TITLES = {
+      "iga-ipna-engine": "IgA Nephropathy / IgA Vasculitis Engine",
+    };
+
     // If scenario not found in the list, show the PathwayRenderer with a fallback scenario object
     const effectiveScenario = scenario || {
       id: selectedScenario,
-      title: selectedScenario.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      title: ENGINE_TITLES[selectedScenario] || selectedScenario.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
       description: "Clinical pathway",
       category: "Clinical",
       priority: "secondary",
