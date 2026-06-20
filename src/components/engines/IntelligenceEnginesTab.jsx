@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 // Engines marked adminOnly: true are hidden from non-admins until approved
 // To make an engine visible to all users, set adminOnly: false (default)
 
-const ENGINES = [
+export const ENGINES = [
   // ── Emergency / Electrolyte ──
   { label: "AKI Engine", desc: "KDIGO + RRT triggers", scenario: "aki-engine", tags: ["AKI", "renal failure", "emergency", "creatinine"], group: "Emergency & Electrolytes" },
   { label: "Hyperkalaemia", desc: "K+ emergency full engine", scenario: "hyperkalemia-deep-engine", tags: ["hyperkalemia", "potassium", "arrhythmia", "emergency"], group: "Emergency & Electrolytes" },

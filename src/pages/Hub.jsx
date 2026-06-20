@@ -19,6 +19,7 @@ import {
 import QuickPatientEntry from "../components/QuickPatientEntry";
 import { useOnlineStatus } from "../components/OfflineDataManager";
 import GlobalSearch from "../components/GlobalSearch";
+import { ENGINES } from "../components/engines/IntelligenceEnginesTab";
 import ContextualSuggestions from "../components/hub/ContextualSuggestions";
 import { usePatient } from "../components/PatientContext";
 import QuickCalculations from "../components/QuickCalculations";
@@ -532,7 +533,7 @@ export default function Hub() {
             <div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-bold text-violet-900">Intelligence Engines</span>
-              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">{31 + dbEngineRecords.length}</span>
+              <span className="text-xs bg-violet-600 text-white px-1.5 py-0.5 rounded-full font-bold">{ENGINES.length + dbEngineRecords.length}</span>
             </div>
             <Link to={createPageUrl("ClinicalSupport") + "?tab=engines"}>
               <span className="text-xs text-violet-600 font-semibold">All →</span>
@@ -542,6 +543,7 @@ export default function Hub() {
             {[
               { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
               { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
+              { label: "IgAN / IgAV",        desc: "IPNA 2024",             color: "bg-blue-700",   scenario: "iga-ipna-engine" },
               { label: "Rickets Engine",     desc: "Calcipenic/Phosphopenic", color: "bg-amber-600", scenario: "rickets-engine" },
               { label: "Oncology Hub",       desc: "ALL·AML·Wilms·RMS·LCH",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
               { label: "Hyperkalaemia",      desc: "K+ Emergency",          color: "bg-orange-600", scenario: "hyperkalemia-deep-engine" },
@@ -562,7 +564,7 @@ export default function Hub() {
               { label: "Cystic Kidney",      desc: "ADPKD/ARPKD/NPHP",      color: "bg-blue-800",   scenario: "cystic-kidney-engine" },
               { label: "CAKUT Engine",       desc: "Antenatal/UPJ/Duplex",   color: "bg-teal-800",   scenario: "cakut-engine" },
               { label: "PUV Engine",         desc: "Urethral Valves",        color: "bg-red-800",    scenario: "puv-engine" },
-              { label: "VUR/UTI",            desc: "Recurrent UTI/VUR",      color: "bg-cyan-800",   scenario: "vur-uti-engine" },
+              { label: "Febrile UTI",        desc: "UTI Imaging (ISPN 2023)", color: "bg-cyan-800",   scenario: "uti-febrile" },
               { label: "HNF1B/Alport",       desc: "Rare hereditary",        color: "bg-green-800",  scenario: "hnf1b-alport-engine" },
               { label: "Hyperoxaluria",      desc: "PH1/PH2/PH3",           color: "bg-orange-700", scenario: "hyperoxaluria-engine" },
               { label: "Cystinosis",         desc: "Fanconi+cysteamine",     color: "bg-blue-700",   scenario: "cystinosis-engine" },
