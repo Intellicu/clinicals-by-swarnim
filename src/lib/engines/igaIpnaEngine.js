@@ -16,7 +16,7 @@ export const IGA_IPNA_GUIDELINE = {
   evidence_grade: 'A–D / X',
   recommendation_strength: 'GRADE',
   doi: '10.1007/s00467-024-06502-6',
-  pmid: '39320469',
+  pmid: '39331079',
   reference: 'Vivarelli M, et al. Pediatr Nephrol. 2024.',
 };
 
@@ -29,7 +29,7 @@ const mk = (grade, strength, section) => ({
   issuing_body: 'International Pediatric Nephrology Association',
   year: 2024,
   doi: '10.1007/s00467-024-06502-6',
-  pmid: '39320469',
+  pmid: '39331079',
 });
 
 export const IGA_IPNA_SOURCES = {
