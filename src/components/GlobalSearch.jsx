@@ -309,6 +309,17 @@ function includes(haystack, needle) {
   return String(haystack).toLowerCase().includes(needle.toLowerCase());
 }
 
+// Word-boundary match — needle must start a word (avoids "iga" matching
+// inside "Migalastat" / "Dabigatran"). Far more relevant for short queries.
+function wordMatch(haystack, needle) {
+  if (!haystack || !needle) return false;
+  const h = String(haystack).toLowerCase();
+  const n = String(needle).toLowerCase().trim();
+  if (!n) return false;
+  const esc = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^a-z0-9])${esc}`).test(h);
+}
+
 function snippet(text, query, maxLen = 90) {
   if (!text) return "";
   const idx = text.toLowerCase().indexOf(query.toLowerCase());
@@ -318,16 +329,17 @@ function snippet(text, query, maxLen = 90) {
   return (start > 0 ? "…" : "") + text.slice(start, end) + (end < text.length ? "…" : "");
 }
 
-// Score: title/name match = 2, body match = 1
+// Score: title word-match = 3, tag word-match = 2, body word-match = 1.
+// Word-boundary scoring surfaces the most relevant items first.
 function scoreStaticItem(item, q) {
-  const titleMatch = item.title.toLowerCase().includes(q) ? 2 : 0;
-  const tagMatch = item.tags.some(t => t.toLowerCase().includes(q)) ? 1 : 0;
+  const titleMatch = wordMatch(item.title, q) ? 3 : 0;
+  const tagMatch = item.tags.some(t => wordMatch(t, q)) ? 2 : 0;
   return titleMatch + tagMatch;
 }
 
 function scoreEntityItem(primaryText, bodyText, q) {
-  const primaryMatch = String(primaryText || "").toLowerCase().includes(q) ? 2 : 0;
-  const bodyMatch = String(bodyText || "").toLowerCase().includes(q) ? 1 : 0;
+  const primaryMatch = wordMatch(primaryText, q) ? 3 : 0;
+  const bodyMatch = wordMatch(bodyText, q) ? 1 : 0;
   return primaryMatch + bodyMatch;
 }
 
@@ -572,7 +584,7 @@ Question: ${q}`,
     } catch { /* silent — synonym lookup failure shouldn't block search */ }
 
     // Helper: check if any expanded term matches
-    const matchesAny = (text) => expandedTerms.some(t => String(text || "").toLowerCase().includes(t));
+    const matchesAny = (text) => expandedTerms.some(t => wordMatch(text, t));
 
     // 1. SearchIndex entity (DB-backed, sorted by rank)
     let dbIndexResults = [];
@@ -580,10 +592,9 @@ Question: ${q}`,
       const dbItems = await base44.entities.SearchIndex.filter({ is_active: true }, "-rank", 50);
       dbIndexResults = dbItems
         .filter(item => expandedTerms.some(t =>
-          String(item.keywords || "").toLowerCase().includes(t) ||
-          String(item.title || "").toLowerCase().includes(t)
+          wordMatch(item.keywords, t) || wordMatch(item.title, t)
         ))
-        .slice(0, 8)
+        .slice(0, 6)
         .map(item => ({
           _type: "static",
           title: item.title,
@@ -602,11 +613,11 @@ Question: ${q}`,
       })
       .filter(item => item._score > 0)
       .sort((a, b) => b._score - a._score)
-      .slice(0, 8)
+      .slice(0, 5)
       .map(item => ({
         _type: "static",
         title: item.title,
-        snippet: item.tags.filter(t => expandedTerms.some(et => t.toLowerCase().includes(et))).slice(0, 4).join(" · ") || item.tags.slice(0, 4).join(" · "),
+        snippet: item.tags.filter(t => expandedTerms.some(et => wordMatch(t, et))).slice(0, 4).join(" · ") || item.tags.slice(0, 4).join(" · "),
         category: item.category,
         _score: item._score,
         navigate: () => {
@@ -615,9 +626,11 @@ Question: ${q}`,
         },
       }));
 
-    // 1b. Formulary static search (instant)
+    // 1b. Formulary static search (instant) — word-boundary filtered for relevance
     const formularyMatches = searchFormulary(q)
-      .slice(0, 5)
+      .filter(d => wordMatch(d.generic, ql) || wordMatch(d.class, ql) ||
+        (d.formulations?.[0]?.brands ? wordMatch(d.formulations[0].brands, ql) : false))
+      .slice(0, 4)
       .map(d => ({
         _type: "static",
         title: d.generic,
@@ -663,13 +676,11 @@ Question: ${q}`,
     const all = await base44.entities.Drug.list("-updated_date", 200);
     return all
       .filter(d =>
-        includes(d.generic_name, ql) ||
-        includes(d.description, ql) ||
-        includes(d.brands_indian, ql) ||
-        includes(d.category, ql) ||
-        includes(d.therapeutic_class, ql) ||
-        includes(d.indications, ql) ||
-        includes(d.clinical_pearls, ql)
+        wordMatch(d.generic_name, ql) ||
+        wordMatch(d.brands_indian, ql) ||
+        wordMatch(d.category, ql) ||
+        wordMatch(d.therapeutic_class, ql) ||
+        wordMatch(d.indications, ql)
       )
       .map(d => ({
         _type: "entity",
@@ -681,7 +692,7 @@ Question: ${q}`,
         navigate: () => createPageUrl("DrugsDosing") + `?search=${encodeURIComponent(d.generic_name)}`,
       }))
       .sort((a, b) => b._score - a._score)
-      .slice(0, 5);
+      .slice(0, 4);
   }
 
   async function searchGuidelines(q, ql) {
@@ -691,14 +702,11 @@ Question: ${q}`,
         // Exclude archived/superseded records from search results
         if (g.status === "Archived" || g.title?.startsWith("[MERGED")) return false;
         return (
-          includes(g.title, ql) ||
-          includes(g.summary, ql) ||
-          includes(g.source, ql) ||
-          includes(g.category, ql) ||
-          includes(g.scope_and_population, ql) ||
-          (Array.isArray(g.keywords) && g.keywords.some(k => includes(k, ql))) ||
-          (Array.isArray(g.key_recommendations) && g.key_recommendations.some(r => includes(r, ql))) ||
-          (Array.isArray(g.practice_pearls) && g.practice_pearls.some(p => includes(p, ql)))
+          wordMatch(g.title, ql) ||
+          wordMatch(g.summary, ql) ||
+          wordMatch(g.category, ql) ||
+          (Array.isArray(g.keywords) && g.keywords.some(k => wordMatch(k, ql))) ||
+          (Array.isArray(g.key_recommendations) && g.key_recommendations.some(r => wordMatch(r, ql)))
         );
       })
       .map(g => ({
@@ -712,17 +720,16 @@ Question: ${q}`,
         navigate: () => createPageUrl("GuidelinesLibrary") + `?id=${g.id}`,
       }))
       .sort((a, b) => b._score - a._score)
-      .slice(0, 6);
+      .slice(0, 4);
   }
 
   async function searchProtocols(q, ql) {
     const all = await base44.entities.TreatmentTemplate.list("-updated_date", 200);
     return all
       .filter(t =>
-        includes(t.name, ql) ||
-        includes(t.diagnosis, ql) ||
-        includes(t.description, ql) ||
-        includes(t.specialty, ql)
+        wordMatch(t.name, ql) ||
+        wordMatch(t.diagnosis, ql) ||
+        wordMatch(t.specialty, ql)
       )
       .map(t => ({
         _type: "entity",
@@ -741,9 +748,8 @@ Question: ${q}`,
     const all = await base44.entities.TeachingModule.list("-updated_date", 200);
     return all
       .filter(m =>
-        includes(m.title, ql) ||
-        includes(m.category, ql) ||
-        includes(m.content?.overview, ql)
+        wordMatch(m.title, ql) ||
+        wordMatch(m.category, ql)
       )
       .map(m => ({
         _type: "entity",
@@ -755,17 +761,16 @@ Question: ${q}`,
         navigate: () => createPageUrl("TeachingHub") + `?search=${encodeURIComponent(m.title)}&id=${m.id}`,
       }))
       .sort((a, b) => b._score - a._score)
-      .slice(0, 4);
+      .slice(0, 3);
   }
 
   async function searchBiopsy(q, ql) {
     const all = await base44.entities.BiopsyPattern.list("-updated_date", 200);
     return all
       .filter(b =>
-        includes(b.name, ql) ||
-        includes(b.also_called, ql) ||
-        includes(b.clinical_presentation, ql) ||
-        includes(b.pattern_code, ql)
+        wordMatch(b.name, ql) ||
+        wordMatch(b.also_called, ql) ||
+        wordMatch(b.pattern_code, ql)
       )
       .map(b => ({
         _type: "entity",
@@ -777,7 +782,7 @@ Question: ${q}`,
         navigate: () => createPageUrl("GlomerularDiseases") + `?search=${encodeURIComponent(b.name)}`,
       }))
       .sort((a, b) => b._score - a._score)
-      .slice(0, 4);
+      .slice(0, 3);
   }
 
   // ── Click outside ──────────────────────────────────────────────────────────
