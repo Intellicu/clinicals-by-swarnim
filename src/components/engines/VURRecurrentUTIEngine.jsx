@@ -5,9 +5,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, ChevronRight, ArrowLeft, Activity, AlertCircle, Microscope } from "lucide-react";
 
-// ISPN 2021 Recurrent UTI Risk Factors
+// Recurrent UTI risk factors (Revised ISPN 2023)
 const RISK_FACTORS = [
-  { id: "age_lt2", label: "Age < 2 years (highest risk group — ISPN 2021)" },
+  { id: "age_lt2", label: "Age < 2 years (higher risk group)" },
   { id: "male_uncircumcised", label: "Uncircumcised male <1 year" },
   { id: "febrile", label: "Febrile UTI (temp >38°C) — upper tract involvement" },
   { id: "recurrent", label: "≥2 febrile UTIs in 12 months or ≥3 any UTIs" },
@@ -19,12 +19,13 @@ const RISK_FACTORS = [
   { id: "single_kidney", label: "Solitary / duplex kidney" },
 ];
 
+// Management aligned with Revised ISPN 2023 (conservative; prophylaxis limited to high-grade)
 const VUR_GRADES = [
-  { grade: "I", desc: "Ureter only (no calyceal filling)", management: "Conservative — antibiotics / observation. VCUG in 12–18m if asymptomatic." },
-  { grade: "II", desc: "Ureter + pelvis without dilation", management: "Conservative — prophylactic antibiotics if age <2y or recurrent UTI." },
-  { grade: "III", desc: "Mild to moderate ureteral dilation", management: "CAP if age <5y with BBD or recurrent UTI. Consider endoscopic (STING) at age 3–5y if fails." },
-  { grade: "IV", desc: "Marked dilation with tortuous ureter", management: "STING / endoscopic injection (Deflux) OR surgical reimplantation if breakthrough UTIs or scarring." },
-  { grade: "V", desc: "Severe dilation, intrarenal reflux", management: "Surgical reimplantation (Cohen/Politano) — high risk of scarring. DMSA before and after." },
+  { grade: "I", desc: "Ureter only (no calyceal filling)", management: "Low-grade — no antibiotic prophylaxis. High spontaneous resolution. Treat BBD if present." },
+  { grade: "II", desc: "Ureter + pelvis without dilation", management: "Low-grade — no antibiotic prophylaxis. Consider only if recurrent febrile UTI with BBD." },
+  { grade: "III", desc: "Mild to moderate ureteral dilation", management: "High-grade — antibiotic prophylaxis first-line + evaluate/treat BBD with urotherapy." },
+  { grade: "IV", desc: "Marked dilation with tortuous ureter", management: "High-grade — prophylaxis + treat BBD. Surgery only for breakthrough febrile UTI despite prophylaxis." },
+  { grade: "V", desc: "Severe dilation, intrarenal reflux", management: "High-grade — prophylaxis + treat BBD. Reimplantation if breakthrough febrile UTI despite prophylaxis." },
 ];
 
 export default function VURRecurrentUTIEngine() {
@@ -46,9 +47,9 @@ export default function VURRecurrentUTIEngine() {
         <div className="flex items-center gap-2 mb-1">
           <Activity className="w-5 h-5" />
           <h3 className="text-sm font-bold">Recurrent UTI / VUR Intelligence Engine</h3>
-          <Badge className="bg-white/20 text-white text-xs border-white/30">ISPN 2021 · IPNA · EAU Guidelines</Badge>
+          <Badge className="bg-white/20 text-white text-xs border-white/30">Revised ISPN 2023 · IPNA</Badge>
         </div>
-        <p className="text-xs text-teal-100">ISPN 2021: Risk stratification → Imaging → VUR grading → Management → Follow-up</p>
+        <p className="text-xs text-teal-100">ISPN 2023: Risk stratification → Conservative imaging → VUR grading → Management → Follow-up</p>
       </div>
 
       {step === 0 && (
@@ -72,10 +73,10 @@ export default function VURRecurrentUTIEngine() {
         <div className="space-y-3">
           <p className="text-sm font-semibold text-slate-800">Imaging Recommendations:</p>
           {[
-            { test: "USG Kidneys + Bladder", when: "ALL children with first febrile UTI. Repeat in 6 weeks if abnormal.", icon: "🔍" },
-            { test: "VCUG (Voiding Cystourethrogram)", when: risk === "High" ? "RECOMMENDED — High risk: male <2y, bilateral HN, recurrent febrile UTI, abnormal USG, family history VUR" : risk === "Intermediate" ? "Consider — if recurrent febrile UTI or abnormal USG" : "Optional — Low risk; reserve for recurrence or specific indications", icon: "📷" },
-            { test: "DMSA Scan", when: "Perform 4–6 MONTHS after acute pyelonephritis to assess for permanent renal scarring", icon: "☢️" },
-            { test: "MAG3 Diuretic Renogram", when: "If USG shows significant hydronephrosis — rule out obstruction (UPJ/UVJ)", icon: "🔬" },
+            { test: "Ultrasound KUB", when: "ALL children after a UTI (kidneys, ureters, bladder). Detects anomalies and clues to BBD.", icon: "🔍" },
+            { test: "MCU / VCUG", when: "ONLY if: non-E. coli UTI in a child <2 years, abnormal ultrasound, OR recurrent UTI. Perform after the UTI is treated (≈2–3 weeks). Restricting MCU improves yield and avoids radiation.", icon: "📷" },
+            { test: "Late-phase DMSA", when: "ONLY for recurrent UTI or high-grade VUR — perform 4–6 months after UTI to detect permanent scars. AVOID acute-phase DMSA (low specificity; cannot distinguish acute pyelonephritis from scar).", icon: "☢️" },
+            { test: "MAG3 Diuretic Renogram", when: "If ultrasound shows significant hydronephrosis — rule out obstruction (UPJ/UVJ).", icon: "🔬" },
           ].map((item, i) => (
             <div key={i} className="rounded-xl border border-slate-200 bg-white p-3">
               <p className="text-sm font-bold text-slate-800">{item.icon} {item.test}</p>
@@ -114,31 +115,30 @@ export default function VURRecurrentUTIEngine() {
       {step === 3 && vurGrade && (
         <div className="space-y-3">
           {[
-            { title: "CAP (Continuous Antibiotic Prophylaxis) — ISPN 2021", color: "bg-blue-50 border-blue-200", items: [
-              "Trimethoprim 2 mg/kg OD (max 100 mg) — preferred first-line ≥3 months",
-              "Nitrofurantoin 1–2 mg/kg OD (≥3 months, ≥40 weeks corrected gestation; avoid in G6PD deficiency)",
-              "Cefalexin 10 mg/kg OD — first-line in neonates <3 months and if TMP/NFM contraindicated",
-              "ISPN 2021 Indications: VUR grade III–V; recurrent febrile UTI (≥2); DMSA scar; age <1y with dilating VUR; BBD with recurrent UTI",
-              "Duration: Until VUR resolves on imaging OR age 5y (re-evaluate) OR puberty; re-VCUG at 18–24m on CAP",
-              "ISPN position: BBD MUST be treated concurrently — CAP alone fails if bladder dysfunction untreated",
+            { title: "Antibiotic Prophylaxis — ISPN 2023 (limited indications)", color: "bg-blue-50 border-blue-200", items: [
+              "Indicated: high-grade VUR (grades III–V)",
+              "Also: recurrent febrile UTI with BBD (irrespective of VUR); infants with low-grade VUR may be considered",
+              "NOT for normal urinary tract or low-grade VUR alone; NOT for antenatal hydronephrosis awaiting evaluation",
+              "Cotrimoxazole or nitrofurantoin (>3 months); cephalexin in young infants — AVOID amoxicillin-clavulanate (resistance)",
+              "BBD MUST be treated concurrently with urotherapy (± laxatives) — strong recommendation",
+              "Discontinue if toilet-trained, no BBD, and no febrile UTI in the preceding 1 year",
             ]},
-            { title: "Endoscopic (STING/HIT) Procedure", color: "bg-amber-50 border-amber-200", items: [
-              "Subureteric injection of Deflux (dextranomer/hyaluronic acid)",
-              "Success: Grade III ~75%, Grade IV ~60%, Grade V ~50%",
-              "Indication: Breakthrough UTI on CAP, parental preference, grade III–IV",
-              "Risk: De novo contralateral VUR in ~5%; ureterovesical obstruction (rare)",
+            { title: "Endoscopic Correction (bulking agent)", color: "bg-amber-50 border-amber-200", items: [
+              "Subureteric injection of a bulking agent — minimally invasive",
+              "Lower success rate than ureteric reimplantation — discuss with caregivers",
+              "An option where there is parental hesitancy to use long-term antibiotics",
             ]},
             { title: "Surgical Reimplantation", color: "bg-green-50 border-green-200", items: [
-              "Cohen cross-trigonal reimplantation (most common in children)",
-              "Indication: VUR grade V, failed endoscopic × 2, progressive scarring, parental preference",
-              "Success rate >95% for grades III–V",
-              "Robotic-assisted reimplantation: Available at specialised centres",
+              "Reserved for recurrent breakthrough febrile UTI despite prophylaxis AND optimal BBD management",
+              "More effective than prophylaxis at preventing febrile UTI, but neither reduces the risk of kidney scarring",
+              "Cohen cross-trigonal reimplantation (most common); robotic/laparoscopic options available",
             ]},
-            { title: "Follow-up Schedule", color: "bg-slate-50 border-slate-200", items: [
-              "USG: Every 6 months while on CAP",
-              "VCUG: Repeat at 1–2 years on CAP (resolution = stop CAP)",
-              "DMSA: 6 months post-last febrile UTI, then annually if scarring",
-              "BP + UPCR: Annually if DMSA shows scarring",
+            { title: "Follow-up Schedule — ISPN 2023", color: "bg-slate-50 border-slate-200", items: [
+              "Ultrasound periodically to monitor kidney growth in persistent high-grade VUR",
+              "Repeat cystography NOT routine — only after 4–8 years if deemed necessary",
+              "Repeat DMSA only with recurrence of febrile UTI",
+              "Reflux nephropathy: growth, BP, proteinuria and kidney function at each visit",
+              "Screen siblings <3 years with ultrasound (MCU only if abnormal US or febrile UTI)",
             ]},
           ].map((s, i) => (
             <div key={i} className={`rounded-xl border-2 p-3 ${s.color}`}>
