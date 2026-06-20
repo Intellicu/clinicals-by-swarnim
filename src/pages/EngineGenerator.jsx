@@ -262,12 +262,12 @@ Return ONLY valid JSON, no explanation.`;
 
   // ── Build an executable intelligence engine from the guideline (Component 2) ──
   const generateCIEEEngine = async () => {
-    if (!aiTopic.trim() && !aiDocText.trim()) { toast.error("Enter a topic or upload a guideline first"); return; }
+    if (!aiTopic.trim() && !aiDocText.trim() && !docFileUrl) { toast.error("Enter a topic or upload a guideline first"); return; }
     setCieeGenLoading(true);
     setCieeGen(null); setCieeValidation(null); setCieeError(null);
     try {
       toast.info("Parsing guideline into an intelligence engine…");
-      const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText });
+      const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText, fileUrl: docFileUrl });
       if (!res.success) { setCieeError(res.error || "Unknown error"); toast.error("Generation failed"); return; }
       setCieeGen(res.data);
       setCieeValidation(res.validation);
@@ -326,6 +326,7 @@ Return ONLY valid JSON, no explanation.`;
 
   const [pdfUploading, setPdfUploading] = useState(false);
   const [pdfFileName, setPdfFileName] = useState("");
+  const [docFileUrl, setDocFileUrl] = useState(null); // uploaded file URL (sent to LLM directly)
 
   const handleDocUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -338,6 +339,7 @@ Return ONLY valid JSON, no explanation.`;
       try {
         toast.info("Uploading PDF and extracting content…");
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        setDocFileUrl(file_url); // keep URL so we can send the PDF straight to the LLM
         const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
           file_url,
           json_schema: {
@@ -350,12 +352,12 @@ Return ONLY valid JSON, no explanation.`;
         const text = result?.output?.extracted_text || result?.output?.[0]?.extracted_text || "";
         if (text) {
           setAiDocText(text.substring(0, 6000));
-          toast.success(`PDF extracted: ${file.name}`);
+          toast.success(`PDF ready: ${file.name}`);
         } else {
-          toast.error("Could not extract text from PDF");
+          toast.success(`PDF uploaded: ${file.name} — will be sent directly to the model`);
         }
       } catch (err) {
-        toast.error("PDF extraction failed: " + err.message);
+        toast.error("PDF upload failed: " + err.message);
       } finally {
         setPdfUploading(false);
       }
@@ -365,6 +367,7 @@ Return ONLY valid JSON, no explanation.`;
         const text = await file.text();
         setAiDocText(text.substring(0, 6000));
         setPdfFileName(file.name);
+        setDocFileUrl(null);
         toast.success("Document loaded: " + file.name);
       } catch {
         toast.error("Could not read file");
@@ -489,7 +492,7 @@ Return ONLY valid JSON, no explanation.`;
                 {pdfFileName && !pdfUploading && (
                   <div className="flex items-center gap-1 text-xs text-violet-700 bg-violet-100 px-2 py-1 rounded-full border border-violet-200">
                     <FileText className="w-3 h-3" /> {pdfFileName}
-                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); }} className="ml-1 text-violet-400 hover:text-violet-700">
+                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); setDocFileUrl(null); }} className="ml-1 text-violet-400 hover:text-violet-700">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -537,7 +540,7 @@ Return ONLY valid JSON, no explanation.`;
                 {pdfFileName && !pdfUploading && (
                   <div className="flex items-center gap-1 text-xs text-indigo-700 bg-indigo-100 px-2 py-1 rounded-full border border-indigo-200">
                     <FileText className="w-3 h-3" /> {pdfFileName}
-                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); }} className="ml-1 text-indigo-400 hover:text-indigo-700"><X className="w-3 h-3" /></button>
+                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); setDocFileUrl(null); }} className="ml-1 text-indigo-400 hover:text-indigo-700"><X className="w-3 h-3" /></button>
                   </div>
                 )}
               </div>
