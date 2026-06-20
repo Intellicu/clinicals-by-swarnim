@@ -12,7 +12,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  FlaskConical, ShieldAlert, Activity, BookOpen, Flag, ChevronRight,
+  FlaskConical, ShieldAlert, Activity, BookOpen, Flag, ChevronRight, ChevronLeft,
 } from "lucide-react";
 import {
   checkPrescriptionSuppressor, generateMonitoringRules,
@@ -83,17 +83,20 @@ export default function CIEEEngineRunner({
     setHistory([]); setMonitoring([]); setSuppressions([]);
   };
 
+  // Each history entry stores a snapshot of the state BEFORE that node ran,
+  // so we can jump back to any earlier step and resume from there.
   const choose = (opt) => {
-    const newCtx = { ...ctx, ...(opt.set || {}) };
-    setCtx(newCtx);
-    setHistory(h => [...h, { node, choiceLabel: opt.label }]);
+    const snapshot = { ctx, monitoring, suppressions };
+    setCtx({ ...ctx, ...(opt.set || {}) });
+    setHistory(h => [...h, { node, choiceLabel: opt.label, snapshot }]);
     setNodeId(opt.next);
   };
 
   const advance = () => {
+    const snapshot = { ctx, monitoring, suppressions };
     if (isPrescriptionNode(node) && supp.suppressed) {
       setSuppressions(s => [...s, supp.suppression_event]);
-      setHistory(h => [...h, { node, suppressed: true, reason: supp.reason }]);
+      setHistory(h => [...h, { node, suppressed: true, reason: supp.reason, snapshot }]);
       setNodeId(suppressRedirect());
       return;
     }
@@ -104,9 +107,22 @@ export default function CIEEEngineRunner({
         return [...new Map(merged.map(r => [r.rule_id, r])).values()];
       });
     }
-    setHistory(h => [...h, { node }]);
+    setHistory(h => [...h, { node, snapshot }]);
     setNodeId(node.next);
   };
+
+  // Jump back to a previous step (re-opens that node, restoring prior state).
+  const goTo = (index) => {
+    if (index < 0 || index >= history.length) return;
+    const { snapshot, node: target } = history[index];
+    setCtx(snapshot.ctx);
+    setMonitoring(snapshot.monitoring);
+    setSuppressions(snapshot.suppressions);
+    setNodeId(target.id);
+    setHistory(history.slice(0, index));
+  };
+
+  const back = () => { if (history.length) goTo(history.length - 1); };
 
   const isQuestion = node.type === 'QUESTION' || node.type === 'ASSESSMENT';
   const isTerminal = node.type === 'TERMINAL';
@@ -127,17 +143,18 @@ export default function CIEEEngineRunner({
       <div className="relative pl-7 pt-1">
         <div className="absolute left-[9px] top-2 bottom-2 w-px bg-slate-200" />
 
-        {/* completed steps — collapsed one-liners */}
+        {/* completed steps — collapsed one-liners, click to go back */}
         {history.map((h, i) => {
           const ans = h.suppressed ? 'Blocked' : (h.choiceLabel ? shortAnswer(h.choiceLabel) : null);
           return (
-            <div key={i} className="relative mb-2.5">
-              <span className={`absolute -left-[22px] top-[5px] w-2.5 h-2.5 rounded-full ${h.suppressed ? 'bg-red-500' : 'bg-slate-400'}`} />
+            <button key={i} onClick={() => goTo(i)} title="Go back to this step"
+              className="relative mb-2.5 block w-full text-left group">
+              <span className={`absolute -left-[22px] top-[5px] w-2.5 h-2.5 rounded-full ${h.suppressed ? 'bg-red-500' : 'bg-slate-400 group-hover:bg-indigo-500'}`} />
               <div className="flex items-baseline gap-1.5 min-w-0">
-                <span className={`text-[13px] leading-snug truncate ${h.suppressed ? 'text-red-700' : 'text-slate-500'}`}>{h.node.question || h.node.action}</span>
+                <span className={`text-[13px] leading-snug truncate group-hover:text-indigo-700 ${h.suppressed ? 'text-red-700' : 'text-slate-500'}`}>{h.node.question || h.node.action}</span>
                 {ans && <span className={`text-[13px] font-bold leading-snug flex-shrink-0 ${h.suppressed ? 'text-red-700' : 'text-slate-700'}`}>{ans}</span>}
               </div>
-            </div>
+            </button>
           );
         })}
 
@@ -176,6 +193,12 @@ export default function CIEEEngineRunner({
                 {supp.suppressed ? 'Continue → supportive pathway' : 'Continue'}
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
+            )}
+
+            {history.length > 0 && (
+              <button onClick={back} className="mt-3 ml-1 inline-flex items-center gap-1 text-[12px] text-slate-400 hover:text-slate-700">
+                <ChevronLeft className="w-3.5 h-3.5" /> Back
+              </button>
             )}
 
             <EvidenceLine node={node} sources={sources} />
@@ -250,9 +273,14 @@ export default function CIEEEngineRunner({
 
       {/* footer action */}
       {isTerminal ? (
-        <Button variant="outline" size="sm" className="w-full" onClick={onReset || restart}>Run Again</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="flex-1" onClick={back} disabled={!history.length}>
+            <ChevronLeft className="w-4 h-4 mr-1" /> Back
+          </Button>
+          <Button variant="outline" size="sm" className="flex-1" onClick={onReset || restart}>Run Again</Button>
+        </div>
       ) : (
-        <button onClick={restart} className="w-full text-[11px] text-slate-400 underline text-center">Restart pathway</button>
+        <button onClick={restart} className="w-full text-[11px] text-slate-300 hover:text-slate-500 underline text-center">Restart pathway</button>
       )}
     </div>
   );
