@@ -106,6 +106,7 @@ export default function CIEEEngineRunner({
   const [history, setHistory] = useState([]);
   const [monitoring, setMonitoring] = useState([]);
   const [suppressions, setSuppressions] = useState([]);
+  const [acks, setAcks] = useState({}); // acknowledged safety gates, keyed `${nodeId}:${i}`
   // Patient parameters for weight/BSA-based dosing — shared app-wide so the
   // dose calculator and all calculators auto-fill (true round-trip).
   const { patientData, updatePatientData } = usePatient();
@@ -139,9 +140,10 @@ export default function CIEEEngineRunner({
   // Each history entry stores a snapshot of the state BEFORE that node ran,
   // so we can jump back to any earlier step and resume from there.
   const choose = (opt) => {
+    if (gateItems.length && !gatesMet) return; // safety gate
     const snapshot = { ctx, monitoring, suppressions };
     setCtx({ ...ctx, ...(opt.set || {}) });
-    setHistory(h => [...h, { node, choiceLabel: opt.label, snapshot }]);
+    setHistory(h => [...h, { node, choiceLabel: opt.label, snapshot, acknowledged: gateItems.length ? acknowledgedTitles() : undefined }]);
     setNodeId(opt.next);
   };
 
@@ -153,6 +155,7 @@ export default function CIEEEngineRunner({
       setNodeId(suppressRedirect());
       return;
     }
+    if (gateItems.length && !gatesMet) return; // safety gate
     const rules = rulesForNode(node, ctx);
     if (rules.length) {
       setMonitoring(m => {
@@ -160,7 +163,7 @@ export default function CIEEEngineRunner({
         return [...new Map(merged.map(r => [r.rule_id, r])).values()];
       });
     }
-    setHistory(h => [...h, { node, snapshot }]);
+    setHistory(h => [...h, { node, snapshot, acknowledged: gateItems.length ? acknowledgedTitles() : undefined }]);
     setNodeId(node.next);
   };
 
@@ -181,6 +184,12 @@ export default function CIEEEngineRunner({
   const isTerminal = node.type === 'TERMINAL';
   const recIdx = isQuestion && recommend ? recommend(node, ctx) : -1;
   const hasRx = Object.values(pathway.nodes).some(n => n.rx);
+
+  // Hard safety gates — must be acknowledged before this step can proceed.
+  const gateItems = (node.safety || []).map((s, i) => ({ s, i })).filter(x => x.s.gate);
+  const gatesMet = gateItems.every(x => acks[`${node.id}:${x.i}`]);
+  const toggleAck = (i) => setAcks(a => ({ ...a, [`${node.id}:${i}`]: !a[`${node.id}:${i}`] }));
+  const acknowledgedTitles = () => gateItems.map(x => x.s.ack || x.s.title);
 
   return (
     <div className="space-y-4">
@@ -255,32 +264,6 @@ export default function CIEEEngineRunner({
               </div>
             )}
 
-            {isQuestion && (
-              <div className="flex flex-col gap-2.5 mt-5">
-                {(node.options || []).map((opt, i) => (
-                  <button key={i} onClick={() => choose(opt)}
-                    className={`px-5 py-3.5 rounded-xl border-2 text-[16px] font-medium text-left shadow-sm transition-all flex items-center justify-between gap-2
-                      ${opt.tone === 'danger' ? 'border-rose-200 text-rose-700 hover:border-rose-400 hover:bg-rose-50'
-                        : opt.tone === 'muted' ? 'border-slate-200 text-slate-500 hover:border-slate-400 hover:bg-slate-50'
-                        : 'border-slate-200 text-slate-800 hover:border-indigo-400 hover:bg-indigo-50'}
-                      ${i === recIdx ? 'border-indigo-400 bg-indigo-50' : ''}`}>
-                    <span>{opt.label}</span>
-                    <span className="flex items-center gap-1.5 flex-shrink-0">
-                      {i === recIdx && <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold">suggested</span>}
-                      <ChevronRight className="w-5 h-5 text-slate-300" />
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {!isQuestion && (
-              <Button onClick={advance} className={`mt-5 ${supp.suppressed ? 'bg-rose-600 hover:bg-rose-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white text-base h-12 px-6 rounded-xl shadow-sm`}>
-                {supp.suppressed ? 'Continue → supportive pathway' : 'Continue'}
-                <ChevronRight className="w-5 h-5 ml-1" />
-              </Button>
-            )}
-
             {/* Prescription (drug + dose) — links to the prescriber tool */}
             {node.rx && !(isPrescriptionNode(node) && supp.suppressed) && (
               <div className="mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4">
@@ -316,15 +299,38 @@ export default function CIEEEngineRunner({
               </div>
             )}
 
-            {/* Safety constraints (suppressor rules: live vaccines, fertility, pregnancy) */}
+            {/* Safety constraints — advisory notes + hard gates (must confirm to proceed) */}
             {Array.isArray(node.safety) && node.safety.length > 0 && (
               <div className="mt-3 space-y-2">
-                {node.safety.map((s, i) => (
-                  <div key={i} className="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5 flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-[13px] text-amber-800 leading-relaxed"><span className="font-bold">{s.title}: </span>{s.detail}</p>
-                  </div>
-                ))}
+                {node.safety.map((s, i) => {
+                  const checked = !!acks[`${node.id}:${i}`];
+                  if (!s.gate) {
+                    return (
+                      <div key={i} className="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5 flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <p className="text-[13px] text-amber-800 leading-relaxed"><span className="font-bold">{s.title}: </span>{s.detail}</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <button key={i} type="button" onClick={() => toggleAck(i)}
+                      className={`w-full text-left rounded-lg px-3 py-2.5 border-2 flex items-start gap-2.5 transition-all
+                        ${checked ? 'bg-emerald-50 border-emerald-300' : 'bg-red-50 border-red-300'}`}>
+                      <span className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 border-2 ${checked ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-red-400'}`}>
+                        {checked ? '✓' : <ShieldAlert className="w-3.5 h-3.5 text-red-500" />}
+                      </span>
+                      <span>
+                        <span className={`block text-[13px] font-bold ${checked ? 'text-emerald-800' : 'text-red-800'}`}>
+                          {s.title} {!checked && <span className="text-[10px] font-bold uppercase bg-red-200 text-red-800 px-1.5 py-0.5 rounded ml-1">required</span>}
+                        </span>
+                        <span className="block text-[12px] text-slate-600 leading-relaxed mt-0.5">{s.detail}</span>
+                        <span className={`block text-[12px] font-semibold mt-1 ${checked ? 'text-emerald-700' : 'text-red-700'}`}>
+                          {checked ? '✓ ' : '☐ '}{s.ack || 'Confirm documented'}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             )}
 
@@ -350,8 +356,41 @@ export default function CIEEEngineRunner({
               </div>
             )}
 
+            {/* Required-confirmation hint when a safety gate is unmet */}
+            {gateItems.length > 0 && !gatesMet && (
+              <p className="mt-4 text-[12px] font-semibold text-red-700">Confirm the required safety item(s) above to continue.</p>
+            )}
+
+            {/* Action — options (question) or Continue (action) */}
+            {isQuestion && (
+              <div className="flex flex-col gap-2.5 mt-4">
+                {(node.options || []).map((opt, i) => (
+                  <button key={i} onClick={() => choose(opt)} disabled={gateItems.length > 0 && !gatesMet}
+                    className={`px-5 py-3.5 rounded-xl border-2 text-[16px] font-medium text-left shadow-sm transition-all flex items-center justify-between gap-2 disabled:opacity-50 disabled:cursor-not-allowed
+                      ${opt.tone === 'danger' ? 'border-rose-200 text-rose-700 hover:border-rose-400 hover:bg-rose-50'
+                        : opt.tone === 'muted' ? 'border-slate-200 text-slate-500 hover:border-slate-400 hover:bg-slate-50'
+                        : 'border-slate-200 text-slate-800 hover:border-indigo-400 hover:bg-indigo-50'}
+                      ${i === recIdx ? 'border-indigo-400 bg-indigo-50' : ''}`}>
+                    <span>{opt.label}</span>
+                    <span className="flex items-center gap-1.5 flex-shrink-0">
+                      {i === recIdx && <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold">suggested</span>}
+                      <ChevronRight className="w-5 h-5 text-slate-300" />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!isQuestion && (
+              <Button onClick={advance} disabled={gateItems.length > 0 && !gatesMet}
+                className={`mt-4 ${supp.suppressed ? 'bg-rose-600 hover:bg-rose-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white text-base h-12 px-6 rounded-xl shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}>
+                {supp.suppressed ? 'Continue → supportive pathway' : 'Continue'}
+                <ChevronRight className="w-5 h-5 ml-1" />
+              </Button>
+            )}
+
             {history.length > 0 && (
-              <button onClick={back} className="mt-4 ml-0.5 inline-flex items-center gap-1 text-[13px] font-medium text-slate-400 hover:text-indigo-700">
+              <button onClick={back} className="mt-4 ml-3 inline-flex items-center gap-1 text-[13px] font-medium text-slate-400 hover:text-indigo-700">
                 <ChevronLeft className="w-4 h-4" /> Back to previous step
               </button>
             )}
@@ -388,6 +427,9 @@ export default function CIEEEngineRunner({
                       <span className="text-slate-600">{h.suppressed ? `[Blocked] ${h.node.action}` : (h.node.question || h.node.action)}</span>
                       {h.choiceLabel && <span className="font-semibold text-slate-700"> → {shortAnswer(h.choiceLabel)}</span>}
                       {ev?.grade && <span className="text-[9px] text-slate-400 ml-1">(Grade {ev.grade})</span>}
+                      {Array.isArray(h.acknowledged) && h.acknowledged.map((a, j) => (
+                        <span key={j} className="block text-[10px] text-emerald-700">✓ {a}</span>
+                      ))}
                     </div>
                   );
                 })}

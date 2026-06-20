@@ -93,7 +93,7 @@ export const IGA_IPNA_PATHWAY = {
       rx: { drug: 'Methylprednisolone + cyclophosphamide or MMF', dose: 'IV MP 30 mg/kg/day (max 1 g) ×3 → oral prednisolone taper; + CYC or MMF per AAV regimen', route: 'IV then oral', duration: 'Induction 3–6 months' },
       safety: [
         { title: 'Live vaccines', detail: 'Suppress live vaccines during active immunosuppression — log and schedule post-treatment.' },
-        { title: 'Cyclophosphamide — fertility', detail: 'Mandatory fertility-preservation counselling documented before cyclophosphamide.' },
+        { title: 'Cyclophosphamide — fertility', detail: 'Fertility-preservation counselling required before cyclophosphamide.', gate: true, ack: 'Fertility-preservation counselling documented (cyclophosphamide)' },
         { title: 'PJP prophylaxis', detail: 'Add co-trimoxazole PJP prophylaxis during intensive immunosuppression.' },
       ],
       monitoring: [
@@ -260,8 +260,8 @@ export const IGA_IPNA_PATHWAY = {
       rx: { drug: 'Mycophenolate mofetil (or CNI / cyclophosphamide)', dose: 'MMF 1200 mg/m²/day in 2 doses · Tacrolimus C0 3–7 ng/mL · Cyclosporine C0 60–100 ng/mL · CYC per protocol', route: 'Oral / IV (CYC)', duration: 'Min 8–12 weeks; taper after ≥4 weeks remission' },
       safety: [
         { title: 'Live vaccines', detail: 'Suppress live vaccines during active immunosuppression — log and schedule post-treatment.' },
-        { title: 'MMF — pregnancy/teratogenicity', detail: 'Block MMF in fertile patients without documented contraception counselling (teratogenic).' },
-        { title: 'Cyclophosphamide — fertility', detail: 'Mandatory fertility-preservation counselling documented before cyclophosphamide.' },
+        { title: 'MMF — pregnancy / teratogenicity', detail: 'MMF is teratogenic. Document contraception counselling in fertile patients before prescribing.', gate: true, ack: 'Contraception counselling documented (MMF teratogenicity)' },
+        { title: 'Cyclophosphamide — fertility', detail: 'Fertility-preservation counselling required before cyclophosphamide.', gate: true, ack: 'Fertility-preservation counselling documented (cyclophosphamide)' },
       ],
       monitoring: [
         { parameter: 'MMF/MPA exposure + CBC', frequency: 'Monthly → quarterly', target: 'AUC ~30–60 mg·h/L; normal CBC', alert: 'Cytopenia / low AUC', alert_action: 'Dose adjust; consider MPS' },
