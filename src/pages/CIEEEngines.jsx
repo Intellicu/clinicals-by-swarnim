@@ -57,7 +57,7 @@ export default function CIEEEngines() {
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center gap-2">
             <FlaskConical className="w-6 h-6" />
-            <h1 className="text-xl font-bold">CIEE Engines</h1>
+            <h1 className="text-xl font-bold">Intelligence Engines</h1>
           </div>
           <p className="text-indigo-200 text-xs mt-1">
             Guideline-derived decision engines · interactive node traversal · prescription suppression · evidence-traceable

@@ -122,15 +122,46 @@ RULES:
 
 Return ONLY the JSON object matching the schema.`;
 
+// Robustly turn any InvokeLLM response into our parsed graph object.
+function coerceToObject(resp) {
+  if (resp == null) return null;
+  // already the target object?
+  if (typeof resp === 'object' && (resp.pathway || resp.guideline_source)) return resp;
+  // unwrap common text wrappers
+  let text = typeof resp === 'string'
+    ? resp
+    : (resp.result || resp.text || resp.content || resp.output_text ||
+       resp.choices?.[0]?.message?.content || JSON.stringify(resp));
+  text = String(text).trim();
+  // strip markdown code fences
+  text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  // slice to the outermost JSON object
+  const first = text.indexOf('{');
+  const last = text.lastIndexOf('}');
+  if (first !== -1 && last !== -1 && last > first) text = text.slice(first, last + 1);
+  return JSON.parse(text);
+}
+
 // ── Component 2 invocation ───────────────────────────────────────────────────
 export async function generateCIEEPathway({ topic = '', guidelineText = '', fileUrl = null }) {
   try {
+    // Schema-less prompting + robust parsing — the graph contains free-form
+    // context objects and deep nesting that strict structured-output mode
+    // rejects, so we parse the JSON ourselves.
     const raw = await base44.integrations.Core.InvokeLLM({
-      prompt: GEN_PROMPT(topic, guidelineText),
+      prompt: GEN_PROMPT(topic, guidelineText) + '\n\nReturn ONLY the JSON object — no markdown fences, no commentary.',
       file_urls: fileUrl ? [fileUrl] : undefined,
-      response_json_schema: CIEE_GRAPH_SCHEMA,
     });
-    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    let parsed;
+    try {
+      parsed = coerceToObject(raw);
+    } catch (e) {
+      const preview = (typeof raw === 'string' ? raw : JSON.stringify(raw)).slice(0, 180);
+      return { success: false, data: null, validation: null, error: `Could not parse model output as JSON. ${preview}` };
+    }
+    if (!parsed || !parsed.pathway) {
+      return { success: false, data: null, validation: null, error: 'Model did not return a pathway graph. Try again or add more guideline detail.' };
+    }
     const normalized = normalizeGenerated(parsed);
     const validation = validatePathway(normalized.pathway);
     return { success: true, data: normalized, validation, error: null };
@@ -156,9 +187,14 @@ export function normalizeGenerated(parsed) {
     },
   };
 
-  const nodesArr = parsed.pathway?.nodes || [];
+  const rawNodes = parsed.pathway?.nodes || [];
+  // accept either an array of nodes or an {id: node} object map
+  const nodesArr = Array.isArray(rawNodes)
+    ? rawNodes
+    : Object.entries(rawNodes).map(([id, n]) => ({ id, ...n }));
   const nodes = {};
   for (const n of nodesArr) {
+    if (!n || !n.id) continue;
     nodes[n.id] = { ...n, source: n.source || sourceId };
   }
 

@@ -409,7 +409,7 @@ Return ONLY valid JSON, no explanation.`;
             </div>
             <div className="flex flex-col items-end gap-1.5">
               <a href="/CIEEEngines" className="text-[11px] font-semibold bg-white/20 hover:bg-white/30 border border-white/30 rounded-full px-2.5 py-1 flex items-center gap-1">
-                <FlaskConical className="w-3 h-3" /> CIEE Engines Hub
+                <FlaskConical className="w-3 h-3" /> Intelligence Engines Hub
               </a>
               <Badge className="bg-white/20 text-white text-xs border border-white/30">{engines.length} Total</Badge>
             </div>
@@ -453,7 +453,7 @@ Return ONLY valid JSON, no explanation.`;
           </Button>
           <Button onClick={() => setCieeMode(v => !v)} variant="outline"
             className="border-indigo-300 text-indigo-700 hover:bg-indigo-50 gap-1.5 text-sm">
-            <FlaskConical className="w-4 h-4" /> {cieeMode ? "Hide" : "Build Decision Engine (CIEE)"}
+            <FlaskConical className="w-4 h-4" /> {cieeMode ? "Hide" : "Build Intelligence Engine"}
           </Button>
         </div>
 
@@ -502,15 +502,15 @@ Return ONLY valid JSON, no explanation.`;
           </Card>
         )}
 
-        {/* CIEE Decision-Graph Builder */}
+        {/* Intelligence Engine Builder */}
         {cieeMode && (
           <Card className="border-indigo-200 bg-indigo-50">
             <CardHeader className="pb-2 pt-4 px-4">
               <CardTitle className="text-sm flex items-center gap-2 text-indigo-900">
-                <FlaskConical className="w-4 h-4" /> CIEE Decision-Engine Builder
+                <FlaskConical className="w-4 h-4" /> Intelligence Engine Builder
               </CardTitle>
               <p className="text-xs text-indigo-600">
-                Parses an uploaded guideline into an <strong>executable decision graph</strong> (GuidelineSource + DecisionNode processor) — runnable by the same PathwayExecutionEngine, with prescription suppression, monitoring schedules and node-level evidence traceability.
+                Parses an uploaded guideline into an <strong>executable intelligence engine</strong> (structured guideline source + decision-node graph) — runnable by the same execution engine, with prescription suppression, monitoring schedules and node-level evidence traceability.
               </p>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-3">
@@ -541,7 +541,7 @@ Return ONLY valid JSON, no explanation.`;
               </div>
               <Button onClick={generateCIEEEngine} disabled={cieeGenLoading}
                 className="w-full bg-indigo-700 hover:bg-indigo-800 gap-2">
-                {cieeGenLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing guideline → decision graph…</> : <><Cpu className="w-4 h-4" /> Generate CIEE Decision Graph</>}
+                {cieeGenLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing guideline → intelligence engine…</> : <><Cpu className="w-4 h-4" /> Generate Intelligence Engine</>}
               </Button>
 
               {/* Generated graph preview */}
@@ -630,7 +630,7 @@ Return ONLY valid JSON, no explanation.`;
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-                      {eng.ciee_pathway && <Badge className="text-xs bg-indigo-100 text-indigo-700">CIEE</Badge>}
+                      {eng.ciee_pathway && <Badge className="text-xs bg-indigo-100 text-indigo-700">Intelligence Engine</Badge>}
                       <Badge variant="outline" className="text-xs">{eng.group}</Badge>
                       <Badge className={`text-xs ${eng.is_active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
                         {eng.is_active ? "Active" : "Hidden"}
@@ -709,7 +709,7 @@ Return ONLY valid JSON, no explanation.`;
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 sticky top-0 bg-white z-10">
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                 <FlaskConical className="w-4 h-4 text-indigo-600" />
-                {runnerGraph.engine?.label || runnerGraph.guideline_source?.guideline_name || "CIEE Pathway"}
+                {runnerGraph.engine?.label || runnerGraph.guideline_source?.guideline_name || "Intelligence Engine"}
               </h3>
               <button onClick={() => setRunnerGraph(null)} className="p-1 text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
             </div>
@@ -718,7 +718,7 @@ Return ONLY valid JSON, no explanation.`;
                 pathway={runnerGraph.pathway}
                 sources={runnerGraph.sources || {}}
                 initialCtx={{}}
-                title={runnerGraph.engine?.label || "CIEE Pathway Engine"}
+                title={runnerGraph.engine?.label || "Intelligence Engine"}
                 subtitle={runnerGraph.guideline_source?.guideline_name}
                 onReset={() => setRunnerGraph({ ...runnerGraph })}
               />
