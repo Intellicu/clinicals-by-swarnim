@@ -1487,37 +1487,38 @@ Provide comprehensive differential diagnosis ranked by likelihood with clinical 
                 <div className="space-y-3">
                   <Card className="bg-blue-50 border-blue-200">
                     <CardContent className="p-4">
-                      <h5 className="font-bold text-blue-900 mb-2">Baseline Management</h5>
+                      <h5 className="font-bold text-blue-900 mb-2">Supportive Care (IPNA 2024 — first-line for all)</h5>
                       <ul className="text-sm text-blue-800 space-y-1">
-                        <li>• ACE-I/ARB for all patients</li>
-                        <li>• Target BP below 50th percentile</li>
-                        <li>• Reduce proteinuria to under 0.5 g/day</li>
+                        <li>• RASB (ACEi/ARB) at maximally tolerated dose if UPCR ≥0.2 mg/mg</li>
+                        <li>• Target proteinuria UPCR &lt;0.2 mg/mg (20 mg/mmol)</li>
+                        <li>• BP ≤50th percentile (with proteinuria) / ≤75th percentile (ABPM)</li>
+                        <li>• Salt &lt;3–5 g/day · healthy weight · exercise · no smoking</li>
+                        <li>• No specific treatment if isolated microscopic haematuria / resolved gross haematuria</li>
+                        <li>• Tonsillectomy NOT recommended</li>
                       </ul>
                     </CardContent>
                   </Card>
 
-                  {(mestC.E === 1 || mestC.C >= 1 || mestC.T >= 1) &&
-              <Card className="bg-purple-50 border-purple-200">
+                  <Card className="bg-purple-50 border-purple-200">
                       <CardContent className="p-4">
-                        <h5 className="font-bold text-purple-900 mb-2">Immunosuppressive Therapy</h5>
+                        <h5 className="font-bold text-purple-900 mb-2">Glucocorticoids — NOT routine (IPNA 2024)</h5>
                         <p className="text-sm text-purple-800 mb-2">
-                          For persistent proteinuria over 1 g/day despite ACE-I/ARB
+                          Consider a 6-month course ONLY if proteinuria &gt;1 g/day persists after 3–6 months of maximal RASB — after careful risk–benefit (steroid toxicity), preferably within a clinical trial.
                         </p>
                         <div className="space-y-2">
                           <div className="bg-white p-3 rounded border">
-                            <strong className="text-sm">Corticosteroids:</strong>
-                            <p className="text-xs mt-1">Methylprednisolone pulse + oral prednisone</p>
+                            <strong className="text-sm">Glucocorticoids:</strong>
+                            <p className="text-xs mt-1">Oral prednisone 0.8–1 mg/kg/day with taper, or IV methylprednisolone pulses. Add IS if nephrotic syndrome failing GC alone.</p>
                           </div>
                           {mestC.C >= 1 &&
                     <div className="bg-red-100 p-3 rounded border border-red-300">
-                              <strong className="text-sm">Crescentic IgAN - Urgent:</strong>
-                              <p className="text-xs mt-1">High-dose steroids + cyclophosphamide</p>
+                              <strong className="text-sm">Crescentic / RPGN-IgAN — Urgent:</strong>
+                              <p className="text-xs mt-1">&gt;50% eGFR decline ≤3 months + E1 + crescents ≥25% (C2): IV methylprednisolone + cyclophosphamide or MMF (KDIGO AAV regimen).</p>
                             </div>
                     }
                         </div>
                       </CardContent>
                     </Card>
-              }
                 </div>
               </CardContent>
             </Card>

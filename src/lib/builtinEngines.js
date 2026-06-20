@@ -8,4 +8,8 @@
  * tab as "Febrile UTI — Evaluation & Imaging" (single source of truth), so it
  * is intentionally not duplicated here.
  */
-export const BUILTIN_ENGINES = [];
+import { IGA_IPNA_ENGINE } from '@/lib/engines/igaIpnaEngine';
+
+export const BUILTIN_ENGINES = [
+  IGA_IPNA_ENGINE,
+];
