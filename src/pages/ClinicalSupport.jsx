@@ -382,15 +382,6 @@ const clinicalScenarios = [
   hasFullPathway: true
 },
 {
-  id: "uti-febrile",
-  title: "Febrile UTI — Evaluation & Imaging",
-  category: "CAKUT & Urology",
-  priority: "warning",
-  description: "Post-febrile UTI workup · DMSA timing · VUR evaluation · Antibiotic choice",
-  icon: Thermometer,
-  hasFullPathway: true
-},
-{
   id: "neurogenic-bladder-engine",
   title: "Neurogenic Bladder (MMC/SCI/BBD)",
   category: "CAKUT & Urology",

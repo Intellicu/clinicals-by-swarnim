@@ -3,9 +3,9 @@
  * decision graphs run by the same PathwayExecutionEngine (CIEEEngineRunner)
  * as guideline-generated engines. Surfaced in the Intelligence Engines hub
  * alongside DB-saved engines.
+ *
+ * Note: the UTI/VUR reference engine lives in the Clinical Support "Engines"
+ * tab as "Febrile UTI — Evaluation & Imaging" (single source of truth), so it
+ * is intentionally not duplicated here.
  */
-import { UTI_VUR_ENGINE } from '@/lib/engines/utiVurEngine';
-
-export const BUILTIN_ENGINES = [
-  UTI_VUR_ENGINE,
-];
+export const BUILTIN_ENGINES = [];

@@ -74,7 +74,6 @@ import VoidingDysfunctionEngine from "../engines/VoidingDysfunctionEngine";
 import CysticKidneyEngine from "../engines/CysticKidneyEngine";
 import CAKUTEngine from "../engines/CAKUTEngine";
 import PUVEngine from "../engines/PUVEngine";
-import VURRecurrentUTIEngine from "../engines/VURRecurrentUTIEngine";
 import HNF1BAlportEngine from "../engines/HNF1BAlportEngine";
 import PrimaryHyperoxaluriaEngine from "../engines/PrimaryHyperoxaluriaEngine";
 import CystinosisEngine from "../engines/CystinosisEngine";
@@ -114,7 +113,7 @@ const HANDLED_IDS = new Set([
   "polyuria-engine","hyperkalemia-engine","c3g-engine","rpgn-engine",
   "ns-engine","hyponatremia-engine","rpgn-deep-engine","aki-engine","hyperkalemia-deep-engine",
   "fabry-engine","voiding-engine","cystic-kidney-engine","cakut-engine","puv-engine",
-  "vur-uti-engine","hnf1b-alport-engine","hyperoxaluria-engine","cystinosis-engine",
+  "hnf1b-alport-engine","hyperoxaluria-engine","cystinosis-engine",
   "htn-engine","tubular-engine","stone-engine",
   "alport-hnf1b-engine","stone-ph-engine","tubular-disorder-engine",
   "proteinuria-engine","nephrocalcinosis-stone-engine","gn-engine",
@@ -226,7 +225,7 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "cystic-kidney-engine") return <CysticKidneyEngine />;
   if (id === "cakut-engine") return <CAKUTEngine />;
   if (id === "puv-engine") return <PUVEngine />;
-  if (id === "vur-uti-engine") return <VURRecurrentUTIEngine />;
+  if (id === "vur-uti-engine") return <UTIPathway />;
   if (id === "hnf1b-alport-engine") return <HNF1BAlportEngine />;
   if (id === "hyperoxaluria-engine") return <PrimaryHyperoxaluriaEngine />;
   if (id === "cystinosis-engine") return <CystinosisEngine />;

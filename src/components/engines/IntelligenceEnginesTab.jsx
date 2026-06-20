@@ -39,7 +39,7 @@ const ENGINES = [
   // ── CAKUT & Urology ──
   { label: "CAKUT Engine", desc: "Antenatal HN, UPJ, Duplex, MCDK", scenario: "cakut-engine", tags: ["CAKUT", "hydronephrosis", "UPJ", "duplex", "MCDK", "antenatal"], group: "CAKUT & Urology" },
   { label: "PUV Engine", desc: "Posterior urethral valves", scenario: "puv-engine", tags: ["PUV", "posterior urethral valve", "bladder", "MCU", "ESRD risk"], group: "CAKUT & Urology" },
-  { label: "VUR/UTI Engine", desc: "Recurrent UTI + VUR grading", scenario: "vur-uti-engine", tags: ["VUR", "reflux", "UTI", "DMSA", "VCUG", "recurrent UTI"], group: "CAKUT & Urology" },
+  { label: "Febrile UTI — Evaluation & Imaging", desc: "Post-UTI workup · ultrasound (all) · MCU indications · DMSA timing · antibiotics · prophylaxis (ISPN 2023)", scenario: "uti-febrile", tags: ["UTI", "febrile UTI", "VUR", "reflux", "DMSA", "MCU", "VCUG", "ultrasound", "recurrent UTI", "ISPN", "prophylaxis"], group: "CAKUT & Urology" },
   { label: "Voiding Dx", desc: "BBD + Uroflow + OAB", scenario: "voiding-engine", tags: ["voiding dysfunction", "BBD", "uroflow", "OAB", "enuresis", "incontinence"], group: "CAKUT & Urology" },
 
   // ── Tubular & Metabolic ──
@@ -123,7 +123,7 @@ const ENGINE_GUIDELINE_KEYS = {
   "fabry-engine": ["Fabry"],
   "cystic-kidney-engine": ["ADPKD", "ARPKD", "Cystic Kidney", "Nephronophthisis"],
   "cakut-engine": ["CAKUT", "Hydronephrosis"],
-  "vur-uti-engine": ["VUR", "UTI", "Vesicoureteral", "ISPN"],
+  "uti-febrile": ["UTI", "VUR", "Vesicoureteral", "ISPN", "Urinary Tract"],
   "voiding-engine": ["Voiding", "Bladder"],
   "neurogenic-bladder-engine": ["Neurogenic", "Bladder", "CIC", "Spina Bifida"],
   "bladder-diary-engine": ["Voiding", "Bladder", "Uroflow", "Urodynamics"],
