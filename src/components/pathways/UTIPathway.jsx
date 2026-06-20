@@ -14,38 +14,36 @@ export default function UTIPathway() {
   const [age, setAge] = useState("");
   const [hasFever, setHasFever] = useState(false);
   const [feverDuration, setFeverDuration] = useState("");
+  const [recurrentUTI, setRecurrentUTI] = useState(false);
+  const [abnormalUS, setAbnormalUS] = useState(false);
+  const [nonEcoli, setNonEcoli] = useState(false);
+  const [highGradeVUR, setHighGradeVUR] = useState(false);
   const [imagingPlan, setImagingPlan] = useState(null);
 
+  // Imaging logic per Revised ISPN 2023 UTI/VUR guidelines (conservative imaging).
   const generateImagingPlan = () => {
     const ageNum = parseFloat(age);
-    const durationDays = parseFloat(feverDuration);
+    if (!ageNum && ageNum !== 0) return;
 
-    if (!ageNum) return;
+    const plan = { acute: [], dmsa: null, vur: null };
 
-    const plan = {
-      acute: [],
-      dmsa: null,
-      vur: null
-    };
+    // Ultrasound: ALL children after a UTI (acute only if not responding at 48–72 h)
+    plan.acute.push("Ultrasound KUB (kidneys, ureters, bladder) in ALL children after a UTI.");
+    plan.acute.push("Acute ultrasound (within 48–72 h) only if no clinical response to antibiotics.");
 
-    // Acute phase
-    plan.acute.push("Renal/Bladder Ultrasound (within 48-72 hours if febrile UTI)");
-    
-    // DMSA timing
-    if (hasFever && durationDays >= 3) {
-      plan.dmsa = "DMSA scan at 4-6 months post-infection (to detect renal scarring)";
-    } else {
-      plan.dmsa = "DMSA scan may not be needed if single uncomplicated UTI";
-    }
+    // MCU / VCUG: only for specific indications
+    const mcuReasons = [];
+    if (ageNum < 2 && nonEcoli) mcuReasons.push("non-E. coli UTI in a child <2 years");
+    if (abnormalUS) mcuReasons.push("abnormal ultrasound");
+    if (recurrentUTI) mcuReasons.push("recurrent UTI");
+    plan.vur = mcuReasons.length
+      ? `MCU (VCUG) indicated — ${mcuReasons.join("; ")}. Perform after the UTI is treated (≈2–3 weeks).`
+      : "MCU (VCUG) NOT indicated — none of: non-E. coli UTI <2y, abnormal ultrasound, or recurrent UTI. Limiting MCU avoids unnecessary radiation.";
 
-    // VUR evaluation
-    if (ageNum < 2) {
-      plan.vur = "VCUG recommended (high risk age group)";
-    } else if (ageNum >= 2 && ageNum <= 5 && durationDays >= 3) {
-      plan.vur = "VCUG if abnormal ultrasound OR recurrent UTIs";
-    } else {
-      plan.vur = "VCUG not routinely recommended unless recurrent UTIs or abnormal imaging";
-    }
+    // DMSA: avoid acute-phase; late DMSA only for recurrent UTI or high-grade VUR
+    plan.dmsa = (recurrentUTI || highGradeVUR)
+      ? "Late-phase DMSA at 4–6 months to detect kidney scars (indicated: recurrent UTI or high-grade VUR). AVOID acute-phase DMSA."
+      : "DMSA NOT indicated. AVOID acute-phase DMSA (low specificity; cannot distinguish acute pyelonephritis from permanent scar).";
 
     setImagingPlan(plan);
   };
@@ -55,7 +53,7 @@ export default function UTIPathway() {
       <Alert className="bg-orange-50 border-orange-300">
         <Thermometer className="w-5 h-5 text-orange-600" />
         <AlertDescription className="text-orange-800">
-          <strong>Febrile UTI Protocol:</strong> Evidence-based imaging and follow-up per AAP/IAP guidelines
+          <strong>Febrile UTI Protocol:</strong> Conservative imaging per Revised ISPN 2023 UTI/VUR guidelines (ultrasound for all; MCU restricted; avoid acute DMSA).
         </AlertDescription>
       </Alert>
 
@@ -80,6 +78,25 @@ export default function UTIPathway() {
             <Label className="cursor-pointer font-bold">Febrile UTI (Temperature ≥38°C)</Label>
           </div>
 
+          <div className="grid sm:grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 bg-slate-50 p-3 rounded border">
+              <Checkbox checked={recurrentUTI} onCheckedChange={setRecurrentUTI} />
+              <Label className="cursor-pointer text-sm">Recurrent UTI (≥2 episodes)</Label>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-50 p-3 rounded border">
+              <Checkbox checked={abnormalUS} onCheckedChange={setAbnormalUS} />
+              <Label className="cursor-pointer text-sm">Abnormal ultrasound</Label>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-50 p-3 rounded border">
+              <Checkbox checked={nonEcoli} onCheckedChange={setNonEcoli} />
+              <Label className="cursor-pointer text-sm">Non-E. coli uropathogen</Label>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-50 p-3 rounded border">
+              <Checkbox checked={highGradeVUR} onCheckedChange={setHighGradeVUR} />
+              <Label className="cursor-pointer text-sm">Known high-grade VUR (III–V)</Label>
+            </div>
+          </div>
+
           <Button onClick={generateImagingPlan} className="w-full bg-orange-600 hover:bg-orange-700">
             Generate Imaging Protocol
           </Button>
@@ -88,12 +105,24 @@ export default function UTIPathway() {
             <div className="space-y-4 mt-6">
               <Card className="bg-blue-50 border-blue-300">
                 <CardHeader className="bg-blue-100">
-                  <CardTitle className="text-base">Acute Phase Imaging</CardTitle>
+                  <CardTitle className="text-base">Ultrasound (all children)</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
                   {imagingPlan.acute.map((item, idx) => (
                     <p key={idx} className="text-sm">• {item}</p>
                   ))}
+                </CardContent>
+              </Card>
+
+              <Card className="bg-green-50 border-green-300">
+                <CardHeader className="bg-green-100">
+                  <CardTitle className="text-base">MCU / VCUG (VUR Evaluation)</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <p className="text-sm">{imagingPlan.vur}</p>
+                  <p className="text-xs text-green-700 mt-2">
+                    <strong>MCU indications (ISPN 2023):</strong> non-E. coli UTI &lt;2 y, abnormal ultrasound, or recurrent UTI.
+                  </p>
                 </CardContent>
               </Card>
 
@@ -104,19 +133,7 @@ export default function UTIPathway() {
                 <CardContent className="p-4">
                   <p className="text-sm">{imagingPlan.dmsa}</p>
                   <p className="text-xs text-purple-700 mt-2">
-                    <strong>Timing is critical:</strong> Wait 4-6 months after acute infection
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-green-50 border-green-300">
-                <CardHeader className="bg-green-100">
-                  <CardTitle className="text-base">VCUG (VUR Evaluation)</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <p className="text-sm">{imagingPlan.vur}</p>
-                  <p className="text-xs text-green-700 mt-2">
-                    <strong>VUR workup indicated:</strong> Age &lt;2 years OR recurrent UTIs OR abnormal renal US
+                    <strong>Avoid acute-phase DMSA.</strong> Late DMSA at 4–6 months only for recurrent UTI or high-grade VUR.
                   </p>
                 </CardContent>
               </Card>
@@ -166,13 +183,14 @@ export default function UTIPathway() {
           <CardTitle className="text-base">Prophylaxis Indications</CardTitle>
         </CardHeader>
         <CardContent className="p-4 text-sm">
-          <p className="font-bold mb-2">Consider prophylaxis if:</p>
+          <p className="font-bold mb-2">Prophylaxis (ISPN 2023) — limited indications:</p>
           <ul className="space-y-1">
-            <li>• Recurrent febrile UTIs (≥3 in 12 months)</li>
-            <li>• High-grade VUR (grades IV-V)</li>
-            <li>• Renal scarring on DMSA</li>
+            <li>• High-grade VUR (grades III–V)</li>
+            <li>• Recurrent febrile UTI with bladder-bowel dysfunction (± VUR)</li>
+            <li>• <span className="text-slate-600">NOT for normal urinary tract / low-grade VUR; NOT for antenatal hydronephrosis awaiting evaluation</span></li>
           </ul>
-          <p className="mt-3"><strong>Agent:</strong> Trimethoprim 2 mg/kg OD at night</p>
+          <p className="mt-3"><strong>Agent:</strong> Cotrimoxazole or nitrofurantoin (&gt;3 months); cephalexin in young infants. Avoid amoxicillin-clavulanate for prophylaxis.</p>
+          <p className="mt-1 text-xs">Discontinue if toilet-trained, no BBD, and no febrile UTI in the preceding year. All toilet-trained children with UTI should be evaluated for BBD and managed with urotherapy.</p>
         </CardContent>
       </Card>
     </div>

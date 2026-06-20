@@ -14,6 +14,7 @@ import {
   FlaskConical, Search, Loader2, X, ShieldCheck, Cpu, ArrowRight, BookOpen,
 } from "lucide-react";
 import CIEEEngineRunner from "@/components/clinical-ai/CIEEEngineRunner";
+import { BUILTIN_ENGINES } from "@/lib/builtinEngines";
 
 function engineFromRecord(rec) {
   const c = rec.content || {};
@@ -39,9 +40,11 @@ export default function CIEEEngines() {
     queryFn: () => base44.entities.CustomSection.filter({ section_type: "tool", status: "published" }),
   });
 
-  const engines = records
+  const dbEngines = records
     .map(engineFromRecord)
     .filter(e => e.ciee_pathway && e.ciee_pathway.nodes);
+  // Built-in, clinically-reviewed engines are listed first.
+  const engines = [...BUILTIN_ENGINES, ...dbEngines];
 
   const filtered = engines.filter(e =>
     !search ||
@@ -98,7 +101,10 @@ export default function CIEEEngines() {
                         <FlaskConical className="w-4 h-4 text-indigo-600 shrink-0" />
                         <p className="font-semibold text-sm text-slate-800 truncate">{eng.label}</p>
                       </div>
-                      <Badge variant="outline" className="text-[9px] shrink-0">{nodeCount} nodes</Badge>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {eng.builtin && <Badge className="text-[9px] bg-emerald-100 text-emerald-700">Built-in</Badge>}
+                        <Badge variant="outline" className="text-[9px]">{nodeCount} nodes</Badge>
+                      </div>
                     </div>
                     {eng.desc && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{eng.desc}</p>}
 
