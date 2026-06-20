@@ -18,6 +18,7 @@ const ENGINES = [
   // ── Glomerular ──
   { label: "GN Engine", desc: "IgAN · LN · MN · FSGS · PSGN · ANCA · Alport · C3G · IgAVN", scenario: "gn-engine", tags: ["glomerulonephritis", "IgA", "lupus nephritis", "membranous", "FSGS", "PSGN", "ANCA", "Alport", "C3G", "HSP"], group: "Glomerular Disease" },
   { label: "NS Engine", desc: "Nephrotic Syndrome full engine", scenario: "ns-engine", tags: ["nephrotic syndrome", "edema", "proteinuria", "steroid"], group: "Glomerular Disease" },
+  { label: "IgAN / IgAV Engine", desc: "IPNA 2024 — IgA nephropathy & IgA vasculitis nephritis · biopsy indications · RASB · selective steroids · RPGN", scenario: "iga-ipna-engine", tags: ["IgA nephropathy", "IgAN", "IgA vasculitis", "IgAVN", "HSP", "HSPN", "Oxford MEST-C", "crescentic", "RPGN", "IPNA", "RASB", "hematuria"], group: "Glomerular Disease" },
   { label: "RPGN Engine", desc: "Crescentic GN + PLEX", scenario: "rpgn-deep-engine", tags: ["RPGN", "crescentic GN", "plasmapheresis", "ANCA", "anti-GBM"], group: "Glomerular Disease" },
   { label: "TMA Engine", desc: "HUS / aHUS / TTP", scenario: "tma-engine", tags: ["HUS", "aHUS", "TTP", "TMA", "thrombocytopenia"], group: "Glomerular Disease" },
   { label: "Hematuria Engine", desc: "6-step algorithm: glomerular vs urological", scenario: "hematuria-engine", tags: ["hematuria", "blood urine", "RBC", "glomerular", "dysmorphic", "alport", "IgA"], group: "Glomerular Disease" },
@@ -118,6 +119,7 @@ const ENGINE_GUIDELINE_KEYS = {
   "rrt-engine": ["Dialysis", "Peritoneal Dialysis", "Haemodialysis", "CRRT", "RRT", "KDIGO AKI"],
   "polyuria-full-engine": ["Polyuria", "Diabetes Insipidus", "NDI"],
   "gn-engine": ["Glomerulonephritis", "IgA Nephropathy", "Lupus Nephritis", "FSGS", "PSGN", "Membranous"],
+  "iga-ipna-engine": ["IgA Nephropathy", "IgA Vasculitis", "IgAVN", "HSP", "IPNA"],
   "proteinuria-engine": ["Proteinuria", "Nephrotic"],
   "nephrocalcinosis-stone-engine": ["Nephrocalcinosis", "Stone", "Urolithiasis", "Hypercalciuria"],
   "fabry-engine": ["Fabry"],

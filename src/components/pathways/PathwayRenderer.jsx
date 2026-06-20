@@ -93,9 +93,11 @@ import RheumatologyEngine from "../engines/RheumatologyEngine";
 import RicketsEngine from "../engines/RicketsEngine";
 import WilmsTumorEngine from "../engines/WilmsTumorEngine";
 import OncologyEngine from "../engines/OncologyEngine";
+import CIEEEngineRunner from "@/components/clinical-ai/CIEEEngineRunner";
+import { IGA_IPNA_ENGINE } from "@/lib/engines/igaIpnaEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
-  "nephrotic-syndrome","iga-nephropathy","hspn","aki-prifle","htn-emergency","hyperkalemia",
+  "nephrotic-syndrome","iga-nephropathy","iga-ipna-engine","hspn","aki-prifle","htn-emergency","hyperkalemia",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -162,6 +164,15 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "hydronephrosis") return <HydronephrosisPathway />;
   if (id === "childhood-nephrotic") return <NephroticSyndromeChildhoodPathway />;
   if (id === "congenital-nephrotic") return <CongenitalNephroticPathway />;
+  if (id === "iga-ipna-engine") return (
+    <CIEEEngineRunner
+      pathway={IGA_IPNA_ENGINE.ciee_pathway}
+      sources={IGA_IPNA_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={IGA_IPNA_ENGINE.label}
+      subtitle={IGA_IPNA_ENGINE.guideline_source.guideline_name}
+    />
+  );
   if (id === "iga-vasculitis") return <IgAVasculitisPathway />;
   if (id === "anca-vasculitis") return <ANCAbVasculitisPathway />;
   if (id === "membranous-nephropathy") return <MembranousNephropathyPathway />;
