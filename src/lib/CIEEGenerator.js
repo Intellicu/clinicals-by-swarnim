@@ -158,6 +158,13 @@ const WRAPPER_SCHEMA = {
 };
 
 // ── Component 2 invocation ───────────────────────────────────────────────────
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s`)), ms)),
+  ]);
+}
+
 export async function generateCIEEPathway({ topic = '', guidelineText = '', fileUrl = null }) {
   const base = GEN_PROMPT(topic, guidelineText);
   const attempts = [
@@ -181,7 +188,7 @@ export async function generateCIEEPathway({ topic = '', guidelineText = '', file
   const errors = [];
   for (const a of attempts) {
     try {
-      const raw = await base44.integrations.Core.InvokeLLM(a.opts);
+      const raw = await withTimeout(base44.integrations.Core.InvokeLLM(a.opts), 120000, `Model call (${a.label})`);
       const parsed = coerceToObject(raw);
       if (parsed && parsed.pathway) {
         const normalized = normalizeGenerated(parsed);

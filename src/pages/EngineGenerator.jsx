@@ -262,19 +262,24 @@ Return ONLY valid JSON, no explanation.`;
 
   // ── Build an executable intelligence engine from the guideline (Component 2) ──
   const generateCIEEEngine = async () => {
-    if (!aiTopic.trim() && !aiDocText.trim() && !docFileUrl) { toast.error("Enter a topic or upload a guideline first"); return; }
+    // Always give immediate, visible feedback so a click can never look dead.
+    setCieeGen(null); setCieeValidation(null);
+    if (!aiTopic.trim() && !aiDocText.trim() && !docFileUrl) {
+      setCieeError("Enter a clinical topic, paste guideline text, or upload a PDF first.");
+      return;
+    }
+    setCieeError("Contacting the model… this can take 20–60s.");
     setCieeGenLoading(true);
-    setCieeGen(null); setCieeValidation(null); setCieeError(null);
     try {
-      toast.info("Parsing guideline into an intelligence engine…");
       const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText, fileUrl: docFileUrl });
       if (!res.success) { setCieeError(res.error || "Unknown error"); toast.error("Generation failed"); return; }
+      setCieeError(null);
       setCieeGen(res.data);
       setCieeValidation(res.validation);
       if (res.validation?.valid) toast.success(`Intelligence engine generated — ${res.validation.nodeCount} nodes`);
       else toast.warning(`Generated with ${res.validation?.errors?.length || 0} graph issue(s) — review below`);
     } catch (err) {
-      setCieeError(err?.message || String(err));
+      setCieeError("Unexpected error: " + (err?.message || String(err)));
       toast.error("Generation failed");
     } finally {
       setCieeGenLoading(false);
@@ -549,12 +554,12 @@ Return ONLY valid JSON, no explanation.`;
                 {cieeGenLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing guideline → intelligence engine…</> : <><Cpu className="w-4 h-4" /> Generate Intelligence Engine</>}
               </Button>
 
-              {/* Inline error (kept visible for diagnosis) */}
+              {/* Inline status / error (kept visible for diagnosis) */}
               {cieeError && (
-                <div className="rounded-lg p-2 text-xs border bg-red-50 border-red-200 text-red-800 flex items-start gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <div className={`rounded-lg p-2 text-xs border flex items-start gap-1.5 ${cieeGenLoading ? "bg-blue-50 border-blue-200 text-blue-800" : "bg-red-50 border-red-200 text-red-800"}`}>
+                  {cieeGenLoading ? <Loader2 className="w-3.5 h-3.5 mt-0.5 shrink-0 animate-spin" /> : <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
                   <div>
-                    <p className="font-semibold">Generation error</p>
+                    <p className="font-semibold">{cieeGenLoading ? "Working…" : "Generation status"}</p>
                     <p className="mt-0.5 break-words">{cieeError}</p>
                   </div>
                 </div>
