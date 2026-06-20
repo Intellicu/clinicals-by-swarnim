@@ -12,6 +12,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { usePatient } from "@/components/PatientContext";
 import { Button } from "@/components/ui/button";
 import {
   FlaskConical, ShieldAlert, Activity, BookOpen, Flag, ChevronRight, ChevronLeft,
@@ -28,6 +29,43 @@ function shortAnswer(label) {
   let s = String(label).split(/\s+[—–-]\s+/)[0].split(/\s*\(/)[0].trim();
   if (s.length > 26) s = String(label).trim().slice(0, 26) + "…";
   return s;
+}
+
+// Mosteller body surface area (m²)
+function bsaMosteller(weightKg, heightCm) {
+  const w = parseFloat(weightKg), h = parseFloat(heightCm);
+  if (!w || !h) return null;
+  return Math.sqrt((w * h) / 3600);
+}
+
+const fmtMg = (x) => (x >= 1000 ? `${(x / 1000).toFixed(x % 1000 ? 1 : 0)} g` : `${Math.round(x)} mg`);
+
+// Parse a free-text dose rule and compute the patient-specific dose.
+// Handles "a–b mg/kg/day (max N mg|g)" and "a–b mg/m²/day".
+function computeDose(doseStr, { weight, height } = {}) {
+  if (!doseStr) return null;
+  const w = parseFloat(weight);
+  const out = [];
+
+  const perKg = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*mg\/kg/i);
+  if (perKg && w) {
+    const maxM = doseStr.match(/max\s*([\d.]+)\s*(mg|g)/i);
+    const maxMg = maxM ? parseFloat(maxM[1]) * (maxM[2].toLowerCase() === "g" ? 1000 : 1) : null;
+    const cap = (x) => (maxMg ? Math.min(x, maxMg) : x);
+    const lo = cap(parseFloat(perKg[1]) * w);
+    const hi = perKg[2] ? cap(parseFloat(perKg[2]) * w) : null;
+    out.push(hi ? `${fmtMg(lo)}–${fmtMg(hi)}/day` : `${fmtMg(lo)}/day`);
+  }
+
+  const perM2 = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*mg\/m/i);
+  const bsa = bsaMosteller(weight, height);
+  if (perM2 && bsa) {
+    const lo = parseFloat(perM2[1]) * bsa;
+    const hi = perM2[2] ? parseFloat(perM2[2]) * bsa : null;
+    out.push((hi ? `${fmtMg(lo)}–${fmtMg(hi)}/day` : `${fmtMg(lo)}/day`) + ` (BSA ${bsa.toFixed(2)} m²)`);
+  }
+
+  return out.length ? out.join(" · ") : null;
 }
 
 function EvidenceLine({ node, sources }) {
@@ -68,6 +106,18 @@ export default function CIEEEngineRunner({
   const [history, setHistory] = useState([]);
   const [monitoring, setMonitoring] = useState([]);
   const [suppressions, setSuppressions] = useState([]);
+  // Patient parameters for weight/BSA-based dosing — shared app-wide so the
+  // dose calculator and all calculators auto-fill (true round-trip).
+  const { patientData, updatePatientData } = usePatient();
+  const [pt, setPt] = useState({
+    weight: patientData?.weight || initialCtx.weight_kg || '',
+    height: patientData?.height || initialCtx.height_cm || '',
+    age: patientData?.age || initialCtx.age_years || '',
+  });
+  const setPatientField = (k, v) => {
+    setPt(p => ({ ...p, [k]: v }));
+    updatePatientData({ ...patientData, [k]: v }); // sync to shared store
+  };
 
   const node = pathway.nodes[nodeId];
   if (!node) return <div className="text-xs text-red-600">Pathway error: node "{nodeId}" not found.</div>;
@@ -130,6 +180,7 @@ export default function CIEEEngineRunner({
   const isQuestion = node.type === 'QUESTION' || node.type === 'ASSESSMENT';
   const isTerminal = node.type === 'TERMINAL';
   const recIdx = isQuestion && recommend ? recommend(node, ctx) : -1;
+  const hasRx = Object.values(pathway.nodes).some(n => n.rx);
 
   return (
     <div className="space-y-4">
@@ -143,6 +194,33 @@ export default function CIEEEngineRunner({
           {subtitle && <p className="text-xs text-slate-500 truncate">{subtitle}</p>}
         </div>
       </div>
+
+      {/* patient parameters for weight/BSA-based dosing */}
+      {hasRx && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Pill className="w-3.5 h-3.5 text-slate-500" />
+            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wide">Patient — for dosing</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { k: 'weight', label: 'Weight (kg)' },
+              { k: 'height', label: 'Height (cm)' },
+              { k: 'age', label: 'Age (yr)' },
+            ].map(f => (
+              <div key={f.k}>
+                <label className="text-[10px] text-slate-500 block mb-0.5">{f.label}</label>
+                <input type="number" inputMode="decimal" value={pt[f.k]}
+                  onChange={e => setPatientField(f.k, e.target.value)}
+                  className="w-full text-sm h-8 px-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+              </div>
+            ))}
+          </div>
+          {pt.weight && pt.height && (
+            <p className="text-[10px] text-slate-400 mt-1.5">BSA (Mosteller) ≈ {bsaMosteller(pt.weight, pt.height).toFixed(2)} m²</p>
+          )}
+        </div>
+      )}
 
       {/* timeline */}
       <div className="relative pl-8 pt-1">
@@ -216,9 +294,24 @@ export default function CIEEEngineRunner({
                   {node.rx.route && <span className="text-[11px] bg-white border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">{node.rx.route}</span>}
                   {node.rx.duration && <span className="text-[11px] bg-white border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">{node.rx.duration}</span>}
                 </div>
-                <Link to={createPageUrl("DrugsDosing") + `?search=${encodeURIComponent(node.rx.drug)}`}
+                {/* Patient-specific computed dose */}
+                {(() => {
+                  const computed = computeDose(node.rx.dose, pt);
+                  if (computed) {
+                    return (
+                      <div className="mt-2.5 bg-white border border-emerald-300 rounded-lg px-3 py-2">
+                        <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide">Calculated for {pt.weight} kg</span>
+                        <p className="text-[15px] font-bold text-emerald-900">≈ {computed}</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <p className="mt-2 text-[12px] text-emerald-700/70 italic">Enter weight{node.rx.dose && /mg\/m/i.test(node.rx.dose) ? ' + height' : ''} above to calculate the dose.</p>
+                  );
+                })()}
+                <Link to={createPageUrl("DrugsDosing") + `?drug=${encodeURIComponent(node.prescribes || node.rx.drug)}`}
                   className="inline-flex items-center gap-1 text-[13px] font-semibold text-emerald-700 hover:text-emerald-900 mt-2.5">
-                  Open dose calculator <ExternalLink className="w-3.5 h-3.5" />
+                  Open full dose calculator <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
             )}
