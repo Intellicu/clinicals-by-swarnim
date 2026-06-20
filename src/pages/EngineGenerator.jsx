@@ -264,14 +264,28 @@ Return ONLY valid JSON, no explanation.`;
   const generateCIEEEngine = async () => {
     // Always give immediate, visible feedback so a click can never look dead.
     setCieeGen(null); setCieeValidation(null);
-    if (!aiTopic.trim() && !aiDocText.trim() && !docFileUrl) {
+    if (!aiTopic.trim() && !aiDocText.trim() && !docFileUrl && !docFile) {
       setCieeError("Enter a clinical topic, paste guideline text, or upload a PDF first.");
       return;
     }
-    setCieeError("Contacting the model… this can take 20–60s.");
     setCieeGenLoading(true);
     try {
-      const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText, fileUrl: docFileUrl });
+      // Make sure we have a usable file URL — upload now if the background upload didn't complete.
+      let fileUrl = docFileUrl;
+      if (!fileUrl && docFile && !aiDocText.trim()) {
+        setCieeError("Uploading PDF…");
+        try {
+          const up = await base44.integrations.Core.UploadFile({ file: docFile });
+          fileUrl = up?.file_url || up?.url || (typeof up === "string" ? up : null);
+          if (fileUrl) setDocFileUrl(fileUrl);
+        } catch (e) {
+          setCieeError("PDF upload failed: " + (e?.message || e) + ". Try pasting the guideline text instead.");
+          setCieeGenLoading(false);
+          return;
+        }
+      }
+      setCieeError("Contacting the model… this can take 20–60s.");
+      const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText, fileUrl });
       if (!res.success) { setCieeError(res.error || "Unknown error"); toast.error("Generation failed"); return; }
       setCieeError(null);
       setCieeGen(res.data);
@@ -332,37 +346,43 @@ Return ONLY valid JSON, no explanation.`;
   const [pdfUploading, setPdfUploading] = useState(false);
   const [pdfFileName, setPdfFileName] = useState("");
   const [docFileUrl, setDocFileUrl] = useState(null); // uploaded file URL (sent to LLM directly)
+  const [docFile, setDocFile] = useState(null);       // raw File kept so we can upload at generate time
 
   const handleDocUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // For PDF files, upload and extract via AI
+    // Capture the file synchronously — this alone enables generation, even if
+    // the background upload/extraction below fails or returns nothing.
+    setDocFile(file);
+    setPdfFileName(file.name);
+    setDocFileUrl(null);
+    setAiDocText("");
+
+    // For PDF files, upload + try to extract text (best-effort, non-blocking for generation)
     if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
       setPdfUploading(true);
-      setPdfFileName(file.name);
       try {
-        toast.info("Uploading PDF and extracting content…");
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        setDocFileUrl(file_url); // keep URL so we can send the PDF straight to the LLM
-        const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
-          file_url,
-          json_schema: {
-            type: "object",
-            properties: {
-              extracted_text: { type: "string", description: "All meaningful clinical text from the document, including guidelines, protocols, dosing, diagnosis criteria, management steps" }
+        toast.info("Uploading PDF…");
+        const up = await base44.integrations.Core.UploadFile({ file });
+        const fileUrl = up?.file_url || up?.url || (typeof up === "string" ? up : null);
+        if (fileUrl) setDocFileUrl(fileUrl);
+        try {
+          const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+            file_url: fileUrl,
+            json_schema: {
+              type: "object",
+              properties: {
+                extracted_text: { type: "string", description: "All meaningful clinical text from the document, including guidelines, protocols, dosing, diagnosis criteria, management steps" }
+              }
             }
-          }
-        });
-        const text = result?.output?.extracted_text || result?.output?.[0]?.extracted_text || "";
-        if (text) {
-          setAiDocText(text.substring(0, 6000));
-          toast.success(`PDF ready: ${file.name}`);
-        } else {
-          toast.success(`PDF uploaded: ${file.name} — will be sent directly to the model`);
-        }
+          });
+          const text = result?.output?.extracted_text || result?.output?.[0]?.extracted_text || "";
+          if (text) setAiDocText(text.substring(0, 8000));
+        } catch { /* extraction is optional — the file itself is sent to the model */ }
+        toast.success(`PDF ready: ${file.name}`);
       } catch (err) {
-        toast.error("PDF upload failed: " + err.message);
+        toast.error("PDF upload failed: " + (err?.message || err) + " — you can still paste text instead");
       } finally {
         setPdfUploading(false);
       }
@@ -370,9 +390,7 @@ Return ONLY valid JSON, no explanation.`;
       // Plain text / markdown / csv
       try {
         const text = await file.text();
-        setAiDocText(text.substring(0, 6000));
-        setPdfFileName(file.name);
-        setDocFileUrl(null);
+        setAiDocText(text.substring(0, 8000));
         toast.success("Document loaded: " + file.name);
       } catch {
         toast.error("Could not read file");
@@ -497,7 +515,7 @@ Return ONLY valid JSON, no explanation.`;
                 {pdfFileName && !pdfUploading && (
                   <div className="flex items-center gap-1 text-xs text-violet-700 bg-violet-100 px-2 py-1 rounded-full border border-violet-200">
                     <FileText className="w-3 h-3" /> {pdfFileName}
-                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); setDocFileUrl(null); }} className="ml-1 text-violet-400 hover:text-violet-700">
+                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); setDocFileUrl(null); setDocFile(null); }} className="ml-1 text-violet-400 hover:text-violet-700">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -545,7 +563,7 @@ Return ONLY valid JSON, no explanation.`;
                 {pdfFileName && !pdfUploading && (
                   <div className="flex items-center gap-1 text-xs text-indigo-700 bg-indigo-100 px-2 py-1 rounded-full border border-indigo-200">
                     <FileText className="w-3 h-3" /> {pdfFileName}
-                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); setDocFileUrl(null); }} className="ml-1 text-indigo-400 hover:text-indigo-700"><X className="w-3 h-3" /></button>
+                    <button onClick={() => { setAiDocText(""); setPdfFileName(""); setDocFileUrl(null); setDocFile(null); }} className="ml-1 text-indigo-400 hover:text-indigo-700"><X className="w-3 h-3" /></button>
                   </div>
                 )}
               </div>
