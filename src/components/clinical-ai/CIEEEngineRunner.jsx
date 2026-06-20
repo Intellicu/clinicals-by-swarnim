@@ -199,7 +199,10 @@ export default function CIEEEngineRunner({
           <FlaskConical className="w-5 h-5 text-indigo-700" />
         </div>
         <div className="min-w-0">
-          <p className="text-base font-bold text-slate-900 truncate">{title}</p>
+          <p className="text-base font-bold text-slate-900 truncate">
+            {title}
+            <span className="ml-2 align-middle text-[10px] font-bold text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded-full">UI v2</span>
+          </p>
           {subtitle && <p className="text-xs text-slate-500 truncate">{subtitle}</p>}
         </div>
       </div>
