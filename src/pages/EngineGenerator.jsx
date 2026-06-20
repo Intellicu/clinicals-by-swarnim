@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { generateCIEEPathway, validatePathway } from "@/lib/CIEEGenerator";
 import CIEEEngineRunner from "@/components/clinical-ai/CIEEEngineRunner";
+import { extractPdfText } from "@/lib/pdfText";
 
 const GROUPS = [
   "Emergency & Electrolytes", "Glomerular Disease", "CKD & Genetics",
@@ -264,28 +265,16 @@ Return ONLY valid JSON, no explanation.`;
   const generateCIEEEngine = async () => {
     // Always give immediate, visible feedback so a click can never look dead.
     setCieeGen(null); setCieeValidation(null);
-    if (!aiTopic.trim() && !aiDocText.trim() && !docFileUrl && !docFile) {
-      setCieeError("Enter a clinical topic, paste guideline text, or upload a PDF first.");
+    if (!aiTopic.trim() && !aiDocText.trim()) {
+      setCieeError(pdfUploading
+        ? "Still reading the PDF — please wait a moment and try again."
+        : "Enter a clinical topic or paste/upload guideline text first.");
       return;
     }
     setCieeGenLoading(true);
     try {
-      // Make sure we have a usable file URL — upload now if the background upload didn't complete.
-      let fileUrl = docFileUrl;
-      if (!fileUrl && docFile && !aiDocText.trim()) {
-        setCieeError("Uploading PDF…");
-        try {
-          const up = await base44.integrations.Core.UploadFile({ file: docFile });
-          fileUrl = up?.file_url || up?.url || (typeof up === "string" ? up : null);
-          if (fileUrl) setDocFileUrl(fileUrl);
-        } catch (e) {
-          setCieeError("PDF upload failed: " + (e?.message || e) + ". Try pasting the guideline text instead.");
-          setCieeGenLoading(false);
-          return;
-        }
-      }
       setCieeError("Contacting the model… this can take 20–60s.");
-      const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText, fileUrl });
+      const res = await generateCIEEPathway({ topic: aiTopic, guidelineText: aiDocText });
       if (!res.success) { setCieeError(res.error || "Unknown error"); toast.error("Generation failed"); return; }
       setCieeError(null);
       setCieeGen(res.data);
@@ -359,30 +348,20 @@ Return ONLY valid JSON, no explanation.`;
     setDocFileUrl(null);
     setAiDocText("");
 
-    // For PDF files, upload + try to extract text (best-effort, non-blocking for generation)
+    // PDF: extract text in-browser (no upload / no network).
     if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
       setPdfUploading(true);
       try {
-        toast.info("Uploading PDF…");
-        const up = await base44.integrations.Core.UploadFile({ file });
-        const fileUrl = up?.file_url || up?.url || (typeof up === "string" ? up : null);
-        if (fileUrl) setDocFileUrl(fileUrl);
-        try {
-          const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
-            file_url: fileUrl,
-            json_schema: {
-              type: "object",
-              properties: {
-                extracted_text: { type: "string", description: "All meaningful clinical text from the document, including guidelines, protocols, dosing, diagnosis criteria, management steps" }
-              }
-            }
-          });
-          const text = result?.output?.extracted_text || result?.output?.[0]?.extracted_text || "";
-          if (text) setAiDocText(text.substring(0, 8000));
-        } catch { /* extraction is optional — the file itself is sent to the model */ }
-        toast.success(`PDF ready: ${file.name}`);
+        toast.info("Reading PDF…");
+        const text = await extractPdfText(file);
+        if (text && text.length > 40) {
+          setAiDocText(text);
+          toast.success(`PDF read: ${file.name} (${text.length} chars)`);
+        } else {
+          toast.error("This PDF appears to be scanned/image-only — no selectable text. Please paste the guideline text.");
+        }
       } catch (err) {
-        toast.error("PDF upload failed: " + (err?.message || err) + " — you can still paste text instead");
+        toast.error("Could not read PDF: " + (err?.message || err) + " — please paste the text instead");
       } finally {
         setPdfUploading(false);
       }
@@ -390,7 +369,7 @@ Return ONLY valid JSON, no explanation.`;
       // Plain text / markdown / csv
       try {
         const text = await file.text();
-        setAiDocText(text.substring(0, 8000));
+        setAiDocText(text.substring(0, 12000));
         toast.success("Document loaded: " + file.name);
       } catch {
         toast.error("Could not read file");
