@@ -541,7 +541,7 @@ export default function Hub() {
           </div>
           <div className="flex gap-2 overflow-x-auto p-2.5" style={{ scrollbarWidth: "none" }}>
             {[
-              { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
+              { label: "Febrile UTI",        desc: "UTI Imaging (ISPN 2023)", color: "bg-cyan-800",  scenario: "uti-febrile" },
               { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
               { label: "IgAN / IgAV",        desc: "IPNA 2024",             color: "bg-blue-700",   scenario: "iga-ipna-engine" },
               { label: "Rickets Engine",     desc: "Calcipenic/Phosphopenic", color: "bg-amber-600", scenario: "rickets-engine" },
@@ -564,7 +564,7 @@ export default function Hub() {
               { label: "Cystic Kidney",      desc: "ADPKD/ARPKD/NPHP",      color: "bg-blue-800",   scenario: "cystic-kidney-engine" },
               { label: "CAKUT Engine",       desc: "Antenatal/UPJ/Duplex",   color: "bg-teal-800",   scenario: "cakut-engine" },
               { label: "PUV Engine",         desc: "Urethral Valves",        color: "bg-red-800",    scenario: "puv-engine" },
-              { label: "Febrile UTI",        desc: "UTI Imaging (ISPN 2023)", color: "bg-cyan-800",   scenario: "uti-febrile" },
+              { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
               { label: "HNF1B/Alport",       desc: "Rare hereditary",        color: "bg-green-800",  scenario: "hnf1b-alport-engine" },
               { label: "Hyperoxaluria",      desc: "PH1/PH2/PH3",           color: "bg-orange-700", scenario: "hyperoxaluria-engine" },
               { label: "Cystinosis",         desc: "Fanconi+cysteamine",     color: "bg-blue-700",   scenario: "cystinosis-engine" },

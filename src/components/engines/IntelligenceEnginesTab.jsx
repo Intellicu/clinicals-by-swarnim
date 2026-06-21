@@ -17,9 +17,10 @@ export const ENGINES = [
   { label: "Met. Acidosis", desc: "AG / RTA Engine", scenario: "metabolic-acidosis-engine", tags: ["acidosis", "anion gap", "RTA", "bicarbonate"], group: "Emergency & Electrolytes" },
   // ── Glomerular ──
   { label: "GN Engine", desc: "IgAN · LN · MN · FSGS · PSGN · ANCA · Alport · C3G · IgAVN", scenario: "gn-engine", tags: ["glomerulonephritis", "IgA", "lupus nephritis", "membranous", "FSGS", "PSGN", "ANCA", "Alport", "C3G", "HSP"], group: "Glomerular Disease" },
-  { label: "NS Engine", desc: "Nephrotic Syndrome full engine", scenario: "ns-engine", tags: ["nephrotic syndrome", "edema", "proteinuria", "steroid"], group: "Glomerular Disease" },
-  { label: "SSNS Management Engine", desc: "IPNA 2022 — initial PDN · relapse · FRNS/SDNS steroid-sparing · monitoring & safety", scenario: "ssns-engine", tags: ["SSNS", "steroid sensitive", "nephrotic syndrome", "FRNS", "SDNS", "relapse", "levamisole", "cyclophosphamide", "tacrolimus", "MMF", "rituximab", "prednisolone", "IPNA"], group: "Glomerular Disease" },
-  { label: "IgA Nephropathy / IgA Vasculitis Engine", desc: "IPNA 2024 — IgAN & IgA vasculitis nephritis · biopsy indications · RASB · selective steroids · RPGN", scenario: "iga-ipna-engine", tags: ["IgA nephropathy", "IgAN", "IgA vasculitis", "IgAVN", "HSP", "HSPN", "Oxford MEST-C", "crescentic", "RPGN", "IPNA", "RASB", "hematuria"], group: "Glomerular Disease" },
+  { label: "NS Engine", desc: "Nephrotic Syndrome full engine", scenario: "ns-engine", tags: ["nephrotic syndrome", "edema", "proteinuria", "steroid"], group: "Glomerular Disease", ciee: true },
+  { label: "SSNS Management Engine", desc: "IPNA 2022 — initial PDN · relapse · FRNS/SDNS steroid-sparing · monitoring & safety", scenario: "ssns-engine", tags: ["SSNS", "steroid sensitive", "nephrotic syndrome", "FRNS", "SDNS", "relapse", "levamisole", "cyclophosphamide", "tacrolimus", "MMF", "rituximab", "prednisolone", "IPNA"], group: "Glomerular Disease", ciee: true },
+  { label: "SRNS Management Engine", desc: "ISPN 2021 — steroid resistance (no remission after 6 weeks) · evaluation · genetics · CNI + TDM · 6-mo response · rituximab/MMF/IV CYC · RAAS + supportive care · transplant · congenital NS", scenario: "srns-engine", tags: ["SRNS", "steroid resistant", "nephrotic syndrome", "FSGS", "genetic", "monogenic", "NPHS2", "WT1", "tacrolimus", "cyclosporine", "CNI", "rituximab", "MMF", "cyclophosphamide", "ACE inhibitor", "transplant", "congenital", "ISPN"], group: "Glomerular Disease", ciee: true },
+  { label: "IgA Nephropathy / IgA Vasculitis Engine", desc: "IPNA 2024 — IgAN & IgA vasculitis nephritis · biopsy indications · RASB · selective steroids · RPGN", scenario: "iga-ipna-engine", tags: ["IgA nephropathy", "IgAN", "IgA vasculitis", "IgAVN", "HSP", "HSPN", "Oxford MEST-C", "crescentic", "RPGN", "IPNA", "RASB", "hematuria"], group: "Glomerular Disease", ciee: true },
   { label: "RPGN Engine", desc: "Crescentic GN + PLEX", scenario: "rpgn-deep-engine", tags: ["RPGN", "crescentic GN", "plasmapheresis", "ANCA", "anti-GBM"], group: "Glomerular Disease" },
   { label: "TMA Engine", desc: "HUS / aHUS / TTP", scenario: "tma-engine", tags: ["HUS", "aHUS", "TTP", "TMA", "thrombocytopenia"], group: "Glomerular Disease" },
   { label: "Hematuria Engine", desc: "6-step algorithm: glomerular vs urological", scenario: "hematuria-engine", tags: ["hematuria", "blood urine", "RBC", "glomerular", "dysmorphic", "alport", "IgA"], group: "Glomerular Disease" },
@@ -41,7 +42,7 @@ export const ENGINES = [
   // ── CAKUT & Urology ──
   { label: "CAKUT Engine", desc: "Antenatal HN, UPJ, Duplex, MCDK", scenario: "cakut-engine", tags: ["CAKUT", "hydronephrosis", "UPJ", "duplex", "MCDK", "antenatal"], group: "CAKUT & Urology" },
   { label: "PUV Engine", desc: "Posterior urethral valves", scenario: "puv-engine", tags: ["PUV", "posterior urethral valve", "bladder", "MCU", "ESRD risk"], group: "CAKUT & Urology" },
-  { label: "Febrile UTI — Evaluation & Imaging", desc: "Post-UTI workup · ultrasound (all) · MCU indications · DMSA timing · antibiotics · prophylaxis (ISPN 2023)", scenario: "uti-febrile", tags: ["UTI", "febrile UTI", "VUR", "reflux", "DMSA", "MCU", "VCUG", "ultrasound", "recurrent UTI", "ISPN", "prophylaxis"], group: "CAKUT & Urology" },
+  { label: "Febrile UTI — Evaluation & Imaging", desc: "Post-UTI workup · ultrasound (all) · MCU indications · DMSA timing · antibiotics · prophylaxis (ISPN 2023)", scenario: "uti-febrile", tags: ["UTI", "febrile UTI", "VUR", "reflux", "DMSA", "MCU", "VCUG", "ultrasound", "recurrent UTI", "ISPN", "prophylaxis"], group: "CAKUT & Urology", ciee: true },
   { label: "Voiding Dx", desc: "BBD + Uroflow + OAB", scenario: "voiding-engine", tags: ["voiding dysfunction", "BBD", "uroflow", "OAB", "enuresis", "incontinence"], group: "CAKUT & Urology" },
 
   // ── Tubular & Metabolic ──
@@ -106,7 +107,26 @@ const GROUP_BADGE = {
   "Oncology": "bg-red-700",
 };
 
-const GROUPS = [...new Set(ENGINES.map(e => e.group))];
+// Explicit group display order — Emergency & Electrolytes is shown AFTER
+// Tubular & Metabolic (per clinical-pathways layout preference).
+const GROUP_ORDER = [
+  "Glomerular Disease",
+  "CKD & Genetics",
+  "CAKUT & Urology",
+  "Tubular & Metabolic",
+  "Emergency & Electrolytes",
+  "Hypertension",
+  "RRT & Dialysis",
+  "Nutrition & Diet",
+  "Rheumatology",
+  "Oncology",
+];
+const orderGroups = (groups) => {
+  const known = GROUP_ORDER.filter(g => groups.includes(g));
+  const rest = groups.filter(g => !GROUP_ORDER.includes(g));
+  return [...known, ...rest];
+};
+const GROUPS = orderGroups([...new Set(ENGINES.map(e => e.group))]);
 
 // Keyword → guideline title fragments for matching from DB
 const ENGINE_GUIDELINE_KEYS = {
@@ -121,6 +141,8 @@ const ENGINE_GUIDELINE_KEYS = {
   "polyuria-full-engine": ["Polyuria", "Diabetes Insipidus", "NDI"],
   "gn-engine": ["Glomerulonephritis", "IgA Nephropathy", "Lupus Nephritis", "FSGS", "PSGN", "Membranous"],
   "iga-ipna-engine": ["IgA Nephropathy", "IgA Vasculitis", "IgAVN", "HSP", "IPNA"],
+  "ssns-engine": ["SSNS", "Steroid Sensitive", "Nephrotic", "IPNA"],
+  "srns-engine": ["SRNS", "Steroid Resistant", "Nephrotic", "FSGS", "ISPN", "Genetic"],
   "proteinuria-engine": ["Proteinuria", "Nephrotic"],
   "nephrocalcinosis-stone-engine": ["Nephrocalcinosis", "Stone", "Urolithiasis", "Hypercalciuria"],
   "fabry-engine": ["Fabry"],
@@ -279,7 +301,9 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
         <p className="text-center text-slate-400 py-8 text-sm">No engines match your search</p>
       )}
 
-      {Object.entries(grouped).map(([group, engines]) => (
+      {orderGroups(Object.keys(grouped)).map((group) => {
+        const engines = grouped[group];
+        return (
         <div key={group} className="space-y-2">
           <div className="flex items-center gap-2">
             <Badge className={`text-xs ${GROUP_BADGE[group] || "bg-slate-600"}`}>{group}</Badge>
@@ -295,11 +319,20 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
                   }}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all text-left
                     ${activeEngine === eng.scenario
-                      ? "border-slate-400 bg-slate-100"
-                      : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
+                      ? "border-indigo-400 bg-indigo-50"
+                      : eng.ciee
+                        ? "border-indigo-200 bg-indigo-50/40 hover:border-indigo-400 hover:bg-indigo-50"
+                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-slate-900">{eng.label}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-sm text-slate-900">{eng.label}</p>
+                        {eng.ciee && (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-bold bg-indigo-600 text-white px-1.5 py-0.5 rounded">
+                            <Cpu className="w-2.5 h-2.5" /> CIEE
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-500 mt-0.5">{eng.desc}</p>
                     </div>
                   </div>
@@ -330,7 +363,8 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
             ))}
           </div>
         </div>
-      ))}
+        );
+      })}
 
       {/* Back button */}
       {onBack && (
