@@ -68,7 +68,13 @@ export const SRNS_PATHWAY = {
     'DN-01': {
       id: 'DN-01', type: 'ASSESSMENT', critical: true, source: G1B,
       question: 'Has the child failed to achieve complete remission despite 6 weeks of daily prednisolone at 60 mg/m²/day?',
-      detail: 'Complete remission = urine protein nil–trace by dipstick for 3 consecutive days, OR Up/Uc <0.2, OR 24-h protein <100 mg/m²/day. IV methylprednisolone is NOT required before labelling SRNS (ISPN 2021).',
+      detail: 'Definition of complete remission:',
+      points: [
+        'Urine protein nil–trace by dipstick for 3 consecutive days',
+        'OR spot Up/Uc <0.2',
+        'OR 24-h urine protein <100 mg/m²/day',
+        'IV methylprednisolone is NOT required before labelling SRNS (ISPN 2021)',
+      ],
       options: [
         { label: 'Yes — no remission after 6 weeks (SRNS)', set: { steroid_resistant: true }, next: 'DN-02' },
         { label: 'Partial response with steroid toxicity', set: { steroid_resistant: true, partial: true }, next: 'DN-02', tone: 'muted' },
@@ -89,7 +95,15 @@ export const SRNS_PATHWAY = {
     // ── Phase 2 — Initial evaluation ──────────────────────────────────────
     'DN-03': {
       id: 'DN-03', type: 'ACTION', source: G1A,
-      action: 'Evaluation of SRNS — core investigations: quantitation of proteinuria (spot Up/Uc, preferred over 24-h); serum creatinine; estimated GFR (eGFR, Schwartz); and kidney biopsy (light microscopy + immunofluorescence + electron microscopy — see exceptions). Baseline (Box II): urinalysis + microscopy, CBC, albumin, electrolytes, fasting glucose, HbA1c, total/LDL/HDL cholesterol, triglycerides, calcium/phosphate/ALP, HBsAg/anti-HCV/HIV, renal ultrasonography. Selective: C3/C4, ANA if a secondary cause is suspected; genetic testing only if an indication is met (DN-07).',
+      action: 'Evaluation of SRNS — baseline investigations.',
+      investigations: [
+        { test: 'Quantitation of proteinuria', detail: 'Spot urine protein:creatinine ratio (preferred) or 24-h urine protein.' },
+        { test: 'Serum creatinine', detail: 'Baseline kidney function.' },
+        { test: 'Estimated GFR (eGFR)', detail: 'Schwartz: 0.413 × height(cm) / creatinine(mg/dL).' },
+        { test: 'Kidney biopsy', detail: 'Light microscopy + immunofluorescence + electron microscopy (see deferral exceptions).' },
+        { test: 'Baseline panel (Box II)', detail: 'Urinalysis + microscopy, CBC, albumin, electrolytes, fasting glucose, HbA1c, lipid profile, calcium/phosphate/ALP, HBsAg/anti-HCV/HIV, renal ultrasonography.' },
+        { test: 'Selective tests', detail: 'C3/C4 and ANA if a secondary cause is suspected. Genetic testing only if an indication is met (next step).' },
+      ],
       next: 'DN-04',
     },
     'DN-04': {
@@ -128,7 +142,16 @@ export const SRNS_PATHWAY = {
     'DN-07': {
       id: 'DN-07', type: 'QUESTION', critical: true, source: G1B,
       question: 'Does the patient meet criteria for genetic testing?',
-      detail: 'Indications: congenital NS (<3 months); initial resistance during infancy (<1 year); NS with extrarenal features; family history of SRNS or consanguinity; non-response to CNI (after 6 months — may be triggered later); before transplantation. Monogenic yield by onset: 0–3 mo 69% · 4–12 mo 50% · 1–6 y 25% · 7–12 y 18% · 13–18 y 11%. Late (secondary) resistance: genetic testing NOT indicated.',
+      detail: 'Genetic studies are NOT recommended in all cases — offer them only for these indications:',
+      points: [
+        'Congenital nephrotic syndrome (onset <3 months)',
+        'Initial resistance during infancy (onset <1 year)',
+        'Nephrotic syndrome with extrarenal features',
+        'Familial steroid-resistance or consanguinity',
+        'Non-response to therapy with a CNI (after 6 months)',
+        'Prior to transplantation',
+        'Monogenic yield by onset: 0–3 mo 69% · 4–12 mo 50% · 1–6 y 25% · 7–12 y 18% · 13–18 y 11%. Late (secondary) resistance: genetic testing NOT indicated.',
+      ],
       options: [
         { label: 'Yes — meets ≥1 indication', next: 'DN-08' },
         { label: 'No indication — proceed to CNI (non-genetic)', set: { genetic_test_status: 'not_indicated' }, next: 'DN-09C' },
@@ -195,10 +218,15 @@ export const SRNS_PATHWAY = {
     },
     'DN-11': {
       id: 'DN-11', type: 'MONITORING', source: G1B,
-      action: 'CNI monitoring protocol (from Day 1). Trough at Week 2, then if toxicity/interaction/relapse suspected. Each visit: BP, cosmetic effects. Creatinine + potassium at 2–4 weeks then every 3–6 months; LFT, uric acid, magnesium, lipids every 3–6 months; glucose every 3–6 months (especially tacrolimus); eye exam every 12 months on long-term steroids.',
+      action: 'CNI monitoring protocol — begin from Day 1 of therapy. Schedule:',
       monitoring: [
+        { parameter: 'CNI trough level (C0)', frequency: 'Week 2 after start; then if toxicity / interaction / relapse', target: 'Tacrolimus 4–8 / cyclosporine 80–120 ng/mL', alert: 'Out of target range', alert_action: 'Adjust dose; recheck in 1–2 weeks' },
         { parameter: 'Creatinine / eGFR + potassium', frequency: '2–4 weeks, then every 3–6 months', target: '<20% rise from pre-CNI baseline', alert: 'Creatinine rise >20%', alert_action: 'Reduce CNI; assess nephrotoxicity' },
-        { parameter: 'BP', frequency: 'Every visit', target: '<90th–95th percentile', alert: 'Sustained hypertension', alert_action: 'Optimise antihypertensives (Table III)' },
+        { parameter: 'LFT, uric acid, magnesium, lipids', frequency: 'Every 3–6 months', target: 'Within normal range', alert: 'Abnormal results', alert_action: 'Review CNI dose / interactions' },
+        { parameter: 'Blood glucose', frequency: 'Every 3–6 months (especially tacrolimus)', target: 'Normoglycaemia', alert: 'Hyperglycaemia / new diabetes', alert_action: 'Consider switching to cyclosporine' },
+        { parameter: 'Blood pressure', frequency: 'Every visit', target: '<90th–95th percentile', alert: 'Sustained hypertension', alert_action: 'Optimise antihypertensives (Table III)' },
+        { parameter: 'Cosmetic effects', frequency: 'Every visit', target: 'Tolerable', alert: 'Gingival hyperplasia / hypertrichosis (CsA); tremor / diarrhoea (Tac)', alert_action: 'Consider switching CNI' },
+        { parameter: 'Eye examination (cataract / glaucoma)', frequency: 'Every 12 months on long-term steroids', target: 'Normal', alert: 'Cataract / glaucoma', alert_action: 'Ophthalmology referral' },
       ],
       safety: [
         { title: 'CNI drug interactions (Table IV)', detail: 'DECREASE CNI (risk of non-response): phenytoin, carbamazepine, phenobarbitone, rifampicin. INCREASE CNI (nephrotoxicity): erythromycin/clarithromycin, fluconazole/ketoconazole/voriconazole, diltiazem/verapamil. Additive nephrotoxicity: aminoglycosides, amphotericin B, NSAIDs.' },
@@ -210,7 +238,13 @@ export const SRNS_PATHWAY = {
     'DN-12': {
       id: 'DN-12', type: 'ASSESSMENT', critical: true, source: G2C,
       question: 'What is the CNI response at 6 months?',
-      detail: 'Complete: protein nil–trace ×3 days / Up/Uc <0.2 / 24-h <100 mg/m²/day. Partial: 1+/2+, Up/Uc 0.2–2, albumin ≥3.0 g/dL, no oedema. Non-response: 3+/4+, Up/Uc >2, albumin <3.0 g/dL or oedema. Non-response requires 6 months of adequate dose confirmed by trough levels. (PodoNet 10-yr renal survival: complete 94% · partial 72% · non-response 43%.)',
+      detail: 'Response definitions (Box I, ISPN 2021):',
+      points: [
+        'Complete remission — urine protein nil–trace ×3 days, Up/Uc <0.2, or 24-h <100 mg/m²/day',
+        'Partial remission — urine protein 1+/2+, Up/Uc 0.2–2, albumin ≥3.0 g/dL, no oedema',
+        'Non-response — urine protein 3+/4+, Up/Uc >2, albumin <3.0 g/dL or oedema (requires 6 months of adequate dose confirmed by trough levels)',
+        'Prognosis (PodoNet, 10-yr renal survival): complete 94% · partial 72% · non-response 43%',
+      ],
       options: [
         { label: 'Complete remission', set: { cni_response: 'complete' }, next: 'DN-13' },
         { label: 'Partial remission', set: { cni_response: 'partial' }, next: 'DN-13' },

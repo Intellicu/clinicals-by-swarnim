@@ -290,6 +290,16 @@ export default function CIEEEngineRunner({
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4">
             <p className="text-[21px] leading-snug font-bold text-slate-900">{node.question || node.action}</p>
             {node.detail && <p className="text-sm text-slate-600 mt-2 leading-relaxed">{node.detail}</p>}
+            {Array.isArray(node.points) && node.points.length > 0 && (
+              <ul className="mt-2.5 space-y-1.5">
+                {node.points.map((p, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
 
             {isPrescriptionNode(node) && supp.suppressed && (
               <div className="mt-4 bg-red-50 border-2 border-red-300 rounded-xl px-4 py-3 flex items-start gap-2.5">
@@ -368,22 +378,48 @@ export default function CIEEEngineRunner({
               </div>
             )}
 
+            {/* Evaluation / investigations — card layout, matching monitoring */}
+            {Array.isArray(node.investigations) && node.investigations.length > 0 && (
+              <div className="mt-3 bg-blue-50/50 border border-blue-200 rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <FlaskConical className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-bold text-blue-800">Evaluation &amp; investigations</span>
+                </div>
+                <div className="space-y-1.5">
+                  {node.investigations.map((iv, i) => (
+                    <div key={i} className="bg-white rounded-lg border border-blue-100 border-l-4 border-l-blue-400 p-2.5">
+                      <span className="text-[13px] font-bold text-slate-800">{iv.test}</span>
+                      {iv.detail && <p className="text-[12px] text-slate-600 mt-0.5 leading-relaxed">{iv.detail}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Monitoring attached to this step */}
             {Array.isArray(node.monitoring) && node.monitoring.length > 0 && (
-              <div className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+              <div className="mt-3 bg-indigo-50/50 border border-indigo-200 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <Activity className="w-4 h-4 text-slate-500" />
-                  <span className="text-sm font-bold text-slate-700">Monitoring</span>
+                  <Activity className="w-4 h-4 text-indigo-600" />
+                  <span className="text-sm font-bold text-indigo-800">Monitoring schedule</span>
                 </div>
                 <div className="space-y-1.5">
                   {node.monitoring.map((m, i) => (
-                    <div key={i} className="bg-white rounded-lg p-2.5 border border-slate-100">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[13px] font-semibold text-slate-800">{m.parameter}</span>
-                        <span className="text-[11px] text-slate-500 flex-shrink-0">{m.frequency}</span>
+                    <div key={i} className="bg-white rounded-lg border border-indigo-100 border-l-4 border-l-indigo-400 p-2.5">
+                      <span className="text-[13px] font-bold text-slate-800">{m.parameter}</span>
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {m.frequency && (
+                          <span className="inline-flex items-center text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full">
+                            🕒 {m.frequency}
+                          </span>
+                        )}
+                        {m.target && (
+                          <span className="inline-flex items-center text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            🎯 {m.target}
+                          </span>
+                        )}
                       </div>
-                      {m.target && <p className="text-[12px] text-slate-600 mt-0.5">Target: {m.target}</p>}
-                      {m.alert && <p className="text-[11px] text-red-600 mt-0.5">⚠ {m.alert}{m.alert_action ? ` → ${m.alert_action}` : ''}</p>}
+                      {m.alert && <p className="text-[11px] text-red-600 mt-1.5">⚠ {m.alert}{m.alert_action ? ` → ${m.alert_action}` : ''}</p>}
                     </div>
                   ))}
                 </div>
@@ -392,15 +428,15 @@ export default function CIEEEngineRunner({
 
             {/* Supportive care — structured cards (same clean layout as monitoring) */}
             {Array.isArray(node.care) && node.care.length > 0 && (
-              <div className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+              <div className="mt-3 bg-teal-50/50 border border-teal-200 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <ShieldAlert className="w-4 h-4 text-slate-500" />
-                  <span className="text-sm font-bold text-slate-700">Supportive care</span>
+                  <ShieldAlert className="w-4 h-4 text-teal-600" />
+                  <span className="text-sm font-bold text-teal-800">Supportive care</span>
                 </div>
                 <div className="space-y-1.5">
                   {node.care.map((c, i) => (
-                    <div key={i} className="bg-white rounded-lg p-2.5 border border-slate-100">
-                      <span className="text-[13px] font-semibold text-slate-800">{c.category}</span>
+                    <div key={i} className="bg-white rounded-lg border border-teal-100 border-l-4 border-l-teal-400 p-2.5">
+                      <span className="text-[13px] font-bold text-slate-800">{c.category}</span>
                       {c.detail && <p className="text-[12px] text-slate-600 mt-0.5 leading-relaxed">{c.detail}</p>}
                     </div>
                   ))}
