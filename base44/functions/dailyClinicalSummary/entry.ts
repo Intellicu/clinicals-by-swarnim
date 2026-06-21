@@ -275,70 +275,57 @@ Deno.serve(async (req) => {
       if (pref && pref.daily_clinical_summary === false) continue;
 
       const appId = Deno.env.get("BASE44_APP_ID") || "APP_ID";
-      const unsubUrl = `https://api.base44.com/api/apps/${appId}/functions/dailyClinicalSummary?unsubscribe=${pref?.id || u.email}`;
+      // Public-facing base URL — clinicals.online by default (no Base44 branding
+      // in the email). Override with APP_PUBLIC_URL if the domain changes.
+      const APP_BASE = (Deno.env.get("APP_PUBLIC_URL") || "https://clinicals.online").replace(/\/+$/, "");
+      const summaryUrl = `${APP_BASE}/DailySummary`;
+      const unsubUrl = `${APP_BASE}/api/apps/${appId}/functions/dailyClinicalSummary?unsubscribe=${pref?.id || u.email}`;
 
       const emailBody = `Dear Dr. ${u.full_name || 'Colleague'},
 
-${summaryData.subject_line}
-Today's Theme: ${todayTheme} | ${today}
+Your CliniCals Daily — ${today}
+Theme: ${todayTheme}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-💡 CLINICAL PEARL — ${pearl.topic}
-━━━━━━━━━━━━━━━━━━━━━━━━
+▶ Read today's full interactive summary:
+${summaryUrl}
+
+──────────────
+
+💡 Clinical Pearl · ${pearl.topic}
 ${pearl.pearl}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-📚 GUIDELINE REMINDER — ${guideline.org}
-━━━━━━━━━━━━━━━━━━━━━━━━
-Topic: ${guideline.condition}
+📚 Guideline · ${guideline.org} — ${guideline.condition}
 ${guideline.text}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-🔍 DIAGNOSTIC CHALLENGE
-━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 Diagnostic Challenge
 ${challenge.vignette}
+Answer: ${challenge.options[challenge.answer]} (full explanation in the app)
 
-${challenge.options.join("  |  ")}
-
-Answer: ${challenge.options[challenge.answer]}
-${challenge.explanation}
-
-━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ EMERGENCY MINUTE — ${emergency.scenario.split("(")[0].trim()}
-━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ Emergency Minute · ${emergency.scenario.split("(")[0].trim()}
 ${emergency.steps}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-💊 DRUG SPOTLIGHT — ${drug.drug}
-━━━━━━━━━━━━━━━━━━━━━━━━
+💊 Drug Spotlight · ${drug.drug}
 ${drug.pearl}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-🧬 RARE DISEASE — ${rareDisease.disease}
-━━━━━━━━━━━━━━━━━━━━━━━━
+🧬 Rare Disease · ${rareDisease.disease}
 ${rareDisease.points}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-🧪 LAB INTERPRETATION PEARL
-━━━━━━━━━━━━━━━━━━━━━━━━
+🧪 Lab Pearl
 ${labPearl}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-📈 TRENDING TODAY
-━━━━━━━━━━━━━━━━━━━━━━━━
-${trendingTopic.topic}: ${trendingTopic.desc}
+📈 Trending · ${trendingTopic.topic}
+${trendingTopic.desc}
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-Open full interactive summary → https://app.base44.com/DailySummary
-
-CliniCals Hub by Swarnim — Pediatric Clinical Intelligence
-Educational support only. Verify all clinical decisions independently.
-
+──────────────
+CliniCals by Swarnim · Pediatric Clinical Intelligence
+Educational support only — verify all clinical decisions independently.
+Full summary: ${summaryUrl}
 Unsubscribe: ${unsubUrl}`;
 
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: u.email,
+          from_name: 'CliniCals Daily',
           subject: summaryData.subject_line,
           body: emailBody,
         });
