@@ -47,6 +47,7 @@ export const ENGINES = [
   { label: "Voiding Dx", desc: "BBD + Uroflow + OAB", scenario: "voiding-engine", tags: ["voiding dysfunction", "BBD", "uroflow", "OAB", "enuresis", "incontinence"], group: "CAKUT & Urology" },
 
   // ── Tubular & Metabolic ──
+  { label: "Approach to Tubulopathy Engine", desc: "Phenotype-driven tubulopathy — RTA I–IV · Fanconi (cystinosis/Dent/Lowe/Wilson) · Bartter & Gitelman · mineralocorticoid excess · nephrogenic DI · SIADH/NSIAD · hypomagnesaemia — with targeted genetics, dosing, monitoring & suppressor safety", scenario: "tubulopathy-engine", tags: ["tubulopathy", "RTA", "renal tubular acidosis", "distal RTA", "proximal RTA", "Fanconi", "cystinosis", "Dent", "Lowe", "Bartter", "Gitelman", "Liddle", "nephrogenic diabetes insipidus", "NDI", "SIADH", "hypomagnesaemia", "hypokalemia", "alkalosis", "cysteamine", "indomethacin"], group: "Tubular & Metabolic", ciee: true },
   { label: "Rickets Engine", desc: "Calcipenic vs Phosphopenic — VDDR 1A/1B/2 · XLH · HHRH · Fanconi · Burosumab", scenario: "rickets-engine", tags: ["rickets", "XLH", "VDDR", "phosphopenic", "calcipenic", "FGF23", "burosumab", "phosphate", "hypophosphatemia", "vitamin D"], group: "Tubular & Metabolic" },
   { label: "Tubular Engine", desc: "Fanconi / XLH / NDI", scenario: "tubular-engine", tags: ["Fanconi", "rickets", "XLH", "NDI", "tubular", "phosphate"], group: "Tubular & Metabolic" },
   { label: "Stone Engine", desc: "Renal stones full workup", scenario: "stone-engine", tags: ["stones", "urolithiasis", "calcium oxalate", "cystinuria", "uric acid"], group: "Tubular & Metabolic" },
@@ -145,6 +146,7 @@ const ENGINE_GUIDELINE_KEYS = {
   "ssns-engine": ["SSNS", "Steroid Sensitive", "Nephrotic", "IPNA"],
   "srns-engine": ["SRNS", "Steroid Resistant", "Nephrotic", "FSGS", "ISPN", "Genetic"],
   "ns-complications-engine": ["Nephrotic", "Complications", "Thrombosis", "Infection", "Peritonitis", "Supportive"],
+  "tubulopathy-engine": ["Tubulopathy", "Renal Tubular Acidosis", "RTA", "Fanconi", "Bartter", "Gitelman", "Cystinosis", "Tubular"],
   "proteinuria-engine": ["Proteinuria", "Nephrotic"],
   "nephrocalcinosis-stone-engine": ["Nephrocalcinosis", "Stone", "Urolithiasis", "Hypercalciuria"],
   "fabry-engine": ["Fabry"],

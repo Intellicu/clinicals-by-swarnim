@@ -98,9 +98,10 @@ import { IGA_IPNA_ENGINE } from "@/lib/engines/igaIpnaEngine";
 import { SSNS_ENGINE } from "@/lib/engines/ssnsEngine";
 import { SRNS_ENGINE } from "@/lib/engines/srnsEngine";
 import { NS_COMPLICATIONS_ENGINE } from "@/lib/engines/nsComplicationsEngine";
+import { TUBULOPATHY_ENGINE } from "@/lib/engines/tubulopathyEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
-  "nephrotic-syndrome","iga-nephropathy","iga-ipna-engine","ssns-engine","srns-engine","ns-complications-engine","hspn","aki-prifle","htn-emergency","hyperkalemia",
+  "nephrotic-syndrome","iga-nephropathy","iga-ipna-engine","ssns-engine","srns-engine","ns-complications-engine","tubulopathy-engine","hspn","aki-prifle","htn-emergency","hyperkalemia",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -201,6 +202,15 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
       initialCtx={{}}
       title={NS_COMPLICATIONS_ENGINE.label}
       subtitle={NS_COMPLICATIONS_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "tubulopathy-engine") return (
+    <CIEEEngineRunner
+      pathway={TUBULOPATHY_ENGINE.ciee_pathway}
+      sources={TUBULOPATHY_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={TUBULOPATHY_ENGINE.label}
+      subtitle={TUBULOPATHY_ENGINE.guideline_source.guideline_name}
     />
   );
   if (id === "iga-vasculitis") return <IgAVasculitisPathway />;

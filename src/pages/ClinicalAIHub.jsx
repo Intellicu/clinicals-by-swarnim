@@ -11,7 +11,6 @@ import ECGAnalyzer from '../components/clinical-ai/ECGAnalyzer';
 import GeneticReportAnalyzerInline from '../components/clinical-ai/GeneticReportAnalyzerInline';
 import CIEEPathwayExplorer from '../components/clinical-ai/CIEEPathwayExplorer';
 import { CLINICAL_AI_ANALYZERS } from '@/lib/aiAnalyzers';
-import { Cpu } from 'lucide-react';
 
 // Tab value → component map — single source of truth
 const TAB_COMPONENTS = {
@@ -64,6 +63,7 @@ export default function ClinicalAIHub() {
             {CLINICAL_AI_ANALYZERS.filter(a => a.tab && a.page === 'ClinicalAIHub').map(tool => {
               const Icon = tool.icon;
               const shortName = tool.name
+                .replace('CIEE Pathway Engine', 'CIEE')
                 .replace(' Analyzer', '').replace(' AI', '').replace('Renal Biopsy', 'Biopsy')
                 .replace('Case Discussion', 'Case').replace('Urine Pattern', 'Urine').replace('Uroflowmetry', 'Uroflow')
                 .replace('UDS AI Interpreter', 'UDS AI').replace('Pediatric UDS Interpreter', 'UDS AI').replace(' (Educational)', '');
@@ -80,22 +80,11 @@ export default function ClinicalAIHub() {
                 </TabsTrigger>
               );
             })}
-              {/* CIEE Pathway Engine tab */}
-              <TabsTrigger
-                value="ciee"
-                className="flex flex-col items-center gap-1 py-2 px-2.5 flex-shrink-0 rounded-lg min-w-[60px] text-slate-600 data-[state=active]:text-indigo-700 data-[state=active]:bg-indigo-50"
-              >
-                <Cpu className="w-4 h-4" />
-                <span className="text-[10px] font-semibold leading-tight text-center">CIEE</span>
-              </TabsTrigger>
             </TabsList>
           </div>
 
           {/* Tab content */}
           <div className="mt-4">
-            <TabsContent value="ciee">
-              <CIEEPathwayExplorer />
-            </TabsContent>
             {CLINICAL_AI_ANALYZERS.filter(a => a.tab && a.page === 'ClinicalAIHub').map(tool => (
               <TabsContent key={tool.id} value={tool.tab}>
                 {tool.status === 'beta' && (

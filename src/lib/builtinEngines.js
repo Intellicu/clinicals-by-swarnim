@@ -12,10 +12,12 @@ import { IGA_IPNA_ENGINE } from '@/lib/engines/igaIpnaEngine';
 import { SSNS_ENGINE } from '@/lib/engines/ssnsEngine';
 import { SRNS_ENGINE } from '@/lib/engines/srnsEngine';
 import { NS_COMPLICATIONS_ENGINE } from '@/lib/engines/nsComplicationsEngine';
+import { TUBULOPATHY_ENGINE } from '@/lib/engines/tubulopathyEngine';
 
 export const BUILTIN_ENGINES = [
   SSNS_ENGINE,
   SRNS_ENGINE,
   NS_COMPLICATIONS_ENGINE,
   IGA_IPNA_ENGINE,
+  TUBULOPATHY_ENGINE,
 ];
