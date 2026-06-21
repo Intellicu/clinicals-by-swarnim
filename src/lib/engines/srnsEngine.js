@@ -89,7 +89,7 @@ export const SRNS_PATHWAY = {
     // ── Phase 2 — Initial evaluation ──────────────────────────────────────
     'DN-03': {
       id: 'DN-03', type: 'ACTION', source: G1A,
-      action: 'Baseline evaluation for ALL patients with SRNS (Box II): urinalysis + microscopy; spot Up/Uc (preferred over 24-h); CBC; creatinine, albumin, electrolytes, fasting glucose, HbA1c; total/LDL/HDL cholesterol, triglycerides; calcium, phosphate, ALP; HBsAg, anti-HCV, HIV; renal ultrasonography; kidney biopsy (LM + IF + EM — see exceptions). Selective: C3/C4, ANA if secondary cause suspected; genetic testing per DN-07.',
+      action: 'Evaluation of SRNS — core investigations: quantitation of proteinuria (spot Up/Uc, preferred over 24-h); serum creatinine; estimated GFR (eGFR, Schwartz); and kidney biopsy (light microscopy + immunofluorescence + electron microscopy — see exceptions). Baseline (Box II): urinalysis + microscopy, CBC, albumin, electrolytes, fasting glucose, HbA1c, total/LDL/HDL cholesterol, triglycerides, calcium/phosphate/ALP, HBsAg/anti-HCV/HIV, renal ultrasonography. Selective: C3/C4, ANA if a secondary cause is suspected; genetic testing only if an indication is met (DN-07).',
       next: 'DN-04',
     },
     'DN-04': {
@@ -172,9 +172,14 @@ export const SRNS_PATHWAY = {
       detail: 'Schwartz eGFR = 0.413 × height(cm) / creatinine(mg/dL).',
       options: [
         { label: 'eGFR ≥60 mL/min/1.73m² — safe to start CNI', set: { egfr_adequate: true }, next: 'DN-10' },
-        { label: 'eGFR persistently <60 — withhold CNI', set: { egfr_adequate: false }, next: 'DN-16', tone: 'muted' },
-        { label: 'AKI stage 2–3 present — withhold until resolved', next: 'DN-16', tone: 'danger' },
+        { label: 'eGFR persistently <60 — avoid CNI, use alternative therapy', set: { egfr_adequate: false }, next: 'DN-09E', tone: 'muted' },
+        { label: 'AKI stage 2–3 present — withhold until resolved', next: 'TERM-AKI-HOLD', tone: 'danger' },
       ],
+    },
+    'DN-09E': {
+      id: 'DN-09E', type: 'ACTION', source: G2C,
+      action: 'Persistent eGFR <60 mL/min/1.73m² — a CNI is relatively contraindicated (nephrotoxicity). Use a non-nephrotoxic alternative immunosuppressive agent (e.g. IV rituximab) rather than a CNI, alongside mandatory RAAS blockade and supportive care.',
+      next: 'DN-15',
     },
     'DN-10': {
       id: 'DN-10', type: 'ACTION', source: G1A, prescribes: 'tacrolimus',
@@ -295,7 +300,16 @@ export const SRNS_PATHWAY = {
     },
     'DN-17': {
       id: 'DN-17', type: 'ACTION', source: G1B,
-      action: 'Comprehensive supportive care (all SRNS). (1) BP target 50–75th centile; add CCB/β-blocker/α-blocker if needed; reduced salt. (2) Dyslipidaemia: fasting lipids, CHILD-1→CHILD-2 diet; statin if ≥8 y and LDL >160 (or >130 with CV risk) — atorvastatin 10–20 mg/day. (3) Thrombosis (1C): no routine prophylaxis; ambulation, hydration, compression stockings; avoid central lines/arterial punctures; treat thrombosis with enoxaparin 1 mg/kg/dose SC q12h (>2 months) → warfarin INR 2–3 for 3 months or until remission. (4) CV risk: BMI <85th centile; BP each visit; ABPM 1–2-yearly; echo annually if hypertensive. (5) HPA stress dosing (1D) if oral steroids >2 weeks in past year — hydrocortisone 100 mg/m² IV pre-op then 25 mg/m² q6h; milder stress 30–50 mg/m²/day. (6) Bone: vitamin D 400–800 IU/day, calcium 250–750 mg/day. (7) Immunisation review every 12 months; avoid live vaccines during immunosuppression.',
+      action: 'Comprehensive supportive care (all SRNS patients).',
+      care: [
+        { category: 'Blood pressure', detail: 'Target 50–75th centile; ACE-I/ARB first line, add CCB / β-blocker / α-blocker if needed. Reduced-salt diet.' },
+        { category: 'Dyslipidaemia', detail: 'Fasting lipids; CHILD-1 → CHILD-2 diet. Statin (atorvastatin 10–20 mg/day) if age ≥8 y and LDL >160 mg/dL (or >130 with a CV risk factor).' },
+        { category: 'Thrombosis (1C)', detail: 'No routine prophylactic anticoagulation. Encourage mobilisation, hydration, compression stockings; avoid central lines / arterial punctures. Established thrombosis: enoxaparin 1 mg/kg SC q12h (>2 months) → warfarin INR 2–3 for 3 months or until remission.' },
+        { category: 'Cardiovascular risk', detail: 'BMI <85th centile; BP each visit; ABPM every 1–2 years; echocardiogram annually if hypertensive.' },
+        { category: 'Adrenal / stress steroids (1D)', detail: 'If oral steroids >2 weeks within the past year: hydrocortisone 100 mg/m² IV pre-op then 25 mg/m² q6h; milder stress 30–50 mg/m²/day.' },
+        { category: 'Bone health', detail: 'Vitamin D 400–800 IU/day; calcium 250–750 mg/day.' },
+        { category: 'Immunisation', detail: 'Review every 12 months. Avoid live vaccines during immunosuppression — complete beforehand or defer.' },
+      ],
       safety: [
         { title: 'Statin gate', detail: 'Do not prescribe statins if age <8 years or LDL below threshold.' },
         { title: 'Live vaccines', detail: 'Contraindicated during immunosuppression — complete beforehand or defer.' },
@@ -349,6 +363,7 @@ export const SRNS_PATHWAY = {
 
     // ── Terminals ─────────────────────────────────────────────────────────
     'TERM-NOT-SRNS': { id: 'TERM-NOT-SRNS', type: 'TERMINAL', source: GX, action: 'Remission achieved — not SRNS. Manage as steroid-sensitive NS and reassess if a later relapse fails to remit at 6 weeks.' },
+    'TERM-AKI-HOLD': { id: 'TERM-AKI-HOLD', type: 'TERMINAL', source: G2C, action: 'AKI stage 2–3 — withhold the CNI until the AKI resolves. Optimise volume status, stop nephrotoxins (NSAIDs, aminoglycosides, contrast) and treat the precipitant; recheck eGFR and re-enter the pathway once kidney function has recovered.' },
     'TERM-MONITOR': { id: 'TERM-MONITOR', type: 'TERMINAL', source: G1B, action: 'Continue current management with structured monitoring (DN-18) and plan ahead for CKD progression. Re-enter the transplant pathway when eGFR falls.' },
     'TERM-TRANSPLANT': { id: 'TERM-TRANSPLANT', type: 'TERMINAL', source: G1B, action: 'Transplant pathway plan generated — recurrence-risk stratification, donor considerations, post-transplant surveillance and recurrence-management protocol recorded.' },
     'TERM-CONGENITAL': { id: 'TERM-CONGENITAL', type: 'TERMINAL', source: G1B, action: 'Congenital NS management plan generated — genetic workup, nutrition/albumin support, anti-proteinuric therapy, surveillance and transplant planning recorded.' },

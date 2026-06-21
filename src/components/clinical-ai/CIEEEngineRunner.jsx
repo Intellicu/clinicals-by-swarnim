@@ -390,6 +390,24 @@ export default function CIEEEngineRunner({
               </div>
             )}
 
+            {/* Supportive care — structured cards (same clean layout as monitoring) */}
+            {Array.isArray(node.care) && node.care.length > 0 && (
+              <div className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <ShieldAlert className="w-4 h-4 text-slate-500" />
+                  <span className="text-sm font-bold text-slate-700">Supportive care</span>
+                </div>
+                <div className="space-y-1.5">
+                  {node.care.map((c, i) => (
+                    <div key={i} className="bg-white rounded-lg p-2.5 border border-slate-100">
+                      <span className="text-[13px] font-semibold text-slate-800">{c.category}</span>
+                      {c.detail && <p className="text-[12px] text-slate-600 mt-0.5 leading-relaxed">{c.detail}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Required-confirmation hint when a safety gate is unmet */}
             {gateItems.length > 0 && !gatesMet && (
               <p className="mt-4 text-[12px] font-semibold text-red-700">Confirm the required safety item(s) above to continue.</p>
