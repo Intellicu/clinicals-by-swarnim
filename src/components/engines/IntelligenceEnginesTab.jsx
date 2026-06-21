@@ -17,9 +17,7 @@ export const ENGINES = [
   { label: "Met. Acidosis", desc: "AG / RTA Engine", scenario: "metabolic-acidosis-engine", tags: ["acidosis", "anion gap", "RTA", "bicarbonate"], group: "Emergency & Electrolytes" },
   // ── Glomerular ──
   { label: "GN Engine", desc: "IgAN · LN · MN · FSGS · PSGN · ANCA · Alport · C3G · IgAVN", scenario: "gn-engine", tags: ["glomerulonephritis", "IgA", "lupus nephritis", "membranous", "FSGS", "PSGN", "ANCA", "Alport", "C3G", "HSP"], group: "Glomerular Disease" },
-  { label: "NS Engine", desc: "Nephrotic Syndrome full engine", scenario: "ns-engine", tags: ["nephrotic syndrome", "edema", "proteinuria", "steroid"], group: "Glomerular Disease", ciee: true },
-  { label: "SSNS Management Engine", desc: "IPNA 2022 — initial PDN · relapse · FRNS/SDNS steroid-sparing · monitoring & safety", scenario: "ssns-engine", tags: ["SSNS", "steroid sensitive", "nephrotic syndrome", "FRNS", "SDNS", "relapse", "levamisole", "cyclophosphamide", "tacrolimus", "MMF", "rituximab", "prednisolone", "IPNA"], group: "Glomerular Disease", ciee: true },
-  { label: "SRNS Management Engine", desc: "ISPN 2021 — steroid resistance (no remission after 6 weeks) · evaluation · genetics · CNI + TDM · 6-mo response · rituximab/MMF/IV CYC · RAAS + supportive care · transplant · congenital NS", scenario: "srns-engine", tags: ["SRNS", "steroid resistant", "nephrotic syndrome", "FSGS", "genetic", "monogenic", "NPHS2", "WT1", "tacrolimus", "cyclosporine", "CNI", "rituximab", "MMF", "cyclophosphamide", "ACE inhibitor", "transplant", "congenital", "ISPN"], group: "Glomerular Disease", ciee: true },
+  { label: "NS Engine", desc: "Nephrotic Syndrome umbrella — first episode · relapse · FRNS/SDNS (SSNS, IPNA 2022) · steroid-resistant (SRNS, ISPN 2021) · congenital", scenario: "ns-engine", tags: ["nephrotic syndrome", "edema", "proteinuria", "steroid", "SSNS", "SRNS", "steroid sensitive", "steroid resistant", "FRNS", "SDNS", "relapse", "FSGS", "congenital", "genetic", "tacrolimus", "rituximab", "MMF", "cyclophosphamide", "levamisole", "IPNA", "ISPN"], group: "Glomerular Disease", ciee: true },
   { label: "NS Complications & Supportive Care Engine", desc: "Complications of NS — hypovolaemia · severe oedema/anasarca · infection (SBP/cellulitis/sepsis) · thromboembolism · AKI · dyslipidaemia · endocrine/metabolic · steroid toxicity — plus diet, fluids & vaccination", scenario: "ns-complications-engine", tags: ["nephrotic syndrome", "complications", "hypovolemia", "edema", "anasarca", "albumin", "furosemide", "infection", "peritonitis", "SBP", "cellulitis", "sepsis", "thrombosis", "VTE", "renal vein thrombosis", "enoxaparin", "AKI", "dyslipidemia", "hypothyroidism", "vitamin D", "steroid toxicity", "supportive care", "vaccination"], group: "Glomerular Disease", ciee: true },
   { label: "IgA Nephropathy / IgA Vasculitis Engine", desc: "IPNA 2024 — IgAN & IgA vasculitis nephritis · biopsy indications · RASB · selective steroids · RPGN", scenario: "iga-ipna-engine", tags: ["IgA nephropathy", "IgAN", "IgA vasculitis", "IgAVN", "HSP", "HSPN", "Oxford MEST-C", "crescentic", "RPGN", "IPNA", "RASB", "hematuria"], group: "Glomerular Disease", ciee: true },
   { label: "RPGN Engine", desc: "Crescentic GN + PLEX", scenario: "rpgn-deep-engine", tags: ["RPGN", "crescentic GN", "plasmapheresis", "ANCA", "anti-GBM"], group: "Glomerular Disease" },
@@ -133,7 +131,7 @@ const GROUPS = orderGroups([...new Set(ENGINES.map(e => e.group))]);
 // Keyword → guideline title fragments for matching from DB
 const ENGINE_GUIDELINE_KEYS = {
   "aki-engine": ["AKI", "Acute Kidney"],
-  "ns-engine": ["Nephrotic", "SSNS", "SRNS", "ISKDC"],
+  "ns-engine": ["Nephrotic", "SSNS", "SRNS", "ISKDC", "IPNA", "ISPN", "Steroid"],
   "hyperkalemia-deep-engine": ["Hyperkalemia", "Hyperkalaemia", "Potassium"],
   "hyponatremia-engine": ["Hyponatremia", "Hyponatraemia", "Sodium"],
   "hematuria-engine": ["Hematuria", "Haematuria"],
@@ -143,8 +141,6 @@ const ENGINE_GUIDELINE_KEYS = {
   "polyuria-full-engine": ["Polyuria", "Diabetes Insipidus", "NDI"],
   "gn-engine": ["Glomerulonephritis", "IgA Nephropathy", "Lupus Nephritis", "FSGS", "PSGN", "Membranous"],
   "iga-ipna-engine": ["IgA Nephropathy", "IgA Vasculitis", "IgAVN", "HSP", "IPNA"],
-  "ssns-engine": ["SSNS", "Steroid Sensitive", "Nephrotic", "IPNA"],
-  "srns-engine": ["SRNS", "Steroid Resistant", "Nephrotic", "FSGS", "ISPN", "Genetic"],
   "ns-complications-engine": ["Nephrotic", "Complications", "Thrombosis", "Infection", "Peritonitis", "Supportive"],
   "tubulopathy-engine": ["Tubulopathy", "Renal Tubular Acidosis", "RTA", "Fanconi", "Bartter", "Gitelman", "Cystinosis", "Tubular"],
   "proteinuria-engine": ["Proteinuria", "Nephrotic"],
