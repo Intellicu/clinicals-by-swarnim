@@ -95,9 +95,10 @@ import WilmsTumorEngine from "../engines/WilmsTumorEngine";
 import OncologyEngine from "../engines/OncologyEngine";
 import CIEEEngineRunner from "@/components/clinical-ai/CIEEEngineRunner";
 import { IGA_IPNA_ENGINE } from "@/lib/engines/igaIpnaEngine";
+import { SSNS_ENGINE } from "@/lib/engines/ssnsEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
-  "nephrotic-syndrome","iga-nephropathy","iga-ipna-engine","hspn","aki-prifle","htn-emergency","hyperkalemia",
+  "nephrotic-syndrome","iga-nephropathy","iga-ipna-engine","ssns-engine","hspn","aki-prifle","htn-emergency","hyperkalemia",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -171,6 +172,15 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
       initialCtx={{}}
       title={IGA_IPNA_ENGINE.label}
       subtitle={IGA_IPNA_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "ssns-engine") return (
+    <CIEEEngineRunner
+      pathway={SSNS_ENGINE.ciee_pathway}
+      sources={SSNS_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={SSNS_ENGINE.label}
+      subtitle={SSNS_ENGINE.guideline_source.guideline_name}
     />
   );
   if (id === "iga-vasculitis") return <IgAVasculitisPathway />;

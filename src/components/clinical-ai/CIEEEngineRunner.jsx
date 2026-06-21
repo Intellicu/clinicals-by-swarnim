@@ -98,10 +98,11 @@ function rulesForNode(node, ctx) {
 }
 
 export default function CIEEEngineRunner({
-  pathway, sources, initialCtx = {}, recommend, onReset,
+  pathway, sources, initialCtx = {}, recommend, onReset, entry,
   title = 'CIEE Pathway Engine', subtitle,
 }) {
-  const [nodeId, setNodeId] = useState(pathway.entry);
+  const startNode = entry || pathway.entry;
+  const [nodeId, setNodeId] = useState(startNode);
   const [ctx, setCtx] = useState(initialCtx);
   const [history, setHistory] = useState([]);
   const [monitoring, setMonitoring] = useState([]);
@@ -133,7 +134,7 @@ export default function CIEEEngineRunner({
   };
 
   const restart = () => {
-    setNodeId(pathway.entry); setCtx(initialCtx);
+    setNodeId(startNode); setCtx(initialCtx);
     setHistory([]); setMonitoring([]); setSuppressions([]);
   };
 

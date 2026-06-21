@@ -23,6 +23,7 @@ import {
   generateMonitoringRules, GUIDELINE_SOURCES, SRNS_PATHWAY
 } from "@/lib/CIEEEngine";
 import CIEEEngineRunner from "@/components/clinical-ai/CIEEEngineRunner";
+import { SSNS_PATHWAY, SSNS_SOURCES } from "@/lib/engines/ssnsEngine";
 
 // ── CIEE Sub-components ───────────────────────────────────────────────────────
 
@@ -382,45 +383,19 @@ export default function NephroticSyndromeEngine() {
     </div>
   );
 
-  // ── First episode → ISKDC protocol ────────────────────────────────────────
+  // ── First episode → IPNA 2022 SSNS CIEE pathway (initial PDN) ──────────────
   if (step === 4 && answers.episode === "first") return (
     <div className="space-y-3">
-      <EngineHeader title="First Episode SSNS" color="violet" subtitle="ISKDC Protocol" onReset={reset} />
-      <PathwayTrail steps={[...trail, "First Episode → ISKDC Prednisolone"]} />
-      <ResultHeader diagnosis="First Episode Nephrotic Syndrome (presumed SSNS)" risk="yellow" />
-      <DifferentialTable rows={[
-        { dx: "Steroid-Sensitive NS (SSNS / MCD)", pct: 85, label: "Very Likely" },
-        { dx: "FSGS (focal segmental glomerulosclerosis)", pct: 10, label: "Possible" },
-        { dx: "Secondary NS (SLE, HBV, Henoch-Schönlein)", pct: 3, label: "Unlikely (check ANA)" },
-        { dx: "MN (membranous nephropathy)", pct: 2, label: "Rare in children" },
-      ]} />
-      <TreatmentPanel title="ISKDC / IPNA First Episode Protocol" items={[
-        "Prednisolone 60 mg/m²/day (max 60 mg/day) × 4–6 weeks",
-        "Then 40 mg/m² on alternate days × 4–6 weeks, then taper",
-        "Target: UPCR <0.2 mg/mg or dipstick trace/nil × 3 consecutive days = remission",
-        "Salt restriction: <1–2 g/day NaCl during oedema",
-        "Fluid restriction if severe hyponatraemia (Na <125)",
-        "IV albumin 0.5–1 g/kg only if symptomatic hypovolaemia or severe oedema",
-        "Spironolactone / furosemide for persistent oedema (albumin >2 g/dL before diuretics)",
-        "Penicillin V prophylaxis while oedematous",
-        "Review all vaccinations — live vaccines before starting IS"
-      ]} />
-      <InvestigationPanel
-        mustOrder={["UPCR first-morning urine", "Serum albumin, creatinine, electrolytes", "FBC, lipids (total cholesterol)", "Urine dipstick daily"]}
-        shouldOrder={["ANA (if atypical features)", "Complement C3/C4", "Urine microscopy", "USG kidneys"]}
-        advanced={["Hepatitis B surface Ag + anti-HCV (before any IS)", "Varicella IgG (vaccination if negative, avoid if oedematous)"]}
+      <EngineHeader title="First Episode SSNS" color="violet" subtitle="IPNA 2022 — initial prednisolone & response" onReset={reset} />
+      <PathwayTrail steps={[...trail, "First Episode → IPNA SSNS pathway"]} />
+      <CIEEEngineRunner
+        pathway={SSNS_PATHWAY}
+        sources={SSNS_SOURCES}
+        initialCtx={buildStepperCtx()}
+        entry="DN-06"
+        title="SSNS Management Engine"
+        subtitle="IPNA 2022 · first episode → response → relapse"
       />
-      <MonitoringPanel items={[
-        "Daily home dipstick — record in diary",
-        "Weekly weight + BP + dipstick",
-        "Repeat albumin + creatinine at 4 weeks",
-        "Assess for remission at 4 weeks (→ step down steroids)",
-        "If no remission at 4 weeks: proceed to SRNS evaluation",
-        "Follow-up 2 weeks after steroid taper complete"
-      ]} />
-      <CIEEMonitoringPanel drugs={[]} cieeCtx={cieeCtx} />
-      <GuidelineSource text="ISKDC 1981 (updated IPNA 2021) · Prednisolone dose per IPNA Clinical Practice Recommendations for NS · AAP 2009 UTI guidance adapted" />
-      <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
     </div>
   );
 
@@ -449,110 +424,53 @@ export default function NephroticSyndromeEngine() {
     </div>
   );
 
-  // ── Infrequent relapse ─────────────────────────────────────────────────────
+  // ── Infrequent relapse → IPNA 2022 SSNS CIEE pathway ──────────────────────
   if (answers.relapse_type === "infrequent") return (
     <div className="space-y-3">
-      <EngineHeader title="Infrequent Relapse" color="violet" subtitle="Standard steroid course" onReset={reset} />
-      <PathwayTrail steps={[...trail, "Infrequent Relapse → Steroid Course"]} />
-      <ResultHeader diagnosis="Infrequent Relapse NS" risk="yellow" />
-      <TreatmentPanel items={[
-        "Prednisolone 60 mg/m²/day (max 60 mg) until 3 consecutive dipstick negative",
-        "Then 40 mg/m² alternate days × 4 weeks, taper over 4 weeks",
-        "Do NOT start IS (MMF/Levamisole) for infrequent relapse",
-        "Identify relapse trigger (URTI, infections, vaccinations, medication non-compliance)",
-        "Document steroid course number — track cumulative steroid exposure"
-      ]} />
-      <MonitoringPanel items={["Daily dipstick during relapse", "Weekly weight + BP", "Reassess at 4 weeks — if no remission → consider SRNS pathway"]} />
-      <CIEEMonitoringPanel drugs={[]} cieeCtx={cieeCtx} />
-      <GuidelineSource text="IPNA 2021 — Infrequent relapse: standard prednisolone, no IS required" />
-      <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
+      <EngineHeader title="Infrequent Relapse" color="violet" subtitle="IPNA 2022 — standard prednisolone course" onReset={reset} />
+      <PathwayTrail steps={[...trail, "Infrequent Relapse → IPNA SSNS pathway"]} />
+      <CIEEEngineRunner
+        pathway={SSNS_PATHWAY}
+        sources={SSNS_SOURCES}
+        initialCtx={{ ...buildStepperCtx(), relapse_type: 'infrequent' }}
+        entry="DN-11"
+        title="SSNS Management Engine"
+        subtitle="IPNA 2022 · infrequent relapse"
+      />
     </div>
   );
 
-  // ── FRNS ──────────────────────────────────────────────────────────────────
-  if (answers.relapse_type === "frns") {
-    const cniSuppressed = checkPrescriptionSuppressor('tacrolimus', {
-      ...cieeCtx,
-      genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
-    }).suppressed;
-    return (
-      <div className="space-y-3">
-        <EngineHeader title="Frequent Relapsing NS (FRNS)" color="violet" subtitle="Steroid-sparing therapy" onReset={reset} />
-        <PathwayTrail steps={[...trail, "FRNS → IS Decision"]} />
-        <ResultHeader diagnosis="Frequent Relapsing NS — Steroid-Sparing IS Required" risk="orange" />
-        {cniSuppressed && <SuppressionBanner drug="tacrolimus" cieeCtx={cieeCtx} />}
-        <TreatmentPanel title="IS Protocol (choose 1–2 agents)" items={[
-          "1st line: Levamisole 2.5 mg/kg alternate days × 12–24 months (reduce relapse rate, low toxicity)",
-          "OR: MMF (mycophenolate mofetil) 1200 mg/m²/day in 2 doses × 12–24 months",
-          cniSuppressed
-            ? "⛔ CNI (Cyclosporine/Tacrolimus) BLOCKED by CIEE PrescriptionSuppressor — see genetic result"
-            : "2nd line (if above fail): Cyclosporine 4–5 mg/kg/day in 2 doses (trough 80–120 ng/mL)",
-          "OR: Rituximab 375 mg/m² IV × 1–2 doses (anti-CD20 — highly effective for FRNS/SDNS)",
-          "Continue prednisolone: smallest dose maintaining remission (ideally <0.5 mg/kg/48h)",
-          "STOP if in sustained remission × 12–24 months on IS"
-        ]} />
-        <InvestigationPanel
-          mustOrder={["FBC (levamisole — agranulocytosis risk, check 3-monthly)", "LFT, RFT before and during MMF/CsA", "Hepatitis B, C, VZV, EBV serology before Rituximab"]}
-          shouldOrder={["Renal biopsy if: atypical features, CsA >12 months, declining GFR"]}
-          advanced={["Genetic panel if: syndromic features, SRNS episodes, onset <5 yrs"]}
-        />
-        <MonitoringPanel items={[
-          "Daily dipstick",
-          "3-monthly: FBC, creatinine, albumin, BP",
-          "Annual: growth, BMI, BP, urine dipstick",
-          "Varicella prophylaxis if VZV-naive on IS",
-          "Killed vaccines annually (influenza, pneumococcus) — NO live vaccines on IS"
-        ]} />
-        <CIEEMonitoringPanel drugs={cniSuppressed ? [] : ['cyclosporine']} cieeCtx={cieeCtx} />
-        <GuidelineSource text="IPNA 2021 Clinical Practice Recommendations for FRNS/SDNS · KDIGO 2012" />
-        <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
-      </div>
-    );
-  }
+  // ── FRNS → IPNA 2022 SSNS CIEE pathway (steroid-sparing selection) ─────────
+  if (answers.relapse_type === "frns") return (
+    <div className="space-y-3">
+      <EngineHeader title="Frequent Relapsing NS (FRNS)" color="violet" subtitle="IPNA 2022 — steroid-sparing agent selection" onReset={reset} />
+      <PathwayTrail steps={[...trail, "FRNS → IPNA SSNS pathway"]} />
+      <CIEEEngineRunner
+        pathway={SSNS_PATHWAY}
+        sources={SSNS_SOURCES}
+        initialCtx={{ ...buildStepperCtx(), relapse_type: 'FRNS' }}
+        entry="DN-12"
+        title="SSNS Management Engine"
+        subtitle="IPNA 2022 · FRNS steroid-sparing"
+      />
+    </div>
+  );
 
-  // ── SDNS ──────────────────────────────────────────────────────────────────
-  if (answers.relapse_type === "sdns") {
-    const cniSuppressed = checkPrescriptionSuppressor('tacrolimus', {
-      ...cieeCtx,
-      genetic_variant_status: (cieeCtx.acmg_class === 'Pathogenic' || cieeCtx.acmg_class === 'Likely Pathogenic') ? 'PATHOGENIC' : 'UNKNOWN',
-    }).suppressed;
-    return (
-      <div className="space-y-3">
-        <EngineHeader title="Steroid Dependent NS (SDNS)" color="violet" subtitle="Rituximab / CNI / MMF" onReset={reset} />
-        <PathwayTrail steps={[...trail, "SDNS → IS Decision"]} />
-        <ResultHeader diagnosis="Steroid Dependent NS — Steroid-Sparing IS Mandatory" risk="orange" />
-        {cniSuppressed && <SuppressionBanner drug="tacrolimus" cieeCtx={cieeCtx} />}
-        <TreatmentPanel title="SDNS Protocol" items={[
-          "Rituximab 375 mg/m² IV × 2–4 doses (4-weekly) — preferred for SDNS (PRISM trial evidence)",
-          "Pre-Rituximab: VZV/HBV/pneumococcal vaccine. Check IgG levels.",
-          cniSuppressed
-            ? "⛔ Tacrolimus/Cyclosporine BLOCKED by CIEE PrescriptionSuppressor — genetic SRNS detected"
-            : "Tacrolimus 0.1 mg/kg/day (trough 5–8 ng/mL) if RTX not available/fails",
-          cniSuppressed
-            ? "→ Offer ACEi/ARB + supportive care per genetic SRNS pathway"
-            : "OR: Cyclosporine 4–5 mg/kg/day (trough 80–120 ng/mL) — risk of nephrotoxicity long-term",
-          "MMF as adjunct or maintenance after RTX",
-          "Prednisolone: aim to wean to zero during sustained RTX remission",
-          "Monitor B-cell reconstitution (CD19+ >1%) — re-dose RTX before relapse"
-        ]} />
-        <InvestigationPanel
-          mustOrder={["CD19+ B cell count (flow cytometry — guide RTX re-dosing)", "IgG levels before and after RTX", "VZV/EBV/CMV/HBV serology before RTX"]}
-          shouldOrder={["Renal biopsy if any atypical features or CsA >1 yr"]}
-          advanced={["Genetic panel (NPHS2, WT1, PLCE1) if: syndromic, onset <5yr, recurrent severe relapses"]}
-        />
-        <MonitoringPanel items={[
-          "B-cell CD19+ monthly after RTX (reconstitution ~6 months)",
-          "IgG every 3 months (RTX → hypogammaglobulinaemia risk)",
-          "IVIG if IgG <400 mg/dL + recurrent infections",
-          "Annual renal function + eGFR",
-          "Annual pubertal assessment (steroid toxicity)"
-        ]} />
-        <CIEEMonitoringPanel drugs={cniSuppressed ? [] : ['tacrolimus']} cieeCtx={cieeCtx} />
-        <GuidelineSource text="IPNA 2021 · PRISM trial (RTX for SDNS): Iijima K, NEJM 2014 · KDIGO 2012 NS chapter" />
-        <TraceabilityBadge sourceId="GS-IPNA-2021-NS" />
-      </div>
-    );
-  }
+  // ── SDNS → IPNA 2022 SSNS CIEE pathway (steroid minimisation) ──────────────
+  if (answers.relapse_type === "sdns") return (
+    <div className="space-y-3">
+      <EngineHeader title="Steroid Dependent NS (SDNS)" color="violet" subtitle="IPNA 2022 — steroid-sparing & minimisation" onReset={reset} />
+      <PathwayTrail steps={[...trail, "SDNS → IPNA SSNS pathway"]} />
+      <CIEEEngineRunner
+        pathway={SSNS_PATHWAY}
+        sources={SSNS_SOURCES}
+        initialCtx={{ ...buildStepperCtx(), relapse_type: 'SDNS' }}
+        entry="DN-12"
+        title="SSNS Management Engine"
+        subtitle="IPNA 2022 · SDNS steroid-sparing"
+      />
+    </div>
+  );
 
   // ── SRNS + Atypical NS → interactive CIEE Pathway Engine ────────────────────
   if (answers.relapse_type === "srns" || (step === 3 && answers.atypical === true)) {
