@@ -9,7 +9,7 @@
  * accumulates the MonitoringRuleGenerator schedule (Component 5), and shows
  * node-level evidence via the TraceabilityLinker (Component 7).
  */
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { usePatient } from "@/components/PatientContext";
@@ -180,6 +180,35 @@ export default function CIEEEngineRunner({
 
   const back = () => { if (history.length) goTo(history.length - 1); };
 
+  // ── Phone/browser Back button → step back inside the engine ────────────────
+  // Without this, the hardware Back leaves the whole page. We arm a history
+  // guard while steps exist and consume Back to walk the engine backwards.
+  const histLenRef = useRef(history.length);
+  histLenRef.current = history.length;
+  const backRef = useRef(back);
+  backRef.current = back;
+  const armedRef = useRef(false);
+
+  useEffect(() => {
+    const onPop = () => {
+      if (histLenRef.current > 0) {
+        backRef.current();
+        if (histLenRef.current > 1) window.history.pushState(null, ''); // re-arm if steps remain
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  useEffect(() => {
+    if (history.length > 0 && !armedRef.current) {
+      window.history.pushState(null, ''); // same URL — won't trigger router navigation
+      armedRef.current = true;
+    } else if (history.length === 0) {
+      armedRef.current = false;
+    }
+  }, [history.length]);
+
   const isQuestion = node.type === 'QUESTION' || node.type === 'ASSESSMENT';
   const isTerminal = node.type === 'TERMINAL';
   const recIdx = isQuestion && recommend ? recommend(node, ctx) : -1;
@@ -201,7 +230,7 @@ export default function CIEEEngineRunner({
         <div className="min-w-0">
           <p className="text-base font-bold text-slate-900 truncate">
             {title}
-            <span className="ml-2 align-middle text-[10px] font-bold text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded-full">UI v2</span>
+            <span className="ml-2 align-middle text-[10px] font-bold text-violet-700 bg-violet-100 px-1.5 py-0.5 rounded-full">UI v3</span>
           </p>
           {subtitle && <p className="text-xs text-slate-500 truncate">{subtitle}</p>}
         </div>
@@ -236,7 +265,7 @@ export default function CIEEEngineRunner({
 
       {/* timeline */}
       <div className="relative pl-8 pt-1">
-        <div className="absolute left-[11px] top-3 bottom-3 w-0.5 bg-slate-200" />
+        <div className="absolute left-[11px] top-3 bottom-3 w-0.5 bg-slate-300" />
 
         {/* completed steps — collapsed, click to go back */}
         {history.map((h, i) => {
@@ -244,21 +273,22 @@ export default function CIEEEngineRunner({
           return (
             <button key={i} onClick={() => goTo(i)} title="Go back to this step"
               className="relative mb-3.5 block w-full text-left group">
-              <span className={`absolute -left-[27px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${h.suppressed ? 'bg-red-500' : 'bg-indigo-300 group-hover:bg-indigo-600'}`} />
+              <span className={`absolute -left-[27px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${h.suppressed ? 'bg-red-500' : 'bg-violet-500 group-hover:bg-violet-700'}`} />
               <div className="flex items-baseline gap-2 min-w-0">
-                <span className={`text-[15px] leading-snug truncate group-hover:text-indigo-700 ${h.suppressed ? 'text-red-600' : 'text-slate-500'}`}>{h.node.question || h.node.action}</span>
+                <span className={`text-[15px] leading-snug truncate group-hover:text-violet-700 ${h.suppressed ? 'text-red-600' : 'text-slate-600'}`}>{h.node.question || h.node.action}</span>
                 {ans && <span className={`text-[15px] font-bold leading-snug flex-shrink-0 ${h.suppressed ? 'text-red-700' : 'text-slate-900'}`}>{ans}</span>}
               </div>
             </button>
           );
         })}
 
-        {/* current node — expanded */}
+        {/* current node — expanded, in a white card for contrast */}
         {!isTerminal && (
           <div className="relative">
-            <span className="absolute -left-[29px] top-1 w-4 h-4 rounded-full bg-indigo-600 ring-4 ring-indigo-100" />
+            <span className="absolute -left-[30px] top-4 w-4 h-4 rounded-full bg-violet-600 ring-4 ring-violet-100" />
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4">
             <p className="text-[21px] leading-snug font-bold text-slate-900">{node.question || node.action}</p>
-            {node.detail && <p className="text-sm text-slate-500 mt-2 leading-relaxed">{node.detail}</p>}
+            {node.detail && <p className="text-sm text-slate-600 mt-2 leading-relaxed">{node.detail}</p>}
 
             {isPrescriptionNode(node) && supp.suppressed && (
               <div className="mt-4 bg-red-50 border-2 border-red-300 rounded-xl px-4 py-3 flex items-start gap-2.5">
@@ -369,15 +399,15 @@ export default function CIEEEngineRunner({
               <div className="flex flex-col gap-2.5 mt-4">
                 {(node.options || []).map((opt, i) => (
                   <button key={i} onClick={() => choose(opt)} disabled={gateItems.length > 0 && !gatesMet}
-                    className={`px-5 py-3.5 rounded-xl border-2 text-[16px] font-medium text-left shadow-sm transition-all flex items-center justify-between gap-2 disabled:opacity-50 disabled:cursor-not-allowed
-                      ${opt.tone === 'danger' ? 'border-rose-200 text-rose-700 hover:border-rose-400 hover:bg-rose-50'
-                        : opt.tone === 'muted' ? 'border-slate-200 text-slate-500 hover:border-slate-400 hover:bg-slate-50'
-                        : 'border-slate-200 text-slate-800 hover:border-indigo-400 hover:bg-indigo-50'}
-                      ${i === recIdx ? 'border-indigo-400 bg-indigo-50' : ''}`}>
+                    className={`px-5 py-3.5 rounded-xl text-[16px] font-semibold text-left shadow-sm transition-all flex items-center justify-between gap-2 disabled:opacity-50 disabled:cursor-not-allowed
+                      ${opt.tone === 'danger' ? 'bg-rose-600 text-white hover:bg-rose-700'
+                        : opt.tone === 'muted' ? 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200'
+                        : 'bg-violet-600 text-white hover:bg-violet-700'}
+                      ${i === recIdx ? 'ring-2 ring-offset-2 ring-violet-400' : ''}`}>
                     <span>{opt.label}</span>
                     <span className="flex items-center gap-1.5 flex-shrink-0">
-                      {i === recIdx && <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold">suggested</span>}
-                      <ChevronRight className="w-5 h-5 text-slate-300" />
+                      {i === recIdx && <span className="text-[10px] bg-white/25 text-white px-2 py-0.5 rounded-full font-bold">suggested</span>}
+                      <ChevronRight className="w-5 h-5 opacity-70" />
                     </span>
                   </button>
                 ))}
@@ -399,6 +429,7 @@ export default function CIEEEngineRunner({
             )}
 
             <EvidenceLine node={node} sources={sources} />
+            </div>
           </div>
         )}
 
