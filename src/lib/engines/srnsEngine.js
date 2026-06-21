@@ -101,7 +101,7 @@ export const SRNS_PATHWAY = {
         { test: 'Serum creatinine', detail: 'Baseline kidney function.' },
         { test: 'Estimated GFR (eGFR)', detail: 'Schwartz: 0.413 × height(cm) / creatinine(mg/dL).' },
         { test: 'Kidney biopsy', detail: 'Light microscopy + immunofluorescence + electron microscopy (see deferral exceptions).' },
-        { test: 'Baseline panel (Box II)', detail: 'Urinalysis + microscopy, CBC, albumin, electrolytes, fasting glucose, HbA1c, lipid profile, calcium/phosphate/ALP, HBsAg/anti-HCV/HIV, renal ultrasonography.' },
+        { test: 'Baseline panel', detail: 'Urinalysis + microscopy, CBC, albumin, electrolytes, fasting glucose, HbA1c, lipid profile, calcium/phosphate/ALP, HBsAg/anti-HCV/HIV, renal ultrasonography.' },
         { test: 'Selective tests', detail: 'C3/C4 and ANA if a secondary cause is suspected. Genetic testing only if an indication is met (next step).' },
       ],
       next: 'DN-04',
@@ -109,11 +109,11 @@ export const SRNS_PATHWAY = {
     'DN-04': {
       id: 'DN-04', type: 'ASSESSMENT', source: G1B,
       question: 'Are there features suggesting a genetic or secondary cause?',
-      detail: 'Genetic clues: onset <1 year, deafness/developmental delay/seizures, family history of SRNS or consanguinity, extrarenal anomalies (genitourinary, microcoria, dystrophic nails, microcephaly), syndromic features. Secondary clues: joint pain, weight loss, alopecia, jaundice, rash, palpable purpura, positive viral serology.',
+      detail: 'These features inform the genetic-testing decision in the next step. Genetic clues: onset <1 year, deafness/developmental delay/seizures, family history of SRNS or consanguinity, extrarenal anomalies (genitourinary, microcoria, dystrophic nails, microcephaly), syndromic features. Secondary clues: joint pain, weight loss, alopecia, jaundice, rash, palpable purpura, positive viral serology.',
       options: [
-        { label: 'Genetic features present — fast-track genetics', set: { genetic_features: true }, next: 'DN-07' },
-        { label: 'Secondary-cause features present', set: { secondary_features: true }, next: 'DN-05' },
-        { label: 'No extrarenal features — standard evaluation', next: 'DN-05' },
+        { label: 'Genetic features present', set: { genetic_features: true }, next: 'DN-07' },
+        { label: 'Secondary-cause features present', set: { secondary_features: true }, next: 'DN-07' },
+        { label: 'No extrarenal features', next: 'DN-07' },
       ],
     },
     'DN-05': {
@@ -123,7 +123,7 @@ export const SRNS_PATHWAY = {
       options: [
         { label: 'Biopsy required and not yet done — order now', next: 'DN-06' },
         { label: 'Biopsy already done — record result', next: 'DN-06' },
-        { label: 'Deferred — confirmed genetic; skip to genetics', set: { biopsy_deferred: true }, next: 'DN-07' },
+        { label: 'Deferred — confirmed genetic / congenital', set: { biopsy_deferred: true }, next: 'DN-09C', tone: 'muted' },
       ],
     },
     'DN-06': {
@@ -131,10 +131,10 @@ export const SRNS_PATHWAY = {
       question: 'What is the biopsy histology?',
       detail: 'FSGS 40–50% (CKD progression risk) · MCD 25–40% (better CNI response) · MesPGN 5–8% · Membranous/IgA/proliferative 10–15% (extra workup) · Collapsing FSGS → check HIV & parvovirus · C3 glomerulopathy → complement workup (may be outside SRNS pathway).',
       options: [
-        { label: 'FSGS', set: { biopsy_histology: 'FSGS' }, next: 'DN-07' },
-        { label: 'MCD', set: { biopsy_histology: 'MCD' }, next: 'DN-07' },
-        { label: 'MesPGN', set: { biopsy_histology: 'MesPGN' }, next: 'DN-07' },
-        { label: 'Membranous / IgA / proliferative / collapsing', set: { biopsy_histology: 'other' }, next: 'DN-07', tone: 'muted' },
+        { label: 'FSGS', set: { biopsy_histology: 'FSGS' }, next: 'DN-09C' },
+        { label: 'MCD', set: { biopsy_histology: 'MCD' }, next: 'DN-09C' },
+        { label: 'MesPGN', set: { biopsy_histology: 'MesPGN' }, next: 'DN-09C' },
+        { label: 'Membranous / IgA / proliferative / collapsing', set: { biopsy_histology: 'other' }, next: 'DN-09C', tone: 'muted' },
       ],
     },
 
@@ -153,9 +153,9 @@ export const SRNS_PATHWAY = {
         'Monogenic yield by onset: 0–3 mo 69% · 4–12 mo 50% · 1–6 y 25% · 7–12 y 18% · 13–18 y 11%. Late (secondary) resistance: genetic testing NOT indicated.',
       ],
       options: [
-        { label: 'Yes — meets ≥1 indication', next: 'DN-08' },
-        { label: 'No indication — proceed to CNI (non-genetic)', set: { genetic_test_status: 'not_indicated' }, next: 'DN-09C' },
-        { label: 'Defer — re-test after CNI non-response', set: { genetic_test_status: 'deferred' }, next: 'DN-09C', tone: 'muted' },
+        { label: 'Yes — meets an indication (perform genetic testing)', next: 'DN-08' },
+        { label: 'No indication — proceed to biopsy', set: { genetic_test_status: 'not_indicated' }, next: 'DN-05' },
+        { label: 'Defer genetics — proceed to biopsy now', set: { genetic_test_status: 'deferred' }, next: 'DN-05', tone: 'muted' },
       ],
     },
     'DN-08': {
@@ -169,8 +169,8 @@ export const SRNS_PATHWAY = {
       detail: 'PRIMARY PATHWAY DIVERGENCE. A confirmed monogenic cause means CNI and immunosuppression are generally NOT recommended — this drives the highest-priority safety flag before any CNI prescription.',
       options: [
         { label: 'Pathogenic / likely pathogenic — monogenic SRNS', set: { genetic_variant_status: 'PATHOGENIC', acmg_class: 'Pathogenic' }, next: 'DN-09B', tone: 'danger' },
-        { label: 'Negative / not done — presumed non-genetic', set: { genetic_variant_status: 'NEGATIVE' }, next: 'DN-09C' },
-        { label: 'VUS — treat as non-genetic, counsel uncertainty', set: { genetic_variant_status: 'VUS' }, next: 'DN-09C', tone: 'muted' },
+        { label: 'Negative / not done — presumed non-genetic', set: { genetic_variant_status: 'NEGATIVE' }, next: 'DN-05' },
+        { label: 'VUS — treat as non-genetic, counsel uncertainty', set: { genetic_variant_status: 'VUS' }, next: 'DN-05', tone: 'muted' },
         { label: 'Targetable mutation identified', set: { genetic_variant_status: 'TARGETABLE' }, next: 'DN-09D' },
       ],
     },
@@ -266,7 +266,7 @@ export const SRNS_PATHWAY = {
       question: 'CNI non-responder — has genetic testing been performed?',
       detail: 'CNI-resistant disease = non-response to cyclosporin OR tacrolimus in adequate doses titrated to blood levels for 6 months (Box I).',
       options: [
-        { label: 'Not yet performed — perform now', next: 'DN-07' },
+        { label: 'Not yet performed — send genetics & start alternative therapy', next: 'DN-15' },
         { label: 'Performed — negative / VUS', set: { genetic_variant_status: 'NEGATIVE' }, next: 'DN-15' },
         { label: 'Performed — pathogenic (monogenic)', set: { genetic_variant_status: 'PATHOGENIC', acmg_class: 'Pathogenic' }, next: 'DN-09B', tone: 'danger' },
       ],
