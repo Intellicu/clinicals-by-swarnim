@@ -396,6 +396,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const [synonymChips, setSynonymChips] = useState([]);
   const navigate = useNavigate();
   const containerRef = useRef();
+  const inputRef = useRef();
   const flatResults = useRef([]);
   const recognitionRef = useRef(null);
 
@@ -792,6 +793,19 @@ Question: ${q}`,
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // ── Cmd+K / Ctrl+K global shortcut ─────────────────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   // ── Keyboard nav ──────────────────────────────────────────────────────────
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && aiMode && query.trim()) { runAiAnswer(query); return; }
@@ -843,6 +857,7 @@ Question: ${q}`,
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
         <Input
+          ref={inputRef}
           value={query}
           onChange={e => { setQuery(e.target.value); if (!aiMode) {} }}
           onKeyDown={handleKeyDown}
