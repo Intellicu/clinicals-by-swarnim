@@ -165,76 +165,22 @@ export async function invokeGeneticsAnalyzer({ reportText = '', reportFile = nul
     return wrap(await withRetry(async () => {
       const fileUrl = await uploadIfPresent(reportFile);
       return base44.integrations.Core.InvokeLLM({
-        prompt: `You are a paediatric clinical geneticist specialising in nephrology. Apply the ACMG/AMP 2015 Standards and Guidelines (Richards et al., Genetics in Medicine 2015) rigorously for all variant interpretation.
+        prompt: `You are a paediatric clinical geneticist specialising in nephrology. Apply ACMG/AMP 2015 variant classification (Richards et al., Genet Med 2015) rigorously.
 
 ${clinicalContext ? `Clinical context: ${clinicalContext}` : ''}
 ${reportText ? `Genetic report:\n${reportText}` : ''}
 ${fileUrl ? '(Genetic report file attached)' : ''}
 
-KEY NEPHROPATHY GENES TO FLAG: ${NEPHROTIC_GENES.join(', ')}.
+ACMG CLASSIFICATION RULES:
+- Collect pathogenic criteria: PVS1 (null+LOF gene, Very Strong) | PS1-PS4 (Strong) | PM1-PM6 (Moderate) | PP1-PP5 (Supporting)
+- Collect benign criteria: BA1 (AF≥5%, Stand-alone=Benign alone) | BS1-BS4 (Strong) | BP1-BP7 (Supporting)
+- Classify: Pathogenic = PVS1+PS | PVS1+≥2PM | ≥2PS | PS+≥3PM etc. Likely Path = PVS1+PM | PS+PM | ≥3PM etc. Benign = BA1 or ≥2BS. Likely Benign = BS+BP or ≥2BP. VUS = all other.
+- PP3/BP4 count ONCE per variant (tools share algorithmic basis). PS2 needs both parents confirmed; PM6 if assumed.
 
-═══ ACMG/AMP 2015 CLASSIFICATION FRAMEWORK ═══
+NEPHROLOGY GENES (flag if identified): ${NEPHROTIC_GENES.join(', ')}.
+CNI SUPPRESSOR: If Pathogenic/Likely Pathogenic in NPHS1, NPHS2, WT1, or LAMB2 → prescription_suppressor_triggered=true, cni_contraindicated=true (ISPN 2021 §3.5, Grade 2C).
 
-STEP 1 — DETERMINE VARIANT TYPE AND CONSIDER PVS1:
-- Null variants (nonsense, frameshift, canonical ±1/2 splice sites, initiation codon, multi-exon deletions) in a gene where LOF is a known pathogenic mechanism → PVS1 (Very Strong).
-- CAVEATS: Do NOT apply PVS1 if LOF is not the known mechanism (e.g., GFAP, MYH7), if variant is at extreme 3' end, if splice variant causes exon skipping leaving protein mostly intact, or if multiple transcripts complicate interpretation.
-
-STEP 2 — COLLECT PATHOGENIC EVIDENCE CRITERIA:
-Very Strong:  PVS1 (null variant, LOF gene)
-Strong:       PS1 (same AA change as known pathogenic variant, different nucleotide)
-              PS2 (de novo, BOTH maternity AND paternity confirmed, disease + no family history)
-              PS3 (well-established functional studies showing damaging effect, validated in clinical lab setting)
-              PS4 (significantly higher prevalence in affected vs controls; RR/OR >5.0, CI not including 1.0)
-Moderate:     PM1 (mutational hotspot or critical functional domain, no benign variation)
-              PM2 (absent from large population databases or at extremely low frequency if recessive — gnomAD, ExAC, ESP)
-              PM3 (for recessive disorders: in trans with pathogenic variant; requires parental testing to confirm phase)
-              PM4 (in-frame indels in non-repeat region or stop-loss variants causing protein length change)
-              PM5 (novel missense at same AA residue as known pathogenic missense; e.g., Arg156His is pathogenic → Arg156Cys is novel)
-              PM6 (assumed de novo WITHOUT confirmation of both parents — use PM6, not PS2)
-Supporting:   PP1 (co-segregation with disease in multiple affected family members in a definitively disease-causing gene)
-              PP2 (missense in gene with low benign missense rate where missense is common disease mechanism)
-              PP3 (multiple computational/in silico tools predict deleterious effect — SIFT, PolyPhen-2, CADD, MutationTaster, etc. — count ONCE even if multiple tools agree)
-              PP4 (patient phenotype/family history highly specific for single-gene etiology)
-              PP5 (reputable source recently reports pathogenic, evidence not available for independent review — use cautiously)
-
-STEP 3 — COLLECT BENIGN EVIDENCE CRITERIA:
-Stand-alone:  BA1 (allele frequency ≥5% in ExAC/gnomAD/1000 Genomes/ESP — standalone benign)
-Strong:       BS1 (allele frequency greater than expected for disorder — disease prevalence-based threshold)
-              BS2 (observed in healthy adults for recessive homozygous/dominant het/X-linked hemizygous with full early penetrance expected)
-              BS3 (well-established functional studies show NO damaging effect on protein function or splicing)
-              BS4 (lack of segregation in affected family members — caveat: phenocopies)
-Supporting:   BP1 (missense in gene where ONLY truncating variants are pathogenic)
-              BP2 (in trans with pathogenic variant for dominant disorder, OR in cis with pathogenic variant in any pattern)
-              BP3 (in-frame indels in repetitive region without known function)
-              BP4 (multiple computational tools predict NO impact — count ONCE)
-              BP5 (variant found in case with alternate molecular basis for disease)
-              BP6 (reputable source reports benign, evidence not available — use cautiously)
-              BP7 (synonymous variant: splicing algorithms predict no splice impact AND nucleotide not highly conserved)
-
-STEP 4 — APPLY COMBINATION RULES (Richards et al. Table 5):
-PATHOGENIC:         PVS1 + ≥1 PS  |  PVS1 + ≥2 PM  |  PVS1 + PM + PP  |  PVS1 + ≥2 PP  |  ≥2 PS  |  PS + ≥3 PM  |  PS + 2PM + ≥2 PP  |  PS + PM + ≥4 PP
-LIKELY PATHOGENIC:  PVS1 + PM  |  PS + 1-2 PM  |  PS + ≥2 PP  |  ≥3 PM  |  2 PM + ≥2 PP  |  PM + ≥4 PP
-LIKELY BENIGN:      BS + BP  |  ≥2 BP
-BENIGN:             BA1 alone  |  ≥2 BS
-VUS:                All other combinations, or contradictory pathogenic+benign evidence
-
-STEP 5 — SPECIAL CONSIDERATIONS:
-- Population frequency: PM2 only if absent/very rare. Check gnomAD v4, ExAC, 1000G, ESP. For recessive conditions, also check gnomAD homozygotes.
-- De novo: PS2 requires both parents confirmed negative with identity testing. PM6 if parents assumed negative but not tested.
-- Functional studies: PS3/BS3 only if study is well-validated and reproducible; NOT all published functional assays qualify.
-- In silico tools: PP3/BP4 each count only ONCE regardless of how many tools agree (they share algorithmic basis).
-- VUS management: Do NOT use VUS for clinical decisions. Do NOT offer predictive family testing based on VUS alone. Re-contact lab in 2 years.
-
-STEP 6 — CLINICAL IMPLICATIONS (NEPHROLOGY-SPECIFIC):
-- PATHOGENIC/LIKELY PATHOGENIC variants in NPHS1, NPHS2, WT1, LAMB2 → CNI (calcineurin inhibitors: tacrolimus/cyclosporine) contraindicated; genetic SRNS does not respond to CNI (ISPN 2021 §3.5, Evidence Grade 2C)
-- COL4A3/A4/A5 (Alport): early ACEi/ARB to slow CKD progression; screen family for haematuria/CKD
-- PKD1/PKD2: consider tolvaptan in adolescents with rapidly progressive ADPKD (KDIGO ADPKD 2023)
-- CFH/CFI: eculizumab for aHUS; genetic testing guides complement inhibitor duration
-- HNF1B/PAX2: check for extrarenal features (MODY5, pancreatic hypoplasia, ocular anomalies)
-
-PRESCRIPTION SUPPRESSOR: If acmg_class = "Pathogenic" or "Likely Pathogenic" AND gene_identified is in [NPHS1, NPHS2, WT1, LAMB2, PLCE1 when non-responsive], set prescription_suppressor_triggered = true and cni_contraindicated = true.
-
-List ALL criteria you evaluated in acmg_criteria_applied. List which pathogenic criteria APPLY in pathogenic_evidence. List which benign criteria APPLY in benign_evidence. Explain the combination rule used in acmg_classification_rationale.`,
+List applicable criteria codes in pathogenic_evidence[] and benign_evidence[]. State the combination rule used in acmg_classification_rationale (one sentence).`,
         file_urls: fileUrl ? [fileUrl] : undefined,
         response_json_schema: {
           type: 'object',
@@ -248,7 +194,6 @@ List ALL criteria you evaluated in acmg_criteria_applied. List which pathogenic 
             acmg_classification_rationale: { type: 'string' },
             pathogenic_evidence: { type: 'array', items: { type: 'string' } },
             benign_evidence: { type: 'array', items: { type: 'string' } },
-            acmg_criteria_applied: { type: 'array', items: { type: 'string' } },
             population_frequency_note: { type: 'string' },
             is_nephrotic_gene: { type: 'boolean' },
             cni_contraindicated: { type: 'boolean' },
@@ -260,7 +205,6 @@ List ALL criteria you evaluated in acmg_criteria_applied. List which pathogenic 
             family_testing_recommended: { type: 'boolean' },
             family_testing_rationale: { type: 'string' },
             counseling_points: { type: 'array', items: { type: 'string' } },
-            limitations: { type: 'array', items: { type: 'string' } },
             next_steps: { type: 'array', items: { type: 'string' } },
             evidence_grade: { type: 'string', enum: ['1A', '1B', '2B', '2C', 'X'] },
             guideline_ref: { type: 'string' },
