@@ -283,44 +283,90 @@ Deno.serve(async (req) => {
 
       const emailBody = `Dear Dr. ${u.full_name || 'Colleague'},
 
-Your CliniCals Daily — ${today}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CliniCals Daily  ·  ${today}
 Theme: ${todayTheme}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-▶ Read today's full interactive summary:
+▶ Open today's full interactive summary
 ${summaryUrl}
 
-──────────────
 
-💡 Clinical Pearl · ${pearl.topic}
+─────────────────────────────
+💡  CLINICAL PEARL  ·  ${pearl.topic}
+─────────────────────────────
+
 ${pearl.pearl}
 
-📚 Guideline · ${guideline.org} — ${guideline.condition}
+
+─────────────────────────────
+📚  GUIDELINE REMINDER  ·  ${guideline.org}
+${guideline.condition}
+─────────────────────────────
+
 ${guideline.text}
 
-🔍 Diagnostic Challenge
-${challenge.vignette}
-Answer: ${challenge.options[challenge.answer]} (full explanation in the app)
 
-⚡ Emergency Minute · ${emergency.scenario.split("(")[0].trim()}
+─────────────────────────────
+🔍  DIAGNOSTIC CHALLENGE
+─────────────────────────────
+
+${challenge.vignette}
+
+  A. ${challenge.options[0]}
+  B. ${challenge.options[1]}
+  C. ${challenge.options[2]}
+  D. ${challenge.options[3]}
+
+Answer: ${challenge.options[challenge.answer]}
+→ Full explanation in the app
+
+
+─────────────────────────────
+⚡  EMERGENCY MINUTE
+${emergency.scenario.split("(")[0].trim()}
+─────────────────────────────
+
 ${emergency.steps}
 
-💊 Drug Spotlight · ${drug.drug}
+
+─────────────────────────────
+💊  DRUG SPOTLIGHT  ·  ${drug.drug}
+─────────────────────────────
+
 ${drug.pearl}
 
-🧬 Rare Disease · ${rareDisease.disease}
+
+─────────────────────────────
+🧬  RARE DISEASE  ·  ${rareDisease.disease}
+─────────────────────────────
+
 ${rareDisease.points}
 
-🧪 Lab Pearl
+
+─────────────────────────────
+🧪  LAB PEARL
+─────────────────────────────
+
 ${labPearl}
 
-📈 Trending · ${trendingTopic.topic}
+
+─────────────────────────────
+📈  TRENDING THIS WEEK
+${trendingTopic.topic}
+─────────────────────────────
+
 ${trendingTopic.desc}
 
-──────────────
-CliniCals by Swarnim · Pediatric Clinical Intelligence
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CliniCals by Swarnim
+Pediatric Clinical Intelligence
 Educational support only — verify all clinical decisions independently.
+
 Full summary: ${summaryUrl}
-Unsubscribe: ${unsubUrl}`;
+Unsubscribe: ${unsubUrl}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 
       try {
         await base44.asServiceRole.integrations.Core.SendEmail({
