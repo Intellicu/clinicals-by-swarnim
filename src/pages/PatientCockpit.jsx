@@ -17,6 +17,7 @@ import {
 import { format } from "date-fns";
 import { toast } from "sonner";
 import PatientContextBar from "@/components/clinic/PatientContextBar";
+import PatientAlertsStrip from "@/components/clinic/PatientAlertsStrip";
 import QuickVitalsCapture from "@/components/clinic/QuickVitalsCapture";
 import ContextualClinicalIntelligence from "@/components/clinic/ContextualClinicalIntelligence";
 import EnhancedDigitalPrescriptionPad from "@/components/clinic/EnhancedDigitalPrescriptionPad";
@@ -201,6 +202,19 @@ Be concise. Show source guideline.`,
 
           {/* Context bar */}
           <PatientContextBar patient={patient} vitals={vitals} bpStage={bpStage} />
+
+          {/* Alerts strip */}
+          <PatientAlertsStrip
+            vitals={vitals}
+            labs={labResults[0] ? {
+              creatinine: labResults[0].creatinine,
+              egfr: labResults[0].egfr,
+              potassium: labResults[0].potassium,
+              proteinuria: labResults[0].proteinuria,
+            } : {}}
+            onTabChange={(tabId) => setActiveTab(tabId)}
+            maxVisible={5}
+          />
 
           {/* Tab bar */}
           <div className="flex border-t border-slate-100 mt-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>

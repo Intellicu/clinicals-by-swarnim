@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,7 @@ import {
   ChevronRight, X
 } from "lucide-react";
 import NephrologyCalculators from "../components/calculators/NephrologyCalculators";
+import EmergencyToolsStrip from "@/components/hub/EmergencyToolsStrip";
 import RheumatologyCalculators from "../components/calculators/RheumatologyCalculators";
 import SteroidTaperEngine from "../components/calculators/SteroidTaperEngine";
 import DoseCalculatorEngine from "../components/calculators/DoseCalculatorEngine";
@@ -87,6 +88,7 @@ const SPECIALTY_TABS = [
 ];
 
 export default function CalculatorsHub() {
+  const navigate = useNavigate();
   const [view, setView] = useState("hub"); // "hub" | "specialty"
   const [activeTab, setActiveTab] = useState("nephrology");
   const [search, setSearch] = useState("");
@@ -210,6 +212,13 @@ export default function CalculatorsHub() {
         ) : (
           /* ── Browse Hub ── */
           <>
+            {/* Emergency tools strip */}
+            <EmergencyToolsStrip
+              searchQuery={search}
+              onNavigate={(route) => navigate(route)}
+              className="rounded-xl mb-4"
+            />
+
             {/* Search */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />

@@ -1,0 +1,355 @@
+/**
+ * Mobile Optimization & Accessibility Improvements
+ * Add this to src/app/globals.css or your main stylesheet
+ * 
+ * Ensures:
+ * - Touch targets 48×48px minimum on mobile
+ * - Input font 16px (prevents iOS auto-zoom)
+ * - Proper form spacing
+ * - Tab bar accessibility
+ */
+
+/* ========================================
+   MOBILE TOUCH TARGET OPTIMIZATION
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* All buttons must be minimum 48×48px on mobile */
+  button,
+  a[role="button"],
+  .btn,
+  [role="button"] {
+    min-height: 48px;
+    min-width: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+  }
+
+  /* Tab bar buttons - large touch targets */
+  [role="tablist"] button,
+  .tab-button,
+  .nav-tab {
+    min-height: 56px;
+    min-width: 56px;
+    padding: 12px;
+  }
+
+  /* Icon-only buttons need padding around icon */
+  button[data-icon-only],
+  .icon-button {
+    padding: 12px;
+  }
+
+  /* Form inputs - 16px font prevents iOS auto-zoom */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="time"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    transition: border-color 200ms ease-in-out;
+  }
+
+  /* Form inputs on focus */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  /* Form field spacing */
+  .form-group,
+  .form-field {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Label styling for mobile */
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  /* Fieldset spacing */
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Checkboxes & radio buttons - larger hit targets */
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  /* Checkbox label wrapper for easy tap */
+  label[data-checkbox],
+  label[data-radio] {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Select dropdown - larger on mobile */
+  select {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+}
+
+/* ========================================
+   DESKTOP ADJUSTMENTS (NO CHANGE)
+   ======================================== */
+
+@media (min-width: 769px) {
+  button,
+  a[role="button"],
+  .btn {
+    min-height: 40px;
+    padding: 8px 16px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  textarea,
+  select {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .form-group,
+  .form-field {
+    margin-bottom: 12px;
+    gap: 6px;
+  }
+}
+
+/* ========================================
+   VITALS INPUT OPTIMIZATION
+   ======================================== */
+
+.vitals-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .vitals-input-group {
+    gap: 16px;
+  }
+
+  .vitals-input-group input {
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+
+  /* Large +/- buttons for BP/HR input */
+  .vitals-increment-button,
+  .vitals-decrement-button {
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    transition: all 200ms ease-in-out;
+  }
+
+  .vitals-increment-button:active,
+  .vitals-decrement-button:active {
+    background: #f1f5f9;
+    border-color: #3b82f6;
+  }
+}
+
+/* ========================================
+   SLIDER INPUT FOR VITALS (OPTIONAL)
+   ======================================== */
+
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   PRESCRIPTION PAD MOBILE OPTIMIZATION
+   ======================================== */
+
+.prescription-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .prescription-pad {
+    gap: 20px;
+  }
+
+  /* Wizard step styling */
+  .prescription-step {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .prescription-step-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .prescription-step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Date/time picker optimization */
+  input[type="date"],
+  input[type="time"] {
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY & FOCUS STATES
+   ======================================== */
+
+/* High contrast focus indicators */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ========================================
+   KEYBOARD NAVIGATION
+   ======================================== */
+
+/* Show focus indicator for keyboard nav only (not mouse) */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Visible focus for dark backgrounds */
+button:focus-visible:dark,
+.dark button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+/* ========================================
+   LANDSCAPE ORIENTATION (iPhone in landscape)
+   ======================================== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  button {
+    min-height: 40px;
+    padding: 6px 12px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+
+  .form-group {
+    margin-bottom: 8px;
+    gap: 4px;
+  }
+}
