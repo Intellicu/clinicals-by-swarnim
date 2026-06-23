@@ -230,8 +230,8 @@ export default function GeneticReportAnalyzer() {
             <Alert className="bg-purple-50 border-purple-200">
               <Dna className="w-4 h-4 text-purple-600" />
               <AlertDescription className="text-xs text-purple-900">
-                <strong>AI Genetic Analysis Assistant</strong> — Classifies variants per ACMG/AMP 2015 criteria, explains gene-disease associations, provides TEACHING explanations for trainees, counselling guidance, and management plans. Upload PDF/image reports or paste findings directly.
-                <span className="block mt-1 text-purple-700 font-medium">⚠️ For educational and clinical decision support only. Always verify with a certified clinical geneticist/genetic counsellor.</span>
+                <strong>AI Genetic Analysis Assistant</strong> — Classifies variants using the ACMG/AMP 2015 Standards and Guidelines (Richards et al., <em>Genetics in Medicine</em> 2015) with explicit criteria codes (PVS1, PS1–PS4, PM1–PM6, PP1–PP5, BA1, BS1–BS4, BP1–BP7) and combination rules. Explains gene–disease associations, provides teaching explanations, counselling guidance, and management plans. Upload PDF/image reports or paste variant findings.
+                <span className="block mt-1 text-purple-700 font-medium">⚠️ For educational and clinical decision support only. Always verify with a certified clinical geneticist/genetic counsellor. ACMG 5-tier classification applies: Pathogenic · Likely Pathogenic · VUS · Likely Benign · Benign.</span>
               </AlertDescription>
             </Alert>
 
