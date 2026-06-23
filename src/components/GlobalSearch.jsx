@@ -8,9 +8,9 @@ import { base44 } from "@/api/base44Client";
 import { searchFormulary } from "@/lib/formulary/nephrology-drugs";
 import { resolveReference } from "@/lib/appRouteRegistry";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
 // STATIC KNOWLEDGE INDEX (pages / pathways / calculators)
-// ─────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
 const SEARCH_INDEX = [
   { title: "Minimal Change Disease (MCD)", category: "GN Pathway", page: "GlomerularDiseases", tags: ["MCD", "minimal change", "nephrotic", "prednisolone", "SSNS", "FRNS", "SDNS", "steroid sensitive", "foot process", "podocyte"] },
   { title: "FSGS – Focal Segmental Glomerulosclerosis", category: "GN Pathway", page: "GlomerularDiseases", tags: ["FSGS", "focal segmental", "podocin", "NPHS2", "tacrolimus", "cyclosporin", "sparsentan", "steroid resistant", "CNI"] },
@@ -105,7 +105,6 @@ const SEARCH_INDEX = [
   { title: "Clinical Approaches – Approach-Based", category: "Pathway", page: "ClinicalApproaches", tags: ["clinical approaches", "approach haematuria", "approach proteinuria", "approach hypertension", "approach AKI"] },
   { title: "AI Clinical Pathway Generator", category: "AI Tool", page: "AIClinicalPathway", tags: ["AI pathway", "pathway generator", "clinical decision AI", "differential AI"] },
   { title: "Discharge Summary Generator", category: "Tool", page: "DischargeSummary", tags: ["discharge summary", "discharge letter", "hospital discharge", "summary AI"] },
-  // ── Intelligence Engines ──
   { title: "Nephrotic Syndrome Engine (NS Engine)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=ns-engine", tags: ["NS engine", "nephrotic syndrome engine", "SSNS", "FRNS", "SDNS", "SRNS", "ISKDC", "relapse", "prednisolone", "rituximab"] },
   { title: "AKI Diagnostic Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-engine", tags: ["AKI engine", "acute kidney injury engine", "pRIFLE", "KDIGO AKI", "ATN", "oliguria", "RRT triggers"] },
   { title: "Hyperkalemia Deep Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hyperkalemia-deep-engine", tags: ["hyperkalemia engine", "K+ emergency", "calcium gluconate", "insulin dextrose", "salbutamol", "ECG potassium", "dialysis K"] },
@@ -146,15 +145,12 @@ const SEARCH_INDEX = [
   { title: "All Intelligence Engines", category: "Engine", page: "ClinicalSupport", params: "?tab=engines", tags: ["engines", "intelligence engines", "clinical engines", "diagnostic engines", "all engines"] },
   { title: "Wilms Tumor Engine (Nephroblastoma)", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=wilms-tumor-engine", tags: ["Wilms tumor", "nephroblastoma", "NWTS", "SIOP", "COG", "actinomycin vincristine", "WAGR", "BWS", "Denys-Drash", "WT1", "bilateral Wilms", "nephron sparing", "DD4A", "flank RT", "pediatric oncology nephrology"] },
   { title: "Daily Clinical Summary", category: "Tool", page: "DailySummary", tags: ["daily summary", "clinical briefing", "vignette", "learning pearl", "morning report"] },
-  // ── Growth, Nutrition & Development Engines ──
-  // Retired Growth/Nutrition/Dev engines → redirected to General Pediatrics Hub / Nutrition Hub / Anthropometry
   { title: "Vaccination Schedule (IAP 2023)", category: "Education", page: "GeneralPediatricsHub", tags: ["vaccination", "immunization engine", "IAP schedule", "catch-up vaccine", "CKD vaccine", "transplant vaccine", "live vaccine rules"] },
   { title: "Growth & Anthropometry Assessment", category: "Calculator", page: "Anthropometry", tags: ["growth", "z-score", "stunting", "wasting", "growth failure CKD", "WHO growth", "IAP growth", "short stature", "anthropometry", "SAM", "MUAC"] },
   { title: "SAM/MAM — Nutritional Assessment", category: "Pathway", page: "GeneralPediatricsHub", tags: ["SAM", "MAM", "malnutrition", "nutrition engine", "PEM", "kwashiorkor", "marasmus", "MUAC", "tube feeding", "WHO SAM protocol"] },
   { title: "Developmental Milestones & M-CHAT", category: "Education", page: "GeneralPediatricsHub", tags: ["developmental engine", "milestones", "M-CHAT autism", "developmental delay", "gross motor fine motor", "ASD", "neurodevelopment"] },
   { title: "Short Stature & Growth Hormone Deficiency", category: "Pathway", page: "PediatricEndocrinology", tags: ["short stature", "GHD", "growth hormone deficiency", "Turner", "bone age", "IGF-1", "constitutional delay"] },
   { title: "Renal Nutrition / CKD Diet", category: "Nutrition", page: "NutritionHub", tags: ["renal nutrition", "CKD diet", "dialysis nutrition", "phosphorus diet", "potassium restriction CKD", "KDOQI nutrition", "nephrotic diet"] },
-  // ── Oncology ──
   { title: "Paediatric Oncology Engine", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["oncology", "cancer", "ALL", "AML", "leukaemia", "Wilms", "neuroblastoma", "lymphoma", "TLS", "febrile neutropenia", "chemotherapy", "BFM", "SIOP", "COG", "UKALL", "paediatric oncology", "actinomycin", "vincristine"] },
   { title: "ALL – Acute Lymphoblastic Leukaemia Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["ALL", "acute lymphoblastic leukaemia", "UKALL", "BFM", "prednisolone VCR asparaginase", "6-MP MTX maintenance", "MRD ALL", "NUDT15", "induction ALL"] },
   { title: "AML – Acute Myeloid Leukaemia Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["AML", "acute myeloid leukaemia", "AML-BFM", "cytarabine idarubicin", "APL ATRA", "ATO arsenic", "FLT3", "autologous SCT", "induction AML", "APL differentiation syndrome"] },
@@ -164,11 +160,10 @@ const SEARCH_INDEX = [
   { title: "Febrile Neutropenia Protocol", category: "Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=oncology-engine", tags: ["febrile neutropenia", "FN", "ANC <500", "pip-taz piperacillin", "meropenem", "vancomycin", "liposomal amphotericin", "G-CSF", "MASCC score", "oncology emergency"] },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
 // PREDICTIVE SUGGESTIONS (instant, no DB call needed)
-// ─────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
 const PREDICTIVE_SUGGESTIONS = [
-  // Lupus / SLE
   { trigger: ["lupus", "ln", "sle"], suggestions: [
     { label: "Lupus Nephritis Management", page: "GlomerularDiseases", params: "?tab=lupus-nephritis" },
     { label: "ISN/RPS Classification (Class III-VI)", page: "GlomerularDiseases", params: "?tab=lupus-nephritis" },
@@ -178,7 +173,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "Biopsy Interpretation", page: "ClinicalAIHub", params: "?tab=biopsy" },
     { label: "Monitoring Protocol", page: "ClinicalSupport", params: "?tab=pathways&scenario=rheumatology-engine" },
   ]},
-  // Nephrotic Syndrome
   { trigger: ["nephrotic", "ns ", "nephrosis", "ssns", "frns", "sdns", "srns", "inss", "iskdc"], suggestions: [
     { label: "Nephrotic Syndrome Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=ns-engine" },
     { label: "ISKDC Protocol (SSNS)", page: "ClinicalSupport", params: "?tab=pathways&scenario=ns-engine" },
@@ -188,7 +182,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "MMF for NS", page: "DrugsDosing", params: "?search=mycophenolate" },
     { label: "Severe Oedema Management", page: "EmergencyHub", params: "" },
   ]},
-  // Tacrolimus
   { trigger: ["tacrolimus", "fk506", "fk 506", "tacro"], suggestions: [
     { label: "Tacrolimus Dosing (SRNS)", page: "DrugsDosing", params: "?search=tacrolimus" },
     { label: "Tacrolimus Trough Targets", page: "DrugsDosing", params: "?search=tacrolimus" },
@@ -196,7 +189,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "Tacrolimus Drug Interactions", page: "DrugsDosing", params: "?search=tacrolimus" },
     { label: "Transplant Protocols", page: "ClinicalSupport", params: "?tab=pathways&scenario=rrt-engine" },
   ]},
-  // AKI
   { trigger: ["aki", "acute kidney injury", "prifle"], suggestions: [
     { label: "AKI Engine (KDIGO Staging)", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-engine" },
     { label: "AKI Stager Calculator", page: "AKIStager", params: "" },
@@ -204,7 +196,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "Nephrotoxin Prevention", page: "ClinicalSupport", params: "?tab=pathways&scenario=aki-engine" },
     { label: "Fluid Management in AKI", page: "FluidCalculator", params: "" },
   ]},
-  // CKD
   { trigger: ["ckd", "chronic kidney", "egfr", "schwartz"], suggestions: [
     { label: "CKD Engine (KDIGO Staging)", page: "ClinicalSupport", params: "?tab=pathways&scenario=ckd-engine" },
     { label: "Schwartz GFR Calculator", page: "SchwartzGFR", params: "" },
@@ -213,7 +204,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "CKD Nutrition & Diet", page: "NutritionHub", params: "" },
     { label: "Renal Diet Generator", page: "NutritionHub", params: "" },
   ]},
-  // Hypertension
   { trigger: ["hypertension", "htn", "blood pressure", "bp ", "nicardipine", "labetalol"], suggestions: [
     { label: "Pediatric HTN Engine (2017 AAP)", page: "ClinicalSupport", params: "?tab=pathways&scenario=htn-engine" },
     { label: "BP Percentile Calculator", page: "BPPercentiles", params: "" },
@@ -221,7 +211,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "Antihypertensive Drug Dosing", page: "DrugsDosing", params: "?search=amlodipine" },
     { label: "Secondary HTN Investigation", page: "ClinicalSupport", params: "?tab=pathways&scenario=htn-engine" },
   ]},
-  // aHUS / TMA / Eculizumab
   { trigger: ["ahus", "a-hus", "tma", "eculizumab", "ravulizumab", "complement", "c3g", "c3 glomerulo"], suggestions: [
     { label: "aHUS / TMA Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hus-engine" },
     { label: "Eculizumab Dosing", page: "DrugsDosing", params: "?search=eculizumab" },
@@ -230,7 +219,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "Meningococcal Vaccination Guide", page: "GeneralPediatricsHub", params: "" },
     { label: "Complement Genetics Testing", page: "GeneticReportAnalyzer", params: "" },
   ]},
-  // Dialysis / RRT
   { trigger: ["dialysis", "haemodialysis", "hemodialysis", "peritoneal dialysis", "crrt", "pd ", "rrt", "kdigo dialysis"], suggestions: [
     { label: "RRT / Dialysis Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=rrt-engine" },
     { label: "RRT Assistant", page: "RRTAssistant", params: "" },
@@ -239,7 +227,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "CRRT / Continuous Dialysis", page: "RRTAssistant", params: "?tab=crrt" },
     { label: "Dialysis Drug Dosing", page: "DrugsDosing", params: "?formulary_category=Dialysis+Medications" },
   ]},
-  // Transplant
   { trigger: ["transplant", "immunosuppression", "rejection", "dsas", "abmr", "tacrolimus transplant", "basiliximab", "atg"], suggestions: [
     { label: "Transplant Immunosuppression Pathway", page: "UrologyNephrologyHub", params: "" },
     { label: "Tacrolimus Dosing (Transplant)", page: "DrugsDosing", params: "?search=tacrolimus" },
@@ -247,7 +234,6 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "Transplant Drug Formulary", page: "DrugsDosing", params: "?formulary_category=Transplant+Medications" },
     { label: "Vaccination Pre-Transplant", page: "GeneralPediatricsHub", params: "" },
   ]},
-  // Genetics
   { trigger: ["genetic", "exome", "srns genetic", "nphs1", "nphs2", "wt1", "col4", "alport", "hnf1b", "acmg", "variant", "vus"], suggestions: [
     { label: "Genetic Report Analyzer (ACMG)", page: "GeneticReportAnalyzer", params: "" },
     { label: "Alport / HNF1B Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=hnf1b-alport-engine" },
@@ -255,34 +241,29 @@ const PREDICTIVE_SUGGESTIONS = [
     { label: "Rare Disease Module", page: "RareDiseaseModule", params: "" },
     { label: "Fabry Disease Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=fabry-engine" },
   ]},
-  // Biopsy
   { trigger: ["biopsy", "renal biopsy", "histology", "lm ", "if staining", "em ", "fsgs biopsy", "igan biopsy"], suggestions: [
     { label: "Biopsy AI Analyzer", page: "ClinicalAIHub", params: "?tab=biopsy" },
     { label: "Renal Biopsy Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=renal-biopsy-engine" },
     { label: "Biopsy Patterns Database", page: "GlomerularDiseases", params: "" },
     { label: "Lupus Biopsy Classes (ISN/RPS)", page: "GlomerularDiseases", params: "?tab=lupus-nephritis" },
   ]},
-  // Rituxmab
   { trigger: ["rituximab", "rtx", "anti-cd20", "cd19", "b cell"], suggestions: [
     { label: "Rituximab Dosing (FRNS/SDNS)", page: "DrugsDosing", params: "?search=rituximab" },
     { label: "Rituximab in ANCA Vasculitis", page: "GlomerularDiseases", params: "?tab=anca-vasculitis" },
     { label: "Rituximab Monitoring Protocol", page: "DrugsDosing", params: "?search=rituximab" },
     { label: "Pre-Rituximab Workup", page: "DrugsDosing", params: "?search=rituximab" },
   ]},
-  // Cystinosis
   { trigger: ["cystinosis", "cysteamine", "ctns", "fanconi cystinosis"], suggestions: [
     { label: "Cystinosis Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=cystinosis-engine" },
     { label: "Cysteamine Dosing", page: "DrugsDosing", params: "?search=cysteamine" },
     { label: "Rare Disease Module", page: "RareDiseaseModule", params: "" },
   ]},
-  // Proteinuria
   { trigger: ["proteinuria", "upcr", "acr", "nephrotic range", "microalbuminuria"], suggestions: [
     { label: "Proteinuria Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=proteinuria-engine" },
     { label: "Nephrotic Syndrome Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=ns-engine" },
     { label: "Proteinuria Investigation Guide", page: "Proteinuria", params: "" },
     { label: "Renal Biopsy Indications", page: "ClinicalSupport", params: "?tab=pathways&scenario=renal-biopsy-engine" },
   ]},
-  // UTI / VUR
   { trigger: ["uti", "urinary tract infection", "pyelonephritis", "vur", "reflux", "dmsa", "vcug"], suggestions: [
     { label: "VUR / Recurrent UTI Engine", page: "ClinicalSupport", params: "?tab=pathways&scenario=vur-uti-engine" },
     { label: "Urology & Nephrology Hub", page: "UrologyNephrologyHub", params: "" },
@@ -301,16 +282,11 @@ function getPredictiveSuggestions(query) {
   return [];
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
 function includes(haystack, needle) {
   if (!haystack || !needle) return false;
   return String(haystack).toLowerCase().includes(needle.toLowerCase());
 }
 
-// Word-boundary match — needle must start a word (avoids "iga" matching
-// inside "Migalastat" / "Dabigatran"). Far more relevant for short queries.
 function wordMatch(haystack, needle) {
   if (!haystack || !needle) return false;
   const h = String(haystack).toLowerCase();
@@ -329,8 +305,6 @@ function snippet(text, query, maxLen = 90) {
   return (start > 0 ? "…" : "") + text.slice(start, end) + (end < text.length ? "…" : "");
 }
 
-// Score: title word-match = 3, tag word-match = 2, body word-match = 1.
-// Word-boundary scoring surfaces the most relevant items first.
 function scoreStaticItem(item, q) {
   const titleMatch = wordMatch(item.title, q) ? 3 : 0;
   const tagMatch = item.tags.some(t => wordMatch(t, q)) ? 2 : 0;
@@ -378,9 +352,6 @@ const ENTITY_GROUP_META = {
   static:     { label: "Pathways & Tools",       icon: Layers,        color: "text-slate-600" },
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
 export default function GlobalSearch({ placeholder = "Search drugs, guidelines, pathways...", className = "" }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -400,9 +371,7 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const flatResults = useRef([]);
   const recognitionRef = useRef(null);
 
-  // ── Indian medical term corrections ─────────────────────────────────────────
   const normaliseVoiceQuery = (text) => {
-    // Common misrecognitions for Indian English medical terms
     const corrections = {
       "capital": "catheter", "cathedra": "catheter", "capitol": "catheter",
       "peritoneum": "peritoneal", "dialyses": "dialysis",
@@ -434,23 +403,20 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     if (!SpeechRecognition) { alert("Voice search not supported in this browser"); return; }
     if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return; }
     const rec = new SpeechRecognition();
-    // Prefer Indian English; fall back gracefully to other Indian languages
     rec.lang = "en-IN";
     rec.interimResults = false;
-    rec.maxAlternatives = 5; // get more alternatives for better matching
+    rec.maxAlternatives = 5;
     rec.continuous = false;
     rec.onresult = (e) => {
-      // Pick best alternative after applying medical term corrections
       const transcripts = Array.from({ length: e.results[0].length }, (_, i) => e.results[0][i].transcript);
       const corrected = transcripts.map(normaliseVoiceQuery);
-      const t = corrected[0]; // use best (highest confidence) after correction
+      const t = corrected[0];
       setQuery(t);
       setIsListening(false);
       if (aiMode) runAiAnswer(t);
     };
     rec.onerror = (e) => {
       setIsListening(false);
-      // If language not supported, retry with default
       if (e.error === "language-not-supported") {
         console.warn("Voice language not supported — try typing");
       }
@@ -461,7 +427,6 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     setIsListening(true);
   }, [isListening, aiMode]);
 
-  // ── Smart query routing: detect drug/calc queries before calling AI ──────────
   function detectQueryType(q) {
     const ql = q.toLowerCase();
     if (/(dose|dosing|mg\/kg|how much|frequency|trough|level|tdm|iv dose|oral dose)/.test(ql)) return "drug";
@@ -476,7 +441,6 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
     setAiAnswer(null);
     setOpen(true);
     try {
-      // Fetch AppRoute records and SearchIndex context in parallel to inject into prompt
       const [appRoutes, searchIndexResults] = await Promise.allSettled([
         base44.entities.AppRoute.filter({ is_active: true }, "-search_rank", 27),
         base44.entities.SearchIndex.filter({ is_active: true }, "-rank", 8),
@@ -532,7 +496,6 @@ Question: ${q}`,
     setAiLoading(false);
   }, []);
 
-  // ── Instant predictive suggestions ────────────────────────────────────────
   useEffect(() => {
     const q = query.trim();
     if (!q || q.length < 3) {
@@ -543,13 +506,11 @@ Question: ${q}`,
     if (q.length >= 3) setOpen(true);
   }, [query]);
 
-  // ── Debounce (for DB search) ───────────────────────────────────────────────
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 300);
     return () => clearTimeout(t);
   }, [query]);
 
-  // ── Run search when debounced query changes ────────────────────────────────
   useEffect(() => {
     if (!debouncedQuery) {
       setGroups({});
@@ -566,7 +527,6 @@ Question: ${q}`,
     setLoading(true);
     const ql = q.toLowerCase();
 
-    // 0. Synonym expansion — query SearchSynonym entity before anything else
     let expandedTerms = [ql];
     let synonymChips = [];
     try {
@@ -582,12 +542,10 @@ Question: ${q}`,
           try { synonymChips = JSON.parse(syn.route_suggestions); } catch { synonymChips = []; }
         }
       }
-    } catch { /* silent — synonym lookup failure shouldn't block search */ }
+    } catch {}
 
-    // Helper: check if any expanded term matches
     const matchesAny = (text) => expandedTerms.some(t => wordMatch(text, t));
 
-    // 1. SearchIndex entity (DB-backed, sorted by rank)
     let dbIndexResults = [];
     try {
       const dbItems = await base44.entities.SearchIndex.filter({ is_active: true }, "-rank", 50);
@@ -604,9 +562,8 @@ Question: ${q}`,
           _score: String(item.title || "").toLowerCase().includes(ql) ? 3 : 2,
           navigate: () => item.app_url,
         }));
-    } catch { /* fall through to static index */ }
+    } catch {}
 
-    // 2. Static index (pathways / calculators) — used as fallback/supplement
     const staticMatches = SEARCH_INDEX
       .map(item => {
         const score = expandedTerms.reduce((s, t) => s + scoreStaticItem(item, t), 0);
@@ -627,7 +584,6 @@ Question: ${q}`,
         },
       }));
 
-    // 1b. Formulary static search (instant) — word-boundary filtered for relevance
     const formularyMatches = searchFormulary(q)
       .filter(d => wordMatch(d.generic, ql) || wordMatch(d.class, ql) ||
         (d.formulations?.[0]?.brands ? wordMatch(d.formulations[0].brands, ql) : false))
@@ -641,7 +597,6 @@ Question: ${q}`,
         navigate: () => createPageUrl("DrugsDosing") + `?formulary=${encodeURIComponent(d.generic)}`,
       }));
 
-    // 2. Entity searches (parallel)
     const [drugs, guidelines, protocols, teaching, biopsy] = await Promise.allSettled([
       searchDrugs(q, ql),
       searchGuidelines(q, ql),
@@ -660,10 +615,8 @@ Question: ${q}`,
     if (protocols.status === "fulfilled" && protocols.value.length) newGroups.protocols = protocols.value;
     if (teaching.status === "fulfilled" && teaching.value.length) newGroups.teaching = teaching.value;
     if (biopsy.status === "fulfilled" && biopsy.value.length) newGroups.biopsy = biopsy.value;
-    // Only add static if dbIndex didn't already cover those results
     if (staticMatches.length && dbIndexResults.length < 4) newGroups.static = staticMatches;
 
-    // Build flat list for keyboard nav
     flatResults.current = Object.values(newGroups).flat();
 
     setGroups(newGroups);
@@ -672,7 +625,6 @@ Question: ${q}`,
     setLoading(false);
   }, []);
 
-  // ── Entity search functions ────────────────────────────────────────────────
   async function searchDrugs(q, ql) {
     const all = await base44.entities.Drug.list("-updated_date", 200);
     return all
@@ -700,7 +652,6 @@ Question: ${q}`,
     const all = await base44.entities.Guideline.list("-updated_date", 200);
     return all
       .filter(g => {
-        // Exclude archived/superseded records from search results
         if (g.status === "Archived" || g.title?.startsWith("[MERGED")) return false;
         return (
           wordMatch(g.title, ql) ||
@@ -717,7 +668,6 @@ Question: ${q}`,
         badgeText: `${g.source || "Guideline"} ${g.year || ""}`.trim(),
         badgeClass: "bg-amber-100 text-amber-700",
         _score: scoreEntityItem(g.title + " " + (g.keywords || []).join(" "), g.summary + " " + (g.practice_pearls || []).join(" "), ql),
-        // Navigate directly to the guideline page with id — opens modal immediately
         navigate: () => createPageUrl("GuidelinesLibrary") + `?id=${g.id}`,
       }))
       .sort((a, b) => b._score - a._score)
@@ -786,14 +736,13 @@ Question: ${q}`,
       .slice(0, 3);
   }
 
-  // ── Click outside ──────────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e) => { if (!containerRef.current?.contains(e.target)) setOpen(false); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ── Cmd+K / Ctrl+K global shortcut ─────────────────────────────────────────
+  // Cmd+K / Ctrl+K global shortcut
   useEffect(() => {
     const handler = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -806,7 +755,6 @@ Question: ${q}`,
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // ── Keyboard nav ──────────────────────────────────────────────────────────
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && aiMode && query.trim()) { runAiAnswer(query); return; }
     if (!open) return;
@@ -829,7 +777,6 @@ Question: ${q}`,
   const hasResults = Object.values(groups).some(g => g.length > 0);
   const totalResults = Object.values(groups).reduce((s, g) => s + g.length, 0);
 
-  // Compute flat index offset per group for keyboard highlighting
   let runningIdx = 0;
   const groupOffsets = {};
   for (const key of Object.keys(groups)) {
@@ -837,12 +784,10 @@ Question: ${q}`,
     runningIdx += groups[key].length;
   }
 
-  // Import ReactMarkdown inline to avoid circular
   const ReactMarkdown = React.lazy(() => import("react-markdown"));
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      {/* Mode toggle */}
       <div className="flex items-center gap-1 mb-1.5">
         <button onClick={() => { setAiMode(false); setAiAnswer(null); }}
           className={`text-[10px] font-bold px-2.5 py-1 rounded-full transition-all ${!aiMode ? "bg-white text-indigo-700 shadow-sm" : "bg-white/20 text-white hover:bg-white/30"}`}>
@@ -880,7 +825,6 @@ Question: ${q}`,
         </div>
       </div>
 
-      {/* AI Answer Panel */}
       {aiMode && (aiLoading || aiAnswer) && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[500px] overflow-y-auto">
           {aiLoading && (
@@ -950,7 +894,6 @@ Question: ${q}`,
       {!aiMode && open && query.trim().length >= 3 && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[480px] overflow-y-auto">
 
-          {/* Synonym expansion chips — instant route suggestions */}
           {synonymChips.length > 0 && (
             <div className="px-3 py-2 border-b border-slate-100 bg-teal-50">
               <p className="text-[10px] font-bold text-teal-600 uppercase tracking-wide mb-1.5">Expanded Suggestions</p>
@@ -966,7 +909,6 @@ Question: ${q}`,
             </div>
           )}
 
-          {/* Predictive suggestions (instant, shown immediately while typing) */}
           {predictiveSuggestions.length > 0 && (
             <div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 border-b border-indigo-100 sticky top-0">
@@ -1006,7 +948,6 @@ Question: ${q}`,
 
             return (
               <div key={key}>
-                {/* Section header */}
                 <div className={`flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border-b border-slate-100 sticky top-0`}>
                   <Icon className={`w-3.5 h-3.5 ${meta.color}`} />
                   <span className={`text-xs font-semibold uppercase tracking-wide ${meta.color}`}>{meta.label}</span>
