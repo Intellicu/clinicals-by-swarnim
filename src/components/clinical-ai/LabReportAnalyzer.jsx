@@ -8,6 +8,7 @@ import { Upload, Loader2, TestTube, AlertTriangle, FlaskConical, BookOpen } from
 import { toast } from 'sonner';
 import { invokeLabAnalyzer } from '@/lib/LLMService';
 import { buildTraceabilityLink } from '@/lib/CIEEEngine';
+import ReportActions from '@/components/clinical-ai/ReportActions';
 
 const LAB_TYPES = ['RFT', 'VBG', 'ABG', 'Electrolytes', 'Urine Analysis', 'CBC', 'LFT', 'Lipids'];
 
@@ -269,6 +270,12 @@ export default function LabReportAnalyzer() {
               </div>
             )}
           </div>
+
+          <ReportActions
+            title={`${labType} Lab Report Analysis`}
+            result={analysis}
+            summary={analysis ? `${analysis.primary_interpretation}${analysis.ckd_stage ? ' · ' + analysis.ckd_stage : ''}${analysis.critical_values?.length ? '\nCritical: ' + analysis.critical_values.join('; ') : ''}` : ""}
+          />
 
           <Button variant="outline" size="sm" className="w-full" onClick={() => setActiveTab('analyze')}>
             Analyze Another Report

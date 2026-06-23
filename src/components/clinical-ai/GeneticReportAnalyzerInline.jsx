@@ -13,6 +13,7 @@ import { createPageUrl } from "@/utils";
 import { toast } from "sonner";
 import { invokeGeneticsAnalyzer } from "@/lib/LLMService";
 import { buildTraceabilityLink } from "@/lib/CIEEEngine";
+import ReportActions from "@/components/clinical-ai/ReportActions";
 
 const DISCLAIMER = "This tool provides educational and clinical decision-support information and does not replace physician judgment. Clinical correlation and specialist genetic counselling is required.";
 
@@ -348,6 +349,12 @@ export default function GeneticReportAnalyzerInline() {
               {trace.pmid && <p className="text-[10px] text-slate-400 mt-1">PMID: {trace.pmid}</p>}
             </div>
           )}
+
+          <ReportActions
+            title="Genetic Report Analysis"
+            result={result}
+            summary={result ? `ACMG: ${result.acmg_class} · Gene: ${result.gene_identified || '—'} · ${result.variant_hgvs || ''}${result.prescription_suppressor_triggered ? '\n⚠ CNI CONTRAINDICATED' : ''}` : ""}
+          />
 
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="flex-1" onClick={() => { setResult(null); setActiveTab("clinical"); }}>
