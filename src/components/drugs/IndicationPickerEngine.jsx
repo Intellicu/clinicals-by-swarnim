@@ -121,30 +121,32 @@ function DoseRuleIndicationPicker({ rules, drug, weight, bsa, onSelectRule }) {
                     onClick={() => setSelectedId(isSelected ? null : rule.id)}
                     className={`w-full text-left p-3 rounded-xl border-2 transition-all ${isSelected ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50"}`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-bold text-slate-900">{rule.indication}</span>
-                      <div className="flex items-center gap-1">
+                    {/* Header row */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <span className="text-sm font-bold text-slate-900 leading-snug">{rule.indication}</span>
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         {rule.phase && <Badge className="bg-slate-100 text-slate-600 text-[10px]">{rule.phase}</Badge>}
-                        {isSelected && <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />}
+                        {isSelected && <CheckCircle className="w-4 h-4 text-emerald-600" />}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-slate-700">
-                      <span><span className="text-slate-400">Dose: </span><strong>{rule.dose_value} {rule.dose_unit}</strong></span>
-                      <span><span className="text-slate-400">Freq: </span><strong>{rule.frequency || "—"}</strong></span>
-                      <span><span className="text-slate-400">Route: </span><strong>{rule.route || "—"}</strong></span>
-                      {rule.duration_days > 0 && <span><span className="text-slate-400">Duration: </span><strong>{rule.duration_days}d</strong></span>}
-                      {rule.duration_notes && <span className="col-span-2 text-slate-500 italic text-[11px]">{rule.duration_notes}</span>}
+                    {/* Dose details — stacked pairs */}
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-700 mb-2">
+                      <span><span className="text-slate-400">Dose </span><strong>{rule.dose_value} {rule.dose_unit}</strong></span>
+                      <span><span className="text-slate-400">Freq </span><strong>{rule.frequency || "—"}</strong></span>
+                      <span><span className="text-slate-400">Route </span><strong>{rule.route || "—"}</strong></span>
+                      {rule.duration_days > 0 && <span><span className="text-slate-400">Duration </span><strong>{rule.duration_days} days</strong></span>}
                     </div>
+                    {rule.duration_notes && <p className="text-[11px] text-slate-500 italic mb-2">{rule.duration_notes}</p>}
 
                     {/* Patient-specific calculated dose */}
                     {c && (
-                      <div className="mt-2 bg-teal-50 rounded-lg px-3 py-1.5 border border-teal-100">
+                      <div className="bg-teal-50 rounded-lg px-3 py-2 border border-teal-200">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-teal-700 font-semibold">For this patient:</span>
-                          <span className="text-sm font-bold text-teal-900">
-                            {c.finalDose} {c.unit.includes("kg") ? "mg" : c.unit.includes("m") ? "mg" : c.unit}
-                            {c.capped && <span className="ml-1 text-amber-600 text-xs">(capped at {c.capVal})</span>}
+                          <span className="text-xs text-teal-700 font-semibold">For {weight} kg patient:</span>
+                          <span className="text-base font-bold text-teal-900">
+                            {c.finalDose} mg
+                            {c.capped && <span className="ml-1 text-amber-600 text-xs font-normal">(max {c.capVal} mg)</span>}
                           </span>
                         </div>
                         <p className="text-[10px] text-teal-600 mt-0.5">{c.basisLabel}</p>
@@ -152,12 +154,12 @@ function DoseRuleIndicationPicker({ rules, drug, weight, bsa, onSelectRule }) {
                       </div>
                     )}
 
-                    {/* TDM warning */}
-                    {rule.tdm_required && (
-                      <p className="text-[10px] text-indigo-700 mt-1 font-semibold">🎯 TDM required — target: {rule.target_trough || "see guideline"}</p>
-                    )}
-                    {rule.guideline_source && (
-                      <p className="text-[10px] text-slate-400 mt-0.5">📚 {rule.guideline_source}</p>
+                    {/* Footer */}
+                    {(rule.tdm_required || rule.guideline_source) && (
+                      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5">
+                        {rule.tdm_required && <p className="text-[10px] text-indigo-700 font-semibold">🎯 TDM — target: {rule.target_trough || "see guideline"}</p>}
+                        {rule.guideline_source && <p className="text-[10px] text-slate-400">📚 {rule.guideline_source}</p>}
+                      </div>
                     )}
                   </button>
                 );
