@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Copy, Printer, Check } from "lucide-react";
+import { Copy, Printer, Check } from "lucide-react";
 import { toast } from "sonner";
 
-export default function ReportActions({ title = "Analysis Report", result, summary = "", printId }) {
+export default function ReportActions({ title = "Analysis Report", result, summary = "" }) {
   const [copied, setCopied] = useState(false);
 
   function handlePrint() {
@@ -16,39 +16,22 @@ export default function ReportActions({ title = "Analysis Report", result, summa
   }
 
   function handleCopy() {
+    const body = buildTextSummary(result) || summary;
     const lines = [
       `=== ${title} ===`,
       `Generated: ${new Date().toLocaleString()}`,
-      `Powered by ClinicalHub — For clinical use only`,
+      `ClinicalHub — For clinical use only`,
       "",
-      summary || buildTextSummary(result),
+      body,
       "",
       "--- Disclaimer ---",
-      "This is a clinical decision-support tool. Clinical correlation required.",
+      "Clinical decision-support only. Verify with a qualified clinician before any clinical action.",
     ];
     navigator.clipboard.writeText(lines.join("\n")).then(() => {
       setCopied(true);
       toast.success("Report copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => toast.error("Could not copy — please try manually"));
-  }
-
-  function handleDownload() {
-    if (!result) return;
-    const payload = {
-      title,
-      generated_at: new Date().toISOString(),
-      source: "ClinicalHub",
-      data: result,
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${title.replace(/\s+/g, "_")}_${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Report downloaded");
   }
 
   return (
@@ -62,222 +45,130 @@ export default function ReportActions({ title = "Analysis Report", result, summa
         <Printer className="w-3.5 h-3.5" />
         Save PDF
       </Button>
-      {result && (
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8" onClick={handleDownload}>
-          <Download className="w-3.5 h-3.5" />
-          JSON
-        </Button>
-      )}
     </div>
   );
 }
 
-// ── Full HTML report builder ─────────────────────────────────────────────────
 function buildPrintHTML(title, result, summary) {
   const ts = new Date().toLocaleString();
   const css = `
-    body { font-family: Arial, sans-serif; font-size: 12px; color: #1a1a1a; margin: 0; padding: 24px; }
-    h1 { font-size: 18px; color: #1e3a5f; border-bottom: 2px solid #1e3a5f; padding-bottom: 6px; margin-bottom: 4px; }
-    .meta { color: #666; font-size: 10px; margin-bottom: 20px; }
-    h2 { font-size: 13px; color: #1e3a5f; margin: 16px 0 6px; border-left: 3px solid #3b82f6; padding-left: 8px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin: 2px; }
-    .badge-red { background: #fee2e2; color: #991b1b; }
-    .badge-orange { background: #ffedd5; color: #9a3412; }
-    .badge-yellow { background: #fef9c3; color: #854d0e; }
-    .badge-green { background: #dcfce7; color: #166534; }
-    .badge-blue { background: #dbeafe; color: #1e40af; }
-    .badge-purple { background: #ede9fe; color: #5b21b6; }
-    .badge-gray { background: #f1f5f9; color: #334155; }
-    .row { display: flex; gap: 12px; margin-bottom: 4px; }
-    .label { font-weight: bold; min-width: 160px; color: #374151; }
-    .value { color: #1f2937; }
-    ul { margin: 4px 0 8px 0; padding-left: 18px; }
-    li { margin-bottom: 2px; }
-    .warn { background: #fff7ed; border: 1px solid #fb923c; border-radius: 4px; padding: 8px 12px; margin: 12px 0; }
-    .info { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 4px; padding: 8px 12px; margin: 12px 0; }
-    .disclaimer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #6b7280; }
-    @media print { body { padding: 12px; } }
+    body{font-family:Arial,sans-serif;font-size:12px;color:#1a1a1a;margin:0;padding:24px}
+    h1{font-size:18px;color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:6px;margin-bottom:4px}
+    .meta{color:#666;font-size:10px;margin-bottom:20px}
+    h2{font-size:13px;color:#1e3a5f;margin:16px 0 6px;border-left:3px solid #3b82f6;padding-left:8px}
+    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;margin:2px}
+    .r{background:#fee2e2;color:#991b1b}.o{background:#ffedd5;color:#9a3412}.y{background:#fef9c3;color:#854d0e}
+    .g{background:#dcfce7;color:#166534}.b{background:#dbeafe;color:#1e40af}.p{background:#ede9fe;color:#5b21b6}.gr{background:#f1f5f9;color:#334155}
+    .row{display:flex;gap:12px;margin-bottom:4px}.label{font-weight:bold;min-width:160px;color:#374151}
+    ul{margin:4px 0 8px;padding-left:18px}li{margin-bottom:2px}
+    .warn{background:#fff7ed;border:1px solid #fb923c;border-radius:4px;padding:8px 12px;margin:12px 0}
+    .info{background:#eff6ff;border:1px solid #93c5fd;border-radius:4px;padding:8px 12px;margin:12px 0}
+    .disc{margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:10px;color:#6b7280}
+    @media print{body{padding:12px}}
   `;
-
   let body = "";
-
   if (!result) {
-    body = `<p>${summary || "No analysis data available."}</p>`;
+    body = `<p>${summary || "No analysis data."}</p>`;
   } else if (result.primary_diagnosis !== undefined && result.primary_interpretation === undefined) {
-    // ── Biopsy report
-    body += renderBadgeRow("Diagnosis", result.primary_diagnosis, acmgColor(result.histology_class));
-    body += renderBadgeRow("Histology Class", result.histology_class, "badge-blue");
-    body += renderBadgeRow("Confidence", result.confidence_level, "badge-gray");
-    body += renderBadgeRow("Severity Grade", result.severity_grade, severityColor(result.severity_grade));
-    body += renderBadgeRow("Evidence Grade", result.evidence_grade, "badge-purple");
-    body += renderBadgeRow("Guideline", result.guideline_ref, "badge-gray");
-    body += renderBadgeRow("Recommendation Strength", result.recommendation_strength, "badge-gray");
+    body += row("Diagnosis", result.primary_diagnosis, "b") + row("Histology Class", result.histology_class, "b") + row("Confidence", result.confidence_level, "gr") + row("Severity", result.severity_grade, sev(result.severity_grade)) + row("Evidence Grade", result.evidence_grade, "p") + row("Guideline", result.guideline_ref, "gr") + row("Recommendation", result.recommendation_strength, "gr");
     if (result.prognosis) body += `<h2>Prognosis</h2><p>${result.prognosis}</p>`;
-    body += renderList("Glomerular Findings", result.glomerular_findings);
-    body += renderList("Tubular Findings", result.tubular_findings);
-    body += renderList("Interstitial Findings", result.interstitial_findings);
-    body += renderList("Vascular Findings", result.vascular_findings);
+    body += lst("Glomerular Findings", result.glomerular_findings) + lst("Tubular Findings", result.tubular_findings) + lst("Interstitial Findings", result.interstitial_findings) + lst("Vascular Findings", result.vascular_findings);
     if (result.immunofluorescence) body += `<h2>Immunofluorescence</h2><p>${result.immunofluorescence}</p>`;
     if (result.electron_microscopy) body += `<h2>Electron Microscopy</h2><p>${result.electron_microscopy}</p>`;
-    body += renderList("Differential Diagnoses", result.differential_diagnoses);
-    body += renderList("Treatment Recommendations", result.treatment_recommendations);
-    body += renderList("Key References", result.key_references);
+    body += lst("Differential Diagnoses", result.differential_diagnoses) + lst("Treatment Recommendations", result.treatment_recommendations) + lst("Key References", result.key_references);
   } else if (result.primary_interpretation !== undefined) {
-    // ── Lab report
     body += `<h2>Interpretation</h2><p>${result.primary_interpretation}</p>`;
-    body += renderBadgeRow("CKD Stage", result.ckd_stage, severityColor(result.ckd_stage));
-    body += renderBadgeRow("AKI Stage", result.aki_stage, severityColor(result.aki_stage));
-    body += renderBadgeRow("Severity", result.severity, severityColor(result.severity));
-    body += renderBadgeRow("Evidence Grade", result.evidence_grade, "badge-purple");
-    body += renderBadgeRow("Guideline", result.guideline_ref, "badge-gray");
-    body += renderBadgeRow("Recommendation Strength", result.recommendation_strength, "badge-gray");
+    body += row("CKD Stage", result.ckd_stage, sev(result.ckd_stage)) + row("AKI Stage", result.aki_stage, sev(result.aki_stage)) + row("Severity", result.severity, sev(result.severity)) + row("Acid-Base", result.acid_base_disorder, "o") + row("Compensation", result.compensation_status, "gr") + row("Evidence Grade", result.evidence_grade, "p") + row("Guideline", result.guideline_ref, "gr");
     const ev = result.extracted_values;
     if (ev) {
-      body += `<h2>Extracted Lab Values</h2>`;
-      const labFields = [
-        ["Creatinine", ev.creatinine_mg_dL, "mg/dL"],
-        ["BUN", ev.bun_mg_dL, "mg/dL"],
-        ["eGFR (reported)", ev.egfr_reported, "mL/min/1.73m²"],
-        ["eGFR (Schwartz)", ev.egfr_schwartz, "mL/min/1.73m²"],
-        ["eGFR used", ev.egfr_used, `mL/min/1.73m² (${ev.egfr_source || ""})`],
-        ["Sodium", ev.sodium_mEq_L, "mEq/L"],
-        ["Potassium", ev.potassium_mEq_L, "mEq/L"],
-        ["Calcium", ev.calcium_mg_dL, "mg/dL"],
-        ["Phosphate", ev.phosphate_mg_dL, "mg/dL"],
-        ["Albumin", ev.albumin_g_dL, "g/dL"],
-        ["Haemoglobin", ev.haemoglobin_g_dL, "g/dL"],
-      ];
-      body += `<ul>${labFields.filter(f => f[1] != null).map(f => `<li><b>${f[0]}:</b> ${f[1]} ${f[2]}</li>`).join("")}</ul>`;
+      body += `<h2>Extracted Lab Values</h2><ul>`;
+      [["Creatinine",ev.creatinine_mg_dL,"mg/dL"],["BUN",ev.bun_mg_dL,"mg/dL"],["eGFR reported",ev.egfr_reported,"mL/min/1.73m²"],["eGFR Schwartz",ev.egfr_schwartz,"mL/min/1.73m²"],["eGFR used",ev.egfr_used,`mL/min/1.73m² (${ev.egfr_source||""})`],["Sodium",ev.sodium_mEq_L,"mEq/L"],["Potassium",ev.potassium_mEq_L,"mEq/L"],["Calcium",ev.calcium_mg_dL,"mg/dL"],["Phosphate",ev.phosphate_mg_dL,"mg/dL"],["Albumin",ev.albumin_g_dL,"g/dL"],["Haemoglobin",ev.haemoglobin_g_dL,"g/dL"]].filter(f=>f[1]!=null).forEach(f=>{ body+=`<li><b>${f[0]}:</b> ${f[1]} ${f[2]}</li>`; });
+      body += "</ul>";
     }
-    if (result.acid_base_disorder) body += renderBadgeRow("Acid-Base Disorder", result.acid_base_disorder, "badge-orange");
-    if (result.compensation_status) body += renderBadgeRow("Compensation", result.compensation_status, "badge-gray");
-    body += renderList("Critical Values", result.critical_values, true);
-    body += renderList("Abnormal Findings", result.abnormal_findings);
-    body += renderList("Differential Diagnosis", result.differential_diagnosis);
-    body += renderList("Treatment Recommendations", result.treatment_recommendations);
-    body += renderList("Additional Tests", result.additional_tests);
-    body += renderList("Clinical Pearls", result.clinical_pearls);
+    body += lst("Critical Values", result.critical_values) + lst("Abnormal Findings", result.abnormal_findings) + lst("Differential Diagnosis", result.differential_diagnosis) + lst("Treatment Recommendations", result.treatment_recommendations) + lst("Additional Tests", result.additional_tests) + lst("Clinical Pearls", result.clinical_pearls);
   } else if (result.acmg_class !== undefined) {
-    // ── Genetics report
-    body += renderBadgeRow("ACMG Classification", result.acmg_class, acmgColor(result.acmg_class));
-    body += renderBadgeRow("Gene", result.gene_identified, "badge-purple");
-    body += renderBadgeRow("Variant (HGVS)", result.variant_hgvs, "badge-gray");
-    body += renderBadgeRow("Variant Type", result.variant_type, "badge-gray");
-    body += renderBadgeRow("Zygosity", result.zygosity, "badge-blue");
-    body += renderBadgeRow("Inheritance", result.inheritance_pattern, "badge-gray");
-    body += renderBadgeRow("Evidence Grade", result.evidence_grade, "badge-purple");
-    body += renderBadgeRow("Guideline", result.guideline_ref, "badge-gray");
+    body += row("ACMG Class", result.acmg_class, acmgC(result.acmg_class)) + row("Gene", result.gene_identified, "p") + row("Variant (HGVS)", result.variant_hgvs, "gr") + row("Variant Type", result.variant_type, "gr") + row("Zygosity", result.zygosity, "b") + row("Inheritance", result.inheritance_pattern, "gr") + row("Evidence Grade", result.evidence_grade, "p") + row("Guideline", result.guideline_ref, "gr");
     if (result.acmg_classification_rationale) body += `<h2>Classification Rationale</h2><p>${result.acmg_classification_rationale}</p>`;
-    if (result.pathogenic_evidence?.length) body += `<h2>Pathogenic Evidence Criteria</h2><p>${result.pathogenic_evidence.map(c => `<span class="badge badge-red">${c}</span>`).join(" ")}</p>`;
-    if (result.benign_evidence?.length) body += `<h2>Benign Evidence Criteria</h2><p>${result.benign_evidence.map(c => `<span class="badge badge-blue">${c}</span>`).join(" ")}</p>`;
-    if (result.prescription_suppressor_triggered) body += `<div class="warn"><b>⚠ CNI CONTRAINDICATED</b> — Prescription Suppressor Activated (ISPN 2021 §3.5, Grade 2C)<br>${result.suppression_reason || ""}</div>`;
+    if (result.pathogenic_evidence?.length) body += `<h2>Pathogenic Criteria</h2><p>${result.pathogenic_evidence.map(c=>`<span class="badge r">${c}</span>`).join(" ")}</p>`;
+    if (result.benign_evidence?.length) body += `<h2>Benign Criteria</h2><p>${result.benign_evidence.map(c=>`<span class="badge b">${c}</span>`).join(" ")}</p>`;
+    if (result.prescription_suppressor_triggered) body += `<div class="warn"><b>⚠ CNI CONTRAINDICATED</b> — Prescription Suppressor Activated (ISPN 2021 §3.5, Grade 2C)<br>${result.suppression_reason||""}</div>`;
     if (result.disease_association) body += `<h2>Disease Association</h2><p>${result.disease_association}</p>`;
     if (result.clinical_significance) body += `<h2>Clinical Significance</h2><p>${result.clinical_significance}</p>`;
     if (result.population_frequency_note) body += `<h2>Population Frequency</h2><p>${result.population_frequency_note}</p>`;
-    body += renderList("Management Implications", result.management_implications);
-    body += renderList("Counselling Points", result.counseling_points);
-    body += renderList("Next Steps", result.next_steps);
-    if (result.family_testing_recommended) body += `<div class="info"><b>Family Testing Recommended</b> — ${result.family_testing_rationale || ""}</div>`;
+    body += lst("Management Implications", result.management_implications) + lst("Counselling Points", result.counseling_points) + lst("Next Steps", result.next_steps);
+    if (result.family_testing_recommended) body += `<div class="info"><b>Family Testing Recommended</b> — ${result.family_testing_rationale||""}</div>`;
   } else if (result.most_likely_diagnosis !== undefined) {
-    // ── Case report
-    body += renderBadgeRow("Most Likely Diagnosis", result.most_likely_diagnosis, "badge-blue");
-    body += renderBadgeRow("Confidence", result.confidence_level, "badge-gray");
+    body += row("Most Likely Diagnosis", result.most_likely_diagnosis, "b") + row("Confidence", result.confidence_level, "gr");
     if (result.case_summary) body += `<h2>Case Summary</h2><p>${result.case_summary}</p>`;
     if (result.pathophysiology) body += `<h2>Pathophysiology</h2><p>${result.pathophysiology}</p>`;
-    body += renderList("Problem List", result.problem_list);
-    if (result.differential_diagnoses?.length) {
-      body += `<h2>Differential Diagnoses</h2><ul>${result.differential_diagnoses.map(d =>
-        `<li><b>${d.diagnosis}</b> (${d.probability}) — ${d.reasoning}</li>`).join("")}</ul>`;
-    }
+    body += lst("Problem List", result.problem_list);
+    if (result.differential_diagnoses?.length) body += `<h2>Differential Diagnoses</h2><ul>${result.differential_diagnoses.map(d=>`<li><b>${d.diagnosis}</b> (${d.probability}) — ${d.reasoning}</li>`).join("")}</ul>`;
     const mp = result.management_plan;
-    if (mp) {
-      body += renderList("Immediate Management", mp.immediate);
-      body += renderList("Short-Term Management", mp.short_term);
-      body += renderList("Long-Term Management", mp.long_term);
-    }
-    body += renderList("Red Flags", result.red_flags);
-    body += renderList("Additional Investigations", result.additional_investigations);
-    body += renderList("Counselling Points", result.counseling_points);
+    if (mp) body += lst("Immediate Management", mp.immediate) + lst("Short-Term Management", mp.short_term) + lst("Long-Term Management", mp.long_term);
+    body += lst("Red Flags", result.red_flags) + lst("Additional Investigations", result.additional_investigations) + lst("Counselling Points", result.counseling_points);
     if (result.prognosis) body += `<h2>Prognosis</h2><p>${result.prognosis}</p>`;
     if (result.follow_up_plan) body += `<h2>Follow-Up Plan</h2><p>${result.follow_up_plan}</p>`;
-    body += renderList("Guidelines Applied", result.guidelines_applied);
-    if (result.traceability_links?.length) {
-      body += `<h2>Evidence Traceability</h2><ul>${result.traceability_links.map(t =>
-        `<li><b>${t.recommendation}</b> — ${t.guideline} ${t.section || ""} [${t.evidence_grade || ""}] (${t.recommendation_strength || ""})</li>`).join("")}</ul>`;
-    }
-  } else {
-    body += `<p>${summary}</p>`;
-  }
+    body += lst("Guidelines Applied", result.guidelines_applied);
+    if (result.traceability_links?.length) body += `<h2>Evidence Traceability</h2><ul>${result.traceability_links.map(t=>`<li><b>${t.recommendation}</b> — ${t.guideline} ${t.section||""} [${t.evidence_grade||""}] (${t.recommendation_strength||""})</li>`).join("")}</ul>`;
+  } else { body = `<p>${summary}</p>`; }
 
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><style>${css}</style></head><body>
-    <h1>${title}</h1>
-    <p class="meta">Generated: ${ts} &nbsp;·&nbsp; ClinicalHub — For clinical use only</p>
-    ${body}
-    <div class="disclaimer">⚠ This report is generated by an AI clinical decision-support tool. All findings must be verified by a qualified clinician before any clinical action is taken. Not a substitute for professional medical judgement.</div>
-  </body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><style>${css}</style></head><body><h1>${title}</h1><p class="meta">Generated: ${ts} · ClinicalHub — For clinical use only</p>${body}<div class="disc">⚠ AI clinical decision-support. Verify with a qualified clinician before any clinical action.</div></body></html>`;
 }
 
-function renderBadgeRow(label, value, badgeClass = "badge-gray") {
-  if (!value) return "";
-  return `<div class="row"><span class="label">${label}:</span><span class="badge ${badgeClass}">${value}</span></div>`;
-}
-
-function renderList(label, arr, warn = false) {
-  if (!arr?.length) return "";
-  const cls = warn ? "warn" : "";
-  return `<h2>${label}</h2><ul class="${cls}">${arr.map(i => `<li>${i}</li>`).join("")}</ul>`;
-}
-
-function acmgColor(val) {
-  if (!val) return "badge-gray";
-  const v = val.toLowerCase();
-  if (v.includes("pathogenic") && !v.includes("likely")) return "badge-red";
-  if (v.includes("likely pathogenic")) return "badge-orange";
-  if (v.includes("vus") || v.includes("uncertain")) return "badge-yellow";
-  if (v.includes("likely benign")) return "badge-blue";
-  if (v.includes("benign")) return "badge-green";
-  return "badge-blue";
-}
-
-function severityColor(val) {
-  if (!val) return "badge-gray";
-  const v = val.toLowerCase();
-  if (v.includes("critical") || v.includes("severe") || v.includes("stage 5") || v.includes("g5")) return "badge-red";
-  if (v.includes("moderate") || v.includes("stage 3") || v.includes("stage 4") || v.includes("g3") || v.includes("g4")) return "badge-orange";
-  if (v.includes("mild") || v.includes("stage 2") || v.includes("g2")) return "badge-yellow";
-  return "badge-gray";
-}
+function row(label, value, cls="gr") { if(!value) return ""; return `<div class="row"><span class="label">${label}:</span><span class="badge ${cls}">${value}</span></div>`; }
+function lst(label, arr) { if(!arr?.length) return ""; return `<h2>${label}</h2><ul>${arr.map(i=>`<li>${i}</li>`).join("")}</ul>`; }
+function acmgC(v="") { const l=v.toLowerCase(); if(l.includes("pathogenic")&&!l.includes("likely")) return "r"; if(l.includes("likely pathogenic")) return "o"; if(l.includes("vus")||l.includes("uncertain")) return "y"; if(l.includes("likely benign")) return "b"; if(l.includes("benign")) return "g"; return "b"; }
+function sev(v="") { const l=v.toLowerCase(); if(l.includes("critical")||l.includes("severe")||l.match(/stage [45]|g[45]/)) return "r"; if(l.includes("moderate")||l.match(/stage [34]|g[34]/)) return "o"; if(l.includes("mild")||l.match(/stage [12]|g[12]/)) return "y"; return "gr"; }
 
 function buildTextSummary(result) {
   if (!result) return "";
   const lines = [];
-  if (result.acmg_class) {
-    lines.push(`ACMG Classification: ${result.acmg_class}`);
-    if (result.gene_identified) lines.push(`Gene: ${result.gene_identified}`);
-    if (result.variant_hgvs) lines.push(`Variant: ${result.variant_hgvs}`);
-    if (result.zygosity) lines.push(`Zygosity: ${result.zygosity}`);
-    if (result.acmg_classification_rationale) lines.push(`Rationale: ${result.acmg_classification_rationale}`);
-    if (result.prescription_suppressor_triggered) lines.push("⚠ CNI CONTRAINDICATED — Prescription Suppressor Activated");
-    if (result.management_implications?.length) lines.push("Management: " + result.management_implications.join("; "));
-  }
-  if (result.primary_interpretation) {
-    lines.push(`Interpretation: ${result.primary_interpretation}`);
-    if (result.ckd_stage) lines.push(`CKD Stage: ${result.ckd_stage}`);
-    if (result.aki_stage) lines.push(`AKI Stage: ${result.aki_stage}`);
+  const add = (label, val) => val && lines.push(`${label}: ${val}`);
+  const addList = (label, arr) => arr?.length && lines.push(`${label}:\n${arr.map(i => `  • ${i}`).join("\n")}`);
+
+  if (result.acmg_class !== undefined) {
+    add("ACMG Classification", result.acmg_class); add("Gene", result.gene_identified); add("Variant", result.variant_hgvs);
+    add("Zygosity", result.zygosity); add("Inheritance", result.inheritance_pattern); add("Variant Type", result.variant_type);
+    add("Rationale", result.acmg_classification_rationale);
+    result.pathogenic_evidence?.length && lines.push(`Pathogenic Criteria: ${result.pathogenic_evidence.join(", ")}`);
+    result.benign_evidence?.length && lines.push(`Benign Criteria: ${result.benign_evidence.join(", ")}`);
+    result.prescription_suppressor_triggered && lines.push("⚠ CNI CONTRAINDICATED — Prescription Suppressor Activated");
+    add("Disease Association", result.disease_association); add("Clinical Significance", result.clinical_significance);
+    add("Population Frequency", result.population_frequency_note);
+    addList("Management Implications", result.management_implications); addList("Counselling Points", result.counseling_points); addList("Next Steps", result.next_steps);
+    result.family_testing_recommended && lines.push(`Family Testing Recommended: ${result.family_testing_rationale || "Yes"}`);
+  } else if (result.primary_interpretation !== undefined) {
+    add("Interpretation", result.primary_interpretation); add("CKD Stage", result.ckd_stage); add("AKI Stage", result.aki_stage);
+    add("Severity", result.severity); add("Acid-Base Disorder", result.acid_base_disorder); add("Compensation", result.compensation_status);
     const ev = result.extracted_values;
-    if (ev?.creatinine_mg_dL) lines.push(`Creatinine: ${ev.creatinine_mg_dL} mg/dL`);
-    if (ev?.egfr_used) lines.push(`eGFR: ${ev.egfr_used.toFixed(1)} mL/min/1.73m²`);
-    if (result.critical_values?.length) lines.push("Critical: " + result.critical_values.join("; "));
-    if (result.treatment_recommendations?.length) lines.push("Treatment: " + result.treatment_recommendations.join("; "));
+    if (ev) {
+      [["Creatinine",ev.creatinine_mg_dL,"mg/dL"],["BUN",ev.bun_mg_dL,"mg/dL"],["eGFR used",ev.egfr_used,`mL/min/1.73m² (${ev.egfr_source||""})`],["Sodium",ev.sodium_mEq_L,"mEq/L"],["Potassium",ev.potassium_mEq_L,"mEq/L"],["Calcium",ev.calcium_mg_dL,"mg/dL"],["Phosphate",ev.phosphate_mg_dL,"mg/dL"],["Albumin",ev.albumin_g_dL,"g/dL"],["Haemoglobin",ev.haemoglobin_g_dL,"g/dL"]].filter(f=>f[1]!=null).forEach(f=>lines.push(`${f[0]}: ${f[1]} ${f[2]}`));
+    }
+    addList("Critical Values", result.critical_values); addList("Abnormal Findings", result.abnormal_findings);
+    addList("Differential Diagnosis", result.differential_diagnosis); addList("Treatment Recommendations", result.treatment_recommendations);
+    addList("Additional Tests", result.additional_tests); addList("Clinical Pearls", result.clinical_pearls);
+  } else if (result.primary_diagnosis !== undefined) {
+    add("Diagnosis", result.primary_diagnosis); add("Histology Class", result.histology_class); add("Confidence", result.confidence_level);
+    add("Severity Grade", result.severity_grade); add("Prognosis", result.prognosis);
+    if (result.immunofluorescence) add("Immunofluorescence", result.immunofluorescence);
+    if (result.electron_microscopy) add("Electron Microscopy", result.electron_microscopy);
+    addList("Glomerular Findings", result.glomerular_findings); addList("Tubular Findings", result.tubular_findings);
+    addList("Interstitial Findings", result.interstitial_findings); addList("Vascular Findings", result.vascular_findings);
+    addList("Differential Diagnoses", result.differential_diagnoses); addList("Treatment Recommendations", result.treatment_recommendations);
+    addList("Key References", result.key_references);
+  } else if (result.most_likely_diagnosis !== undefined) {
+    add("Most Likely Diagnosis", result.most_likely_diagnosis); add("Confidence", result.confidence_level);
+    add("Case Summary", result.case_summary); add("Pathophysiology", result.pathophysiology);
+    addList("Problem List", result.problem_list);
+    result.differential_diagnoses?.length && lines.push(`Differentials:\n${result.differential_diagnoses.map(d=>`  • ${d.diagnosis} (${d.probability}) — ${d.reasoning}`).join("\n")}`);
+    const mp = result.management_plan;
+    if (mp) { addList("Immediate Management", mp.immediate); addList("Short-Term Management", mp.short_term); addList("Long-Term Management", mp.long_term); }
+    addList("Red Flags", result.red_flags); addList("Additional Investigations", result.additional_investigations);
+    addList("Counselling Points", result.counseling_points); add("Prognosis", result.prognosis); add("Follow-Up Plan", result.follow_up_plan);
+    addList("Guidelines Applied", result.guidelines_applied);
+    result.traceability_links?.length && lines.push(`Evidence Traceability:\n${result.traceability_links.map(t=>`  • ${t.recommendation} — ${t.guideline} ${t.section||""} [${t.evidence_grade||""}]`).join("\n")}`);
   }
-  if (result.primary_diagnosis && !result.primary_interpretation) {
-    lines.push(`Diagnosis: ${result.primary_diagnosis}`);
-    if (result.histology_class) lines.push(`Histology: ${result.histology_class}`);
-    if (result.severity_grade) lines.push(`Severity: ${result.severity_grade}`);
-    if (result.prognosis) lines.push(`Prognosis: ${result.prognosis}`);
-    if (result.treatment_recommendations?.length) lines.push("Treatment: " + result.treatment_recommendations.join("; "));
-  }
-  if (result.evidence_grade) lines.push(`Evidence Grade: ${result.evidence_grade}`);
-  if (result.guideline_ref) lines.push(`Guideline: ${result.guideline_ref}`);
+
+  add("Evidence Grade", result.evidence_grade); add("Guideline", result.guideline_ref); add("Recommendation Strength", result.recommendation_strength);
   return lines.join("\n");
 }
