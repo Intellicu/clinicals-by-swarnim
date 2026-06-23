@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, Loader2, Microscope, AlertCircle, BookOpen, ArrowRight, Stethoscope, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { buildTraceabilityLink } from '@/lib/CIEEEngine';
+import ReportActions from '@/components/clinical-ai/ReportActions';
 
 const PATTERN_LINKS = {
   "FSGS": [
@@ -328,6 +329,12 @@ For evidence_grade use KDIGO 2021 grades: 1A, 1B, 2B, 2C, or X. Reference specif
               </div>
             </div>
           </div>
+
+          <ReportActions
+            title="Biopsy Analysis Report"
+            result={analysis}
+            summary={analysis ? `Diagnosis: ${analysis.primary_diagnosis} · Class: ${analysis.histology_class} · Severity: ${analysis.severity_grade || '—'}\nPrognosis: ${analysis.prognosis || '—'}` : ""}
+          />
 
           <Button variant="outline" size="sm" className="w-full" onClick={() => setActiveTab('analyze')}>
             Analyse Another Biopsy
