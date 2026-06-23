@@ -60,16 +60,43 @@ const VACCINES = [
   { name: "Influenza (inactivated)", type: "Annual", note: "Annual dose — inactivated only, not live attenuated" },
 ];
 
+const ANTIBIOTIC_PROPHYLAXIS = [
+  {
+    indication: "Unvaccinated or incompletely immunized against meningococcus at initiation of therapy; To eradicate nasal carriage",
+    duration: "First two weeks",
+    options: [
+      { drug: "IV Ceftriaxone", dose: "25–50 mg/kg twice daily (max 500 mg twice daily)" },
+      { drug: "Oral Ciprofloxacin", dose: "10 mg/kg (max 500 mg) twice daily" },
+    ],
+  },
+  {
+    indication: "Long-term prophylaxis for all patients (vaccinated or unvaccinated)",
+    duration: "Continue up to 2 months after the last dose of eculizumab",
+    options: [
+      { drug: "Penicillin V", dose: "1–11 months: 62.5 mg twice daily; 1–4 years: 125 mg twice daily; ≥5 years: 250 mg twice daily" },
+      { drug: "Erythromycin", dose: "0–3 months: 12.5 mg twice daily (if unvaccinated); 24 months–3 years: 125 mg twice daily; >3 years: 250 mg twice daily" },
+      { drug: "Azithromycin", dose: "10 mg/kg (max 500 mg) once daily" },
+    ],
+  },
+];
+
 const MONITORING = [
-  { test: "LDH", frequency: "Before every infusion", note: "Rising LDH = TMA activity — urgent review" },
-  { test: "Platelets", frequency: "Before every infusion", note: "<100 × 10⁹/L — stop, review, consider supplemental eculizumab" },
-  { test: "Creatinine / eGFR", frequency: "Before every infusion", note: "Monitor renal recovery trajectory" },
-  { test: "Haemoglobin", frequency: "Before every infusion", note: "Falling Hb = breakthrough haemolysis / TMA" },
-  { test: "Urinalysis + protein:creatinine", frequency: "Before every infusion", note: "Persistent proteinuria = residual renal injury" },
-  { test: "Haptoglobin", frequency: "Monthly", note: "Undetectable = active haemolysis" },
-  { test: "CH50 / AP50", frequency: "Monthly", note: "Target: complete complement inhibition (CH50 undetectable)" },
-  { test: "Free Hb (plasma)", frequency: "Monthly", note: "Elevated = intravascular haemolysis" },
-  { test: "Meningococcal antibody titres", frequency: "Annual", note: "Confirm ongoing vaccine protection" },
+  { test: "History, examination, BP, anthropometry", frequency: "Every visit (inpatient & outpatient)", note: "Exclude disease activity, infections; detect hypertension, growth failure" },
+  { test: "Complete blood counts (CBC)", frequency: "q 1–2 days until remission; then q 1 week × 1 month; then q 2–3 months; at suspicion of relapse", note: "Remission: Platelets >100,000/µL, Schistocytes <2%, LDH below ULN on 2 consecutive days. Relapse: recurrence of anaemia with schistocytes >2%, elevated LDH and/or thrombocytopenia <150,000/µL without AKI, or with AKI after >2 weeks" },
+  { test: "Peripheral smear for schistocytes", frequency: "q 1–2 days until remission; then q 1 month × 6 months; then q 3 months × 22 years; at suspicion of relapse", note: "Schistocytes >2% = active TMA" },
+  { test: "LDH", frequency: "q 1–2 days until remission; then same as CBC", note: "Rising LDH = TMA activity — urgent review" },
+  { test: "Blood urea, creatinine, electrolytes", frequency: "q 1–2 days until remission; then q 2–3 months", note: "Monitor renal recovery trajectory" },
+  { test: "Complement C3", frequency: "q 1 week × 1 month; then q 3–6 months", note: "Low C3 may indicate ongoing complement activation" },
+  { test: "Liver function tests", frequency: "q 1 week × 1 month; then q 3–6 months", note: "Baseline and periodic monitoring" },
+  { test: "Urine protein & creatinine (first morning spot or 24-hr)", frequency: "q 1 week × 1 month; then q 3–6 months", note: "Persistent proteinuria = residual renal injury" },
+  { test: "Urine microscopy", frequency: "q 1 week × 1 month; then q 3–6 months", note: "Red cell casts, haematuria" },
+  { test: "CH50 / Total complement activity (if available)", frequency: "At 1 week of therapy; if refractory to ECZ; after 1–2 months", note: "CH50 <10% indicates adequate complement blockade. Useful to (i) distinguish inadequate drug dose from C3 polymorphism, (ii) increasing dosing interval, (iii) guide discontinuation of antibiotic prophylaxis" },
+  { test: "Eculizumab trough (if available)", frequency: "If refractory or relapse", note: "Trough level <50 µg/mL and 2100 µg/mL may correlate with lack of, and marked reduction in CH50 activity respectively" },
+  { test: "Ambulatory blood pressure monitoring", frequency: "Annually", note: "Detect masked hypertension and left ventricular hypertrophy" },
+  { test: "Echocardiography", frequency: "Annually", note: "Detect left ventricular hypertrophy" },
+  { test: "Meningococcal symptoms check (by provider)", frequency: "Daily during illness; q 3–4 days during infections with symptoms", note: "Contact physician if lethargy, fever, headache, vomiting or irritability; haematuria, oliguria, pallor, lethargic, nausea; recurrence of haematuria or proteinuria by dipstick" },
+  { test: "Blood pressure (home)", frequency: "Twice daily × 7 days/month if on medication", note: "Monitor for hypertension" },
+  { test: "Dipstick for protein & blood", frequency: "q 3–4 days; during infections or with symptoms", note: "Early warning of disease relapse or renal deterioration" },
 ];
 
 export default function EculizumabGuidance() {
@@ -377,9 +404,21 @@ export default function EculizumabGuidance() {
               </div>
             </div>
           ))}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
-            <p className="text-xs font-bold text-amber-900 mb-1">Antibiotic Prophylaxis (if vaccines not possible before starting):</p>
-            <p className="text-xs text-amber-800">Phenoxymethylpenicillin (Penicillin V) 250 mg BD (≥12 yrs; 125 mg BD for younger) OR Amoxicillin 250 mg BD. Continue until 2 weeks post-vaccination. Consider lifelong prophylaxis in high-risk patients.</p>
+          <div className="mt-3 space-y-3">
+            <p className="text-xs font-bold text-red-800 uppercase tracking-wide">Antibiotic Prophylaxis Protocol</p>
+            {ANTIBIOTIC_PROPHYLAXIS.map((row, i) => (
+              <div key={i} className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900">
+                <p className="font-semibold mb-1">{row.indication}</p>
+                <p className="text-[10px] text-amber-700 mb-2">Duration: {row.duration}</p>
+                <div className="space-y-1">
+                  {row.options.map((opt, j) => (
+                    <div key={j} className="bg-white/70 rounded p-2 border border-amber-200">
+                      <span className="font-bold">{opt.drug}: </span>{opt.dose}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-700">
             <p><strong>Other systemic infections:</strong> Administer with caution in patients with active systemic infections. Increased susceptibility to <em>Neisseria</em> species and other encapsulated bacteria.</p>

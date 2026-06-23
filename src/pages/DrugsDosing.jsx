@@ -1090,7 +1090,10 @@ function DrugFullMonograph({ drug }) {
               </div>
 
               {/* Sub-tab content */}
-              {drugSubTab === "dose" && (
+              {drugSubTab === "dose" && selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && (
+                <EculizumabGuidance />
+              )}
+              {drugSubTab === "dose" && !selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && (
                 <div className="space-y-3">
                   {dose && dose.type !== "TDM" && dose.type !== "unknown" ? (
                     <div className="grid grid-cols-2 gap-2">
@@ -1204,7 +1207,10 @@ function DrugFullMonograph({ drug }) {
                 </div>
               )}
 
-              {drugSubTab === "monograph" && (
+              {drugSubTab === "monograph" && selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && (
+                <EculizumabGuidance />
+              )}
+              {drugSubTab === "monograph" && !selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && (
                 <DrugFullMonograph drug={selectedDrug} />
               )}
 
