@@ -111,11 +111,11 @@ export default function EnhancedClinicalEncounter({ appointment, workspace, onCo
       </Card>
 
       <Tabs defaultValue="encounter">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="encounter">Clinical Encounter</TabsTrigger>
-          <TabsTrigger value="monitoring">Home Monitoring</TabsTrigger>
-          <TabsTrigger value="prescription">Digital Prescription</TabsTrigger>
-          <TabsTrigger value="formulary" className="flex items-center gap-1">
+        <TabsList className="flex w-full h-auto overflow-x-auto p-1">
+          <TabsTrigger value="encounter" className="flex-shrink-0">Clinical Encounter</TabsTrigger>
+          <TabsTrigger value="monitoring" className="flex-shrink-0">Home Monitoring</TabsTrigger>
+          <TabsTrigger value="prescription" className="flex-shrink-0">Digital Prescription</TabsTrigger>
+          <TabsTrigger value="formulary" className="flex-shrink-0 flex items-center gap-1">
             <FlaskConical className="w-3.5 h-3.5" />Formulary
           </TabsTrigger>
         </TabsList>

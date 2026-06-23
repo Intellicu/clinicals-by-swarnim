@@ -164,9 +164,9 @@ export default function DiseaseClusters({ isAdmin }) {
     <div className="space-y-3">
       <Tabs defaultValue="genetic_ns">
         <div className="overflow-x-auto pb-1">
-          <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1 min-w-full md:grid md:grid-cols-6">
+          <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1 min-w-full overflow-x-auto">
             {CLUSTERS.map(c => (
-              <TabsTrigger key={c.id} value={c.id} className="px-3 py-2 text-xs rounded-lg whitespace-nowrap data-[state=active]:bg-violet-600 data-[state=active]:text-white">
+              <TabsTrigger key={c.id} value={c.id} className="flex-shrink-0 px-3 py-2 text-xs rounded-lg whitespace-nowrap data-[state=active]:bg-violet-600 data-[state=active]:text-white">
                 {c.name}
               </TabsTrigger>
             ))}

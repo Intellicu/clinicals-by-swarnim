@@ -180,12 +180,12 @@ Return JSON:`;
           </Alert>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="drugs">Drugs</TabsTrigger>
-              <TabsTrigger value="interactions">Interactions</TabsTrigger>
-              <TabsTrigger value="diet">Diet</TabsTrigger>
-              <TabsTrigger value="trends">Trends</TabsTrigger>
+            <TabsList className="flex w-full h-auto overflow-x-auto p-1">
+              <TabsTrigger value="overview" className="flex-shrink-0">Overview</TabsTrigger>
+              <TabsTrigger value="drugs" className="flex-shrink-0">Drugs</TabsTrigger>
+              <TabsTrigger value="interactions" className="flex-shrink-0">Interactions</TabsTrigger>
+              <TabsTrigger value="diet" className="flex-shrink-0">Diet</TabsTrigger>
+              <TabsTrigger value="trends" className="flex-shrink-0">Trends</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-3">

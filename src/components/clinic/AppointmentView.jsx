@@ -78,11 +78,11 @@ export default function AppointmentView({ patient, onClose }) {
           {/* Left Column - Patient Info */}
           <div className="lg:col-span-2 space-y-4">
             <Tabs defaultValue="history">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="history">History</TabsTrigger>
-                <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
-                <TabsTrigger value="labs">Lab Reports</TabsTrigger>
-                <TabsTrigger value="records">Records</TabsTrigger>
+              <TabsList className="flex w-full h-auto overflow-x-auto p-1">
+                <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
+                <TabsTrigger value="monitoring" className="flex-shrink-0">Monitoring</TabsTrigger>
+                <TabsTrigger value="labs" className="flex-shrink-0">Lab Reports</TabsTrigger>
+                <TabsTrigger value="records" className="flex-shrink-0">Records</TabsTrigger>
               </TabsList>
 
               <TabsContent value="history">

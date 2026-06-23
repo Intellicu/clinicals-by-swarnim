@@ -174,7 +174,7 @@ export default function ResearchMethodsContent() {
       </Alert>
 
       <Tabs defaultValue="designs">
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 text-xs">
+        <TabsList className="flex w-full h-auto overflow-x-auto p-1 text-xs">
           <TabsTrigger value="designs">Study Designs</TabsTrigger>
           <TabsTrigger value="prisma">PRISMA / SysRev</TabsTrigger>
           <TabsTrigger value="bias">Bias Tools</TabsTrigger>

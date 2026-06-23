@@ -606,17 +606,17 @@ export default function StartAppointmentWorkspace({ appointment, patient, worksp
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 h-auto">
-          <TabsTrigger value="encounter" className="text-xs py-2 gap-1">
+        <TabsList className="flex w-full h-auto overflow-x-auto p-1">
+          <TabsTrigger value="encounter" className="flex-shrink-0 text-xs py-2 gap-1">
             <ClipboardList className="w-3.5 h-3.5" /> History & Exam
           </TabsTrigger>
-          <TabsTrigger value="vitals" className="text-xs py-2 gap-1">
+          <TabsTrigger value="vitals" className="flex-shrink-0 text-xs py-2 gap-1">
             <Activity className="w-3.5 h-3.5" /> Vitals & Growth
           </TabsTrigger>
-          <TabsTrigger value="prescription" className="text-xs py-2 gap-1">
+          <TabsTrigger value="prescription" className="flex-shrink-0 text-xs py-2 gap-1">
             <Pill className="w-3.5 h-3.5" /> Prescription {medications.length > 0 && <Badge className="bg-emerald-500 text-white text-[10px] px-1 ml-1">{medications.length}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="ai" className="text-xs py-2 gap-1">
+          <TabsTrigger value="ai" className="flex-shrink-0 text-xs py-2 gap-1">
             <Brain className="w-3.5 h-3.5" /> AI Assist
           </TabsTrigger>
         </TabsList>

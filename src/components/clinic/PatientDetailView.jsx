@@ -107,14 +107,14 @@ export default function PatientDetailView({ patient, onUpdate }) {
       </Card>
 
       <Tabs defaultValue="visits" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7 text-xs">
-          <TabsTrigger value="visits">Visits</TabsTrigger>
-          <TabsTrigger value="documents">Docs</TabsTrigger>
-          <TabsTrigger value="appointments">Appts</TabsTrigger>
-          <TabsTrigger value="labs">Labs</TabsTrigger>
-          <TabsTrigger value="plan">Plan</TabsTrigger>
-          <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger value="scans">Scans</TabsTrigger>
+        <TabsList className="flex w-full h-auto overflow-x-auto p-1 text-xs">
+          <TabsTrigger value="visits" className="flex-shrink-0">Visits</TabsTrigger>
+          <TabsTrigger value="documents" className="flex-shrink-0">Docs</TabsTrigger>
+          <TabsTrigger value="appointments" className="flex-shrink-0">Appts</TabsTrigger>
+          <TabsTrigger value="labs" className="flex-shrink-0">Labs</TabsTrigger>
+          <TabsTrigger value="plan" className="flex-shrink-0">Plan</TabsTrigger>
+          <TabsTrigger value="summary" className="flex-shrink-0">Summary</TabsTrigger>
+          <TabsTrigger value="scans" className="flex-shrink-0">Scans</TabsTrigger>
         </TabsList>
 
         <TabsContent value="documents">

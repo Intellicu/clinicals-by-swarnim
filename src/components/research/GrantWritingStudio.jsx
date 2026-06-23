@@ -556,7 +556,7 @@ Return a list of section headings, required content for each, word limits if spe
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-3 w-full">
+            <TabsList className="flex w-full h-auto overflow-x-auto p-1">
               <TabsTrigger value="editor" className="gap-1.5 text-xs">
                 <PenLine className="w-3.5 h-3.5" />Section Editor
               </TabsTrigger>

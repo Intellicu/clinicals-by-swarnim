@@ -467,7 +467,7 @@ export default function EnhancedDigitalPrescriptionPad({
           )}
 
           <Tabs defaultValue="prescription">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="flex w-full h-auto overflow-x-auto p-1">
               <TabsTrigger value="prescription">Prescription</TabsTrigger>
               <TabsTrigger value="clinical">Clinical Notes</TabsTrigger>
               <TabsTrigger value="follow-up">Follow-up</TabsTrigger>

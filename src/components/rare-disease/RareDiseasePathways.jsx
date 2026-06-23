@@ -554,9 +554,9 @@ export default function RareDiseasePathways({ isAdmin }) {
   return (
     <Tabs defaultValue="ahus">
       <div className="overflow-x-auto pb-1 mb-3">
-        <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1 min-w-full md:grid md:grid-cols-9">
+        <TabsList className="inline-flex h-auto gap-1 bg-white border border-slate-200 rounded-xl p-1 min-w-full overflow-x-auto">
           {DEFAULT_PATHWAYS.map(p => (
-            <TabsTrigger key={p.id} value={p.id} className="px-2 py-2 text-xs rounded-lg whitespace-nowrap data-[state=active]:bg-violet-600 data-[state=active]:text-white">
+            <TabsTrigger key={p.id} value={p.id} className="flex-shrink-0 px-2 py-2 text-xs rounded-lg whitespace-nowrap data-[state=active]:bg-violet-600 data-[state=active]:text-white">
               {p.name}
             </TabsTrigger>
           ))}

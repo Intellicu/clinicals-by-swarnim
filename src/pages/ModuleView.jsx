@@ -320,12 +320,12 @@ export default function ModuleView() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="content">📖 Learn</TabsTrigger>
-            <TabsTrigger value="objectives">🎯 Objectives</TabsTrigger>
-            <TabsTrigger value="quiz">📝 Quiz</TabsTrigger>
-            <TabsTrigger value="cases">🏥 Cases</TabsTrigger>
-            <TabsTrigger value="notes">✍️ Notes</TabsTrigger>
+          <TabsList className="flex w-full h-auto overflow-x-auto p-1">
+            <TabsTrigger value="content" className="flex-shrink-0">📖 Learn</TabsTrigger>
+            <TabsTrigger value="objectives" className="flex-shrink-0">🎯 Objectives</TabsTrigger>
+            <TabsTrigger value="quiz" className="flex-shrink-0">📝 Quiz</TabsTrigger>
+            <TabsTrigger value="cases" className="flex-shrink-0">🏥 Cases</TabsTrigger>
+            <TabsTrigger value="notes" className="flex-shrink-0">✍️ Notes</TabsTrigger>
           </TabsList>
 
           <TabsContent value="content">

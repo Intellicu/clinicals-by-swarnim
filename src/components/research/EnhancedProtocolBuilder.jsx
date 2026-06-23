@@ -241,13 +241,13 @@ export default function EnhancedProtocolBuilder() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="basic">
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="basic">Basic Info</TabsTrigger>
-              <TabsTrigger value="design">Design</TabsTrigger>
-              <TabsTrigger value="sample">Sample Size</TabsTrigger>
-              <TabsTrigger value="outcomes">Outcomes</TabsTrigger>
-              <TabsTrigger value="methodology">Methodology</TabsTrigger>
-              <TabsTrigger value="ethics">Ethics & Budget</TabsTrigger>
+            <TabsList className="flex w-full h-auto overflow-x-auto p-1">
+              <TabsTrigger value="basic" className="flex-shrink-0">Basic Info</TabsTrigger>
+              <TabsTrigger value="design" className="flex-shrink-0">Design</TabsTrigger>
+              <TabsTrigger value="sample" className="flex-shrink-0">Sample Size</TabsTrigger>
+              <TabsTrigger value="outcomes" className="flex-shrink-0">Outcomes</TabsTrigger>
+              <TabsTrigger value="methodology" className="flex-shrink-0">Methodology</TabsTrigger>
+              <TabsTrigger value="ethics" className="flex-shrink-0">Ethics & Budget</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-4 mt-4">

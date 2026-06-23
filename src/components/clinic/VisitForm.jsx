@@ -107,7 +107,7 @@ function VisitFormInner({ patient, onSuccess }) {
 
   return (
     <Tabs defaultValue="quick" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="flex w-full h-auto overflow-x-auto p-1">
         <TabsTrigger value="quick">Quick Entry</TabsTrigger>
         <TabsTrigger value="pad">Digital Pad</TabsTrigger>
         <TabsTrigger value="scribe">AI Scribe</TabsTrigger>
