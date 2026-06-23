@@ -1,9 +1,8 @@
 /**
  * FormularyCategoryStrips
- * 
+ *
  * Renders horizontal scrollable strips for each Drug formulary_category.
- * Queries Drug entity by formulary_category; strips with 0 results auto-hide.
- * Only shows is_prescribable != false AND is_duplicate_hidden != true records.
+ * Drug cards show name only — tap to open full monograph.
  */
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -40,7 +39,6 @@ function CategoryStrip({ category, onSelect }) {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Don't render strip if no drugs found
   if (!isLoading && drugs.length === 0) return null;
 
   return (
@@ -72,15 +70,9 @@ function CategoryStrip({ category, onSelect }) {
               <button
                 key={drug.id}
                 onClick={() => onSelect?.(drug)}
-                className="flex-shrink-0 bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-xl px-3 py-2 text-left transition-all min-w-[120px] max-w-[160px]"
+                className="flex-shrink-0 bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-lg px-3 py-2 text-left transition-all"
               >
-                <p className="text-xs font-bold text-slate-900 leading-tight truncate">{drug.generic_name}</p>
-                {drug.brands_indian && (
-                  <p className="text-[10px] text-slate-400 truncate mt-0.5">{drug.brands_indian.split(",")[0].trim()}</p>
-                )}
-                {drug.dose_weight_based && (
-                  <p className="text-[10px] text-indigo-600 mt-0.5 truncate">{drug.dose_weight_based.split(" ").slice(0,3).join(" ")}</p>
-                )}
+                <p className="text-xs font-semibold text-slate-900 whitespace-nowrap">{drug.generic_name}</p>
               </button>
             ))}
           </div>
