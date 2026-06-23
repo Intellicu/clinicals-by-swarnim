@@ -184,13 +184,15 @@ For each paper: provide title, authors (first author + et al), journal, year, ke
       {results && (
         <div className="space-y-3">
           {/* Tab navigation */}
-          <div className="flex gap-1 border-b">
-            {tabs.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors ${activeTab === t.id ? "border-teal-500 text-teal-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
-                <t.icon className="w-3.5 h-3.5" />{t.label}
-              </button>
-            ))}
+          <div className="overflow-x-auto border-b" style={{ scrollbarWidth: "none" }}>
+            <div className="flex gap-1 min-w-max">
+              {tabs.map(t => (
+                <button key={t.id} onClick={() => setActiveTab(t.id)}
+                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === t.id ? "border-teal-500 text-teal-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
+                  <t.icon className="w-3.5 h-3.5" />{t.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* New Evidence */}
