@@ -122,9 +122,6 @@ export default function CIEEEngineRunner({
   };
 
   const node = pathway.nodes[nodeId];
-  if (!node) return <div className="text-xs text-red-600">Pathway error: node "{nodeId}" not found.</div>;
-
-  const supp = isPrescriptionNode(node) ? checkPrescriptionSuppressor(node.prescribes, ctx) : { suppressed: false };
 
   // where a suppressed prescription redirects: prefer an ACE-I/supportive node, else just continue
   const suppressRedirect = () => {
@@ -209,6 +206,10 @@ export default function CIEEEngineRunner({
       armedRef.current = false;
     }
   }, [history.length]);
+
+  if (!node) return <div className="text-xs text-red-600">Pathway error: node "{nodeId}" not found.</div>;
+
+  const supp = isPrescriptionNode(node) ? checkPrescriptionSuppressor(node.prescribes, ctx) : { suppressed: false };
 
   const isQuestion = node.type === 'QUESTION' || node.type === 'ASSESSMENT';
   const isTerminal = node.type === 'TERMINAL';

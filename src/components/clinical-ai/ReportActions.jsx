@@ -224,7 +224,8 @@ function renderBadgeRow(label, value, badgeClass = "badge-gray") {
 
 function renderList(label, arr, warn = false) {
   if (!arr?.length) return "";
-  return `<h2>${label}</h2><ul class="${warn ? "warn" : "}">${arr.map(i => `<li>${i}</li>`).join("")}</ul>`;
+  const cls = warn ? "warn" : "";
+  return `<h2>${label}</h2><ul class="${cls}">${arr.map(i => `<li>${i}</li>`).join("")}</ul>`;
 }
 
 function acmgColor(val) {
