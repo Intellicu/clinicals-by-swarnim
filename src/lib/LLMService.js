@@ -165,27 +165,29 @@ export async function invokeGeneticsAnalyzer({ reportText = '', reportFile = nul
     return wrap(await withRetry(async () => {
       const fileUrl = await uploadIfPresent(reportFile);
       return base44.integrations.Core.InvokeLLM({
-        prompt: `You are a paediatric clinical geneticist specialising in nephrology.
+        prompt: `Classify this genetic variant using ACMG/AMP 2015 criteria (Richards et al., Genet Med 2015).
 
 ${clinicalContext ? `Clinical context: ${clinicalContext}` : ''}
 ${reportText ? `Genetic report:\n${reportText}` : ''}
-${fileUrl ? '(Genetic report file attached)' : ''}
 
-Key nephropathy genes to flag: ${NEPHROTIC_GENES.join(', ')}.
-Use ACMG 5-class variant classification: Pathogenic, Likely Pathogenic, VUS, Likely Benign, Benign.
-
-CRITICAL PrescriptionSuppressor rule: if acmg_class is "Pathogenic" or "Likely Pathogenic" AND drug_class_warning should flag "CNI" (calcineurin inhibitors: tacrolimus, cyclosporine), set cni_contraindicated = true.
-
-For evidence_grade: genetic SRNS diagnosis is IPNA 2021 evidence grade 2C for treatment implications.`,
+Apply criteria codes: PVS1 (null+LOF gene), PS1-PS4 (Strong), PM1-PM6 (Moderate), PP1-PP5 (Supporting), BA1 (AF≥5%=Benign alone), BS1-BS4 (Strong benign), BP1-BP7 (Supporting benign).
+Combine per Richards Table 5 rules. PP3/BP4 count ONCE per variant.
+Nephropathy genes: NPHS1, NPHS2, WT1, LAMB2, PLCE1, TRPC6, INF2, ACTN4, COL4A3/4/5.
+If P/LP in NPHS1/NPHS2/WT1/LAMB2: set cni_contraindicated=true, prescription_suppressor_triggered=true (ISPN 2021 §3.5, 2C).`,
         file_urls: fileUrl ? [fileUrl] : undefined,
         response_json_schema: {
           type: 'object',
           properties: {
             gene_identified: { type: 'string' },
             variant_hgvs: { type: 'string' },
+            variant_type: { type: 'string', enum: ['Nonsense', 'Frameshift', 'Missense', 'Splice site', 'Synonymous', 'In-frame indel', 'Stop-loss', 'Copy number variant', 'Structural', 'Unknown'] },
             zygosity: { type: 'string', enum: ['Homozygous', 'Heterozygous', 'Compound heterozygous', 'Hemizygous', 'Unknown'] },
             inheritance_pattern: { type: 'string', enum: ['Autosomal Recessive', 'Autosomal Dominant', 'X-linked', 'De novo', 'Unknown'] },
             acmg_class: { type: 'string', enum: ['Pathogenic', 'Likely Pathogenic', 'VUS', 'Likely Benign', 'Benign'] },
+            acmg_classification_rationale: { type: 'string' },
+            pathogenic_evidence: { type: 'array', items: { type: 'string' } },
+            benign_evidence: { type: 'array', items: { type: 'string' } },
+            population_frequency_note: { type: 'string' },
             is_nephrotic_gene: { type: 'boolean' },
             cni_contraindicated: { type: 'boolean' },
             prescription_suppressor_triggered: { type: 'boolean' },
@@ -196,13 +198,12 @@ For evidence_grade: genetic SRNS diagnosis is IPNA 2021 evidence grade 2C for tr
             family_testing_recommended: { type: 'boolean' },
             family_testing_rationale: { type: 'string' },
             counseling_points: { type: 'array', items: { type: 'string' } },
-            limitations: { type: 'array', items: { type: 'string' } },
             next_steps: { type: 'array', items: { type: 'string' } },
             evidence_grade: { type: 'string', enum: ['1A', '1B', '2B', '2C', 'X'] },
             guideline_ref: { type: 'string' },
             recommendation_strength: { type: 'string', enum: ['Recommendation', 'Suggestion', 'Practice Point'] },
           },
-          required: ['acmg_class', 'is_nephrotic_gene', 'cni_contraindicated', 'prescription_suppressor_triggered']
+          required: ['acmg_class', 'is_nephrotic_gene', 'cni_contraindicated', 'prescription_suppressor_triggered', 'acmg_classification_rationale', 'pathogenic_evidence', 'benign_evidence']
         },
       });
     }), meta);
