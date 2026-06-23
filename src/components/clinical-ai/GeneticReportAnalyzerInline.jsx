@@ -13,6 +13,7 @@ import { createPageUrl } from "@/utils";
 import { toast } from "sonner";
 import { invokeGeneticsAnalyzer } from "@/lib/LLMService";
 import { buildTraceabilityLink } from "@/lib/CIEEEngine";
+import ReportActions from "@/components/clinical-ai/ReportActions";
 
 const DISCLAIMER = "This tool provides educational and clinical decision-support information and does not replace physician judgment. Clinical correlation and specialist genetic counselling is required.";
 
@@ -25,14 +26,61 @@ const ACMG_META = {
 };
 
 const LEARNING_POINTS = [
-  "ACMG 5-tier classification (Pathogenic/Likely Pathogenic/VUS/Likely Benign/Benign) is the global standard for variant interpretation.",
-  "VUS variants should not be used to guide clinical decisions — reclassification occurs frequently as population data grows.",
-  "Trio sequencing (proband + both parents) dramatically improves diagnostic yield and helps confirm de novo status.",
-  "Autosomal recessive nephropathy genes include NPHS1, NPHS2, WT1, LAMB2, COL4A3/A4/A5, UMOD, and >50 others.",
-  "De novo variants in dominant genes (e.g. WT1, PAX2, HNF1B) explain sporadic cases without family history.",
-  "Phenotype-genotype correlation guides treatment: COL4A3/A4/A5 (Alport) → ACEi early; NPHS2 (podocin) → poor CNI response.",
-  "VUS reclassification should be scheduled 2 years after report date — contact the reporting laboratory.",
-  "PATHOGENIC variants in NPHS1, NPHS2, WT1, LAMB2 → CNI contraindicated (ISPN 2021 §3.5, Grade 2C).",
+  "ACMG/AMP 2015 (Richards et al.) uses a 5-tier system: Pathogenic / Likely Pathogenic / VUS / Likely Benign / Benign — the global standard for clinical variant reporting.",
+  "PVS1 (Very Strong pathogenic): null variants (nonsense, frameshift, ±1/2 splice, initiation codon, multi-exon deletion) in a gene where LOF is a known mechanism. Key caveat: do NOT apply if LOF is not the mechanism (e.g., MYH7, GFAP).",
+  "PS2 requires BOTH maternity AND paternity confirmed by identity testing to claim de novo. PM6 applies when parental status is assumed but not confirmed.",
+  "PP3 / BP4 (in silico computational evidence) can each be used only ONCE per variant even when multiple tools agree — they share algorithmic basis (SIFT, PolyPhen-2, CADD, MutationTaster, etc.).",
+  "BA1 (stand-alone benign): allele frequency ≥5% in gnomAD/ExAC/1000 Genomes — this ALONE classifies a variant as benign regardless of other evidence.",
+  "VUS variants must NEVER be used to guide clinical decisions or for predictive family testing. Re-contact the laboratory every 2 years — reclassification is common as databases grow.",
+  "Trio sequencing (proband + both parents) increases diagnostic yield and allows de novo variant identification. De novo status upgrades pathogenicity from PM6 (moderate) to PS2 (strong).",
+  "PATHOGENIC variants in NPHS1, NPHS2, WT1, LAMB2 → CNI (tacrolimus/cyclosporine) contraindicated — genetic SRNS does not respond to CNI therapy (ISPN 2021 §3.5, Grade 2C).",
+  "Population frequency threshold (PM2): absent from large databases or at extremely low frequency if recessive. Check race-matched controls — VUS rates are higher in non-Caucasian patients due to under-representation in genomic databases.",
+  "Functional studies (PS3/BS3) must be well-validated and reproducible in a clinical diagnostic lab setting. Not all published functional assays qualify.",
+  "COL4A3/A4/A5 (Alport syndrome): start ACEi/ARB early regardless of proteinuria severity — even heterozygotes benefit (KDIGO 2022 Alport guidance).",
+  "Secondary findings: ACMG recommends reporting pathogenic/likely pathogenic variants in 81 medically actionable genes (SF v3.2) even when unrelated to the indication. Discuss pre-test.",
+];
+
+const ACMG_CRITERIA_FULL = {
+  pathogenic: [
+    { code: "PVS1", strength: "Very Strong", desc: "Null variant (nonsense, frameshift, ±1/2 splice, initiation codon, multi-exon deletion) in a gene where LOF is a known pathogenic mechanism. Caveats: not if LOF is not mechanism; extreme 3' end; exon-skipping leaves protein intact; multiple transcripts." },
+    { code: "PS1", strength: "Strong", desc: "Same amino acid change as previously established pathogenic variant, different nucleotide. Caveat: beware variants that impact splicing rather than amino acid level." },
+    { code: "PS2", strength: "Strong", desc: "De novo (BOTH maternity AND paternity confirmed by identity testing) in patient with disease and no family history. Note: paternity confirmation alone is insufficient." },
+    { code: "PS3", strength: "Strong", desc: "Well-established in vitro or in vivo functional studies show damaging effect on gene/gene product. Most rigorous when validated and reproducible in clinical diagnostic lab setting." },
+    { code: "PS4", strength: "Strong", desc: "Prevalence in affected significantly increased vs controls. OR/RR >5.0 with CI not including 1.0." },
+    { code: "PM1", strength: "Moderate", desc: "Variant in mutational hotspot or critical well-established functional domain (e.g., enzyme active site) without benign variation." },
+    { code: "PM2", strength: "Moderate", desc: "Absent from large population databases or at extremely low frequency if recessive (gnomAD, ExAC, ESP, 1000 Genomes). Caveat: indel calls may be unreliable." },
+    { code: "PM3", strength: "Moderate", desc: "For recessive disorders: detected in trans with pathogenic variant. Requires parental testing to confirm phase." },
+    { code: "PM4", strength: "Moderate", desc: "Protein length changes from in-frame deletions/insertions in non-repeat region, or stop-loss variants." },
+    { code: "PM5", strength: "Moderate", desc: "Novel missense at same amino acid residue as different known pathogenic missense (e.g., Arg156His is pathogenic → Arg156Cys). Caveat: beware splicing effects." },
+    { code: "PM6", strength: "Moderate", desc: "Assumed de novo WITHOUT confirmation of paternity and maternity (upgrade to PS2 if confirmed)." },
+    { code: "PP1", strength: "Supporting", desc: "Co-segregation with disease in multiple affected family members in gene definitively known to cause disease. Upgrades with increasing segregation data." },
+    { code: "PP2", strength: "Supporting", desc: "Missense variant in gene with low benign missense variation rate where missense is a common disease mechanism." },
+    { code: "PP3", strength: "Supporting", desc: "Multiple lines of computational evidence (SIFT, PolyPhen-2, CADD, MutationTaster, etc.) support deleterious effect. COUNT ONLY ONCE — tools share algorithmic basis." },
+    { code: "PP4", strength: "Supporting", desc: "Patient phenotype or family history highly specific for disease with single genetic etiology." },
+    { code: "PP5", strength: "Supporting", desc: "Reputable source recently reports variant as pathogenic but evidence not available for independent evaluation. Use cautiously." },
+  ],
+  benign: [
+    { code: "BA1", strength: "Stand-Alone", desc: "Allele frequency ≥5% in ExAC, 1000 Genomes, or ESP/gnomAD. Standalone evidence — classifies variant as BENIGN alone." },
+    { code: "BS1", strength: "Strong", desc: "Allele frequency greater than expected for the disorder based on disease prevalence and inheritance." },
+    { code: "BS2", strength: "Strong", desc: "Observed in healthy adult for recessive (homozygous), dominant (heterozygous), or X-linked (hemizygous) disorder with full penetrance expected at early age." },
+    { code: "BS3", strength: "Strong", desc: "Well-established functional studies show NO damaging effect on protein function or splicing." },
+    { code: "BS4", strength: "Strong", desc: "Lack of segregation in affected family members. Caveat: phenocopies may mimic lack of segregation." },
+    { code: "BP1", strength: "Supporting", desc: "Missense variant in a gene where ONLY truncating variants are known to cause disease." },
+    { code: "BP2", strength: "Supporting", desc: "In trans with pathogenic variant for fully penetrant dominant disorder, OR in cis with pathogenic variant in any pattern." },
+    { code: "BP3", strength: "Supporting", desc: "In-frame deletions/insertions in repetitive region without a known function." },
+    { code: "BP4", strength: "Supporting", desc: "Multiple computational tools predict no impact. COUNT ONLY ONCE per variant evaluation." },
+    { code: "BP5", strength: "Supporting", desc: "Variant found in case with an alternate molecular basis for disease." },
+    { code: "BP6", strength: "Supporting", desc: "Reputable source recently reports variant as benign but evidence not available for independent evaluation." },
+    { code: "BP7", strength: "Supporting", desc: "Synonymous (silent) variant where splicing algorithms predict no impact on splice consensus and nucleotide not highly conserved." },
+  ],
+};
+
+const COMBINATION_RULES = [
+  { tier: "PATHOGENIC", color: "bg-red-700 text-white", rules: ["PVS1 + ≥1 PS", "PVS1 + ≥2 PM", "PVS1 + PM + PP", "PVS1 + ≥2 PP", "≥2 PS", "PS + ≥3 PM", "PS + 2 PM + ≥2 PP", "PS + PM + ≥4 PP"] },
+  { tier: "LIKELY PATHOGENIC", color: "bg-orange-500 text-white", rules: ["PVS1 + PM", "PS + 1–2 PM", "PS + ≥2 PP", "≥3 PM", "2 PM + ≥2 PP", "PM + ≥4 PP"] },
+  { tier: "VUS", color: "bg-yellow-500 text-slate-900", rules: ["Criteria not met", "Contradictory P + B evidence"] },
+  { tier: "LIKELY BENIGN", color: "bg-blue-500 text-white", rules: ["BS + BP", "≥2 BP"] },
+  { tier: "BENIGN", color: "bg-green-700 text-white", rules: ["BA1 alone", "≥2 BS"] },
 ];
 
 const COMMON_NEPHROLOGY_GENES = [
@@ -187,15 +235,53 @@ export default function GeneticReportAnalyzerInline() {
               <h4 className="font-semibold text-sm mb-2 text-violet-800">Gene & Variant</h4>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {result.gene_identified && <div><span className="text-slate-500">Gene</span><p className="font-bold font-mono text-violet-700">{result.gene_identified}</p></div>}
-                {result.variant_hgvs && <div><span className="text-slate-500">Variant</span><p className="font-bold font-mono text-slate-800 text-[11px]">{result.variant_hgvs}</p></div>}
+                {result.variant_hgvs && <div><span className="text-slate-500">Variant (HGVS)</span><p className="font-bold font-mono text-slate-800 text-[11px]">{result.variant_hgvs}</p></div>}
+                {result.variant_type && <div><span className="text-slate-500">Variant Type</span><p className="font-semibold">{result.variant_type}</p></div>}
                 {result.zygosity && <div><span className="text-slate-500">Zygosity</span><p className="font-semibold">{result.zygosity}</p></div>}
                 {result.inheritance_pattern && <div><span className="text-slate-500">Inheritance</span><p className="font-semibold">{result.inheritance_pattern}</p></div>}
               </div>
+              {result.population_frequency_note && (
+                <p className="mt-2 text-[11px] text-slate-600 bg-slate-50 rounded p-1.5 border border-slate-200">
+                  <span className="font-semibold">Population Frequency: </span>{result.population_frequency_note}
+                </p>
+              )}
               {result.is_nephrotic_gene && (
-                <div className="mt-2 flex items-center gap-1.5">
+                <div className="mt-2 flex items-center gap-1.5 flex-wrap">
                   <Badge className="bg-violet-100 text-violet-800 text-[10px]">Nephrotic Syndrome Gene</Badge>
                   {result.cni_contraindicated && <Badge className="bg-red-100 text-red-800 text-[10px]">CNI Contraindicated</Badge>}
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* ACMG Criteria Applied */}
+          {(result.pathogenic_evidence?.length > 0 || result.benign_evidence?.length > 0) && (
+            <div className="bg-white rounded-xl p-3 border border-slate-200">
+              <h4 className="font-semibold text-sm mb-2 text-slate-800">ACMG Criteria Applied</h4>
+              {result.pathogenic_evidence?.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-[11px] font-semibold text-red-700 mb-1">Pathogenic Evidence:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {result.pathogenic_evidence.map((c, i) => (
+                      <span key={i} className="text-[10px] bg-red-100 text-red-800 border border-red-200 rounded px-1.5 py-0.5 font-mono font-semibold">{c}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {result.benign_evidence?.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-semibold text-blue-700 mb-1">Benign Evidence:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {result.benign_evidence.map((c, i) => (
+                      <span key={i} className="text-[10px] bg-blue-100 text-blue-800 border border-blue-200 rounded px-1.5 py-0.5 font-mono font-semibold">{c}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {result.acmg_classification_rationale && (
+                <p className="mt-2 text-[11px] text-slate-700 bg-slate-50 rounded p-1.5 border border-slate-200">
+                  <span className="font-semibold">Classification rationale: </span>{result.acmg_classification_rationale}
+                </p>
               )}
             </div>
           )}
@@ -264,6 +350,12 @@ export default function GeneticReportAnalyzerInline() {
             </div>
           )}
 
+          <ReportActions
+            title="Genetic Report Analysis"
+            result={result}
+            summary={result ? `ACMG: ${result.acmg_class} · Gene: ${result.gene_identified || '—'} · ${result.variant_hgvs || ''}${result.prescription_suppressor_triggered ? '\n⚠ CNI CONTRAINDICATED' : ''}` : ""}
+          />
+
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="flex-1" onClick={() => { setResult(null); setActiveTab("clinical"); }}>
               New Analysis
@@ -284,8 +376,9 @@ export default function GeneticReportAnalyzerInline() {
       {/* ── Educational Mode ── */}
       {activeTab === "education" && (
         <div className="space-y-4">
+          {/* 5-tier classification overview */}
           <div className="space-y-2">
-            <p className="text-xs font-bold text-slate-700 uppercase tracking-widest">ACMG Variant Classification</p>
+            <p className="text-xs font-bold text-slate-700 uppercase tracking-widest">ACMG/AMP 2015 — 5-Tier Classification (Richards et al.)</p>
             {Object.entries(ACMG_META).map(([cls, meta]) => (
               <div key={cls} className={`rounded-xl border p-3 ${meta.bg}`}>
                 <p className={`text-xs font-bold ${meta.text} mb-1`}>{cls}</p>
@@ -294,14 +387,65 @@ export default function GeneticReportAnalyzerInline() {
             ))}
           </div>
 
+          {/* Combination rules */}
+          <div>
+            <p className="text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Combination Rules (Table 5, Richards et al. 2015)</p>
+            <div className="space-y-2">
+              {COMBINATION_RULES.map(rule => (
+                <div key={rule.tier} className="rounded-lg overflow-hidden border">
+                  <div className={`px-3 py-1.5 text-xs font-bold ${rule.color}`}>{rule.tier}</div>
+                  <div className="p-2 flex flex-wrap gap-1">
+                    {rule.rules.map((r, i) => (
+                      <span key={i} className="text-[10px] bg-slate-50 border rounded px-1.5 py-0.5 font-mono">{r}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pathogenic criteria */}
+          <div>
+            <p className="text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Pathogenic Evidence Criteria (PVS/PS/PM/PP)</p>
+            <div className="space-y-1.5">
+              {ACMG_CRITERIA_FULL.pathogenic.map(c => (
+                <div key={c.code} className="bg-white border border-red-100 rounded-xl p-2.5">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[11px] font-bold font-mono bg-red-600 text-white px-1.5 py-0.5 rounded flex-shrink-0">{c.code}</span>
+                    <span className="text-[10px] text-red-600 font-semibold">{c.strength}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-700 leading-relaxed">{c.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Benign criteria */}
+          <div>
+            <p className="text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Benign Evidence Criteria (BA/BS/BP)</p>
+            <div className="space-y-1.5">
+              {ACMG_CRITERIA_FULL.benign.map(c => (
+                <div key={c.code} className="bg-white border border-blue-100 rounded-xl p-2.5">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[11px] font-bold font-mono bg-blue-600 text-white px-1.5 py-0.5 rounded flex-shrink-0">{c.code}</span>
+                    <span className="text-[10px] text-blue-600 font-semibold">{c.strength}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-700 leading-relaxed">{c.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Prescription suppressor */}
           <div className="bg-red-50 border border-red-200 rounded-xl p-3">
             <p className="text-xs font-bold text-red-800 mb-2 flex items-center gap-1.5">
               <ShieldAlert className="w-3.5 h-3.5" /> PrescriptionSuppressor Rule
             </p>
-            <p className="text-xs text-red-800">IF genetic_variant_status = PATHOGENIC AND drug_class = CNI (tacrolimus/cyclosporine) → SUPPRESS prescription + log suppression_event</p>
+            <p className="text-xs text-red-800">IF acmg_class = Pathogenic or Likely Pathogenic AND gene is a podocin/nephrin/WT1 gene → SUPPRESS CNI (tacrolimus/cyclosporine) prescription — genetic SRNS does NOT respond to CNI.</p>
             <p className="text-[10px] text-red-600 mt-1">ISPN 2021 §3.5 · Evidence Grade 2C · Suggestion</p>
           </div>
 
+          {/* Key learning points */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
             <p className="text-xs font-bold text-blue-800 mb-2 flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5" /> Key Learning Points
@@ -315,6 +459,7 @@ export default function GeneticReportAnalyzerInline() {
             </ul>
           </div>
 
+          {/* Common Nephrology genes */}
           <div>
             <p className="text-xs font-bold text-slate-700 uppercase tracking-widest mb-2">Common Paediatric Nephrology Genes</p>
             <div className="space-y-2">
@@ -327,6 +472,26 @@ export default function GeneticReportAnalyzerInline() {
                   </div>
                   <p className="text-xs font-semibold text-slate-800">{g.disease}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{g.phenotype}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Key databases */}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <p className="text-xs font-bold text-slate-700 mb-2">🗄️ Key Databases for Variant Interpretation (ACMG Table 1)</p>
+            <div className="space-y-1">
+              {[
+                { name: "gnomAD / ExAC", use: "Population frequency (PM2 / BA1 / BS1). gnomAD v4 has 800k+ exomes." },
+                { name: "ClinVar", use: "Clinical assertions from laboratories — check submitter quality and number of stars." },
+                { name: "OMIM", use: "Gene-disease relationships and inheritance patterns." },
+                { name: "ClinGen", use: "Curated gene-disease validity classifications (Definitive/Strong/Moderate/Limited)." },
+                { name: "HGMD", use: "Variant annotations from literature — requires subscription; verify primary evidence." },
+                { name: "LOVD", use: "Locus-specific databases — especially useful for rare disease genes." },
+              ].map(db => (
+                <div key={db.name} className="text-[11px] flex gap-2">
+                  <span className="font-semibold text-slate-800 flex-shrink-0 w-28">{db.name}</span>
+                  <span className="text-slate-600">{db.use}</span>
                 </div>
               ))}
             </div>
