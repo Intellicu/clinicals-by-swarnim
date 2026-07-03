@@ -43,8 +43,19 @@ export default function BPPercentiles() {
     const ageYears = parseFloat(age);
     const sys = parseFloat(systolic);
     const dia = parseFloat(diastolic);
+    if (isNaN(ageYears) || isNaN(sys) || isNaN(dia)) return;
+    if (ageYears < 1) {
+      setResults({
+        category: "Not supported <1 year", severity: "warning",
+        interpretation: "AAP 2017 percentile tables apply from age 1 year. For infants, use neonatal/infant BP normative data (e.g. Dionne 2012 / second Task Force curves).",
+        recommendations: ["Use infant-specific BP reference data", "Consider 4-limb BP and clinical context", "Nephrology consult if persistently elevated"],
+        thresholds: null, systolic: sys, diastolic: dia,
+      });
+      return;
+    }
     const a = Math.round(Math.min(12, Math.max(1, ageYears)));
-    const sexKey = sex === "Female" ? "F" : "M";
+    // Normalise sex regardless of source casing (patient context may store lowercase)
+    const sexKey = (sex || "").toLowerCase().startsWith("f") ? "F" : "M";
 
     let category, interpretation, recommendations, severity, thresholds;
 
@@ -155,6 +166,7 @@ export default function BPPercentiles() {
                   placeholder="120"
                   className="mt-1"
                 />
+                <p className="text-[11px] text-slate-400 mt-1">Not used in this simplified table (assumes 50th height percentile) — short or tall children need the full AAP height-specific tables.</p>
               </div>
 
               <div>
@@ -227,6 +239,7 @@ export default function BPPercentiles() {
                     <p className="text-sm text-slate-700">{results.interpretation}</p>
                   </div>
 
+                  {results.thresholds && (
                   <div className="bg-white/50 p-4 rounded-lg">
                     <h4 className="font-semibold text-sm mb-2">
                       BP Thresholds for Age {age}y {parseFloat(age) >= 13 ? "(≥13y: Fixed AAP 2017)" : "(＜13y: Percentile-based AAP 2017, 50th height %ile)"}:
@@ -239,6 +252,7 @@ export default function BPPercentiles() {
                       {parseFloat(age) < 13 && <div className="col-span-2 text-amber-700 font-semibold mt-1">Stage 2 threshold: SBP ≥{results.thresholds.sys95 + 12} or DBP ≥{results.thresholds.dia95 + 12} mmHg</div>}
                     </div>
                   </div>
+                  )}
 
                   <div>
                     <h4 className="font-semibold text-sm mb-2">Management Recommendations:</h4>

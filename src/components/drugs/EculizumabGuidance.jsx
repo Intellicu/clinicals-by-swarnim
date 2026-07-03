@@ -168,6 +168,17 @@ export default function EculizumabGuidance() {
             <Input value={weight} onChange={e => setWeight(e.target.value)} placeholder="e.g. 18" className="mt-1" />
           </div>
 
+          {weight && !selectedBand && (
+            <Alert className="bg-amber-50 border-amber-300">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <AlertDescription className="text-amber-800 text-xs">
+                {!isNaN(weightNum) && weightNum > 0 && weightNum < 5
+                  ? "Weight <5 kg is below the licensed dosing range — no approved weight band exists. Specialist decision only; consult the PI and a paediatric nephrologist."
+                  : "Enter a valid weight in kg (licensed bands start at 5 kg)."}
+              </AlertDescription>
+            </Alert>
+          )}
+
           {selectedBand && (
             <div className="space-y-3">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

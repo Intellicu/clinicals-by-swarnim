@@ -18,6 +18,17 @@ export default function FENaCalculator() {
     const uNa = parseFloat(urineNa);
     const sCr = parseFloat(serumCr);
     const uCr = parseFloat(urineCr);
+    // All four must be positive numbers or the formula divides by zero / yields NaN
+    if ([sNa, uNa, sCr, uCr].some(v => isNaN(v) || v <= 0)) {
+      setResults({
+        safetyLevel: "caution",
+        calculationTrace: ["Invalid input — all four values must be positive numbers."],
+        primaryResults: [{ label: "FENa", value: "—", subtext: "Invalid input" }],
+        safetyAlerts: [{ severity: "warning", title: "Invalid input", message: "Serum/urine sodium and creatinine must all be positive numbers." }],
+        additionalInfo: [],
+      });
+      return;
+    }
 
     // FENa = (Urine Na × Serum Cr) / (Serum Na × Urine Cr) × 100
     const fena = ((uNa * sCr) / (sNa * uCr)) * 100;

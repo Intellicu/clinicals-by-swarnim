@@ -153,11 +153,14 @@ export default function PlasmapheresisCalculator() {
   // ─── Core Calculations (from PDF formulas) ───
   const calc = useMemo(() => {
     const wt = parseFloat(weight);
-    const hct = parseFloat(hematocrit) / 100;
+    const hctRaw = parseFloat(hematocrit);
     const ratio = parseFloat(exchangeRatio);
     const qb = parseFloat(bfr);
 
-    if (!wt || isNaN(hct) || isNaN(ratio)) return null;
+    if (!wt || wt <= 0 || isNaN(hctRaw) || isNaN(ratio)) return null;
+    // Hct must be a percentage in a sane physiological range (1–65%); reject fractions/≥100
+    if (hctRaw < 1 || hctRaw >= 66) return { invalid: "Enter haematocrit as a percentage between 1 and 65 (e.g. 30 for 30%)." };
+    const hct = hctRaw / 100;
 
     // EPV = 0.065 × BW × (1 − Hct) [Daugirdas 5th ed]
     const epv_L = 0.065 * wt * (1 - hct);
@@ -323,7 +326,12 @@ export default function PlasmapheresisCalculator() {
           </Card>
 
           {/* Results */}
-          {calc ? (
+          {calc?.invalid ? (
+            <Alert className="bg-amber-50 border-amber-300">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <AlertDescription className="text-amber-800 text-sm">{calc.invalid}</AlertDescription>
+            </Alert>
+          ) : calc ? (
             <div className="space-y-3">
               {/* Core volumes */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

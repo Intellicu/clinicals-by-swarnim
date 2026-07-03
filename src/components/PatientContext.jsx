@@ -10,28 +10,38 @@ export const usePatient = () => {
   return context;
 };
 
+const EMPTY_PATIENT = {
+  weight: '',
+  height: '',
+  age: '',
+  dateOfBirth: '',
+  gender: '',
+  serumCreatinine: '',
+  serumSodium: '',
+  serumPotassium: '',
+  serumCalcium: '',
+  serumPhosphate: '',
+  hemoglobin: '',
+  albumin: '',
+  urineProtein: '',
+  urineCreatinine: '',
+  systolicBP: '',
+  diastolicBP: ''
+};
+
 export const PatientProvider = ({ children }) => {
   const [patientData, setPatientData] = useState(() => {
-    // Load from localStorage on init
-    const saved = localStorage.getItem('clinicalc_patient_data');
-    return saved ? JSON.parse(saved) : {
-      weight: '',
-      height: '',
-      age: '',
-      dateOfBirth: '',
-      gender: '',
-      serumCreatinine: '',
-      serumSodium: '',
-      serumPotassium: '',
-      serumCalcium: '',
-      serumPhosphate: '',
-      hemoglobin: '',
-      albumin: '',
-      urineProtein: '',
-      urineCreatinine: '',
-      systolicBP: '',
-      diastolicBP: ''
-    };
+    // Corrupt localStorage must never take down the whole app — this provider wraps everything
+    try {
+      const saved = localStorage.getItem('clinicalc_patient_data');
+      const parsed = saved ? JSON.parse(saved) : null;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return { ...EMPTY_PATIENT, ...parsed };
+      }
+    } catch {
+      localStorage.removeItem('clinicalc_patient_data');
+    }
+    return EMPTY_PATIENT;
   });
 
   // Save to localStorage whenever data changes
@@ -44,24 +54,7 @@ export const PatientProvider = ({ children }) => {
   };
 
   const clearPatientData = () => {
-    setPatientData({
-      weight: '',
-      height: '',
-      age: '',
-      dateOfBirth: '',
-      gender: '',
-      serumCreatinine: '',
-      serumSodium: '',
-      serumPotassium: '',
-      serumCalcium: '',
-      serumPhosphate: '',
-      hemoglobin: '',
-      albumin: '',
-      urineProtein: '',
-      urineCreatinine: '',
-      systolicBP: '',
-      diastolicBP: ''
-    });
+    setPatientData({ ...EMPTY_PATIENT });
     localStorage.removeItem('clinicalc_patient_data');
   };
 

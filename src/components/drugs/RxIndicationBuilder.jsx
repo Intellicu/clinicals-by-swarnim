@@ -127,40 +127,62 @@ function calculateDose(ind, wt, bsa, activeFreq) {
   else if (fu.includes("SINGLE") || fu.includes("STAT") || fu.includes("ONCE")) dosesPerDay = 1;
   else dosesPerDay = 1; // OD or unknown
 
+  // Practical rounding that never zeroes or distorts small paediatric doses:
+  // <5 mg → 1 decimal; 5–20 mg → nearest 0.5; >20 mg → nearest 2.5
+  const roundAdmin = (x) => x < 5 ? parseFloat(x.toFixed(1)) : x <= 20 ? Math.round(x * 2) / 2 : Math.round(x / 2.5) * 2.5;
+  const roundDay = (x) => x < 10 ? parseFloat(x.toFixed(1)) : x <= 40 ? Math.round(x) : Math.round(x / 5) * 5;
+
+  // Per-dose rule takes precedence — its math must match the trail it prints
+  if (ind.dose_mgkg_dose != null && wt) {
+    const rawAdmin = ind.dose_mgkg_dose * wt;
+    const cappedAdmin = ind.max_mg_dose ? Math.min(rawAdmin, ind.max_mg_dose) : rawAdmin;
+    return {
+      type: "weight",
+      perAdminMg: roundAdmin(cappedAdmin),
+      dailyMg: dosesPerDay >= 1 ? roundDay(cappedAdmin * dosesPerDay) : null,
+      capped: cappedAdmin < rawAdmin,
+      cappedAt: ind.max_mg_dose,
+      trail: `${ind.dose_mgkg_dose} mg/kg/dose × ${wt} kg = ${rawAdmin.toFixed(1)} mg/dose`,
+    };
+  }
+
   if (ind.dose_mgkg_day && wt) {
     const rawDay = ind.dose_mgkg_day * wt;
     const cappedDay = ind.max_mg_day ? Math.min(rawDay, ind.max_mg_day) : rawDay;
-    const perAdmin = dosesPerDay >= 1 ? cappedDay / dosesPerDay : cappedDay;
-    const roundedPerAdmin = Math.round(perAdmin / 2.5) * 2.5; // round to nearest 2.5mg
-    const roundedDay = Math.round(cappedDay / 5) * 5;
-
-    // Calc trail text
-    const isPerDose = ind.dose_mgkg_dose != null;
-    const trailBase = isPerDose
-      ? `${ind.dose_mgkg_dose} mg/kg/dose × ${wt} kg = ${(ind.dose_mgkg_dose * wt).toFixed(1)} mg/dose`
-      : `${ind.dose_mgkg_day} mg/kg/day × ${wt} kg = ${rawDay.toFixed(1)} mg/day ÷ ${dosesPerDay} doses`;
-
+    if (dosesPerDay < 1) {
+      // Alternate-day / weekly: a per-day figure cannot be split into daily administrations
+      return {
+        type: "weight",
+        perAdminMg: roundAdmin(cappedDay),
+        dailyMg: null,
+        capped: cappedDay < rawDay,
+        cappedAt: ind.max_mg_day,
+        trail: `${ind.dose_mgkg_day} mg/kg × ${wt} kg = ${rawDay.toFixed(1)} mg per administration (${freq} — non-daily schedule, verify)`,
+      };
+    }
+    const perAdmin = cappedDay / dosesPerDay;
     return {
       type: "weight",
-      perAdminMg: roundedPerAdmin,
-      dailyMg: roundedDay,
+      perAdminMg: roundAdmin(perAdmin),
+      dailyMg: roundDay(cappedDay),
       capped: cappedDay < rawDay,
       cappedAt: ind.max_mg_day,
-      trail: trailBase,
+      trail: `${ind.dose_mgkg_day} mg/kg/day × ${wt} kg = ${rawDay.toFixed(1)} mg/day ÷ ${dosesPerDay} doses`,
     };
   }
 
   if (ind.dose_bsa && bsa) {
     const rawDay = ind.dose_bsa * bsa;
     const cappedDay = ind.max_mg_day ? Math.min(rawDay, ind.max_mg_day) : rawDay;
-    const perAdmin = dosesPerDay >= 1 ? cappedDay / dosesPerDay : cappedDay;
+    const nonDaily = dosesPerDay < 1;
+    const perAdmin = nonDaily ? cappedDay : cappedDay / dosesPerDay;
     return {
       type: "bsa",
-      perAdminMg: Math.round(perAdmin / 2.5) * 2.5,
-      dailyMg: Math.round(cappedDay / 5) * 5,
+      perAdminMg: roundAdmin(perAdmin),
+      dailyMg: nonDaily ? null : roundDay(cappedDay),
       capped: cappedDay < rawDay,
       cappedAt: ind.max_mg_day,
-      trail: `${ind.dose_bsa} ${ind.dose_unit_raw || "mg/m²/day"} × BSA ${bsa} m² = ${rawDay.toFixed(1)} mg/day ÷ ${dosesPerDay} doses`,
+      trail: `${ind.dose_bsa} ${ind.dose_unit_raw || "mg/m²/day"} × BSA ${bsa} m² = ${rawDay.toFixed(1)} mg${nonDaily ? ` per administration (${freq} — non-daily schedule, verify)` : `/day ÷ ${dosesPerDay} doses`}`,
     };
   }
 
@@ -422,7 +444,8 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
                   </div>
                   <div className="bg-white rounded-xl border-2 border-teal-300 p-3 text-center">
                     <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Daily Total</p>
-                    <p className="text-2xl font-bold text-teal-800">{calc.dailyMg} mg</p>
+                    <p className="text-2xl font-bold text-teal-800">{calc.dailyMg != null ? `${calc.dailyMg} mg` : "—"}</p>
+                    {calc.dailyMg == null && <p className="text-[10px] text-amber-600">Non-daily schedule</p>}
                   </div>
                 </div>
                 {/* Prominent Calculation Math */}
@@ -450,7 +473,7 @@ export default function RxIndicationBuilder({ drug, weight, height, onClose, onA
                   </div>
                   <div className="bg-white rounded-xl border-2 border-blue-300 p-3 text-center">
                     <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Starting Daily</p>
-                    <p className="text-2xl font-bold text-blue-800">{calc.dailyMg} mg</p>
+                    <p className="text-2xl font-bold text-blue-800">{calc.dailyMg != null ? `${calc.dailyMg} mg` : "—"}</p>
                   </div>
                 </div>
                 <div className="bg-slate-900 rounded-xl px-4 py-3 border border-slate-700">

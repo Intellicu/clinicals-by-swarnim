@@ -73,11 +73,13 @@ function interpretHAZ(z) {
 }
 function interpretBMI(bmi, age) {
   if (age < 2) return { label: 'Not applicable <2y', color: 'gray' };
-  if (bmi < 14) return { label: 'Severely Thin', color: 'red' };
-  if (bmi < 16) return { label: 'Thin', color: 'amber' };
-  if (bmi < 25) return { label: 'Normal', color: 'green' };
-  if (bmi < 30) return { label: 'Overweight', color: 'orange' };
-  return { label: 'Obese', color: 'red' };
+  // Fixed cutoffs are only screening approximations in children — BMI-for-age percentiles are definitive
+  const caveat = age < 18 ? ' (screening — confirm on BMI-for-age chart)' : '';
+  if (bmi < 14) return { label: 'Severely Thin' + caveat, color: 'red' };
+  if (bmi < 16) return { label: 'Thin' + caveat, color: 'amber' };
+  if (bmi < 25) return { label: 'Normal' + caveat, color: 'green' };
+  if (bmi < 30) return { label: 'Overweight' + caveat, color: 'orange' };
+  return { label: 'Obese' + caveat, color: 'red' };
 }
 
 const colorBadge = {
@@ -108,36 +110,42 @@ export default function Anthropometry() {
     const htM = ht / 100;
     const bmi = wt / (htM * htM);
     const bsa = Math.sqrt((ht * wt) / 3600);
-    const ibw = 18.5 * htM * htM;
+    // BMI-based IBW is an adult concept — only meaningful from adolescence
+    const ibw = ageYears >= 12 ? 18.5 * htM * htM : null;
 
-    // WAZ
-    const wazMedian = getInterpolated(WHO_WAZ, ageMonths, sex);
-    const wazSD = getInterpolated(WHO_WAZ_SD, ageMonths, sex);
-    const waz = calcZ(wt, wazMedian, wazSD);
+    // WHO 0–5y reference tables: z-scores are only valid up to 60 months
+    const beyondWho = ageMonths > 60;
+    let waz = null, haz = null;
+    if (!beyondWho) {
+      const wazMedian = getInterpolated(WHO_WAZ, ageMonths, sex);
+      const wazSD = getInterpolated(WHO_WAZ_SD, ageMonths, sex);
+      waz = calcZ(wt, wazMedian, wazSD);
 
-    // HAZ
-    const hazMedian = getInterpolated(WHO_HAZ, ageMonths, sex);
-    const hazSD = getInterpolated(WHO_HAZ_SD, ageMonths, sex);
-    const haz = calcZ(ht, hazMedian, hazSD);
-
-    // WHZ (simplified — weight/height ratio z using height-based median)
-    const whz = haz !== null && waz !== null ? (waz - haz * 0.4) : null; // rough approximation
+      const hazMedian = getInterpolated(WHO_HAZ, ageMonths, sex);
+      const hazSD = getInterpolated(WHO_HAZ_SD, ageMonths, sex);
+      haz = calcZ(ht, hazMedian, hazSD);
+    }
 
     const wazInterp = interpretWAZ(waz);
     const hazInterp = interpretHAZ(haz);
     const bmiInterp = interpretBMI(bmi, ageYears);
 
-    // Nutrition action
+    // Nutrition action — MUAC is the primary SAM/MAM criterion (6–59 months); WAZ flags underweight
+    const muacVal = parseFloat(muac);
     let nutritionAction = null;
-    if (waz !== null && waz < -3) {
-      nutritionAction = { level: "urgent", text: "Severe Acute Malnutrition — RUTF/therapeutic feeding, admit if oedema or poor appetite." };
+    if (!isNaN(muacVal) && ageMonths >= 6 && ageMonths <= 60 && muacVal < 11.5) {
+      nutritionAction = { level: "urgent", text: "Severe Acute Malnutrition (MUAC <11.5 cm) — RUTF/therapeutic feeding, admit if oedema or poor appetite." };
+    } else if (!isNaN(muacVal) && ageMonths >= 6 && ageMonths <= 60 && muacVal < 12.5) {
+      nutritionAction = { level: "moderate", text: "Moderate Acute Malnutrition (MUAC 11.5–12.5 cm) — supplementary feeding, close follow-up." };
+    } else if (waz !== null && waz < -3) {
+      nutritionAction = { level: "urgent", text: "Severely underweight (WAZ <−3) — assess for acute malnutrition (MUAC / weight-for-height), consider therapeutic feeding." };
     } else if (waz !== null && waz < -2) {
-      nutritionAction = { level: "moderate", text: "Moderate malnutrition — high-calorie diet, supplementary feeding, micronutrient support." };
+      nutritionAction = { level: "moderate", text: "Underweight (WAZ <−2) — high-calorie diet, supplementary feeding, micronutrient support." };
     } else if (haz !== null && haz < -2) {
       nutritionAction = { level: "mild", text: "Stunting detected — assess chronic illness, dietary diversity, micronutrient supplementation (zinc, iron, Vit A)." };
     }
 
-    setResults({ ageMonths, ageYears, wt, ht, bmi, bsa, ibw, waz, haz, whz, wazInterp, hazInterp, bmiInterp, nutritionAction });
+    setResults({ ageMonths, ageYears, wt, ht, bmi, bsa, ibw, waz, haz, beyondWho, wazInterp, hazInterp, bmiInterp, nutritionAction });
   };
 
   const muacStatus = muac ? (
@@ -224,12 +232,21 @@ export default function Anthropometry() {
         {/* Results */}
         {results && (
           <>
+            {results.beyondWho && (
+              <Alert className="mb-4 bg-amber-50 border-amber-300">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <AlertDescription className="text-amber-800 text-xs">
+                  <strong>Age &gt;5 years:</strong> WHO 0–5y growth-standard z-scores are not valid at this age and are not shown.
+                  Use IAP/WHO 5–19y growth charts for weight-for-age, height-for-age and BMI percentiles.
+                </AlertDescription>
+              </Alert>
+            )}
             {/* Quick summary row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
               {[
                 { label: "BMI", value: results.bmi.toFixed(1), unit: "kg/m²" },
                 { label: "BSA", value: results.bsa.toFixed(3), unit: "m² (Mosteller)" },
-                { label: "Ideal Wt", value: results.ibw.toFixed(1), unit: "kg (BMI 18.5)" },
+                { label: "Ideal Wt", value: results.ibw !== null ? results.ibw.toFixed(1) : "—", unit: results.ibw !== null ? "kg (BMI 18.5)" : "≥12y only" },
                 { label: "Age", value: results.ageYears.toFixed(1), unit: `yrs (${results.ageMonths.toFixed(0)}m)` },
               ].map(({ label, value, unit }) => (
                 <Card key={label} className="bg-white border border-slate-200 shadow-sm">
@@ -334,7 +351,7 @@ export default function Anthropometry() {
                           ["Height", `${results.ht} cm`],
                           ["BMI", `${results.bmi.toFixed(2)} kg/m²`],
                           ["BSA (Mosteller)", `${results.bsa.toFixed(4)} m²`],
-                          ["Ideal Body Weight", `${results.ibw.toFixed(1)} kg`],
+                          ["Ideal Body Weight", results.ibw !== null ? `${results.ibw.toFixed(1)} kg` : "N/A (<12y)"],
                           ["WAZ", results.waz !== null ? results.waz.toFixed(2) : 'N/A'],
                           ["HAZ", results.haz !== null ? results.haz.toFixed(2) : 'N/A'],
                           ...(muac ? [["MUAC", `${muac} cm — ${muacStatus?.label}`]] : []),

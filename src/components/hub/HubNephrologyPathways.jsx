@@ -323,7 +323,8 @@ export default function HubNephrologyPathways() {
       saveCustom(updated);
     } else if (!editModal.isCustom) {
       // Store built-in edit override in localStorage
-      const overrides = JSON.parse(localStorage.getItem("builtin_pathway_overrides") || "{}");
+      let overrides = {};
+      try { overrides = JSON.parse(localStorage.getItem("builtin_pathway_overrides") || "{}") || {}; } catch { overrides = {}; }
       overrides[p.name] = p;
       localStorage.setItem("builtin_pathway_overrides", JSON.stringify(overrides));
       // Force re-render

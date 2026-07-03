@@ -170,7 +170,8 @@ Provide:
   const savePlan = () => {
     if (!result) return;
     const updatedResult = { ...result, meal_plan: mealPlan };
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    let saved = [];
+    try { const p = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); saved = Array.isArray(p) ? p : []; } catch { saved = []; }
     const newSaved = [{ id: Date.now(), ...updatedResult }, ...saved.slice(0, 9)];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newSaved));
     toast.success("Diet plan saved offline");

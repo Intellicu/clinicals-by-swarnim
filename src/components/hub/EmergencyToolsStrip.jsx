@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ChevronRight, AlertCircle } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 
@@ -23,7 +23,8 @@ const EmergencyToolsStrip = React.forwardRef(({ searchQuery = '', onNavigate, cl
     });
   }, [searchQuery]);
 
-  const visibleTools = orderedTools.slice(0, 3);
+  const [expanded, setExpanded] = useState(false);
+  const visibleTools = expanded ? orderedTools : orderedTools.slice(0, 3);
   const moreCount = orderedTools.length - visibleTools.length;
 
   return (
@@ -41,9 +42,15 @@ const EmergencyToolsStrip = React.forwardRef(({ searchQuery = '', onNavigate, cl
             </button>
           ))}
           {moreCount > 0 && (
-            <button onClick={() => {}}
+            <button onClick={() => setExpanded(true)}
               className="flex-shrink-0 px-3 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-200 text-white font-semibold text-sm border border-white/30 hover:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/50">
               +{moreCount} More
+            </button>
+          )}
+          {expanded && orderedTools.length > 3 && (
+            <button onClick={() => setExpanded(false)}
+              className="flex-shrink-0 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 text-white/90 font-semibold text-sm border border-white/20">
+              Show less
             </button>
           )}
         </div>

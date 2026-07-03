@@ -20,11 +20,27 @@ import {
 import { toast } from "sonner";
 
 // ── Dose calculation from a DoseRule ────────────────────────────────────────
+function dosesPerDayFromFreq(freq = "") {
+  const f = freq.toUpperCase();
+  if (f.includes("QID") || f.includes("Q6H")) return 4;
+  if (f.includes("TID") || f.includes("TDS") || f.includes("Q8H")) return 3;
+  if (f.includes("BID") || f.includes("BD") || f.includes("Q12H") || f.includes("TWICE")) return 2;
+  if (f.includes("ALT") || f.includes("EOD") || f.includes("WEEK")) return 0; // non-daily — can't split a daily total
+  return 1; // OD / STAT / unknown
+}
+
+// The measured unit ("mg", "mcg", "g", "units"…) — never assume mg
+function unitLabelOf(doseUnit = "") {
+  const m = doseUnit.match(/^([a-zA-Zμ]+)/);
+  return m ? m[1] : "mg";
+}
+
 function calcFromRule(rule, weightKg, bsaM2) {
   const wt = parseFloat(weightKg) || 0;
   const bsa = parseFloat(bsaM2) || 0;
   const val = rule.dose_value;
   const unit = rule.dose_unit || "";
+  const unitLabel = unitLabelOf(unit);
   const maxTotalMg = rule.max_total_mg;
   const roundStrat = rule.rounding_strategy || "exact";
 
@@ -39,7 +55,7 @@ function calcFromRule(rule, weightKg, bsaM2) {
       rawDose = val * bsa;
       basisLabel = `${bsa} m² × ${val} ${unit}`;
     }
-  } else if (unit.includes("dose") || unit.includes("day") || unit === "mg/day" || unit === "mcg/day") {
+  } else if (unit.includes("dose") || unit.includes("day")) {
     rawDose = val;
     basisLabel = `Fixed: ${val} ${unit}`;
   }
@@ -55,24 +71,46 @@ function calcFromRule(rule, weightKg, bsaM2) {
     rawDose = maxTotalMg;
   }
 
-  // Rounding
-  let finalDose = rawDose;
-  if (roundStrat === "nearest_5") finalDose = Math.round(rawDose / 5) * 5;
-  else if (roundStrat === "nearest_10") finalDose = Math.round(rawDose / 10) * 10;
-  else if (roundStrat === "round_up") finalDose = Math.ceil(rawDose);
-  else if (roundStrat === "round_down") finalDose = Math.floor(rawDose);
-  else finalDose = parseFloat(rawDose.toFixed(2));
+  // Per-day units must be divided across the day's administrations;
+  // per-dose (or unspecified) units are already a single administration.
+  const isPerDay = /\/\s*day\b/i.test(unit) || unit.toLowerCase().endsWith("day");
+  const dosesPerDay = dosesPerDayFromFreq(rule.frequency);
+  let perAdminRaw = rawDose;
+  let dailyTotal = null;
+  let scheduleWarning = null;
+  if (isPerDay) {
+    dailyTotal = rawDose;
+    if (dosesPerDay >= 1) {
+      perAdminRaw = rawDose / dosesPerDay;
+    } else {
+      scheduleWarning = `Rule is per-day but frequency is "${rule.frequency}" (non-daily) — verify schedule manually`;
+    }
+  } else if (dosesPerDay >= 1) {
+    dailyTotal = rawDose * dosesPerDay;
+  }
 
-  // Sanity check against min/max per kg
+  // Rounding — applied to the per-administration dose
+  const applyRound = (x) => {
+    if (roundStrat === "nearest_5") return x < 5 ? parseFloat(x.toFixed(2)) : Math.round(x / 5) * 5;
+    if (roundStrat === "nearest_10") return x < 10 ? parseFloat(x.toFixed(2)) : Math.round(x / 10) * 10;
+    if (roundStrat === "round_up") return x < 2 ? parseFloat(x.toFixed(2)) : Math.ceil(x);
+    if (roundStrat === "round_down") return x < 2 ? parseFloat(x.toFixed(2)) : Math.floor(x);
+    return parseFloat(x.toFixed(2));
+  };
+  const finalDose = applyRound(perAdminRaw);
+  if (dailyTotal !== null) dailyTotal = parseFloat(dailyTotal.toFixed(2));
+
+  // Sanity check against min/max per kg (on the daily amount when the rule is per-day)
   let rangeWarning = null;
-  if (rule.min_dose_per_kg && wt && (finalDose / wt) < rule.min_dose_per_kg) {
-    rangeWarning = `Dose ${finalDose} falls below minimum ${rule.min_dose_per_kg} mg/kg`;
+  const checkAmount = isPerDay && dailyTotal !== null ? dailyTotal : finalDose;
+  if (rule.min_dose_per_kg && wt && (checkAmount / wt) < rule.min_dose_per_kg) {
+    rangeWarning = `Dose ${checkAmount} falls below minimum ${rule.min_dose_per_kg} ${unitLabel}/kg`;
   }
-  if (rule.max_dose_per_kg && wt && (finalDose / wt) > rule.max_dose_per_kg) {
-    rangeWarning = `Dose ${finalDose} exceeds maximum ${rule.max_dose_per_kg} mg/kg`;
+  if (rule.max_dose_per_kg && wt && (checkAmount / wt) > rule.max_dose_per_kg) {
+    rangeWarning = `Dose ${checkAmount} exceeds maximum ${rule.max_dose_per_kg} ${unitLabel}/kg`;
   }
 
-  return { finalDose, basisLabel, capped, capVal, rangeWarning, unit };
+  return { finalDose, dailyTotal, isPerDay, dosesPerDay, unitLabel, basisLabel, capped, capVal, rangeWarning, scheduleWarning, unit };
 }
 
 // ── Indication Picker (DoseRule-based) ───────────────────────────────────────
@@ -147,13 +185,17 @@ function DoseRuleIndicationPicker({ rules, drug, weight, bsa, onSelectRule }) {
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-semibold text-teal-700">For this patient:</span>
                           <span className="text-xl font-bold text-teal-900 leading-none">
-                            {c.finalDose} mg
+                            {c.finalDose} {c.unitLabel}<span className="text-xs font-semibold"> /dose</span>
                           </span>
                         </div>
                         <div className="flex items-center justify-between mt-0.5">
                           <span className="text-[10px] text-teal-600">{c.basisLabel}</span>
-                          {c.capped && <span className="text-[10px] text-amber-600">max {c.capVal} mg</span>}
+                          {c.capped && <span className="text-[10px] text-amber-600">max {c.capVal} {c.unitLabel}</span>}
                         </div>
+                        {c.dailyTotal !== null && c.dosesPerDay > 1 && (
+                          <p className="text-[10px] text-teal-700 mt-0.5">Daily total: {c.dailyTotal} {c.unitLabel} ÷ {c.dosesPerDay} doses</p>
+                        )}
+                        {c.scheduleWarning && <p className="text-[10px] text-amber-600 mt-0.5">⚠ {c.scheduleWarning}</p>}
                         {c.rangeWarning && <p className="text-[10px] text-amber-600 mt-0.5">⚠ {c.rangeWarning}</p>}
                       </div>
                     )}
@@ -181,8 +223,10 @@ function DoseRuleIndicationPicker({ rules, drug, weight, bsa, onSelectRule }) {
             <p className="font-bold text-slate-900 not-italic mb-1">Calculation Trail</p>
             <p>Indication: {selectedRule.indication}</p>
             <p>Rule: {selectedRule.dose_value} {selectedRule.dose_unit} {selectedRule.frequency} {selectedRule.route}</p>
-            <p>{calc.basisLabel} = {calc.finalDose} {selectedRule.dose_unit.includes("kg") ? "mg" : selectedRule.dose_unit}</p>
-            {calc.capped && <p className="text-amber-700">⚠ Capped at max {calc.capVal} mg/dose</p>}
+            <p>{calc.basisLabel} = {calc.isPerDay && calc.dailyTotal !== null ? `${calc.dailyTotal} ${calc.unitLabel}/day` : `${calc.finalDose} ${calc.unitLabel}`}</p>
+            {calc.isPerDay && calc.dosesPerDay >= 1 && <p>Per administration: {calc.dailyTotal} ÷ {calc.dosesPerDay} = {calc.finalDose} {calc.unitLabel}/dose</p>}
+            {calc.capped && <p className="text-amber-700">⚠ Capped at max {calc.capVal} {calc.unitLabel}</p>}
+            {calc.scheduleWarning && <p className="text-amber-700">⚠ {calc.scheduleWarning}</p>}
             {selectedRule.duration_days > 0 && <p>Duration: {selectedRule.duration_days} days</p>}
             {selectedRule.duration_notes && <p>({selectedRule.duration_notes})</p>}
           </div>
@@ -242,16 +286,11 @@ function MonographOnlyState({ drug, weight, bsa, onManualEntry }) {
         </AlertDescription>
       </Alert>
 
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="flex-1 border-slate-300 text-slate-600" onClick={() => {}}>
-          <BookOpen className="w-3.5 h-3.5 mr-1" /> View Full Monograph
-        </Button>
-        <Button size="sm"
-          className="flex-1 bg-slate-700 hover:bg-slate-800 text-white gap-1"
-          onClick={() => setShowManual(v => !v)}>
-          <Pencil className="w-3.5 h-3.5" /> Manual Entry {showManual ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-        </Button>
-      </div>
+      <Button size="sm"
+        className="w-full bg-slate-700 hover:bg-slate-800 text-white gap-1"
+        onClick={() => setShowManual(v => !v)}>
+        <Pencil className="w-3.5 h-3.5" /> Manual Entry {showManual ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+      </Button>
 
       {showManual && (
         <div className="bg-slate-50 rounded-xl border border-slate-200 p-3 space-y-2">

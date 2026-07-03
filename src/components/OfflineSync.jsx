@@ -3,6 +3,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
+function readPendingSync() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem('pending_sync') || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    localStorage.setItem('pending_sync', '[]');
+    return [];
+  }
+}
+
 export default function OfflineSync() {
   const [isOnline, setIsOnline] = useState(true);
   const [pendingSync, setPendingSync] = useState(0);
@@ -27,8 +37,7 @@ export default function OfflineSync() {
     setIsOnline(navigator.onLine);
 
     // Load pending items
-    const pending = JSON.parse(localStorage.getItem('pending_sync') || '[]');
-    setPendingSync(pending.length);
+    setPendingSync(readPendingSync().length);
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -37,7 +46,7 @@ export default function OfflineSync() {
   }, []);
 
   const syncPendingData = async () => {
-    const pending = JSON.parse(localStorage.getItem('pending_sync') || '[]');
+    const pending = readPendingSync();
     if (pending.length === 0) return;
 
     try {

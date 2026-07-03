@@ -51,9 +51,11 @@ const INTERACTION_RULES = [
 
 function findInteractions(drugs) {
   const lower = drugs.map(d => d.generic_name?.toLowerCase() || "");
+  // Whole-word match so e.g. methylprednisolone doesn't trigger prednisolone rules
+  const hasDrug = (key) => { const re = new RegExp(`\\b${key}\\b`); return lower.some(n => re.test(n)); };
   const found = [];
   INTERACTION_RULES.forEach(rule => {
-    if (lower.some(n => n.includes(rule.a)) && lower.some(n => n.includes(rule.b))) found.push(rule);
+    if (hasDrug(rule.a) && hasDrug(rule.b)) found.push(rule);
   });
   return found;
 }
@@ -63,45 +65,54 @@ function freqFactor(freq = "") {
   if (f.includes("QID") || f.includes("Q6H")) return 4;
   if (f.includes("TID") || f.includes("TDS") || f.includes("Q8H")) return 3;
   if (f.includes("BID") || f.includes("BD") || f.includes("Q12H") || f.includes("TWICE")) return 2;
+  if (f.includes("ALT") || f.includes("EOD") || f.includes("WEEK")) return 0; // not daily — cannot divide a daily total
   return 1;
 }
 
 function calcDose(drug, wt, bsa, egfr) {
   if (!drug) return null;
-  const raw = drug.dose_weight_based || "";
+  // Normalise en/em dashes so ranges like "0.5–2 mg/kg" parse as ranges, not as a bare upper bound
+  const raw = (drug.dose_weight_based || "").replace(/[–—]/g, "-");
   const type = drug.dose_calculation_type || "per_day";
   const freq = drug.frequency || "OD";
-  if (type === "TDM") return { type: "TDM", perDose: "TDM-guided", daily: "—", freq, note: `Starting: ${raw}` };
+  if (type === "TDM") return { type: "TDM", perDose: "TDM-guided", daily: "—", freq, note: `Starting: ${drug.dose_weight_based}` };
   if (type === "fixed" || (!raw.includes("/kg") && !raw.includes("/m²")))
-    return { type: "fixed", perDose: drug.dose_age_based || raw, daily: "—", freq, note: "Age-based or fixed dose" };
+    return { type: "fixed", perDose: drug.dose_age_based || drug.dose_weight_based, daily: "—", freq, note: "Age-based or fixed dose" };
   if (raw.includes("/m²")) {
-    const m = raw.match(/([\d.]+)(?:-)?([\d.]+)?\s*(\w+)\/m²/);
+    const m = raw.match(/([\d.]+)\s*(?:-\s*([\d.]+))?\s*(\w+)\/m²/);
     if (m && bsa) {
       const minD = parseFloat(m[1]) * bsa, maxD = m[2] ? parseFloat(m[2]) * bsa : minD;
       const unit = m[3], factor = freqFactor(freq);
+      if (factor === 0) {
+        return { type: "bsa", perDose: `${minD.toFixed(1)}${m[2] ? `–${maxD.toFixed(1)}` : ""} ${unit}`, daily: "—", freq, note: `${m[1]}${m[2] ? `–${m[2]}` : ""} ${unit}/m² × BSA ${bsa.toFixed(2)} m² — non-daily frequency (${freq}), verify schedule` };
+      }
       const perMin = (minD / factor).toFixed(1), perMax = m[2] ? (maxD / factor).toFixed(1) : perMin;
       return { type: "bsa", perDose: m[2] ? `${perMin}–${perMax} ${unit}` : `${perMin} ${unit}`, daily: `${minD.toFixed(1)}–${maxD.toFixed(1)} ${unit}/day`, freq, note: `${m[1]}${m[2] ? `–${m[2]}` : ""} ${unit}/m²/day × BSA ${bsa.toFixed(2)} m²` };
     }
   }
   if (raw.includes("/kg")) {
-    const m = raw.match(/([\d.]+)(?:-)?([\d.]+)?\s*(\w+)\/kg/);
+    const m = raw.match(/([\d.]+)\s*(?:-\s*([\d.]+))?\s*(\w+)\/kg/);
     if (m && wt) {
       const minRaw = parseFloat(m[1]), maxRaw = m[2] ? parseFloat(m[2]) : minRaw, unit = m[3], factor = freqFactor(freq);
       const minD = minRaw * wt, maxD = maxRaw * wt;
-      if (type === "per_dose") {
-        return { type: "weight_per_dose", perDose: m[2] ? `${minD.toFixed(1)}–${maxD.toFixed(1)} ${unit}` : `${minD.toFixed(1)} ${unit}`, daily: `${(minD * factor).toFixed(1)}–${(maxD * factor).toFixed(1)} ${unit}/day`, freq, note: `${minRaw}${m[2] ? `–${maxRaw}` : ""} ${unit}/kg/dose × ${wt} kg` };
+      if (type === "per_dose" || factor === 0) {
+        return { type: "weight_per_dose", perDose: m[2] ? `${minD.toFixed(1)}–${maxD.toFixed(1)} ${unit}` : `${minD.toFixed(1)} ${unit}`, daily: factor > 0 ? `${(minD * factor).toFixed(1)}–${(maxD * factor).toFixed(1)} ${unit}/day` : "—", freq, note: `${minRaw}${m[2] ? `–${maxRaw}` : ""} ${unit}/kg/dose × ${wt} kg${factor === 0 ? ` — non-daily frequency (${freq})` : ""}` };
       } else {
         const perMin = (minD / factor).toFixed(1), perMax = (maxD / factor).toFixed(1);
         return { type: "weight_per_day", perDose: m[2] ? `${perMin}–${perMax} ${unit}` : `${perMin} ${unit}`, daily: m[2] ? `${minD.toFixed(1)}–${maxD.toFixed(1)} ${unit}/day` : `${minD.toFixed(1)} ${unit}/day`, freq, note: `${minRaw}${m[2] ? `–${maxRaw}` : ""} ${unit}/kg/day ÷ ${factor} doses × ${wt} kg` };
       }
     }
   }
-  return { type: "unknown", perDose: raw, daily: "—", freq, note: "See drug monograph" };
+  return { type: "unknown", perDose: drug.dose_weight_based, daily: "—", freq, note: "See drug monograph" };
 }
 
 function getRenalFlag(drug, egfr) {
   if (!egfr || !drug.renal_adjust) return null;
   const adj = drug.renal_adjust.toLowerCase(), g = parseFloat(egfr);
+  // Text saying no adjustment is needed must not raise a flag (unless it also carries a real warning)
+  const saysNoAdjust = /\bno (dose )?adjust/.test(adj) || adj.includes("not required");
+  const hasRealWarning = adj.includes("avoid") || adj.includes("contraindicated") || adj.includes("reduce") || adj.includes("caution");
+  if (saysNoAdjust && !hasRealWarning) return null;
   if ((adj.includes("avoid") || adj.includes("contraindicated")) && g < 30) return { level: "critical", msg: drug.renal_adjust };
   if ((adj.includes("reduce") || adj.includes("adjust")) && g < 60) return { level: g < 30 ? "critical" : "warning", msg: drug.renal_adjust };
   if (adj.includes("caution") && g < 60) return { level: "info", msg: drug.renal_adjust };
@@ -374,13 +385,7 @@ export default function DrugsDosing() {
     return h && w ? parseFloat(Math.sqrt((h * w) / 3600).toFixed(3)) : null;
   }, [height, weight]);
 
-  const autoEgfr = useMemo(() => {
-    const cr = parseFloat(egfr), h = parseFloat(height), a = parseFloat(age);
-    if (!isNaN(cr) && cr > 0 && h && a) { const k = a < 2 ? 0.33 : a < 13 ? 0.55 : 0.70; return ((k * h) / cr).toFixed(0); }
-    return null;
-  }, [egfr, height, age]);
-
-  const effectiveEgfr = egfr && !isNaN(parseFloat(egfr)) ? parseFloat(egfr) : (autoEgfr ? parseFloat(autoEgfr) : null);
+  const effectiveEgfr = egfr && !isNaN(parseFloat(egfr)) ? parseFloat(egfr) : null;
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
@@ -404,10 +409,19 @@ export default function DrugsDosing() {
   };
 
   const addToRx = (drug) => {
-    if (!rxDrugs.find(d => d.id === drug.id)) {
-      setRxDrugs(prev => [...prev, drug]);
-      toast.success(`${drug.generic_name} added to prescription`);
+    const existing = rxDrugs.find(d => d.id === drug.id);
+    if (existing) {
+      // Same drug added for a different indication → replace the existing line and tell the user
+      if (drug._indication && drug._indication !== existing._indication) {
+        setRxDrugs(prev => prev.map(d => d.id === drug.id ? drug : d));
+        toast.info(`${drug.generic_name} updated in Rx (indication: ${drug._indication})`);
+      } else {
+        toast.info(`${drug.generic_name} is already in the prescription`);
+      }
+      return;
     }
+    setRxDrugs(prev => [...prev, drug]);
+    toast.success(`${drug.generic_name} added to prescription`);
   };
 
   // Opens the indication builder for a drug (from drug detail view or search)
@@ -575,7 +589,7 @@ export default function DrugsDosing() {
 
 // ── Build prescription text from DoseRule + calc ──────────────────────────────
 function buildDrugPrescriptionText(drug, rule, calc) {
-  const doseStr = calc?.finalDose != null ? `${calc.finalDose} mg` : `${rule.dose_value} ${rule.dose_unit}`;
+  const doseStr = calc?.finalDose != null ? `${calc.finalDose} ${calc.unitLabel}/dose` : `${rule.dose_value} ${rule.dose_unit}`;
   const brands = drug.brands_indian ? `\n   Brands: ${drug.brands_indian.split(",").slice(0,2).join(", ")}` : "";
   const dur = rule.duration_days > 0 ? ` × ${rule.duration_days} days` : rule.duration_notes ? ` (${rule.duration_notes})` : "";
   return `${drug.generic_name} [${rule.indication}]\n   Dose: ${doseStr}  |  ${rule.frequency || "—"}  |  ${rule.route || "PO"}${dur}${brands}`;
@@ -584,10 +598,13 @@ function buildDrugPrescriptionText(drug, rule, calc) {
 // ── Build calc trail string ────────────────────────────────────────────────────
 function buildCalcTrail(drug, rule, calc) {
   if (!calc) return "";
+  const u = calc.unitLabel || "mg";
   let trail = `${drug.generic_name} — ${rule.indication}\n`;
-  trail += `  ${calc.basisLabel} = ${calc.finalDose} mg`;
-  if (calc.capped) trail += `\n  Max cap ${calc.capVal} mg → ${calc.finalDose} mg (within limit)`;
-  if (rule.rounding_strategy && rule.rounding_strategy !== "exact") trail += `\n  Rounded (${rule.rounding_strategy.replace("_", " ")}) → ${calc.finalDose} mg`;
+  trail += `  ${calc.basisLabel} = ${calc.isPerDay && calc.dailyTotal != null ? `${calc.dailyTotal} ${u}/day` : `${calc.finalDose} ${u}`}`;
+  if (calc.isPerDay && calc.dosesPerDay >= 1) trail += `\n  Per administration: ${calc.dailyTotal} ÷ ${calc.dosesPerDay} = ${calc.finalDose} ${u}/dose`;
+  if (calc.capped) trail += `\n  Max cap ${calc.capVal} ${u} applied`;
+  if (rule.rounding_strategy && rule.rounding_strategy !== "exact") trail += `\n  Rounded (${rule.rounding_strategy.replace("_", " ")}) → ${calc.finalDose} ${u}`;
+  if (calc.scheduleWarning) trail += `\n  ⚠ ${calc.scheduleWarning}`;
   trail += `\n  Frequency: ${rule.frequency || "—"}`;
   if (rule.duration_days > 0) trail += ` × ${rule.duration_days} days`;
   if (rule.guideline_source) trail += `  (${rule.guideline_source})`;
@@ -984,7 +1001,7 @@ function DrugFullMonograph({ drug }) {
             <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2"><Clock className="w-4 h-4 text-teal-600" /> Recently Viewed</h2>
             {recentDrugs.length === 0 ? (
               <div className="text-center py-12 text-slate-400 text-sm">No recent drugs. Start searching to build history.</div>
-            ) : recentDrugs.map(drug => (
+            ) : recentDrugs.map(stored => drugs.find(d => d.id === stored.id) || stored).map(drug => (
               <div key={drug.id} onClick={() => selectDrug(drug)}
                 className="flex items-center gap-3 px-3 py-3 bg-white rounded-xl border border-slate-200 hover:border-teal-300 cursor-pointer transition-all">
                 <Clock className="w-4 h-4 text-slate-400" />
@@ -1093,7 +1110,24 @@ function DrugFullMonograph({ drug }) {
               {drugSubTab === "dose" && selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && (
                 <EculizumabGuidance />
               )}
-              {drugSubTab === "dose" && !selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && (
+              {drugSubTab === "dose" && !selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && isMultiIndicationDrug(selectedDrug?.generic_name) && (
+                <div className="space-y-3">
+                  <Alert className="bg-amber-50 border-amber-300">
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <AlertDescription className="text-amber-800 text-sm">
+                      <strong>{selectedDrug.generic_name} has multiple indication-specific regimens</strong> — a single dose cannot be shown safely.
+                      Use the <button onClick={() => setDrugSubTab("indications")} className="underline font-semibold">Indications tab</button> to select the clinical context and calculate the correct dose.
+                    </AlertDescription>
+                  </Alert>
+                  {selectedDrug.renal_adjust && (
+                    <Card className="bg-indigo-50 border border-indigo-200"><CardContent className="p-3">
+                      <p className="text-xs font-bold text-indigo-600 uppercase mb-1">Renal Adjustments</p>
+                      <p className="text-xs text-indigo-800">{selectedDrug.renal_adjust}</p>
+                    </CardContent></Card>
+                  )}
+                </div>
+              )}
+              {drugSubTab === "dose" && !selectedDrug?.generic_name?.toLowerCase().includes("eculizumab") && !isMultiIndicationDrug(selectedDrug?.generic_name) && (
                 <div className="space-y-3">
                   {dose && dose.type !== "TDM" && dose.type !== "unknown" ? (
                     <div className="grid grid-cols-2 gap-2">
@@ -1233,7 +1267,7 @@ function DrugFullMonograph({ drug }) {
                         category: selectedDrug.category,
                         therapeutic_class: selectedDrug.therapeutic_class,
                         route: rule.route || selectedDrug.route || "PO",
-                        dose_weight_based: `${calc?.finalDose ?? rule.dose_value} mg`,
+                        dose_weight_based: calc ? `${calc.finalDose} ${calc.unitLabel}/dose` : `${rule.dose_value} ${rule.dose_unit}`,
                         frequency: rule.frequency || selectedDrug.frequency || "OD",
                         brands_indian: selectedDrug.brands_indian || "",
                         renal_adjust: selectedDrug.renal_adjust || "",

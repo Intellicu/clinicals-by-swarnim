@@ -20,6 +20,16 @@ export default function CKiDGFR() {
     const crMgDl = parseFloat(creatinine);
     const cysCmgL = cystatinC ? parseFloat(cystatinC) : null;
     const bunMgDl = bun ? parseFloat(bun) : null;
+    // Height and creatinine are denominators — must be positive to avoid Infinity/NaN
+    if (isNaN(heightCm) || heightCm <= 0 || isNaN(crMgDl) || crMgDl <= 0) {
+      setResults({
+        safetyLevel: "caution",
+        calculationTrace: ["Invalid input — height and serum creatinine must both be positive numbers."],
+        primaryResults: [{ label: "eGFR", value: "—", subtext: "Invalid input" }],
+        alerts: [{ severity: "warning", title: "Invalid input", message: "Enter height (cm) and serum creatinine (mg/dL) as positive numbers." }],
+      });
+      return;
+    }
 
     let eGFR;
     let formulaUsed = "";

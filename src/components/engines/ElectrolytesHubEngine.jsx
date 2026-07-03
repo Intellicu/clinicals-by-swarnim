@@ -165,7 +165,7 @@ const HypernatremiaEngine = () => {
             <div className="rounded-xl border-2 border-amber-200 bg-amber-50 p-3 text-xs space-y-1">
               <p className="font-bold text-amber-900">Euvolaemic Hypernatremia — Diabetes Insipidus (DI)</p>
               {["Urine osmolality <300 mOsm/kg despite plasma hyperosmolality = DI", "Proceed to Polyuria Engine for DDAVP test (Central DI vs Nephrogenic DI)", "Central DI: DDAVP intranasal/SC/oral; monitor for hyponatraemia", "Nephrogenic DI: low-solute diet + HCTZ + amiloride + indomethacin", "Correct hypernatraemia: 0.45% NaCl or 5% dextrose (free water) at max 10 mEq/L/24h correction rate"].map((c, i) => <p key={i} className="text-amber-800">• {c}</p>)}
-              <button onClick={() => {}} className="mt-2 text-blue-600 underline text-xs font-semibold">→ See Polyuria/DI Engine for full DDAVP protocol</button>
+              <p className="mt-2 text-blue-700 text-xs font-semibold">→ Open the Polyuria/DI Engine from the Electrolytes hub for the full DDAVP protocol</p>
             </div>
           )}
           <Button variant="outline" size="sm" className="w-full" onClick={back}><ArrowLeft className="w-3.5 h-3.5 mr-1" />Back</Button>
