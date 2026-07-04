@@ -41,6 +41,7 @@ export default function ManuscriptStudio({ project }) {
   });
   const [loading, setLoading] = useState(null);
   const [targetJournal, setTargetJournal] = useState(project?.target_journal || "");
+  const [journalSuggestions, setJournalSuggestions] = useState("");
   const [saving, setSaving] = useState(false);
 
   const buildProjectContext = () => `
@@ -248,14 +249,23 @@ Return only the improved text.`
                   const result = await base44.integrations.Core.InvokeLLM({
                     prompt: `Recommend 3 journals for a ${project?.study_type || "clinical"} study on pediatric nephrology: "${project?.title}". For each: journal name, impact factor, scope, submission tips. Prefer Indian/Asian journals among them.`
                   });
+                  setJournalSuggestions(String(result ?? ""));
                   toast.success("AI recommendations ready");
-                } catch {}
+                } catch (e) {
+                  toast.error("Could not fetch journal suggestions — try again.");
+                }
                 setLoading(null);
               }}>
                 {loading === "journal" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Search className="w-3 h-3" />}
                 AI Suggest
               </Button>
             </div>
+            {journalSuggestions && (
+              <div className="mb-3 bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                <p className="text-xs font-bold text-indigo-700 mb-1">AI Journal Recommendations</p>
+                <p className="text-xs text-indigo-900 whitespace-pre-line">{journalSuggestions}</p>
+              </div>
+            )}
             <div className="grid md:grid-cols-2 gap-2">
               {JOURNAL_LIST.map(j => (
                 <button key={j.name} onClick={() => setTargetJournal(j.name)}

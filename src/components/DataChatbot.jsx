@@ -140,22 +140,26 @@ export default function DataChatbot() {
     try {
       const patientData = JSON.parse(localStorage.getItem('clinicalc_patient_data') || '{}');
       
-      const contextPrompt = `You are a friendly clinical assistant.
+      const historyBlock = messages.length > 0
+        ? `\nConversation so far:\n${messages.slice(-6).map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n')}\n`
+        : '';
+
+      const contextPrompt = `You are a friendly paediatric nephrology clinical assistant.
 
 Patient Data: ${JSON.stringify(patientData)}
 Patients in System: ${patients.length}
 Recent Visits: ${recentVisits.length}
-
+${historyBlock}
 Question: ${userMessage}
 
-Provide helpful, concise answers. Explain medical terms simply. Be supportive. Keep responses brief (2-3 sentences).`;
+Give a clinically accurate, complete answer. Start with the direct answer, then add key details (doses, thresholds, red flags) when clinically relevant. Explain medical terms simply. If the question needs more detail than a chat bubble allows, summarise and point to the relevant app section.`;
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: contextPrompt,
         add_context_from_internet: false
       });
 
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: String(response ?? '') }]);
     } catch (error) {
       toast.error('Failed to get response');
     } finally {

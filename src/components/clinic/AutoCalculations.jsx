@@ -11,21 +11,25 @@ export default function AutoCalculations({ formData, onUpdate }) {
   const calculateAll = () => {
     const updates = {};
 
+    const wt = parseFloat(formData.weight);
+    const htCm = parseFloat(formData.height);
+    const scr = parseFloat(formData.serumCreatinine);
+
     // BMI calculation
-    if (formData.weight && formData.height) {
-      const heightM = parseFloat(formData.height) / 100;
-      const bmi = parseFloat(formData.weight) / (heightM * heightM);
+    if (wt > 0 && htCm > 0) {
+      const heightM = htCm / 100;
+      const bmi = wt / (heightM * heightM);
       updates.bmi = bmi.toFixed(1);
 
       // BSA (Mosteller)
-      const bsa = Math.sqrt((parseFloat(formData.height) * parseFloat(formData.weight)) / 3600);
+      const bsa = Math.sqrt((htCm * wt) / 3600);
       updates.bsa = bsa.toFixed(3);
     }
 
-    // Schwartz eGFR
-    if (formData.height && formData.serumCreatinine) {
+    // Schwartz eGFR — creatinine must be a positive number (zero would divide to Infinity)
+    if (htCm > 0 && scr > 0) {
       const k = 0.413; // Schwartz constant for children
-      const egfr = (k * parseFloat(formData.height)) / parseFloat(formData.serumCreatinine);
+      const egfr = (k * htCm) / scr;
       updates.egfr = egfr.toFixed(1);
       
       // CKD Stage

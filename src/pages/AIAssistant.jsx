@@ -44,18 +44,27 @@ export default function AIAssistant() {
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ prompt, useOnline, fileUrls }) => {
-      let context = "";
-      
+    mutationFn: async ({ prompt, useOnline, fileUrls, history }) => {
+      // Standing clinical role so answers stay detailed and domain-appropriate in both modes
+      let context = "You are an expert paediatric nephrology clinical assistant. Give detailed, structured, evidence-based answers with doses, thresholds and guideline citations where relevant. State the age group your answer applies to.\n\n";
+
       if (!useOnline && guidelines.length > 0) {
-        context = "You are a clinical assistant with access to the following guidelines:\n\n";
+        context += "You have access to the following guidelines:\n\n";
         guidelines.forEach(g => {
           context += `${g.title} (${g.source} ${g.year}):\n${g.summary}\n\n`;
         });
-        context += "\nAnswer the following clinical question based on these guidelines:\n\n";
       }
 
-      const fullPrompt = context + prompt + "\n\nIMPORTANT: DO NOT use asterisks or markdown bold formatting (no **). Use plain text with clear structure.";
+      // Include prior turns so follow-up questions keep their context
+      if (history?.length) {
+        context += "Conversation so far:\n";
+        history.slice(-8).forEach(m => {
+          context += `${m.role === "user" ? "Clinician" : "Assistant"}: ${m.content}\n`;
+        });
+        context += "\n";
+      }
+
+      const fullPrompt = context + "Current question:\n" + prompt + "\n\nIMPORTANT: DO NOT use asterisks or markdown bold formatting (no **). Use plain text with clear structure.";
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: fullPrompt,
@@ -63,7 +72,7 @@ export default function AIAssistant() {
         file_urls: fileUrls.length > 0 ? fileUrls : undefined
       });
 
-      const cleanedResponse = response.replace(/\*\*/g, '');
+      const cleanedResponse = String(response ?? "").replace(/\*\*/g, '');
       const responseWithDisclaimer = cleanedResponse + "\n\n---\nAI Disclaimer: This response is AI-generated for educational purposes based on clinical guidelines. Always exercise independent clinical judgment and verify all recommendations with current evidence-based sources.";
       return responseWithDisclaimer;
     },
@@ -90,8 +99,9 @@ export default function AIAssistant() {
   };
 
   const handleSend = () => {
-    if (!message.trim()) return;
+    if (!message.trim() || sendMessageMutation.isPending) return;
 
+    const history = conversation;
     setConversation(prev => [...prev, {
       role: "user",
       content: message
@@ -102,7 +112,8 @@ export default function AIAssistant() {
     sendMessageMutation.mutate({
       prompt: message,
       useOnline: searchOnline,
-      fileUrls
+      fileUrls,
+      history
     });
 
     setMessage("");

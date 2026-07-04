@@ -33,25 +33,36 @@ export default function DrugDoseAutoCalculator({ patientWeight, patientAge, onAd
     if (!selectedDrug || !patientWeight) return;
 
     const weight = parseFloat(patientWeight);
-    let dosePerKg = parseFloat(selectedDrug.dose_weight_based);
-    
-    if (!dosePerKg) {
-      setCalculatedDose(null);
+    if (isNaN(weight) || weight <= 0) { setCalculatedDose(null); return; }
+
+    // Only compute for a simple, unambiguous "X[-Y] <unit>/kg" dose string.
+    // BSA-based (/m²), multi-regimen prose, or TDM doses must NOT be reduced
+    // to parseFloat(prefix) × weight — that silently produces wrong doses.
+    const raw = (selectedDrug.dose_weight_based || "").replace(/[–—]/g, "-").trim();
+    const m = raw.match(/^([\d.]+)\s*(?:-\s*([\d.]+))?\s*(mg|mcg|g|units?)\/kg(\/(?:day|dose))?\s*$/i);
+    if (!m || raw.includes("/m²") || raw.includes("/m2")) {
+      setCalculatedDose({ unsupported: true, doseText: selectedDrug.dose_weight_based || "No dose data" });
       return;
     }
 
-    const totalDose = dosePerKg * weight;
+    const minPerKg = parseFloat(m[1]);
+    const maxPerKg = m[2] ? parseFloat(m[2]) : minPerKg;
+    const unit = m[3];
+    const basis = m[4] || "";
+    const minTotal = minPerKg * weight;
+    const maxTotal = maxPerKg * weight;
     const maxDose = selectedDrug.max_dose_per_day ? parseFloat(selectedDrug.max_dose_per_day) : Infinity;
-    const finalDose = Math.min(totalDose, maxDose);
+    const cappedMin = Math.min(minTotal, maxDose);
+    const cappedMax = Math.min(maxTotal, maxDose);
 
     setCalculatedDose({
-      dose: finalDose.toFixed(1),
-      unit: 'mg',
+      dose: cappedMin === cappedMax ? cappedMin.toFixed(1) : `${cappedMin.toFixed(1)}–${cappedMax.toFixed(1)}`,
+      unit: `${unit}${basis}`,
       frequency: selectedDrug.frequency,
       route: selectedDrug.route,
       formulations: selectedDrug.formulations || [],
       monitoring: selectedDrug.monitoring,
-      maxExceeded: totalDose > maxDose
+      maxExceeded: maxTotal > maxDose
     });
   };
 
@@ -106,7 +117,23 @@ export default function DrugDoseAutoCalculator({ patientWeight, patientAge, onAd
           </div>
         )}
 
-        {selectedDrug && calculatedDose && (
+        {selectedDrug && calculatedDose?.unsupported && (
+          <Card className="bg-amber-50 border-amber-300">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <span className="font-semibold text-amber-900 text-sm">Cannot auto-calculate</span>
+              </div>
+              <p className="text-xs text-amber-800">
+                This drug's dosing is BSA-based, indication-specific, or TDM-guided — a simple weight multiplication would be wrong.
+              </p>
+              <p className="text-xs text-amber-900 mt-1 font-medium">Reference dose: {calculatedDose.doseText}</p>
+              <p className="text-xs text-amber-700 mt-1">Use Drugs &amp; Dosing → Indications for the calculated dose.</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {selectedDrug && calculatedDose && !calculatedDose.unsupported && (
           <div className="space-y-3">
             <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
               <CardContent className="p-3">

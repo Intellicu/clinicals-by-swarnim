@@ -121,13 +121,18 @@ Always cite sources. Include formulas where relevant. Flag off-label use.${docCo
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    toast.info('Uploading files...');
-    const results = await Promise.all(files.map(async f => {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
-      return { name: f.name, url: file_url, type: f.type, saved: false };
-    }));
-    setUploadedFiles(p => [...p, ...results]);
-    toast.success(`${files.length} file(s) uploaded. You can now ask questions about them.`);
+    toast.info('Uploading files...', { id: 'ai-upload' });
+    try {
+      const results = await Promise.all(files.map(async f => {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
+        return { name: f.name, url: file_url, type: f.type, saved: false };
+      }));
+      setUploadedFiles(p => [...p, ...results]);
+      toast.success(`${files.length} file(s) uploaded. You can now ask questions about them.`, { id: 'ai-upload' });
+    } catch (err) {
+      console.error('Upload failed:', err);
+      toast.error('File upload failed — check connection and try again.', { id: 'ai-upload' });
+    }
   };
 
   const saveDocToLibrary = (doc) => {
@@ -161,11 +166,17 @@ Always cite sources. Include formulas where relevant. Flag off-label use.${docCo
         ...savedDocs.map(d => d.url)
       ].filter(Boolean);
 
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `${buildSystemPrompt()}\n\nUSER: ${messageText}\n\n${filesToSend.length > 0 ? `Uploaded documents: ${filesToSend.map(f => f.name).join(', ')}. Analyze and answer based on these.` : ''}\n\nProvide a comprehensive, evidence-based response.`,
+      // Include recent turns so follow-up questions keep their context
+      const historyBlock = messages.length > 0
+        ? `\n\nConversation so far:\n${messages.slice(-8).map(m => `${m.role === 'user' ? 'Clinician' : 'Assistant'}: ${m.content}`).join('\n')}\n`
+        : '';
+
+      const rawResponse = await base44.integrations.Core.InvokeLLM({
+        prompt: `${buildSystemPrompt()}${historyBlock}\n\nUSER: ${messageText}\n\n${filesToSend.length > 0 ? `Uploaded documents: ${filesToSend.map(f => f.name).join(', ')}. Analyze and answer based on these.` : ''}\n\nProvide a comprehensive, evidence-based response.`,
         add_context_from_internet: true,
         file_urls: allFileUrls.length > 0 ? allFileUrls : undefined
       });
+      const response = String(rawResponse ?? '');
 
       setMessages(p => [...p, {
         role: 'assistant',
