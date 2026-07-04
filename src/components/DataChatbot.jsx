@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MessageCircle, Send, X, Loader2, Bot, User, AlertTriangle, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { invokeGrounded } from '@/lib/ai/groundedLLM';
 
 export default function DataChatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -154,10 +155,10 @@ Question: ${userMessage}
 
 Give a clinically accurate, complete answer. Start with the direct answer, then add key details (doses, thresholds, red flags) when clinically relevant. Explain medical terms simply. If the question needs more detail than a chat bubble allows, summarise and point to the relevant app section.`;
 
-      const response = await base44.integrations.Core.InvokeLLM({
+      const { response, fromCache } = await invokeGrounded({
         prompt: contextPrompt,
         add_context_from_internet: false
-      });
+      }, { cache: false }); // patient-specific context — never cache across patients
 
       setMessages(prev => [...prev, { role: 'assistant', content: String(response ?? '') }]);
     } catch (error) {

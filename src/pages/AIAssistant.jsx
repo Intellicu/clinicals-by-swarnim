@@ -24,6 +24,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner"; // Added import for toast
+import { invokeGrounded, selectRelevantGuidelines } from "@/lib/ai/groundedLLM";
 
 export default function AIAssistant() {
   const [message, setMessage] = useState("");
@@ -48,9 +49,12 @@ export default function AIAssistant() {
       // Standing clinical role so answers stay detailed and domain-appropriate in both modes
       let context = "You are an expert paediatric nephrology clinical assistant. Give detailed, structured, evidence-based answers with doses, thresholds and guideline citations where relevant. State the age group your answer applies to.\n\n";
 
-      if (!useOnline && guidelines.length > 0) {
+      // Send only guidelines relevant to this question — not the whole library (token saver)
+      const relevant = selectRelevantGuidelines(guidelines, prompt, 5);
+      const toInclude = relevant.length > 0 ? relevant : guidelines.slice(0, 3);
+      if (!useOnline && toInclude.length > 0) {
         context += "You have access to the following guidelines:\n\n";
-        guidelines.forEach(g => {
+        toInclude.forEach(g => {
           context += `${g.title} (${g.source} ${g.year}):\n${g.summary}\n\n`;
         });
       }
@@ -66,13 +70,13 @@ export default function AIAssistant() {
 
       const fullPrompt = context + "Current question:\n" + prompt + "\n\nIMPORTANT: DO NOT use asterisks or markdown bold formatting (no **). Use plain text with clear structure.";
 
-      const response = await base44.integrations.Core.InvokeLLM({
+      const { response, fromCache } = await invokeGrounded({
         prompt: fullPrompt,
         add_context_from_internet: useOnline,
         file_urls: fileUrls.length > 0 ? fileUrls : undefined
       });
 
-      const cleanedResponse = String(response ?? "").replace(/\*\*/g, '');
+      const cleanedResponse = String(response ?? "").replace(/\*\*/g, '') + (fromCache ? "\n\n_(served from offline cache)_" : "");
       const responseWithDisclaimer = cleanedResponse + "\n\n---\nAI Disclaimer: This response is AI-generated for educational purposes based on clinical guidelines. Always exercise independent clinical judgment and verify all recommendations with current evidence-based sources.";
       return responseWithDisclaimer;
     },

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
+import { invokeGrounded } from '@/lib/ai/groundedLLM';
 
 const QUICK_QUESTIONS = [
   "Steroid dosing for nephrotic syndrome?",
@@ -171,12 +172,12 @@ Always cite sources. Include formulas where relevant. Flag off-label use.${docCo
         ? `\n\nConversation so far:\n${messages.slice(-8).map(m => `${m.role === 'user' ? 'Clinician' : 'Assistant'}: ${m.content}`).join('\n')}\n`
         : '';
 
-      const rawResponse = await base44.integrations.Core.InvokeLLM({
+      const { response: rawResponse, fromCache } = await invokeGrounded({
         prompt: `${buildSystemPrompt()}${historyBlock}\n\nUSER: ${messageText}\n\n${filesToSend.length > 0 ? `Uploaded documents: ${filesToSend.map(f => f.name).join(', ')}. Analyze and answer based on these.` : ''}\n\nProvide a comprehensive, evidence-based response.`,
         add_context_from_internet: true,
         file_urls: allFileUrls.length > 0 ? allFileUrls : undefined
       });
-      const response = String(rawResponse ?? '');
+      const response = String(rawResponse ?? '') + (fromCache ? '\n\n_(served from offline cache)_' : '');
 
       setMessages(p => [...p, {
         role: 'assistant',

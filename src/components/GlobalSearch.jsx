@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers, Mic, MicOff, ExternalLink } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { GROUNDING_RULES } from "@/lib/ai/groundedLLM";
 import { searchFormulary } from "@/lib/formulary/nephrology-drugs";
 import { resolveReference } from "@/lib/appRouteRegistry";
 
@@ -363,6 +364,9 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
   const [isListening, setIsListening] = useState(false);
   const [aiMode, setAiMode] = useState(false);
   const [aiAnswer, setAiAnswer] = useState(null);
+  const [aiHistory, setAiHistory] = useState([]); // [{q, a}] — enables follow-up questions
+  const aiHistoryRef = useRef([]);
+  const [followUp, setFollowUp] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [synonymChips, setSynonymChips] = useState([]);
   const navigate = useNavigate();
@@ -453,10 +457,16 @@ export default function GlobalSearch({ placeholder = "Search drugs, guidelines, 
         ? searchIndexResults.value.map(r => `- ${r.title} (${r.type}): ${r.app_url}`).join("\n")
         : "";
 
+      const historyBlock = aiHistoryRef.current.length > 0
+        ? `\nConversation so far (answer the new question in this context):\n${aiHistoryRef.current.slice(-4).map(t => `Q: ${t.q}\nA: ${t.a}`).join("\n")}\n`
+        : "";
+
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `You are a senior pediatric nephrology clinical assistant for CliniCals Hub (India). Answer the following clinical question accurately and concisely in max 250 words.
 
-Rules:
+${GROUNDING_RULES}
+
+Additional rules:
 - Cite guidelines inline: [KDIGO 2022], [IPNA 2023], [AAP 2017], [IAP 2023]
 - Use Indian brand names (e.g., Wysolone, Pangraf, Reditux)
 - Be specific and clinically actionable
@@ -467,7 +477,7 @@ ${routeContext}
 
 Available tools/pathways in-app:
 ${indexContext}
-
+${historyBlock}
 Return JSON:
 - "answer": markdown with inline citations (bold key doses/values)
 - "references": array of citation strings (e.g. "KDIGO 2022 AKI Guideline, Section 2.1")
@@ -487,6 +497,8 @@ Question: ${q}`,
       const parsed = result?.answer ? result : (result?.data?.answer ? result.data : null);
       if (parsed?.answer) {
         setAiAnswer(parsed);
+        aiHistoryRef.current = [...aiHistoryRef.current, { q, a: parsed.answer }].slice(-6);
+        setAiHistory(aiHistoryRef.current);
       } else {
         setAiAnswer({ answer: "No answer available. Please try a more specific clinical question.", references: [], appLinks: [] });
       }
@@ -812,7 +824,7 @@ Question: ${q}`,
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {query && (
-            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); setPredictiveSuggestions([]); setSynonymChips([]); setAiAnswer(null); flatResults.current = []; }}
+            <button onClick={() => { setQuery(""); setOpen(false); setGroups({}); setPredictiveSuggestions([]); setSynonymChips([]); setAiAnswer(null); aiHistoryRef.current = []; setAiHistory([]); setFollowUp(""); flatResults.current = []; }}
               className="text-slate-400 hover:text-slate-600">
               <X className="w-4 h-4" />
             </button>
@@ -885,7 +897,30 @@ Question: ${q}`,
                   </ul>
                 </div>
               )}
-              <p className="text-[10px] text-slate-400 border-t border-slate-100 pt-2">AI-generated — verify clinically. Ask another question or search below.</p>
+              <div className="border-t border-slate-100 pt-2 space-y-2">
+                {aiHistory.length > 1 && (
+                  <p className="text-[10px] text-purple-500">{aiHistory.length} questions in this conversation — context is remembered.</p>
+                )}
+                <form className="flex gap-2" onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!followUp.trim() || aiLoading) return;
+                  const fq = followUp.trim();
+                  setFollowUp("");
+                  runAiAnswer(fq);
+                }}>
+                  <input
+                    value={followUp}
+                    onChange={(e) => setFollowUp(e.target.value)}
+                    placeholder="Ask a follow-up question..."
+                    className="flex-1 text-xs border border-purple-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                  />
+                  <button type="submit" disabled={!followUp.trim() || aiLoading}
+                    className="text-xs bg-purple-600 text-white rounded-lg px-3 py-1.5 disabled:opacity-40 hover:bg-purple-700">
+                    Ask
+                  </button>
+                </form>
+                <p className="text-[10px] text-slate-400">AI-generated — verify clinically.</p>
+              </div>
             </div>
           )}
         </div>
