@@ -1,27 +1,41 @@
 /**
  * Platform facade — the ONLY module the app should import platform services from.
  *
- * Today it re-exports the Base44 implementation (see ./base44Client.js, which
- * also applies the global AI-grounding and offline-snapshot layers).
+ * Backend selection is automatic:
+ *   - If VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are set → Supabase backend.
+ *   - Otherwise → Base44 (default, unchanged).
+ * Flipping backends therefore requires NO code change — just env vars — and the
+ * app keeps running on Base44 until Supabase is configured.
  *
- * MIGRATION CONTRACT: to move off Base44, reimplement the same surface here
- * (backed by e.g. Supabase + an LLM edge function) and delete base44Client.js.
- * No other file in src/ may import from ./base44Client or @base44/* directly.
+ * MIGRATION CONTRACT: no other file in src/ may import from ./base44Client,
+ * ./supabaseClient, or @base44/* directly. Everything goes through `base44`
+ * (kept as the export name for compatibility) or the named aliases below.
  *
  * Surface used by the app (inventoried July 2026):
- *  - base44.entities.<48 entity names>.list / filter / create / update / delete
- *  - base44.auth.{me,loginViaEmailPassword,loginWithProvider,logout,register,
+ *  - .entities.<48 entity names>.{list,filter,get,create,update,delete,bulkCreate}
+ *  - .auth.{me,loginViaEmailPassword,loginWithProvider,logout,register,
  *      redirectToLogin,resendOtp,resetPassword,resetPasswordRequest,setToken}
- *  - base44.integrations.Core.{InvokeLLM,UploadFile,ExtractDataFromUploadedFile,
+ *  - .integrations.Core.{InvokeLLM,UploadFile,ExtractDataFromUploadedFile,
  *      SendEmail,GenerateImage}
- *  - base44.functions.invoke(name, payload)
+ *  - .functions.invoke(name, payload)
  */
-import { base44 } from "./base44Client";
+import { base44 as base44Backend } from "./base44Client";
+import { supabaseBackend, isSupabaseConfigured } from "./supabaseClient";
+import { enableOfflineSnapshots } from "@/lib/offline/entitySnapshot";
 
-export { base44 };
+// The active backend. Name kept as `base44` so the 244 existing call sites and
+// the base44Client cross-cutting layers (grounding, offline snapshots) are
+// untouched. When Supabase is configured it transparently takes over.
+// (Base44 already has offline snapshots applied inside base44Client.js; the
+//  Supabase backend gets the same reference-data offline layer here. LLM
+//  grounding for Supabase is enforced server-side in the invoke-llm edge fn.)
+if (isSupabaseConfigured) enableOfflineSnapshots(supabaseBackend);
+export const base44 = isSupabaseConfigured ? supabaseBackend : base44Backend;
 
-// Named service aliases — prefer these in NEW code; they make the eventual
-// backend swap explicit and greppable.
+export const activeBackend = isSupabaseConfigured ? "supabase" : "base44";
+
+// Named service aliases — prefer these in NEW code; they make the backend
+// swap explicit and greppable.
 export const db = base44.entities;
 export const auth = base44.auth;
 export const ai = {

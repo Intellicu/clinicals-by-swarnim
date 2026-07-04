@@ -52,32 +52,70 @@ Should return only the AuthContext bootstrap line.
    client). Do reference tables first (Drug, DoseRule, Guideline, SearchIndex,
    AppRoute), then patient tables.
 
-## Phase 3 — Auth (~3 days)
+## Phase 3 — Auth ✅ CODE READY (adapter written; AuthContext rewrite pending)
 
-Supabase Auth covers all 10 methods the app uses (email/password, OAuth
-provider, logout, register, password reset request/confirm, OTP resend, token).
-- Rewrite `src/lib/AuthContext.jsx` against `supabase.auth` and drop the
-  `createAxiosClient` public-settings probe.
-- Map the `role: 'admin'` concept to a Postgres column + a JWT claim (used by
-  the RLS policies above).
+Supabase Auth covers all 10 methods the app uses. `src/api/supabaseClient.js`
+implements the full `auth.*` surface against `supabase.auth`.
+
+Still to do at cutover:
+- Rewrite `src/lib/AuthContext.jsx` against the facade's `auth` (drop the
+  `createAxiosClient` public-settings probe — it's the last Base44-specific line).
+- Map `role: 'admin'` to a JWT claim / `app_metadata.role` (RLS policies use it).
 - **Password hashes are not exportable from Base44** — users must reset. Plan a
   one-time "set your new password" email via Supabase's reset flow at cutover.
 
-## Phase 4 — Integrations (~1 week)
+## Phase 4 — Integrations ✅ CODE READY (deploy pending)
 
-Reimplement inside `src/api/client.js` (or a new `supabaseClient.js` it wraps):
+`src/api/supabaseClient.js` implements the full entity + integration surface.
+Edge functions are in `supabase/functions/`:
 
-| Base44 call | Replacement |
-|---|---|
-| `Core.InvokeLLM` | Supabase **Edge Function** proxying the Anthropic API. Move `GROUNDING_RULES` server-side so it can't be bypassed. `response_json_schema` → Claude tool-use. **Never put the API key in the frontend.** |
-| `Core.UploadFile` | Supabase **Storage** `upload()` → returns public/signed URL |
-| `Core.ExtractDataFromUploadedFile` | Edge function: Claude with the file attached |
-| `Core.SendEmail` | Edge function → Resend or SES |
-| `Core.GenerateImage` | Audit usage; likely droppable, else an image API from an edge function |
-| `functions.invoke('dailyClinicalSummary')` | Rewrite as a scheduled Edge Function (pg_cron / Supabase schedule) |
+| Base44 call | Replacement | Status |
+|---|---|---|
+| `Core.InvokeLLM` | `supabase/functions/invoke-llm` — Anthropic proxy, grounding enforced server-side, JSON schema → tool-use | ✅ written |
+| `Core.UploadFile` | Supabase Storage `uploads` bucket (in adapter) | ✅ written |
+| `Core.ExtractDataFromUploadedFile` | `supabase/functions/extract-file` — Claude with the file attached | ✅ written |
+| `Core.SendEmail` | `supabase/functions/send-email` — Resend | ✅ written |
+| `Core.GenerateImage` | adapter → `generate-image` edge fn | stub — audit usage first, likely droppable |
+| `functions.invoke('dailyClinicalSummary')` | `supabase/functions/dailyClinicalSummary` — grounded, idempotent, cron-able | ✅ written |
 
-Keep the AI response cache and offline snapshot layers exactly as-is — they sit
-above the client and are backend-agnostic.
+The AI response cache and offline snapshot layers are backend-agnostic and are
+applied to whichever backend is active (see `src/api/client.js`).
+
+### How the backend switch works
+
+`src/api/client.js` selects Supabase automatically when `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` are set (see `.env.example`); otherwise it stays on
+Base44. **No code change flips it — just env vars.** You can even run a preview
+build with Supabase env while production stays on Base44.
+
+### Deploy checklist (when the Supabase project exists)
+
+```
+# 1. Link the project
+supabase link --project-ref <ref>
+
+# 2. Apply schema (after reviewing migration-export/schema.sql)
+supabase db push   # or paste schema.sql into the SQL editor
+
+# 3. Create the storage bucket the adapter expects
+#    (Supabase dashboard → Storage → new bucket named "uploads", public)
+
+# 4. Set edge-function secrets
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-... LLM_MODEL=claude-opus-4-8
+supabase secrets set RESEND_API_KEY=re_... EMAIL_FROM="CliniCals <noreply@domain>"
+
+# 5. Deploy functions
+supabase functions deploy invoke-llm
+supabase functions deploy extract-file
+supabase functions deploy send-email
+supabase functions deploy dailyClinicalSummary
+
+# 6. (optional) schedule the daily summary
+#    In SQL editor: select cron.schedule('daily-summary','0 1 * * *',
+#      $$ select net.http_post('<project>/functions/v1/dailyClinicalSummary','{}') $$);
+
+# 7. Flip the frontend: set VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY and redeploy
+```
 
 ## Phase 5 — Hosting cutover (~2 days)
 
