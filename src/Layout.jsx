@@ -19,6 +19,7 @@ import FloatingHubButton from "./components/FloatingHubButton";
 import { useQueryClient } from "@tanstack/react-query";
 import WorkspaceSidebar from "./components/nav/WorkspaceSidebar";
 import TopQuickAccessBar from "./components/nav/TopQuickAccessBar";
+import OfflineSync from "./components/OfflineSync";
 
 // Tab root URLs — re-tapping the active tab resets to these
 const TAB_ROOTS = {
@@ -297,6 +298,7 @@ export default function Layout({ children, currentPageName }) {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.18 }}
                 >
+                  <OfflineSync />
                   {children}
                 </motion.div>
               </AnimatePresence>
