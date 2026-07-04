@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertTriangle, Calculator, CheckCircle2, XCircle, Info } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 
 const DISCLAIMER = "⚠️ Decision-support only. Verify all doses against your institutional protocol and formulary. Not a substitute for clinical judgment.";

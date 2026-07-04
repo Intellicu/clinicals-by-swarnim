@@ -7,7 +7,7 @@ import {
   TrendingUp, AlertTriangle, CheckCircle, Loader2,
   Activity, Clock, Target
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function RiskStratification({ patient, visits = [] }) {

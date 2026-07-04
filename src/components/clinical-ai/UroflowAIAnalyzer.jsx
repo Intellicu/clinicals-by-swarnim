@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import {
   Wind, Upload, Loader2, AlertTriangle, CheckCircle,
   Activity, Info, ChevronDown, ChevronRight

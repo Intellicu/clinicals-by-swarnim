@@ -11,7 +11,7 @@ import {
   BookOpen, Calculator, Brain, GraduationCap, Settings,
   Globe, Sparkles
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 
 export default function VoiceAgent() {
   const [isListening, setIsListening] = useState(false);

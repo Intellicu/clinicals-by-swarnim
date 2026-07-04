@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Pencil, Trash2, Save, X, Loader2, Sparkles, Globe, FileText } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 import { useAdminStatus } from "@/lib/useAdminStatus";
 

@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Mic, MicOff, Loader2, Check, X, FileText, Sparkles } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 
 /**

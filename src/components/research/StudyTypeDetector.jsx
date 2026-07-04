@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { Sparkles, Loader2, ChevronDown, CheckCircle2, AlertTriangle, Info } from "lucide-react";
 import { classifyStudyType, STUDY_TYPES } from "@/lib/AdaptiveMethodologyEngine";
 

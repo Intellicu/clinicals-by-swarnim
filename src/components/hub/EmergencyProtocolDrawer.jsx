@@ -4,7 +4,7 @@
  */
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import {
   X, AlertCircle, Activity, Brain, Zap, Wind, Droplet, Heart,
   Beaker, RefreshCw, ChevronRight, ArrowLeft, Calculator

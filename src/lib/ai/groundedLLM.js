@@ -1,4 +1,4 @@
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 
 /**
  * Shared grounding + caching layer for every LLM call in the app.

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Mic, Square, Loader2, Languages, FileText } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function AIScribe({ onTranscriptComplete, autoFillEnabled = true }) {

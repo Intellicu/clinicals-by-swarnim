@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ContextualActionsPanel from "@/components/clinicalOS/ContextualActionsPanel";
 import AIEnhancePanel from "@/components/clinicalOS/AIEnhancePanel";
 import AdminGovernanceQueue from "@/components/clinicalOS/AdminGovernanceQueue";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";

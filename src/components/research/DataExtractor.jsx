@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { useQuery } from '@tanstack/react-query';
 import {
   Database, CheckCircle2, AlertCircle, RefreshCw, Eye, FileText,

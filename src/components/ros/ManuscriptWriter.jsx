@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 import {
   Sparkles, ChevronLeft, Loader2, BookOpen, FileText,

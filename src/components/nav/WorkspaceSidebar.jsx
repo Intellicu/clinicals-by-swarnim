@@ -14,7 +14,7 @@ import {
   Syringe, Radio, FileSearch, Edit3, Database, Cpu, Flag, TrendingUp
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 
 // ── Workspace definitions ─────────────────────────────────────────────────

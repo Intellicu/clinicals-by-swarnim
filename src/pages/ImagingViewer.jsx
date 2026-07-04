@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { Search, User, Eye, Activity, FileText, ChevronDown, ChevronUp, CheckCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 

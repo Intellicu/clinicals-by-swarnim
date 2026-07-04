@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { Brain, Loader2, AlertTriangle, ChevronDown, ChevronUp, Microscope, FlaskConical, Dna } from "lucide-react";
 
 const ANALYZERS = [

@@ -8,7 +8,7 @@ import {
   Microscope, Activity, TestTube, Brain, Upload, Loader2, Sparkles,
   ChevronDown, ChevronUp, Camera, FileText, Wind
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 

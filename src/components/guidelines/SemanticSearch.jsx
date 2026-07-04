@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Loader2, Sparkles, Filter } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function SemanticSearch({ guidelines, onResultsFound }) {

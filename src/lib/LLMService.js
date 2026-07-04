@@ -4,7 +4,7 @@
  * Response: { success, data, error, metadata }
  * Offline: results cached in localStorage by input hash.
  */
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 
 const MAX_RETRIES = 2;
 const RETRY_BASE_MS = 600;

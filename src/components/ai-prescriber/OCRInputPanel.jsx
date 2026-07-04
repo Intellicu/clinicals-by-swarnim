@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import {
   Camera, Upload, FileText, Loader2, CheckCircle, AlertTriangle,
   Edit3, Scan, Image, RefreshCw

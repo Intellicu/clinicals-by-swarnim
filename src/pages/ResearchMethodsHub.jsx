@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowLeft, BookOpen, FlaskConical, FileText, Layers, Sparkles, Loader2, CheckCircle, Download, ChevronRight, GitBranch } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 
 const STUDY_DESIGNS = [

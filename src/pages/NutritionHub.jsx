@@ -11,7 +11,7 @@ import {
   Loader2, Printer, ChevronDown, ChevronRight, ChevronUp,
   AlertTriangle, CheckCircle, XCircle, Droplet, Info
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import NutritionAssessment from "../components/nutrition/NutritionAssessment";
 import NutritionPrescription from "../components/nutrition/NutritionPrescription";
 import NutritionAdvancedTools from "../components/nutrition/NutritionAdvancedTools";

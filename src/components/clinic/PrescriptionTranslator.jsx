@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Languages, Loader2, Copy } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function PrescriptionTranslator({ prescriptionText }) {

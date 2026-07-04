@@ -4,7 +4,7 @@ import { createPageUrl } from "@/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, X, ArrowRight, Pill, BookOpen, FileText, GraduationCap, Microscope, Layers, Mic, MicOff, ExternalLink } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { GROUNDING_RULES } from "@/lib/ai/groundedLLM";
 import { searchFormulary } from "@/lib/formulary/nephrology-drugs";
 import { resolveReference } from "@/lib/appRouteRegistry";

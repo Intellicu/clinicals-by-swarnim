@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { 
   Search, BookOpen, Sparkles, Download, FileText, TrendingUp,
   Database, Loader2, CheckCircle2, XCircle

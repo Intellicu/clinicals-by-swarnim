@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Trash2, Upload, Loader2, FileText, Save, X } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 
 const evidenceLevels = [

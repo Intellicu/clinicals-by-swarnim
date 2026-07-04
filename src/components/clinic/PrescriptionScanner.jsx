@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Camera, Upload, Loader2, FileText, CheckCircle } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function PrescriptionScanner({ onScanComplete }) {

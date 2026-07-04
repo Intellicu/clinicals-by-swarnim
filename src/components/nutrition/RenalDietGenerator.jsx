@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import {
   Apple, Printer, ChevronDown, ChevronRight, AlertTriangle,
   Loader2, Utensils, Droplet, Info, CheckCircle, XCircle

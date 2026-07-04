@@ -13,7 +13,7 @@ import {
   GitBranch, Heart, Loader2, Sparkles, Globe, Upload, Info
 } from "lucide-react";
 import { toast } from "sonner";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 
 // ─── Pathway Action Modal (Add/Edit) ─────────────────────────────────────────
 export function PathwayModal({ pathway, onSave, onClose }) {

@@ -10,7 +10,7 @@
  * any guideline-derived graph, with node-level evidence traceability,
  * prescription suppression and auto-generated monitoring schedules.
  */
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 
 // ── JSON schema constraining the LLM to emit a runnable decision graph ────────
 export const CIEE_GRAPH_SCHEMA = {

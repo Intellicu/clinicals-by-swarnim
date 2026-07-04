@@ -11,7 +11,7 @@ import {
   Shield, FileText, Loader2, ChevronDown, ChevronUp,
   BarChart3, Lock, Bot, BookOpen
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 
 const CONFIDENCE_COLORS = {

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import {
   FileText, Sparkles, Loader2, Printer, Copy,
   CheckCircle, AlertTriangle, Pill, Calendar, User

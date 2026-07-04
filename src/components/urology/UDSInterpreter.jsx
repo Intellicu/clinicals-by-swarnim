@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import {
   Brain, Loader2, AlertTriangle, Upload, Activity,
   ChevronDown, ChevronUp, CheckCircle, BookOpen, Info

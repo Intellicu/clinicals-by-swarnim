@@ -16,7 +16,7 @@ import {
   Save, Trash2, Eye, ChevronLeft, ChevronRight, 
   Loader2, Image as ImageIcon, Maximize2, X, Plus
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { toast } from "sonner";
 
 const ANNOTATION_COLORS = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'];

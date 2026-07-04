@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Send, Copy, Heart, Users, Baby, Shield, FileText, RefreshCw, ChevronDown, ChevronUp, Info } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 

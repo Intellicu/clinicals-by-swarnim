@@ -7,7 +7,7 @@ import {
   Shield, Loader2, AlertTriangle, CheckCircle, Brain,
   Pill, TestTube, TrendingUp, AlertCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function CDSSSidebar({ patientData, visitData, diagnosis }) {

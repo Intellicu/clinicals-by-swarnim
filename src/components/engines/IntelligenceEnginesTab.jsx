@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Cpu, ChevronRight, Search, X, BookOpen, ExternalLink, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
 
 // Engines marked adminOnly: true are hidden from non-admins until approved

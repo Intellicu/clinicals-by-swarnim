@@ -23,7 +23,7 @@ import {
   X, Plus, ChevronDown, ChevronUp, Info, Layers, TrendingUp
 } from "lucide-react";
 import { toast } from "sonner";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { TreatmentTemplatePanel } from "./TreatmentTemplates";
 import IndicationPickerEngine from "./IndicationPickerEngine";
 

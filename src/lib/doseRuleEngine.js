@@ -8,7 +8,7 @@
  * calculates precise doses. It does NOT derive dosing from free-text descriptions.
  */
 
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 
 /**
  * Find the best DoseRule for a given drug + indication + patient context.

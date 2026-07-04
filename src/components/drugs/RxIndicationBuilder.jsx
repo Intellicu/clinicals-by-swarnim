@@ -8,7 +8,7 @@ import {
   Copy, ShieldAlert, X, Loader2, ChevronUp, Activity
 } from "lucide-react";
 import { toast } from "sonner";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 
 // ── Static indication presets ─────────────────────────────────────────────────
 const INDICATION_PRESETS = {

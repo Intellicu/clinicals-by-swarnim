@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import {
   Search, AlertTriangle, CheckCircle, Sparkles, Loader2,
   ChevronRight, TestTube, Brain, BookOpen, X, Plus

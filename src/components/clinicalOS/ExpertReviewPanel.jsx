@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { REVIEW_STATUS } from "@/lib/clinicalOS/EvidenceGovernance";
 import { toast } from "sonner";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 
 function ReviewStatusBadge({ status }) {
   const cfg = REVIEW_STATUS[status] || REVIEW_STATUS.DRAFT;

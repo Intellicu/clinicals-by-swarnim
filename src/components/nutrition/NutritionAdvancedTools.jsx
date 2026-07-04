@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AlertTriangle, Loader2, FlaskConical, Droplet, Settings } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import GuidelineTag from "./GuidelineTag";
 
 // ─── Tube Feeding Planner ────────────────────────────────────────────────────

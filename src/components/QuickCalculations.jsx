@@ -23,7 +23,7 @@ import {
   Camera,
   Loader2
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 
 const COMMON_DRUGS = [
   { 

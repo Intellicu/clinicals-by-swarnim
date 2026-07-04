@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { Sparkles, X, Send, Loader2, ChevronDown, ChevronUp, Brain, RefreshCw } from "lucide-react";
 import { classifyStudyType, STUDY_TYPES, NEPHRO_CONTEXT, suggestNextSteps } from "@/lib/AdaptiveMethodologyEngine";
 

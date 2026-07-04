@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { User, Save, Trash2, Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 
 export default function QuickPatientEntry({ compact = false }) {
   const { patientData, updatePatientData, clearPatientData } = usePatient();

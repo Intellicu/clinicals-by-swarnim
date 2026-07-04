@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TestTube, ChevronDown, ChevronUp, ArrowRight, Brain, Loader2, AlertTriangle, Zap, Plus, Pencil, Trash2, X, Check } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
 
 // ─── Rich condition data ────────────────────────────────────────────────────

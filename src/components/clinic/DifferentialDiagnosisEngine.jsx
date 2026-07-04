@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Brain, Loader2, CheckCircle, AlertTriangle, TrendingUp, ChevronRight } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function DifferentialDiagnosisEngine({ visitData, patientData, onDiagnosisSelect }) {

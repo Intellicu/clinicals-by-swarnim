@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { Bot, X, ChevronRight, Send, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { CLINICAL_AI_ANALYZERS } from "@/lib/aiAnalyzers";

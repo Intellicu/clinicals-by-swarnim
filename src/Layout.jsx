@@ -6,7 +6,7 @@ import { Home, ArrowLeft, Users, Sparkles, Layers } from "lucide-react";
 import ContextualBottomBar from "./components/nav/ContextualBottomBar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/client";
 import { PatientProvider } from "./components/PatientContext";
 
 import FeedbackReportButton from "./components/FeedbackReportButton";
