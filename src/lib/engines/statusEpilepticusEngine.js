@@ -1,26 +1,30 @@
 /**
- * Convulsive Status Epilepticus Intelligence Engine — CIEE built-in.
+ * Status Epilepticus Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Status Epilepticus (§5.49),
- * Indian Academy of Pediatrics. Time-driven, staged (0–5 / 5–15 / >15–20 min).
+ * Source: IAP Standard Treatment Guidelines 2022 — Evaluation and Management of
+ * Status Epilepticus in Children (CIEE Engine 7, 26 decision nodes). Indian
+ * Academy of Pediatrics. Management proceeds in parallel with diagnosis and is
+ * strictly TIME-STAGED against ILAE thresholds: prehospital → arrival 0–5 min →
+ * first-line benzodiazepine → 5–20 min second-line loading (+ repeat / alternative)
+ * → 30–60 min maintenance & work-up → 1–24 h refractory anaesthesia → >24 h
+ * super-refractory → discharge.
  *
- * Run by the shared PathwayExecutionEngine (CIEEEngineRunner). Treatment is
- * time-driven — the timeline is staged by minutes-since-onset.
+ * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
  *
  * DRAFT / UNREVIEWED — pending expert clinical sign-off (Dr. Swarnim). Doses
- * reflect standard published paediatric values but must be verified before this
- * engine is exposed as clinically validated.
+ * reflect the IAP STG 2022 algorithm but must be verified before this engine is
+ * exposed as clinically validated.
  */
 
 export const SE_GUIDELINE = {
   id: 'GS-IAP-STG-2022-SE',
   guideline_name: 'IAP STG 2022 — Status Epilepticus',
-  guideline_section: 'Recognition · Stabilisation · Benzodiazepine · Second-line AED · Refractory · Cause',
+  guideline_section: 'Recognition · Prehospital · Arrival 0–5 min · Benzodiazepine · Second-line · Refractory · Super-refractory · Discharge',
   issuing_body: 'Indian Academy of Pediatrics',
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022, §5.49 (Status Epilepticus). Companion: NCS/ILAE status epilepticus guidelines.',
+  reference: 'IAP Standard Treatment Guidelines 2022 — Status Epilepticus in Children. CIEE Engine 7.',
 };
 
 const mk = (grade, strength, section) => ({
@@ -33,8 +37,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const SE_SOURCES = {
-  'GS-IAP-STG-2022-SE-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'Recommendation (§5.49)'),
-  'GS-IAP-STG-2022-SE-PP': mk('Practice point', 'Practice point', 'Practice point (§5.49)'),
+  'GS-IAP-STG-2022-SE-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §Status Epilepticus'),
+  'GS-IAP-STG-2022-SE-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §Status Epilepticus'),
 };
 
 const B = 'GS-IAP-STG-2022-SE-1B';
@@ -43,111 +47,214 @@ const PP = 'GS-IAP-STG-2022-SE-PP';
 export const SE_PATHWAY = {
   entry: 'SE-DN-01',
   nodes: {
-    // ── Recognition ────────────────────────────────────────────────────────
+    // ── PHASE 1 — RECOGNITION (DN-01–03) ─────────────────────────────────────
     'SE-DN-01': {
       id: 'SE-DN-01', type: 'ASSESSMENT', critical: true, source: B,
-      question: 'Convulsive status epilepticus — seizure >5 min, or clustered seizures without recovery of consciousness?',
-      detail: 'Start a seizure timer now — treatment is time-driven and staged by minutes since onset. Note the onset time; it also feeds monitoring and audit.',
+      question: 'Convulsing now, or recurrent seizures without recovery of consciousness?',
+      detail: 'If yes, clinically treat as status epilepticus and begin management immediately — do not wait for investigations.',
       options: [
-        { label: 'Yes — ongoing/recurrent seizure ≥5 min', next: 'SE-DN-02', tone: 'danger' },
-        { label: 'No — seizure stopped, patient recovering', next: 'TERM-STOPPED', tone: 'muted' },
+        { label: 'Yes — ongoing / recurrent seizure', next: 'SE-DN-02', tone: 'danger' },
+        { label: 'No — seizure stopped, recovering', next: 'TERM-STOPPED', tone: 'muted' },
       ],
     },
-
-    // ── Stabilisation (0 min) ──────────────────────────────────────────────
     'SE-DN-02': {
-      id: 'SE-DN-02', type: 'ACTION', source: PP,
-      action: 'Stabilise (0 min): airway–breathing–circulation, recovery position, high-flow oxygen, capillary blood glucose, and obtain IV/IO access. Attach monitoring.',
-      investigations: [
-        { test: 'Capillary blood glucose', detail: 'Immediately — hypoglycaemia is a rapidly reversible cause.' },
-        { test: 'IV/IO access + bloods', detail: 'Electrolytes (Na, Ca, Mg), venous gas, and AED levels if on treatment.' },
+      id: 'SE-DN-02', type: 'ASSESSMENT', critical: true, source: B,
+      question: 'Time threshold (t1) reached?',
+      detail: 'Generalised convulsive SE at 5 min; focal impaired-consciousness SE at 10 min — t1 triggers the active SE pathway.',
+      options: [
+        { label: 'Generalised convulsive ≥5 min', set: { se_type: 'generalised' }, next: 'SE-DN-03', tone: 'danger' },
+        { label: 'Focal impaired-consciousness ≥10 min', set: { se_type: 'focal' }, next: 'SE-DN-03', tone: 'danger' },
       ],
-      next: 'SE-DN-03',
     },
     'SE-DN-03': {
-      id: 'SE-DN-03', type: 'QUESTION', source: B,
-      question: 'Hypoglycaemia on capillary glucose?',
-      detail: 'Treat a reversible cause before escalating anticonvulsants.',
+      id: 'SE-DN-03', type: 'ASSESSMENT', source: PP,
+      question: 'Aetiology category?',
+      detail: 'Classify to prioritise the work-up.',
       options: [
-        { label: 'Yes — low glucose', next: 'SE-DN-03B', tone: 'danger' },
-        { label: 'No — glucose normal', next: 'SE-DN-04' },
+        { label: 'Known symptomatic (acute cause)', set: { etiology: 'symptomatic' }, next: 'SE-DN-SETTING' },
+        { label: 'Known epilepsy with breakthrough', set: { etiology: 'epilepsy' }, next: 'SE-DN-SETTING' },
+        { label: 'Unknown / NORSE-FIRES', set: { etiology: 'unknown' }, next: 'SE-DN-SETTING' },
       ],
     },
-    'SE-DN-03B': {
-      id: 'SE-DN-03B', type: 'ACTION', source: B, prescribes: 'dextrose',
-      action: 'Correct hypoglycaemia, then continue the time-based algorithm.',
-      rx: { drug: 'Dextrose 10%', dose: '2 mL/kg of 10% dextrose IV bolus', route: 'IV/IO', duration: 'Recheck glucose after bolus' },
-      next: 'SE-DN-04',
+    'SE-DN-SETTING': {
+      id: 'SE-DN-SETTING', type: 'QUESTION', source: PP,
+      question: 'Where is the child now?',
+      options: [
+        { label: 'Home / clinic / ambulance — no IV access', next: 'SE-DN-05' },
+        { label: 'In hospital / IV access available', next: 'SE-DN-07' },
+      ],
     },
 
-    // ── First-line benzodiazepine (0–5 min) ────────────────────────────────
-    'SE-DN-04': {
-      id: 'SE-DN-04', type: 'ACTION', critical: true, source: B, prescribes: 'lorazepam',
-      action: 'First-line benzodiazepine (time window 0–5 min). IV/IO lorazepam OR diazepam. If no IV access: buccal or intranasal midazolam. May repeat once at 5 minutes.',
-      rx: { drug: 'Lorazepam (or Diazepam / Midazolam)', dose: 'Lorazepam 0.1 mg/kg IV (max 4 mg) · Diazepam 0.3 mg/kg IV/IO (max 10 mg) · No access → Midazolam 0.3 mg/kg buccal / 0.2 mg/kg intranasal (max 10 mg)', route: 'IV / IO / buccal / intranasal', duration: 'May repeat once at 5 min' },
-      safety: [
-        { title: 'Respiratory depression', detail: 'Have airway/ventilation support ready — benzodiazepines can cause apnoea, especially after a repeat dose.' },
-      ],
-      next: 'SE-DN-05',
-    },
+    // ── PHASE 2 — PREHOSPITAL (DN-04–06) ─────────────────────────────────────
     'SE-DN-05': {
-      id: 'SE-DN-05', type: 'QUESTION', critical: true, source: B,
-      question: 'Still seizing at 5–15 minutes (after up to 2 benzodiazepine doses)?',
-      options: [
-        { label: 'Yes — ongoing seizure', next: 'SE-DN-06', tone: 'danger' },
-        { label: 'No — seizure terminated', next: 'SE-DN-08' },
+      id: 'SE-DN-05', type: 'ACTION', critical: true, source: B, prescribes: 'midazolam',
+      action: 'Prehospital rescue benzodiazepine (no IV) — plus recovery position, airway support and a glucose check.',
+      rx: { drug: 'Midazolam (buccal/nasal) — or lorazepam / diazepam', dose: 'Midazolam buccal/nasal 0.1–0.2 mg/kg/dose · Lorazepam IM/intranasal 0.1–0.2 mg/kg · Diazepam IM/rectal 0.5 mg/kg', route: 'Buccal / intranasal / IM / rectal', duration: 'Single rescue dose; transfer to hospital' },
+      points: [
+        'Recovery position, airway support',
+        'Check capillary glucose; treat if low',
       ],
+      next: 'SE-DN-06',
     },
-
-    // ── Second-line AED (5–15 min) ─────────────────────────────────────────
     'SE-DN-06': {
-      id: 'SE-DN-06', type: 'ACTION', critical: true, source: B, prescribes: 'levetiracetam',
-      action: 'Second-line AED (time window 5–15 min). Levetiracetam OR phenytoin/fosphenytoin OR valproate as an IV loading dose. Prepare airway support.',
-      rx: { drug: 'Levetiracetam (or Phenytoin/Fosphenytoin / Valproate)', dose: 'Levetiracetam 40–60 mg/kg IV (max 4.5 g) · Phenytoin/Fosphenytoin 20 mg/kg IV · Valproate 40 mg/kg IV', route: 'IV', duration: 'Single loading dose' },
-      safety: [
-        { title: 'Phenytoin infusion', detail: 'Infuse phenytoin no faster than 1 mg/kg/min with cardiac monitoring (hypotension/arrhythmia). Avoid valproate where a metabolic/mitochondrial disorder or hepatic dysfunction is suspected.' },
-      ],
+      id: 'SE-DN-06', type: 'ACTION', source: PP,
+      action: 'Transfer to hospital, preferably with oxygen; maintain airway–breathing–circulation during transfer.',
       next: 'SE-DN-07',
     },
+
+    // ── PHASE 3 — ARRIVAL 0–5 MIN (DN-07–10) ─────────────────────────────────
     'SE-DN-07': {
-      id: 'SE-DN-07', type: 'QUESTION', critical: true, source: B,
-      question: 'Still seizing beyond 15–20 minutes (refractory status epilepticus)?',
-      options: [
-        { label: 'Yes — refractory', next: 'SE-DN-07B', tone: 'danger' },
-        { label: 'No — seizure terminated', next: 'SE-DN-08' },
-      ],
-    },
-    'SE-DN-07B': {
-      id: 'SE-DN-07B', type: 'ACTION', critical: true, source: PP, prescribes: 'midazolam',
-      action: 'Refractory SE: give a second second-line agent (from SE-DN-06 not yet used), then start an anaesthetic infusion (midazolam or thiopentone) with intubation and ventilation. Transfer to PICU with continuous EEG where available.',
-      rx: { drug: 'Midazolam infusion (or Thiopentone)', dose: 'Midazolam 0.1–0.2 mg/kg IV load then 0.05–0.4 mg/kg/h infusion, titrated', route: 'IV — intubated/ventilated', duration: 'Titrate to seizure control on cEEG' },
-      safety: [
-        { title: 'Airway', detail: 'Anaesthetic infusions require intubation, ventilation and continuous haemodynamic monitoring — do not start without airway control.' },
-      ],
+      id: 'SE-DN-07', type: 'ACTION', source: PP,
+      action: 'Arrival (0–5 min) — secure airway, breathing and circulation; give oxygen and ventilation as needed; establish IV access. Take a quick history and examine for aetiology.',
       next: 'SE-DN-08',
     },
-
-    // ── Cause & ongoing care ───────────────────────────────────────────────
     'SE-DN-08': {
-      id: 'SE-DN-08', type: 'MONITORING', source: B,
-      action: 'Find and treat the cause. Correct sodium, calcium and glucose. If CNS infection is possible, start empirical ceftriaxone + acyclovir without delay. Arrange neuroimaging and EEG per indication.',
+      id: 'SE-DN-08', type: 'ACTION', source: PP,
+      action: 'Draw investigations in parallel with treatment.',
+      investigations: [
+        { test: 'Capillary & lab glucose', detail: 'Immediate — reversible cause.' },
+        { test: 'CBC, calcium, magnesium, sodium, potassium', detail: 'Correct electrolyte causes.' },
+        { test: 'ABG/VBG; blood culture if fever', detail: 'Metabolic assessment; sepsis screen.' },
+      ],
+      next: 'SE-DN-09',
+    },
+    'SE-DN-09': {
+      id: 'SE-DN-09', type: 'QUESTION', source: B,
+      question: 'Hypoglycaemia or a metabolic abnormality present?',
+      detail: 'Treat immediately if abnormal before moving to the next line.',
+      options: [
+        { label: 'Yes — abnormal', next: 'SE-DN-09B', tone: 'danger' },
+        { label: 'No — normal', next: 'SE-DN-10' },
+      ],
+    },
+    'SE-DN-09B': {
+      id: 'SE-DN-09B', type: 'ACTION', source: B, prescribes: 'dextrose',
+      action: 'Correct hypoglycaemia (and other metabolic abnormalities) immediately.',
+      rx: { drug: 'Dextrose 10%', dose: '5 mL/kg of 10% dextrose (or 2 mL/kg of 25%)', route: 'IV/IO', duration: 'Recheck glucose' },
+      next: 'SE-DN-10',
+    },
+    'SE-DN-10': {
+      id: 'SE-DN-10', type: 'ACTION', critical: true, source: B, prescribes: 'lorazepam',
+      action: 'First-line IV benzodiazepine. If no IV access, use IM / intranasal / buccal / rectal routes. May repeat ONCE after 5 min.',
+      rx: { drug: 'Lorazepam (or diazepam / midazolam)', dose: 'Lorazepam 0.1 mg/kg IV (max 4 mg) · Diazepam 0.2–0.3 mg/kg IV (max 10 mg) · Midazolam 0.15–0.2 mg/kg (max 5 mg)', route: 'IV (or IM/IN/buccal/rectal)', duration: 'May repeat once at 5 min' },
+      safety: [
+        { title: 'Respiratory depression', detail: 'Have airway/ventilation support ready — benzodiazepines can cause apnoea, especially after a repeat dose. Do not give more than two benzodiazepine doses.' },
+      ],
+      next: 'SE-DN-11',
+    },
+
+    // ── PHASE 4 — 5–20 MIN SECOND-LINE (DN-11–14) ────────────────────────────
+    'SE-DN-11': {
+      id: 'SE-DN-11', type: 'QUESTION', critical: true, source: B,
+      question: 'Seizures persist after first-line benzodiazepine (up to 2 doses)?',
+      options: [
+        { label: 'Yes — persists', next: 'SE-DN-12', tone: 'danger' },
+        { label: 'No — seizure terminated', next: 'SE-DN-15' },
+      ],
+    },
+    'SE-DN-12': {
+      id: 'SE-DN-12', type: 'ACTION', critical: true, source: B, prescribes: 'phenytoin',
+      action: 'Second-line loading (5–20 min) — phenytoin or fosphenytoin, with cardiac (HR) monitoring.',
+      rx: { drug: 'Phenytoin (or Fosphenytoin)', dose: 'Phenytoin 20 mg/kg in NS at 1 mg/kg/min · Fosphenytoin 20 mg PE/kg at 3 mg/kg/min', route: 'IV (in normal saline)', duration: 'Single loading dose; monitor HR/BP' },
+      safety: [
+        { title: 'Cardiac monitoring', detail: 'Infuse phenytoin no faster than 1 mg/kg/min with continuous ECG (hypotension/arrhythmia). Do NOT mix phenytoin in dextrose.' },
+      ],
+      next: 'SE-DN-13',
+    },
+    'SE-DN-13': {
+      id: 'SE-DN-13', type: 'QUESTION', critical: true, source: B,
+      question: 'Response after second-line loading?',
+      detail: 'If seizures persist, a repeat load may be given: phenytoin 10 mg/kg or fosphenytoin 10 mg PE/kg.',
+      options: [
+        { label: 'Seizure terminated', next: 'SE-DN-15' },
+        { label: 'Persists — repeat load given, still seizing', next: 'SE-DN-14', tone: 'danger' },
+      ],
+    },
+    'SE-DN-14': {
+      id: 'SE-DN-14', type: 'ACTION', critical: true, source: B, prescribes: 'levetiracetam',
+      action: 'Second-line alternative — if still seizing after phenytoin/fosphenytoin, use valproate, phenobarbitone or levetiracetam.',
+      rx: { drug: 'Levetiracetam (or Valproate / Phenobarbitone)', dose: 'Levetiracetam 20–60 mg/kg at 5 mg/kg/min · Valproate 20–40 mg/kg · Phenobarbitone 20 mg/kg in NS at 2 mg/kg/min', route: 'IV', duration: 'Single loading dose' },
+      safety: [
+        { title: 'Agent choice', detail: 'Avoid valproate where a mitochondrial/metabolic disorder or hepatic dysfunction is suspected. Phenobarbitone adds sedation/respiratory depression — prepare airway support.' },
+      ],
+      next: 'SE-DN-14Q',
+    },
+    'SE-DN-14Q': {
+      id: 'SE-DN-14Q', type: 'QUESTION', critical: true, source: B,
+      question: 'Response after the alternative second-line agent?',
+      options: [
+        { label: 'Seizure terminated', next: 'SE-DN-15' },
+        { label: 'Still seizing (refractory SE)', next: 'SE-DN-18', tone: 'danger' },
+      ],
+    },
+
+    // ── PHASE 5 — 30–60 MIN MAINTENANCE & WORK-UP (DN-15–17) ─────────────────
+    'SE-DN-15': {
+      id: 'SE-DN-15', type: 'ACTION', source: B,
+      action: 'Seizure controlled (30–60 min) — start maintenance, assess for PICU/raised ICP, and escalate the aetiology work-up.',
+      points: [
+        'Start a maintenance dose of the chosen AED after 8–12 hours',
+        'Shift to PICU if unstable or raised ICP; treat raised ICP with mannitol / 3% NaCl as indicated',
+        'Aetiology work-up: MRI brain ± contrast (CT if unstable), CSF for neuroinfection, autoimmune / metabolic / genetic studies as indicated',
+      ],
+      next: 'SE-DN-DISCHARGE',
+    },
+
+    // ── PHASE 6 — 1–24 H REFRACTORY (DN-18–21) ───────────────────────────────
+    'SE-DN-18': {
+      id: 'SE-DN-18', type: 'ACTION', critical: true, source: B, prescribes: 'midazolam',
+      action: 'Refractory SE (1–24 h) — enter the anaesthetic-infusion pathway; use bedside EEG to titrate when available.',
+      rx: { drug: 'Midazolam infusion (or thiopentone / propofol / high-dose phenobarbitone)', dose: 'Midazolam 0.1–0.2 mg/kg IV load then 0.05–0.4 mg/kg/h infusion, titrate to burst suppression', route: 'IV — intubated & ventilated', duration: 'Titrate on cEEG; add enteral topiramate; consider ketamine while tapering' },
+      safety: [
+        { title: 'Airway & organ surveillance', detail: 'Anaesthetic infusions require intubation, ventilation and continuous haemodynamic monitoring. Watch for raised ICP, rhabdomyolysis, arrhythmia, sepsis and AED hypersensitivity.' },
+      ],
+      next: 'SE-DN-19Q',
+    },
+    'SE-DN-19Q': {
+      id: 'SE-DN-19Q', type: 'QUESTION', critical: true, source: B,
+      question: 'Seizures controlled on anaesthetic infusion within 24 hours?',
+      options: [
+        { label: 'Controlled — begin taper', next: 'SE-DN-15' },
+        { label: 'Continues beyond 24 h (super-refractory)', next: 'SE-DN-22', tone: 'danger' },
+      ],
+    },
+
+    // ── PHASE 7 — >24 H SUPER-REFRACTORY (DN-22–23) ──────────────────────────
+    'SE-DN-22': {
+      id: 'SE-DN-22', type: 'ACTION', critical: true, source: PP,
+      action: 'Super-refractory SE (>24 h despite anaesthesia) — escalate to multidisciplinary PICU-based therapies.',
+      points: [
+        'Consider ketogenic diet, immunotherapy, VNS, therapeutic hypothermia, and epilepsy surgery in selected cases',
+        'Family counselling: discuss mortality/morbidity risk explicitly and document goals of care',
+      ],
+      next: 'SE-DN-15',
+    },
+
+    // ── PHASE 8 — DISCHARGE / RECOVERY (DN-24–26) ────────────────────────────
+    'SE-DN-DISCHARGE': {
+      id: 'SE-DN-DISCHARGE', type: 'MONITORING', source: B,
+      action: 'Discharge & recovery planning.',
+      points: [
+        'Caregiver education: first aid, recovery position, and rescue-medication use for all caregivers',
+        'Known-epilepsy breakthrough rule: if on low maintenance doses give half the maintenance dose; if on larger doses avoid re-loading and continue the maintenance dose',
+        'Plan neurology follow-up, a seizure action plan and recurrence prevention',
+      ],
       monitoring: [
-        { parameter: 'Seizure recurrence within 24 h', frequency: 'Continuous / first 24 h', target: 'No recurrence', alert: 'Any recurrence within 24 h', alert_action: 'Reassess AED loading adequacy; consider maintenance AED and cEEG' },
-        { parameter: 'Electrolytes + glucose', frequency: 'On admission then per cause', target: 'Normalised Na/Ca/glucose', alert: 'Persistent abnormality', alert_action: 'Correct and re-check' },
+        { parameter: 'Seizure recurrence', frequency: 'First 24 h then per plan', target: 'No recurrence', alert: 'Any recurrence', alert_action: 'Reassess AED loading adequacy; consider maintenance AED and cEEG' },
       ],
       next: 'TERM-DONE',
     },
 
-    // ── Terminals ──────────────────────────────────────────────────────────
-    'TERM-STOPPED': { id: 'TERM-STOPPED', type: 'TERMINAL', source: PP, action: 'Seizure self-terminated (<5 min) with recovery — this is not status epilepticus. Investigate the seizure cause, observe, and treat the underlying trigger (fever, electrolytes, known epilepsy).' },
-    'TERM-DONE': { id: 'TERM-DONE', type: 'TERMINAL', source: B, action: 'Status epilepticus management plan generated — staged termination, cause work-up and 24-hour monitoring recorded.' },
+    // ── Terminals ────────────────────────────────────────────────────────────
+    'TERM-STOPPED': { id: 'TERM-STOPPED', type: 'TERMINAL', source: PP, action: 'Seizure self-terminated with recovery — not status epilepticus. Investigate the cause, observe, and treat the trigger (fever, electrolytes, known epilepsy).' },
+    'TERM-DONE': { id: 'TERM-DONE', type: 'TERMINAL', source: B, action: 'Status epilepticus management plan generated — time-staged termination, maintenance, aetiology work-up, refractory/super-refractory escalation and discharge education recorded.' },
   },
 };
 
 export const STATUS_EPILEPTICUS_ENGINE = {
   id: 'status-epilepticus-engine',
   label: 'Status Epilepticus Engine',
-  desc: 'IAP STG 2022 — time-driven convulsive SE: stabilise + glucose (0 min), benzodiazepine (0–5 min), second-line AED (5–15 min), refractory anaesthetic infusion + PICU (>15–20 min), and cause work-up with 24-hour recurrence monitoring',
+  desc: 'IAP STG 2022 — time-staged convulsive/focal SE: recognition + ILAE t1 → prehospital rescue benzodiazepine → arrival 0–5 min ABC + glucose/metabolic → first-line IV benzodiazepine → 5–20 min phenytoin/fosphenytoin (+ repeat load, then valproate/phenobarbitone/levetiracetam) → 30–60 min maintenance + MRI/CSF work-up → 1–24 h EEG-guided anaesthetic infusion → >24 h super-refractory (ketogenic/immunotherapy) → discharge education',
   group: 'Emergency & Critical Care',
   builtin: true,
   guideline_source: SE_GUIDELINE,
