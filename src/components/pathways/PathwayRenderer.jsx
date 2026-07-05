@@ -102,10 +102,41 @@ import { TUBULOPATHY_ENGINE } from "@/lib/engines/tubulopathyEngine";
 import { ANAPHYLAXIS_ENGINE } from "@/lib/engines/anaphylaxisEngine";
 import { STATUS_EPILEPTICUS_ENGINE } from "@/lib/engines/statusEpilepticusEngine";
 import { SHOCK_ENGINE } from "@/lib/engines/shockEngine";
+import { SNAKEBITE_ENGINE } from "@/lib/engines/snakebiteEngine";
+import { OPP_ENGINE } from "@/lib/engines/opPoisoningEngine";
+import { CROUP_ENGINE } from "@/lib/engines/croupEngine";
+import { DENGUE_ENGINE } from "@/lib/engines/dengueEngine";
+import { ENTERIC_ENGINE } from "@/lib/engines/entericFeverEngine";
+import { MALARIA_ENGINE } from "@/lib/engines/malariaEngine";
+import { MENINGITIS_ENGINE } from "@/lib/engines/meningitisEngine";
+import { FWF_ENGINE } from "@/lib/engines/feverWithoutFocusEngine";
+import { AWD_ENGINE } from "@/lib/engines/diarrhoeaEngine";
+import { DYS_ENGINE } from "@/lib/engines/dysenteryEngine";
+import { CAP_ENGINE } from "@/lib/engines/pneumoniaEngine";
+import { ASTHMA_ENGINE } from "@/lib/engines/asthmaEngine";
+import { FS_ENGINE } from "@/lib/engines/febrileSeizureEngine";
+import { AOM_ENGINE } from "@/lib/engines/aomEngine";
+import { NNJ_ENGINE } from "@/lib/engines/neonatalJaundiceEngine";
+import { IDA_ENGINE } from "@/lib/engines/ironDeficiencyAnaemiaEngine";
+
+// All CIEE lib-module engines rendered through the shared runner, keyed by id.
+const CIEE_LIB_ENGINES = Object.fromEntries(
+  [
+    ANAPHYLAXIS_ENGINE, STATUS_EPILEPTICUS_ENGINE, SHOCK_ENGINE,
+    SNAKEBITE_ENGINE, OPP_ENGINE, CROUP_ENGINE, DENGUE_ENGINE, ENTERIC_ENGINE,
+    MALARIA_ENGINE, MENINGITIS_ENGINE, FWF_ENGINE, AWD_ENGINE, DYS_ENGINE,
+    CAP_ENGINE, ASTHMA_ENGINE, FS_ENGINE, AOM_ENGINE, NNJ_ENGINE, IDA_ENGINE,
+  ].map((e) => [e.id, e])
+);
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","iga-ipna-engine","ssns-engine","srns-engine","ns-complications-engine","tubulopathy-engine","hspn","aki-prifle","htn-emergency","hyperkalemia",
   "anaphylaxis-engine","status-epilepticus-engine","shock-engine",
+  "snakebite-engine","op-poisoning-engine","croup-engine","dengue-engine",
+  "enteric-fever-engine","malaria-engine","meningitis-engine",
+  "fever-without-focus-engine","diarrhoea-engine","dysentery-engine",
+  "pneumonia-engine","asthma-engine","febrile-seizure-engine","aom-engine",
+  "neonatal-jaundice-engine","iron-deficiency-anaemia-engine",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -217,34 +248,20 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
       subtitle={TUBULOPATHY_ENGINE.guideline_source.guideline_name}
     />
   );
-  // ── Emergency & Critical Care Engines (IAP STG 2022) — DRAFT, admin-gated ──
-  if (id === "anaphylaxis-engine") return (
-    <CIEEEngineRunner
-      pathway={ANAPHYLAXIS_ENGINE.ciee_pathway}
-      sources={ANAPHYLAXIS_ENGINE.ciee_sources}
-      initialCtx={{}}
-      title={ANAPHYLAXIS_ENGINE.label}
-      subtitle={ANAPHYLAXIS_ENGINE.guideline_source.guideline_name}
-    />
-  );
-  if (id === "status-epilepticus-engine") return (
-    <CIEEEngineRunner
-      pathway={STATUS_EPILEPTICUS_ENGINE.ciee_pathway}
-      sources={STATUS_EPILEPTICUS_ENGINE.ciee_sources}
-      initialCtx={{}}
-      title={STATUS_EPILEPTICUS_ENGINE.label}
-      subtitle={STATUS_EPILEPTICUS_ENGINE.guideline_source.guideline_name}
-    />
-  );
-  if (id === "shock-engine") return (
-    <CIEEEngineRunner
-      pathway={SHOCK_ENGINE.ciee_pathway}
-      sources={SHOCK_ENGINE.ciee_sources}
-      initialCtx={{}}
-      title={SHOCK_ENGINE.label}
-      subtitle={SHOCK_ENGINE.guideline_source.guideline_name}
-    />
-  );
+  // ── CIEE lib-module engines (IAP STG 2022 emergency + front-door) ──────────
+  // DRAFT, admin-gated. All rendered through the shared PathwayExecutionEngine.
+  if (CIEE_LIB_ENGINES[id]) {
+    const eng = CIEE_LIB_ENGINES[id];
+    return (
+      <CIEEEngineRunner
+        pathway={eng.ciee_pathway}
+        sources={eng.ciee_sources}
+        initialCtx={{}}
+        title={eng.label}
+        subtitle={eng.guideline_source.guideline_name}
+      />
+    );
+  }
   if (id === "iga-vasculitis") return <IgAVasculitisPathway />;
   if (id === "anca-vasculitis") return <ANCAbVasculitisPathway />;
   if (id === "membranous-nephropathy") return <MembranousNephropathyPathway />;

@@ -86,6 +86,22 @@ export const ENGINES = [
   { label: "Anaphylaxis Engine", desc: "IAP STG 2022 §3.35 — recognition (skin signs not required) → immediate IM adrenaline (hard stop) → refractory loop + fluids + PICU → biphasic observation & auto-injector discharge", scenario: "anaphylaxis-engine", tags: ["anaphylaxis", "adrenaline", "epinephrine", "allergy", "allergic reaction", "auto-injector", "IAP STG", "emergency", "angioedema", "biphasic"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
   { label: "Status Epilepticus Engine", desc: "IAP STG 2022 §5.49 — time-driven convulsive SE: stabilise + glucose → benzodiazepine (0–5 min) → second-line AED (5–15 min) → refractory anaesthetic infusion + PICU → cause work-up", scenario: "status-epilepticus-engine", tags: ["status epilepticus", "seizure", "convulsion", "lorazepam", "diazepam", "midazolam", "levetiracetam", "phenytoin", "fosphenytoin", "valproate", "AED", "IAP STG", "emergency", "refractory"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
   { label: "Shock Engine", desc: "IAP STG 2022 §5.48 — undifferentiated paediatric shock: perfusion-based recognition (hypotension is late) → access & bloods → cautious isotonic boluses with reassessment → inotrope escalation → cause-directed care", scenario: "shock-engine", tags: ["shock", "septic shock", "hypovolemia", "fluid bolus", "inotrope", "adrenaline", "noradrenaline", "perfusion", "sepsis", "IAP STG", "emergency", "resuscitation"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
+  { label: "Snakebite Engine", desc: "IAP STG 2022 §5.54 — snakebite: first aid → envenomation assessment (20-WBCT + neuro) → polyvalent ASV (not weight-based) → neurotoxic (neostigmine+atropine) vs haemotoxic (repeat WBCT, ASV, blood products) → renal/compartment watch", scenario: "snakebite-engine", tags: ["snakebite", "envenomation", "ASV", "antivenom", "20-WBCT", "neurotoxic", "haemotoxic", "neostigmine", "cobra", "krait", "viper", "IAP STG", "emergency"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
+  { label: "Organophosphate Poisoning Engine", desc: "IAP STG 2022 §5.52 — OP poisoning: cholinergic toxidrome (DUMBELS) → decontamination (PPE) → atropine DOUBLED q5min to atropinisation then infusion → pralidoxime if organophosphate → intermediate-syndrome watch", scenario: "op-poisoning-engine", tags: ["organophosphate", "OP poisoning", "poisoning", "atropine", "pralidoxime", "2-PAM", "cholinergic", "DUMBELS", "pesticide", "insecticide", "IAP STG", "emergency"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
+  { label: "Acute Bacterial Meningitis Engine", desc: "IAP STG 2022 §7.79 — meningitis: recognise (infants non-specific) → stabilise + culture, LP only if safe but NEVER delay antibiotics → ceftriaxone ± vancomycin + dexamethasone (neonates age-specific) → aciclovir if encephalitis, ICP/SIADH → follow-up + prophylaxis", scenario: "meningitis-engine", tags: ["meningitis", "bacterial meningitis", "ceftriaxone", "vancomycin", "dexamethasone", "aciclovir", "LP", "lumbar puncture", "CSF", "meningococcus", "Hib", "IAP STG", "emergency"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
+  { label: "Croup Engine", desc: "IAP STG 2022 §4.40 — croup by severity: mild → oral dexamethasone home · moderate → dexamethasone + observe, add nebulised adrenaline if not settling · severe → nebulised adrenaline + dexamethasone + O₂ + airway support; rebound watch", scenario: "croup-engine", tags: ["croup", "laryngotracheobronchitis", "stridor", "barking cough", "dexamethasone", "nebulised adrenaline", "racemic epinephrine", "IAP STG", "respiratory"], group: "Respiratory", ciee: true, adminOnly: true },
+  { label: "Community-Acquired Pneumonia Engine", desc: "IAP STG 2022 §2.21 — CAP: danger signs → severe (admit, O₂, IV antibiotics) · fast breathing for age ± indrawing → oral high-dose amoxicillin ×5 d, review 48 h · normal RR → no antibiotic, safety-net", scenario: "pneumonia-engine", tags: ["pneumonia", "CAP", "fast breathing", "chest indrawing", "amoxicillin", "ceftriaxone", "oxygen", "WHO", "IMNCI", "IAP STG", "respiratory"], group: "Respiratory", ciee: true, adminOnly: true },
+  { label: "Acute Asthma Engine", desc: "IAP STG 2022 §2.26–27 — acute asthma by severity: salbutamol ± ipratropium + steroid scaled to severity; life-threatening → IV MgSO₄, consider IV salbutamol/aminophylline, PICU → reassess at 1 h → discharge with inhaler technique + action plan", scenario: "asthma-engine", tags: ["asthma", "wheeze", "bronchodilator", "salbutamol", "ipratropium", "prednisolone", "magnesium sulfate", "MgSO4", "exacerbation", "IAP STG", "respiratory"], group: "Respiratory", ciee: true, adminOnly: true },
+  { label: "Dengue Engine", desc: "IAP STG 2022 §6.70 — WHO-classified dengue: Group A home care (paracetamol only) · Group B warning signs (admit, controlled isotonic fluids titrated to HCT) · Group C severe (bolus ± colloid, PICU) + convalescent overload watch", scenario: "dengue-engine", tags: ["dengue", "DHF", "DSS", "warning signs", "HCT", "hematocrit", "plasma leak", "fluid", "paracetamol", "IAP STG", "infection"], group: "Infectious Disease", ciee: true, adminOnly: true },
+  { label: "Enteric Fever Engine", desc: "IAP STG 2022 §6.58 — enteric fever: severity triage → uncomplicated (oral cefixime/azithromycin, review 48–72 h) vs complicated/toxic (admit, IV ceftriaxone, dexamethasone for shock, surgery for perforation, carbapenem if XDR) → TCV + relapse watch", scenario: "enteric-fever-engine", tags: ["enteric fever", "typhoid", "salmonella", "cefixime", "azithromycin", "ceftriaxone", "XDR typhoid", "TCV", "IAP STG", "infection"], group: "Infectious Disease", ciee: true, adminOnly: true },
+  { label: "Malaria Engine", desc: "IAP STG 2022 §6.72 — malaria: confirm RDT/microscopy + species → severe → IV artesunate + supportive care, then oral ACT · uncomplicated → ACT + single-dose primaquine (falciparum) / chloroquine + 14-day primaquine (vivax), G6PD screen first", scenario: "malaria-engine", tags: ["malaria", "falciparum", "vivax", "artesunate", "artemether-lumefantrine", "ACT", "chloroquine", "primaquine", "G6PD", "RDT", "IAP STG", "infection"], group: "Infectious Disease", ciee: true, adminOnly: true },
+  { label: "Fever Without Focus Engine", desc: "IAP STG 2022 §6.57 — fever without focus by age: <3 mo → full septic screen + admit + IV antibiotics · 3–36 mo toxic/red-flag → treat as SBI · well-appearing → targeted work-up (urine ± malaria/dengue/typhoid), antipyretics, 24–48 h safety-net", scenario: "fever-without-focus-engine", tags: ["fever", "fever without focus", "FWF", "young infant", "sepsis", "serious bacterial infection", "SBI", "urine culture", "antipyretic", "IAP STG"], group: "General Pediatrics", ciee: true, adminOnly: true },
+  { label: "Acute Watery Diarrhoea Engine", desc: "IAP STG 2022 §8.90 — classify dehydration → Plan A (home ORS) / Plan B (75 mL/kg ORS over 4 h) / Plan C (IV 100 mL/kg age-specific) → zinc ×14 d + continue feeding → danger-sign safety-net", scenario: "diarrhoea-engine", tags: ["diarrhoea", "diarrhea", "dehydration", "ORS", "Plan A", "Plan B", "Plan C", "zinc", "rehydration", "WHO", "IMNCI", "IAP STG"], group: "General Pediatrics", ciee: true, adminOnly: true },
+  { label: "Acute Dysentery Engine", desc: "IAP STG 2022 §8.91 — dysentery (bloody stool): rehydrate + zinc → antibiotics ARE indicated (ciprofloxacin/azithromycin ×3 d) → review 48 h → non-response: amoebiasis (metronidazole) or HUS (→ nephrology engines)", scenario: "dysentery-engine", tags: ["dysentery", "bloody diarrhoea", "shigella", "ciprofloxacin", "azithromycin", "amoebiasis", "metronidazole", "HUS", "zinc", "IAP STG"], group: "General Pediatrics", ciee: true, adminOnly: true },
+  { label: "Acute Otitis Media Engine", desc: "IAP STG 2022 §2.19 — AOM: treat now if <6 mo / <2 y bilateral / otorrhoea / severe → high-dose amoxicillin; else watchful waiting + analgesia + 48–72 h delayed prescription; step up to co-amoxiclav on failure; mastoiditis watch", scenario: "aom-engine", tags: ["otitis media", "AOM", "ear infection", "amoxicillin", "co-amoxiclav", "watchful waiting", "mastoiditis", "ear pain", "IAP STG"], group: "General Pediatrics", ciee: true, adminOnly: true },
+  { label: "Febrile Seizure Engine", desc: "IAP STG 2022 §7.78 — febrile seizure: still seizing → treat as status epilepticus · simple → no routine EEG/imaging/LP unless meningitis suspected, reassure · complex/atypical → investigate + senior review; exclude meningitis in all", scenario: "febrile-seizure-engine", tags: ["febrile seizure", "febrile convulsion", "seizure", "fever", "simple", "complex", "meningitis", "EEG", "LP", "IAP STG", "neurology"], group: "Neurology", ciee: true, adminOnly: true },
+  { label: "Neonatal Jaundice Engine", desc: "IAP STG 2022 §1.1 — neonatal jaundice: red-flag screen (<24 h, unwell, <35 wk, rapid rise, prolonged/conjugated) → urgent work-up · else plot TSB on hour-specific nomogram → phototherapy (recheck 4–6 h) → exchange transfusion if above exchange line/encephalopathy", scenario: "neonatal-jaundice-engine", tags: ["neonatal jaundice", "hyperbilirubinemia", "bilirubin", "phototherapy", "exchange transfusion", "nomogram", "kernicterus", "biliary atresia", "G6PD", "IAP STG", "neonatology"], group: "Neonatology", ciee: true, adminOnly: true },
+  { label: "Iron Deficiency Anaemia Engine", desc: "IAP STG 2022 §10.100 — IDA: severe/decompensated → cautious slow transfusion + investigate · stable → oral elemental iron 3–6 mg/kg/day ×8–12 wk → reassess Hb/retic 2–4 wk → non-response → reinvestigate (smear, ferritin, Hb electrophoresis, coeliac)", scenario: "iron-deficiency-anaemia-engine", tags: ["iron deficiency", "anaemia", "anemia", "microcytic", "ferritin", "oral iron", "transfusion", "thalassaemia", "IAP STG", "haematology"], group: "Haematology", ciee: true, adminOnly: true },
 
 ];
 
@@ -101,6 +117,12 @@ const GROUP_STYLE = {
   "Rheumatology": "bg-violet-50 border-violet-200 text-violet-900",
   "Oncology": "bg-red-50 border-red-200 text-red-900",
   "Emergency & Critical Care": "bg-red-50 border-red-200 text-red-900",
+  "Infectious Disease": "bg-orange-50 border-orange-200 text-orange-900",
+  "Respiratory": "bg-sky-50 border-sky-200 text-sky-900",
+  "General Pediatrics": "bg-emerald-50 border-emerald-200 text-emerald-900",
+  "Neurology": "bg-purple-50 border-purple-200 text-purple-900",
+  "Neonatology": "bg-pink-50 border-pink-200 text-pink-900",
+  "Haematology": "bg-rose-50 border-rose-200 text-rose-900",
 };
 
 const GROUP_BADGE = {
@@ -115,12 +137,24 @@ const GROUP_BADGE = {
   "Rheumatology": "bg-violet-700",
   "Oncology": "bg-red-700",
   "Emergency & Critical Care": "bg-red-600",
+  "Infectious Disease": "bg-orange-600",
+  "Respiratory": "bg-sky-600",
+  "General Pediatrics": "bg-emerald-600",
+  "Neurology": "bg-purple-600",
+  "Neonatology": "bg-pink-600",
+  "Haematology": "bg-rose-600",
 };
 
 // Explicit group display order — Emergency & Electrolytes is shown AFTER
 // Tubular & Metabolic (per clinical-pathways layout preference).
 const GROUP_ORDER = [
   "Emergency & Critical Care",
+  "Infectious Disease",
+  "Respiratory",
+  "General Pediatrics",
+  "Neurology",
+  "Neonatology",
+  "Haematology",
   "Glomerular Disease",
   "CKD & Genetics",
   "CAKUT & Urology",
