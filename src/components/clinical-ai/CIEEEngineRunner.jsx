@@ -38,23 +38,57 @@ function bsaMosteller(weightKg, heightCm) {
   return Math.sqrt((w * h) / 3600);
 }
 
-const fmtMg = (x) => (x >= 1000 ? `${(x / 1000).toFixed(x % 1000 ? 1 : 0)} g` : `${Math.round(x)} mg`);
+// Millilitre / milligram / microgram formatters. fmtMg keeps decimals for
+// small (sub-10 mg) doses so life-saving drugs like adrenaline (0.01 mg/kg →
+// e.g. 0.15 mg) render as a real number instead of rounding to "0 mg".
+const fmtMg = (x) => {
+  if (x >= 1000) return `${(x / 1000).toFixed(x % 1000 ? 1 : 0)} g`;
+  if (x < 10) return `${parseFloat(x.toFixed(2))} mg`;
+  return `${Math.round(x)} mg`;
+};
+const fmtMcg = (x) => (x >= 1000 ? `${parseFloat((x / 1000).toFixed(2))} mg` : `${parseFloat(x.toFixed(x < 10 ? 2 : 1))} mcg`);
 
-// Parse a free-text dose rule and compute the patient-specific dose.
-// Handles "a–b mg/kg/day (max N mg|g)" and "a–b mg/m²/day".
+// Parse a free-text dose rule and compute the patient-specific dose. Handles
+// weight-based mg/kg (maintenance "/day" or emergency per-dose), microgram
+// boluses & infusions (mcg/kg, mcg/kg/min), millilitre fluid boluses (mL/kg),
+// and BSA mg/m². A single string may contain several (e.g. "3rd IM adrenaline
+// 0.01 mg/kg (max 0.5 mg); then IV adrenaline 0.05 mcg/kg/min") — each is
+// computed and shown.
 function computeDose(doseStr, { weight, height } = {}) {
   if (!doseStr) return null;
   const w = parseFloat(weight);
   const out = [];
+  const dayS = /\/day/i.test(doseStr) ? '/day' : ''; // per-day vs per-dose
 
+  // mg/kg (won't match "mcg/kg" — no "mg/kg" substring exists there)
   const perKg = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*mg\/kg/i);
   if (perKg && w) {
-    const maxM = doseStr.match(/max\s*([\d.]+)\s*(mg|g)/i);
+    const maxM = doseStr.match(/max[:\s]*([\d.]+)\s*(mg|g)/i);
     const maxMg = maxM ? parseFloat(maxM[1]) * (maxM[2].toLowerCase() === "g" ? 1000 : 1) : null;
     const cap = (x) => (maxMg ? Math.min(x, maxMg) : x);
     const lo = cap(parseFloat(perKg[1]) * w);
     const hi = perKg[2] ? cap(parseFloat(perKg[2]) * w) : null;
-    out.push(hi ? `${fmtMg(lo)}–${fmtMg(hi)}/day` : `${fmtMg(lo)}/day`);
+    out.push(hi ? `${fmtMg(lo)}–${fmtMg(hi)}${dayS}` : `${fmtMg(lo)}${dayS}`);
+  }
+
+  // mcg/kg (bolus) and mcg/kg/min (infusion rate)
+  const perKgMcg = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*mcg\/kg(\/min)?/i);
+  if (perKgMcg && w) {
+    const per = perKgMcg[3] ? '/min' : '';
+    const maxM = doseStr.match(/max[:\s]*([\d.]+)\s*(mg|mcg)/i);
+    const maxMcg = maxM ? parseFloat(maxM[1]) * (maxM[2].toLowerCase() === "mg" ? 1000 : 1) : null;
+    const cap = (x) => (maxMcg ? Math.min(x, maxMcg) : x);
+    const lo = cap(parseFloat(perKgMcg[1]) * w);
+    const hi = perKgMcg[2] ? cap(parseFloat(perKgMcg[2]) * w) : null;
+    out.push(hi ? `${fmtMcg(lo)}–${fmtMcg(hi)}${per}` : `${fmtMcg(lo)}${per}`);
+  }
+
+  // mL/kg fluid bolus
+  const perKgMl = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*m[lL]\/kg/i);
+  if (perKgMl && w) {
+    const lo = parseFloat(perKgMl[1]) * w;
+    const hi = perKgMl[2] ? parseFloat(perKgMl[2]) * w : null;
+    out.push(hi ? `${Math.round(lo)}–${Math.round(hi)} mL` : `${Math.round(lo)} mL`);
   }
 
   const perM2 = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*mg\/m/i);
@@ -62,7 +96,7 @@ function computeDose(doseStr, { weight, height } = {}) {
   if (perM2 && bsa) {
     const lo = parseFloat(perM2[1]) * bsa;
     const hi = perM2[2] ? parseFloat(perM2[2]) * bsa : null;
-    out.push((hi ? `${fmtMg(lo)}–${fmtMg(hi)}/day` : `${fmtMg(lo)}/day`) + ` (BSA ${bsa.toFixed(2)} m²)`);
+    out.push((hi ? `${fmtMg(lo)}–${fmtMg(hi)}${dayS}` : `${fmtMg(lo)}${dayS}`) + ` (BSA ${bsa.toFixed(2)} m²)`);
   }
 
   return out.length ? out.join(" · ") : null;
