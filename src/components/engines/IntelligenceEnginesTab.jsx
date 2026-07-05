@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Cpu, ChevronRight, Search, X, BookOpen, ExternalLink, Lock } from "lucide-react";
+import { Cpu, ChevronRight, Search, X, BookOpen, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { base44 } from "@/api/client";
@@ -79,6 +79,14 @@ export const ENGINES = [
   // ── Oncology ──
   { label: "Pediatric Oncology Hub", desc: "ALL · AML · Wilms · Neuroblastoma · NHL · TLS · Febrile Neutropenia · Drug toxicity · Pathway Engine — SIOP/COG/BFM/UKALL", scenario: "oncology-hub", _customLink: "/OncologyHub", tags: ["oncology", "ALL", "AML", "leukaemia", "Wilms tumour", "neuroblastoma", "lymphoma", "TLS", "febrile neutropenia", "chemotherapy", "vincristine", "6-MP", "asparaginase", "BFM", "SIOP", "COG", "UKALL", "paediatric cancer", "actinomycin", "doxorubicin", "cisplatin", "carboplatin", "etoposide", "antifungal", "MIBG"], group: "Oncology", adminOnly: false },
 
+  // ── Emergency & Critical Care (IAP STG 2022) ──
+  // DRAFT / UNREVIEWED — adminOnly:true keeps these hidden from non-admin users
+  // until Dr. Swarnim's expert clinical sign-off. Do NOT set adminOnly:false or
+  // present as validated without explicit review.
+  { label: "Anaphylaxis Engine", desc: "IAP STG 2022 §3.35 — recognition (skin signs not required) → immediate IM adrenaline (hard stop) → refractory loop + fluids + PICU → biphasic observation & auto-injector discharge", scenario: "anaphylaxis-engine", tags: ["anaphylaxis", "adrenaline", "epinephrine", "allergy", "allergic reaction", "auto-injector", "IAP STG", "emergency", "angioedema", "biphasic"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
+  { label: "Status Epilepticus Engine", desc: "IAP STG 2022 §5.49 — time-driven convulsive SE: stabilise + glucose → benzodiazepine (0–5 min) → second-line AED (5–15 min) → refractory anaesthetic infusion + PICU → cause work-up", scenario: "status-epilepticus-engine", tags: ["status epilepticus", "seizure", "convulsion", "lorazepam", "diazepam", "midazolam", "levetiracetam", "phenytoin", "fosphenytoin", "valproate", "AED", "IAP STG", "emergency", "refractory"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
+  { label: "Shock Engine", desc: "IAP STG 2022 §5.48 — undifferentiated paediatric shock: perfusion-based recognition (hypotension is late) → access & bloods → cautious isotonic boluses with reassessment → inotrope escalation → cause-directed care", scenario: "shock-engine", tags: ["shock", "septic shock", "hypovolemia", "fluid bolus", "inotrope", "adrenaline", "noradrenaline", "perfusion", "sepsis", "IAP STG", "emergency", "resuscitation"], group: "Emergency & Critical Care", ciee: true, adminOnly: true },
+
 ];
 
 const GROUP_STYLE = {
@@ -92,6 +100,7 @@ const GROUP_STYLE = {
   "Nutrition & Diet": "bg-green-50 border-green-200 text-green-900",
   "Rheumatology": "bg-violet-50 border-violet-200 text-violet-900",
   "Oncology": "bg-red-50 border-red-200 text-red-900",
+  "Emergency & Critical Care": "bg-red-50 border-red-200 text-red-900",
 };
 
 const GROUP_BADGE = {
@@ -105,11 +114,13 @@ const GROUP_BADGE = {
   "Nutrition & Diet": "bg-green-600",
   "Rheumatology": "bg-violet-700",
   "Oncology": "bg-red-700",
+  "Emergency & Critical Care": "bg-red-600",
 };
 
 // Explicit group display order — Emergency & Electrolytes is shown AFTER
 // Tubular & Metabolic (per clinical-pathways layout preference).
 const GROUP_ORDER = [
+  "Emergency & Critical Care",
   "Glomerular Disease",
   "CKD & Genetics",
   "CAKUT & Urology",

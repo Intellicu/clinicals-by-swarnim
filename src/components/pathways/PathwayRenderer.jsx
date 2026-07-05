@@ -99,9 +99,13 @@ import { SSNS_ENGINE } from "@/lib/engines/ssnsEngine";
 import { SRNS_ENGINE } from "@/lib/engines/srnsEngine";
 import { NS_COMPLICATIONS_ENGINE } from "@/lib/engines/nsComplicationsEngine";
 import { TUBULOPATHY_ENGINE } from "@/lib/engines/tubulopathyEngine";
+import { ANAPHYLAXIS_ENGINE } from "@/lib/engines/anaphylaxisEngine";
+import { STATUS_EPILEPTICUS_ENGINE } from "@/lib/engines/statusEpilepticusEngine";
+import { SHOCK_ENGINE } from "@/lib/engines/shockEngine";
 // IDs that have their own full pathway component
 const HANDLED_IDS = new Set([
   "nephrotic-syndrome","iga-nephropathy","iga-ipna-engine","ssns-engine","srns-engine","ns-complications-engine","tubulopathy-engine","hspn","aki-prifle","htn-emergency","hyperkalemia",
+  "anaphylaxis-engine","status-epilepticus-engine","shock-engine",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -211,6 +215,34 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
       initialCtx={{}}
       title={TUBULOPATHY_ENGINE.label}
       subtitle={TUBULOPATHY_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  // ── Emergency & Critical Care Engines (IAP STG 2022) — DRAFT, admin-gated ──
+  if (id === "anaphylaxis-engine") return (
+    <CIEEEngineRunner
+      pathway={ANAPHYLAXIS_ENGINE.ciee_pathway}
+      sources={ANAPHYLAXIS_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={ANAPHYLAXIS_ENGINE.label}
+      subtitle={ANAPHYLAXIS_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "status-epilepticus-engine") return (
+    <CIEEEngineRunner
+      pathway={STATUS_EPILEPTICUS_ENGINE.ciee_pathway}
+      sources={STATUS_EPILEPTICUS_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={STATUS_EPILEPTICUS_ENGINE.label}
+      subtitle={STATUS_EPILEPTICUS_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "shock-engine") return (
+    <CIEEEngineRunner
+      pathway={SHOCK_ENGINE.ciee_pathway}
+      sources={SHOCK_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={SHOCK_ENGINE.label}
+      subtitle={SHOCK_ENGINE.guideline_source.guideline_name}
     />
   );
   if (id === "iga-vasculitis") return <IgAVasculitisPathway />;
