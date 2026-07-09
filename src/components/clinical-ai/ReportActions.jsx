@@ -91,7 +91,7 @@ function buildPrintHTML(title, result, summary) {
     if (result.acmg_classification_rationale) body += `<h2>Classification Rationale</h2><p>${result.acmg_classification_rationale}</p>`;
     if (result.pathogenic_evidence?.length) body += `<h2>Pathogenic Criteria</h2><p>${result.pathogenic_evidence.map(c=>`<span class="badge r">${c}</span>`).join(" ")}</p>`;
     if (result.benign_evidence?.length) body += `<h2>Benign Criteria</h2><p>${result.benign_evidence.map(c=>`<span class="badge b">${c}</span>`).join(" ")}</p>`;
-    if (result.prescription_suppressor_triggered) body += `<div class="warn"><b>⚠ CNI CONTRAINDICATED</b> — Prescription Suppressor Activated (ISPN 2021 §3.5, Grade 2C)<br>${result.suppression_reason||""}</div>`;
+    if (result.prescription_suppressor_triggered) body += `<div class="warn"><b>⚠ CNI CONTRAINDICATED</b> — Prescription Suppressor Activated (ISPN 2021, 3.5, Grade 2C)<br>${result.suppression_reason||""}</div>`;
     if (result.disease_association) body += `<h2>Disease Association</h2><p>${result.disease_association}</p>`;
     if (result.clinical_significance) body += `<h2>Clinical Significance</h2><p>${result.clinical_significance}</p>`;
     if (result.population_frequency_note) body += `<h2>Population Frequency</h2><p>${result.population_frequency_note}</p>`;

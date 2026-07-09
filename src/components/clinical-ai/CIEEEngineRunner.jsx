@@ -108,7 +108,7 @@ function EvidenceLine({ node, sources }) {
   return (
     <div className="flex items-center gap-1.5 mt-3 flex-wrap">
       {ev.grade && <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold">Grade {ev.grade}</span>}
-      <span className="text-[10px] text-slate-400">{ev.name}{ev.section ? ` §${ev.section}` : ''}</span>
+      <span className="text-[10px] text-slate-400">{ev.name}{ev.section ? ` · ${ev.section}` : ''}</span>
       {ev.pmid && <span className="text-[9px] text-slate-300">PMID {ev.pmid}</span>}
     </div>
   );

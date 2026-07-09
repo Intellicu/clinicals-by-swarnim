@@ -285,7 +285,7 @@ export default function ClinicalCaseAnalyzer() {
                       <div className="flex gap-1 mt-1 flex-wrap">
                         {link.evidence_grade && <Badge variant="outline" className="text-[9px] py-0">Grade {link.evidence_grade}</Badge>}
                         {link.recommendation_strength && <Badge variant="outline" className="text-[9px] py-0">{link.recommendation_strength}</Badge>}
-                        {link.guideline && <span className="text-[9px] text-slate-400 self-center">{link.guideline} {link.section && `§${link.section}`}</span>}
+                        {link.guideline && <span className="text-[9px] text-slate-400 self-center">{link.guideline} {link.section && `· ${link.section}`}</span>}
                       </div>
                     </div>
                   ))}

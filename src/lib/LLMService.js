@@ -172,7 +172,7 @@ export async function invokeGeneticsAnalyzer({ reportText = '', reportFile = nul
 
 Criteria: PVS1(null+LOF) | PS1-PS4(Strong) | PM1-PM6(Moderate) | PP1-PP5(Supporting) | BA1(AF≥5%=Benign alone) | BS1-BS4(Strong benign) | BP1-BP7(Supporting benign). PP3/BP4 count once per variant.
 Nephropathy genes: NPHS1,NPHS2,WT1,LAMB2,PLCE1,TRPC6,INF2,ACTN4,COL4A3/4/5.
-If P/LP in NPHS1/NPHS2/WT1/LAMB2: cni_contraindicated=true, prescription_suppressor_triggered=true (ISPN 2021 §3.5, 2C).`,
+If P/LP in NPHS1/NPHS2/WT1/LAMB2: cni_contraindicated=true, prescription_suppressor_triggered=true (ISPN 2021, 3.5, 2C).`,
       file_urls: fileUrl ? [fileUrl] : undefined,
       response_json_schema: {
         type: 'object',

@@ -310,7 +310,7 @@ For evidence_grade use KDIGO 2021 grades: 1A, 1B, 2B, 2C, or X. Reference specif
                   {(analysis.recommendation_strength || trace.recommendation_strength) && (
                     <Badge variant="outline" className="text-[10px]">{analysis.recommendation_strength || trace.recommendation_strength}</Badge>
                   )}
-                  <span className="text-slate-500 text-[10px] self-center">{trace.guideline_name} §{trace.guideline_section}</span>
+                  <span className="text-slate-500 text-[10px] self-center">{trace.guideline_name} · {trace.guideline_section}</span>
                 </div>
                 {trace.pmid && <p className="text-[10px] text-slate-400 mt-1">PMID: {trace.pmid} · DOI: {trace.doi}</p>}
               </div>

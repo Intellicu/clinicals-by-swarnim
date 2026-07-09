@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Dna, Loader2, Upload, BookOpen, Stethoscope, Heart, ShieldAlert, ShieldCheck, ExternalLink } from "lucide-react";
+import { AlertTriangle, Dna, Loader2, Upload, BookOpen, Stethoscope, Heart, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { toast } from "sonner";
@@ -33,7 +33,7 @@ const LEARNING_POINTS = [
   "BA1 (stand-alone benign): allele frequency ≥5% in gnomAD/ExAC/1000 Genomes — this ALONE classifies a variant as benign regardless of other evidence.",
   "VUS variants must NEVER be used to guide clinical decisions or for predictive family testing. Re-contact the laboratory every 2 years — reclassification is common as databases grow.",
   "Trio sequencing (proband + both parents) increases diagnostic yield and allows de novo variant identification. De novo status upgrades pathogenicity from PM6 (moderate) to PS2 (strong).",
-  "PATHOGENIC variants in NPHS1, NPHS2, WT1, LAMB2 → CNI (tacrolimus/cyclosporine) contraindicated — genetic SRNS does not respond to CNI therapy (ISPN 2021 §3.5, Grade 2C).",
+  "PATHOGENIC variants in NPHS1, NPHS2, WT1, LAMB2 → CNI (tacrolimus/cyclosporine) contraindicated — genetic SRNS does not respond to CNI therapy (ISPN 2021, 3.5, Grade 2C).",
   "Population frequency threshold (PM2): absent from large databases or at extremely low frequency if recessive. Check race-matched controls — VUS rates are higher in non-Caucasian patients due to under-representation in genomic databases.",
   "Functional studies (PS3/BS3) must be well-validated and reproducible in a clinical diagnostic lab setting. Not all published functional assays qualify.",
   "COL4A3/A4/A5 (Alport syndrome): start ACEi/ARB early regardless of proteinuria severity — even heterozygotes benefit (KDIGO 2022 Alport guidance).",
@@ -212,7 +212,7 @@ export default function GeneticReportAnalyzerInline() {
                 <div>
                   <p className="font-bold text-red-900 text-sm">PRESCRIPTION SUPPRESSOR ACTIVATED</p>
                   <p className="text-xs text-red-800 mt-1">{result.suppression_reason || `CNI (tacrolimus/cyclosporine) contraindicated: ${result.acmg_class} variant in ${result.gene_identified || 'nephrotic gene'}. Genetic SRNS does not respond to CNI therapy.`}</p>
-                  <p className="text-[10px] text-red-700 mt-1">ISPN 2021 §3.5 · Evidence Grade {trace?.evidence_grade || '2C'} · {trace?.recommendation_strength || 'Suggestion'}</p>
+                  <p className="text-[10px] text-red-700 mt-1">ISPN 2021, 3.5 · Evidence Grade {trace?.evidence_grade || '2C'} · {trace?.recommendation_strength || 'Suggestion'}</p>
                 </div>
               </div>
             </div>
@@ -344,7 +344,7 @@ export default function GeneticReportAnalyzerInline() {
               <div className="flex flex-wrap gap-1.5 text-xs">
                 <Badge variant="outline" className="text-[10px]">Grade {result.evidence_grade || trace.evidence_grade}</Badge>
                 <Badge variant="outline" className="text-[10px]">{result.recommendation_strength || trace.recommendation_strength}</Badge>
-                <span className="text-slate-500 text-[10px] self-center">{trace.guideline_name} §{trace.guideline_section}</span>
+                <span className="text-slate-500 text-[10px] self-center">{trace.guideline_name} · {trace.guideline_section}</span>
               </div>
               {trace.pmid && <p className="text-[10px] text-slate-400 mt-1">PMID: {trace.pmid}</p>}
             </div>
@@ -442,7 +442,7 @@ export default function GeneticReportAnalyzerInline() {
               <ShieldAlert className="w-3.5 h-3.5" /> PrescriptionSuppressor Rule
             </p>
             <p className="text-xs text-red-800">IF acmg_class = Pathogenic or Likely Pathogenic AND gene is a podocin/nephrin/WT1 gene → SUPPRESS CNI (tacrolimus/cyclosporine) prescription — genetic SRNS does NOT respond to CNI.</p>
-            <p className="text-[10px] text-red-600 mt-1">ISPN 2021 §3.5 · Evidence Grade 2C · Suggestion</p>
+            <p className="text-[10px] text-red-600 mt-1">ISPN 2021, 3.5 · Evidence Grade 2C · Suggestion</p>
           </div>
 
           {/* Key learning points */}

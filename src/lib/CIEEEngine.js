@@ -136,7 +136,7 @@ export function checkPrescriptionSuppressor(drugName, context) {
     return {
       suppressed: true,
       rule: 'PrescriptionSuppressor-R1',
-      reason: `CNI (${drugName}) contraindicated: genetic_variant_status = PATHOGENIC (${context.genetic_gene || 'gene'} ${context.acmg_class}). Genetic SRNS does not respond to CNI therapy (ISPN 2021 §3.5, Evidence Grade 2C).`,
+      reason: `CNI (${drugName}) contraindicated: genetic_variant_status = PATHOGENIC (${context.genetic_gene || 'gene'} ${context.acmg_class}). Genetic SRNS does not respond to CNI therapy (ISPN 2021, 3.5, Evidence Grade 2C).`,
       guideline_source_id: 'GS-ISPN-2021-GENETICS',
       evidence_grade: '2C',
       suppression_event: {
