@@ -1,7 +1,7 @@
 /**
  * Enteric (Typhoid) Fever Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Enteric Fever (§6.58).
+ * Source: IAP Standard Treatment Guidelines 2022 — Enteric Fever (6.58).
  * Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
@@ -19,7 +19,7 @@ export const ENTERIC_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §6.58 (Enteric Fever).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 6.58 (Enteric Fever).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,8 +32,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const ENTERIC_SOURCES = {
-  'GS-IAP-STG-2022-ENT-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §6.58'),
-  'GS-IAP-STG-2022-ENT-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §6.58'),
+  'GS-IAP-STG-2022-ENT-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 6.58'),
+  'GS-IAP-STG-2022-ENT-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 6.58'),
 };
 
 const B = 'GS-IAP-STG-2022-ENT-1B';
@@ -101,7 +101,7 @@ export const ENTERIC_PATHWAY = {
 export const ENTERIC_ENGINE = {
   id: 'enteric-fever-engine',
   label: 'Enteric Fever Engine',
-  desc: 'IAP STG 2022 §6.58 — enteric fever: severity triage → uncomplicated (oral cefixime 7–14 d or azithromycin 7 d, review 48–72 h) vs complicated/toxic (admit, IV ceftriaxone 10–14 d, dexamethasone for severe toxicity/shock, surgery for perforation, carbapenem if XDR) → prevention (TCV) + relapse watch',
+  desc: 'IAP STG 2022, 6.58 — enteric fever: severity triage → uncomplicated (oral cefixime 7–14 d or azithromycin 7 d, review 48–72 h) vs complicated/toxic (admit, IV ceftriaxone 10–14 d, dexamethasone for severe toxicity/shock, surgery for perforation, carbapenem if XDR) → prevention (TCV) + relapse watch',
   group: 'Infectious Disease',
   builtin: true,
   guideline_source: ENTERIC_GUIDELINE,

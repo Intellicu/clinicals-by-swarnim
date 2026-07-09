@@ -1,7 +1,7 @@
 /**
  * Fever Without Focus (FWF) Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Fever Without Focus (§6.57).
+ * Source: IAP Standard Treatment Guidelines 2022 — Fever Without Focus (6.57).
  * Indian Academy of Pediatrics. Age-banded (<3 months / 3–36 months).
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
@@ -19,7 +19,7 @@ export const FWF_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §6.57 (Fever Without Focus).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 6.57 (Fever Without Focus).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,8 +32,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const FWF_SOURCES = {
-  'GS-IAP-STG-2022-FWF-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §6.57'),
-  'GS-IAP-STG-2022-FWF-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §6.57'),
+  'GS-IAP-STG-2022-FWF-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 6.57'),
+  'GS-IAP-STG-2022-FWF-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 6.57'),
 };
 
 const B = 'GS-IAP-STG-2022-FWF-1B';
@@ -125,7 +125,7 @@ export const FWF_PATHWAY = {
 export const FWF_ENGINE = {
   id: 'fever-without-focus-engine',
   label: 'Fever Without Focus Engine',
-  desc: 'IAP STG 2022 §6.57 — fever without focus by age: <3 months → full septic screen + admit + empirical IV antibiotics (no outpatient) · 3–36 months toxic/red-flag → treat as SBI (investigate + antibiotics, treat shock) · well-appearing → targeted work-up (urine ± malaria/dengue/typhoid), antipyretics, 24–48 h safety-net',
+  desc: 'IAP STG 2022, 6.57 — fever without focus by age: <3 months → full septic screen + admit + empirical IV antibiotics (no outpatient) · 3–36 months toxic/red-flag → treat as SBI (investigate + antibiotics, treat shock) · well-appearing → targeted work-up (urine ± malaria/dengue/typhoid), antipyretics, 24–48 h safety-net',
   group: 'General Pediatrics',
   builtin: true,
   guideline_source: FWF_GUIDELINE,

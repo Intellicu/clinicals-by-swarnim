@@ -1,7 +1,7 @@
 /**
  * Croup (Laryngotracheobronchitis) Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Croup (§4.40). Indian
+ * Source: IAP Standard Treatment Guidelines 2022 — Croup (4.40). Indian
  * Academy of Pediatrics. Severity-driven (Westley-type: mild / moderate /
  * severe).
  *
@@ -20,7 +20,7 @@ export const CROUP_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §4.40 (Croup).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 4.40 (Croup).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -33,8 +33,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const CROUP_SOURCES = {
-  'GS-IAP-STG-2022-CRP-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §4.40'),
-  'GS-IAP-STG-2022-CRP-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §4.40'),
+  'GS-IAP-STG-2022-CRP-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 4.40'),
+  'GS-IAP-STG-2022-CRP-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 4.40'),
 };
 
 const B = 'GS-IAP-STG-2022-CRP-1B';
@@ -122,7 +122,7 @@ export const CROUP_PATHWAY = {
 export const CROUP_ENGINE = {
   id: 'croup-engine',
   label: 'Croup Engine',
-  desc: 'IAP STG 2022 §4.40 — croup by severity: mild → single-dose oral dexamethasone home · moderate → dexamethasone + observe ≥3–4 h, add nebulised adrenaline if not settling · severe → nebulised adrenaline + dexamethasone + O₂ + airway support; response check with rebound watch (~2 h) → discharge vs admit / alternative diagnosis',
+  desc: 'IAP STG 2022, 4.40 — croup by severity: mild → single-dose oral dexamethasone home · moderate → dexamethasone + observe ≥3–4 h, add nebulised adrenaline if not settling · severe → nebulised adrenaline + dexamethasone + O₂ + airway support; response check with rebound watch (~2 h) → discharge vs admit / alternative diagnosis',
   group: 'Respiratory',
   builtin: true,
   guideline_source: CROUP_GUIDELINE,

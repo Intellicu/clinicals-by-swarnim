@@ -1,7 +1,7 @@
 /**
  * Snakebite Envenomation Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Snakebite (§5.54). Indian
+ * Source: IAP Standard Treatment Guidelines 2022 — Snakebite (5.54). Indian
  * Academy of Pediatrics. Aligned with WHO/National Snakebite Management
  * Protocol (India).
  *
@@ -21,7 +21,7 @@ export const SNAKEBITE_GUIDELINE = {
   year: 2022,
   evidence_grade: 'Practice point',
   recommendation_strength: 'Practice point',
-  reference: 'IAP Standard Treatment Guidelines 2022 §5.54 (Snakebite). Companion: National Snakebite Management Protocol / WHO SEARO.',
+  reference: 'IAP Standard Treatment Guidelines 2022, 5.54 (Snakebite). Companion: National Snakebite Management Protocol / WHO SEARO.',
 };
 
 const mk = (grade, strength, section) => ({
@@ -34,8 +34,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const SNAKEBITE_SOURCES = {
-  'GS-IAP-STG-2022-SNK-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §5.54'),
-  'GS-IAP-STG-2022-SNK-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §5.54'),
+  'GS-IAP-STG-2022-SNK-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 5.54'),
+  'GS-IAP-STG-2022-SNK-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 5.54'),
 };
 
 const PP = 'GS-IAP-STG-2022-SNK-PP';
@@ -136,7 +136,7 @@ export const SNAKEBITE_PATHWAY = {
 export const SNAKEBITE_ENGINE = {
   id: 'snakebite-engine',
   label: 'Snakebite Engine',
-  desc: 'IAP STG 2022 §5.54 — snakebite: first aid (immobilise, no cut/suck/tourniquet) → envenomation assessment (20-WBCT + neuro) → observe ≥24 h vs polyvalent ASV (NOT weight-based, adrenaline ready) → neurotoxic (neostigmine + atropine, airway) vs haemotoxic (repeat 20-WBCT, further ASV, blood products) → renal/compartment monitoring',
+  desc: 'IAP STG 2022, 5.54 — snakebite: first aid (immobilise, no cut/suck/tourniquet) → envenomation assessment (20-WBCT + neuro) → observe ≥24 h vs polyvalent ASV (NOT weight-based, adrenaline ready) → neurotoxic (neostigmine + atropine, airway) vs haemotoxic (repeat 20-WBCT, further ASV, blood products) → renal/compartment monitoring',
   group: 'Emergency & Critical Care',
   builtin: true,
   guideline_source: SNAKEBITE_GUIDELINE,

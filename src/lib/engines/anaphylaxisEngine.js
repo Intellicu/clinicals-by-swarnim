@@ -36,8 +36,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const ANAPHYLAXIS_SOURCES = {
-  'GS-IAP-STG-2022-ANA-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §Anaphylaxis'),
-  'GS-IAP-STG-2022-ANA-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §Anaphylaxis'),
+  'GS-IAP-STG-2022-ANA-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 Anaphylaxis'),
+  'GS-IAP-STG-2022-ANA-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 Anaphylaxis'),
 };
 
 const PP = 'GS-IAP-STG-2022-ANA-PP';

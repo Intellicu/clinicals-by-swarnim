@@ -2,7 +2,7 @@
  * Organophosphate (OP) Poisoning Intelligence Engine — CIEE built-in.
  *
  * Source: IAP Standard Treatment Guidelines 2022 — Organophosphate Poisoning
- * (§5.52). Indian Academy of Pediatrics.
+ * (5.52). Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner). Atropine is
  * titrated by DOUBLING every 5 minutes until atropinised — an explicit,
@@ -21,7 +21,7 @@ export const OPP_GUIDELINE = {
   year: 2022,
   evidence_grade: 'Practice point',
   recommendation_strength: 'Practice point',
-  reference: 'IAP Standard Treatment Guidelines 2022 §5.52 (Organophosphate Poisoning).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 5.52 (Organophosphate Poisoning).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -34,8 +34,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const OPP_SOURCES = {
-  'GS-IAP-STG-2022-OPP-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §5.52'),
-  'GS-IAP-STG-2022-OPP-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §5.52'),
+  'GS-IAP-STG-2022-OPP-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 5.52'),
+  'GS-IAP-STG-2022-OPP-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 5.52'),
 };
 
 const PP = 'GS-IAP-STG-2022-OPP-PP';
@@ -121,7 +121,7 @@ export const OPP_PATHWAY = {
 export const OPP_ENGINE = {
   id: 'op-poisoning-engine',
   label: 'Organophosphate Poisoning Engine',
-  desc: 'IAP STG 2022 §5.52 — OP poisoning: recognise cholinergic toxidrome (DUMBELS) → ABC + decontamination (PPE) → atropine DOUBLED q5min to atropinisation then infusion → add pralidoxime early if organophosphate (not pure carbamate) → intermediate-syndrome surveillance, avoid morphine/succinylcholine/aminophylline',
+  desc: 'IAP STG 2022, 5.52 — OP poisoning: recognise cholinergic toxidrome (DUMBELS) → ABC + decontamination (PPE) → atropine DOUBLED q5min to atropinisation then infusion → add pralidoxime early if organophosphate (not pure carbamate) → intermediate-syndrome surveillance, avoid morphine/succinylcholine/aminophylline',
   group: 'Emergency & Critical Care',
   builtin: true,
   guideline_source: OPP_GUIDELINE,

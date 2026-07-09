@@ -1,7 +1,7 @@
 /**
  * Dengue Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Dengue (§6.70) with WHO
+ * Source: IAP Standard Treatment Guidelines 2022 — Dengue (6.70) with WHO
  * classification (no warning signs / warning signs / severe). Indian Academy of
  * Pediatrics.
  *
@@ -20,7 +20,7 @@ export const DENGUE_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §6.70 (Dengue). Companion: WHO Dengue Guidelines.',
+  reference: 'IAP Standard Treatment Guidelines 2022, 6.70 (Dengue). Companion: WHO Dengue Guidelines.',
 };
 
 const mk = (grade, strength, section) => ({
@@ -33,8 +33,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const DENGUE_SOURCES = {
-  'GS-IAP-STG-2022-DEN-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §6.70'),
-  'GS-IAP-STG-2022-DEN-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §6.70'),
+  'GS-IAP-STG-2022-DEN-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 6.70'),
+  'GS-IAP-STG-2022-DEN-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 6.70'),
 };
 
 const B = 'GS-IAP-STG-2022-DEN-1B';
@@ -119,7 +119,7 @@ export const DENGUE_PATHWAY = {
 export const DENGUE_ENGINE = {
   id: 'dengue-engine',
   label: 'Dengue Engine',
-  desc: 'IAP STG 2022 §6.70 — WHO-classified dengue: Group A home care (oral fluids, paracetamol ONLY, daily CBC/HCT) · Group B warning signs (admit, controlled isotonic fluids 5–7→3–5→2–3 mL/kg/h titrated to HCT, avoid overload) · Group C severe (compensated 10–20 mL/kg bolus / hypotensive rapid bolus ± colloid, PICU) + convalescent overload watch',
+  desc: 'IAP STG 2022, 6.70 — WHO-classified dengue: Group A home care (oral fluids, paracetamol ONLY, daily CBC/HCT) · Group B warning signs (admit, controlled isotonic fluids 5–7→3–5→2–3 mL/kg/h titrated to HCT, avoid overload) · Group C severe (compensated 10–20 mL/kg bolus / hypotensive rapid bolus ± colloid, PICU) + convalescent overload watch',
   group: 'Infectious Disease',
   builtin: true,
   guideline_source: DENGUE_GUIDELINE,

@@ -2,7 +2,7 @@
  * Acute Watery Diarrhoea (AWD) Intelligence Engine — CIEE built-in.
  *
  * Source: IAP Standard Treatment Guidelines 2022 — Acute Watery Diarrhoea
- * (§8.90) with WHO dehydration plans A/B/C. Indian Academy of Pediatrics.
+ * (8.90) with WHO dehydration plans A/B/C. Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
  *
@@ -19,7 +19,7 @@ export const AWD_GUIDELINE = {
   year: 2022,
   evidence_grade: '1A',
   recommendation_strength: 'Strong recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §8.90 (Acute Watery Diarrhoea). Companion: WHO/IMNCI.',
+  reference: 'IAP Standard Treatment Guidelines 2022, 8.90 (Acute Watery Diarrhoea). Companion: WHO/IMNCI.',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,8 +32,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const AWD_SOURCES = {
-  'GS-IAP-STG-2022-AWD-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022 §8.90'),
-  'GS-IAP-STG-2022-AWD-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §8.90'),
+  'GS-IAP-STG-2022-AWD-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022, 8.90'),
+  'GS-IAP-STG-2022-AWD-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 8.90'),
 };
 
 const A = 'GS-IAP-STG-2022-AWD-1A';
@@ -122,7 +122,7 @@ export const AWD_PATHWAY = {
 export const AWD_ENGINE = {
   id: 'diarrhoea-engine',
   label: 'Acute Watery Diarrhoea Engine',
-  desc: 'IAP STG 2022 §8.90 — classify dehydration (none/some/severe) → Plan A (home ORS after each stool) / Plan B (75 mL/kg ORS over 4 h, reassess) / Plan C (IV 100 mL/kg age-specific split + ORS 5 mL/kg/h) → zinc ×14 days + continue feeding for all → danger-sign safety-net (blood, high fever, persistent vomiting, no improvement, SAM)',
+  desc: 'IAP STG 2022, 8.90 — classify dehydration (none/some/severe) → Plan A (home ORS after each stool) / Plan B (75 mL/kg ORS over 4 h, reassess) / Plan C (IV 100 mL/kg age-specific split + ORS 5 mL/kg/h) → zinc ×14 days + continue feeding for all → danger-sign safety-net (blood, high fever, persistent vomiting, no improvement, SAM)',
   group: 'General Pediatrics',
   builtin: true,
   guideline_source: AWD_GUIDELINE,

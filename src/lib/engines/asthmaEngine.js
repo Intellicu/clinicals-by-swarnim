@@ -1,7 +1,7 @@
 /**
  * Acute Asthma (Exacerbation) Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Acute Asthma (§2.26–27).
+ * Source: IAP Standard Treatment Guidelines 2022 — Acute Asthma (2.26–27).
  * Indian Academy of Pediatrics. Severity-driven with a 1-hour reassessment.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
@@ -19,7 +19,7 @@ export const ASTHMA_GUIDELINE = {
   year: 2022,
   evidence_grade: '1A',
   recommendation_strength: 'Strong recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §2.26–27 (Acute Asthma).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 2.26–27 (Acute Asthma).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,8 +32,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const ASTHMA_SOURCES = {
-  'GS-IAP-STG-2022-AST-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022 §2.26–27'),
-  'GS-IAP-STG-2022-AST-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §2.26–27'),
+  'GS-IAP-STG-2022-AST-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022, 2.26–27'),
+  'GS-IAP-STG-2022-AST-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 2.26–27'),
 };
 
 const A = 'GS-IAP-STG-2022-AST-1A';
@@ -129,7 +129,7 @@ export const ASTHMA_PATHWAY = {
 export const ASTHMA_ENGINE = {
   id: 'asthma-engine',
   label: 'Acute Asthma Engine',
-  desc: 'IAP STG 2022 §2.26–27 — acute asthma by severity: mild–mod → salbutamol + oral steroid · severe → salbutamol + ipratropium + systemic steroid + O₂ · life-threatening → IV MgSO₄, consider IV salbutamol/aminophylline, PICU → reassess at 1 h → discharge with inhaler technique + written action plan',
+  desc: 'IAP STG 2022, 2.26–27 — acute asthma by severity: mild–mod → salbutamol + oral steroid · severe → salbutamol + ipratropium + systemic steroid + O₂ · life-threatening → IV MgSO₄, consider IV salbutamol/aminophylline, PICU → reassess at 1 h → discharge with inhaler technique + written action plan',
   group: 'Respiratory',
   builtin: true,
   guideline_source: ASTHMA_GUIDELINE,

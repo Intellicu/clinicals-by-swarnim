@@ -1,7 +1,7 @@
 /**
  * Community-Acquired Pneumonia (CAP) Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Pneumonia (§2.21) with
+ * Source: IAP Standard Treatment Guidelines 2022 — Pneumonia (2.21) with
  * WHO/IMNCI fast-breathing thresholds. Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
@@ -19,7 +19,7 @@ export const CAP_GUIDELINE = {
   year: 2022,
   evidence_grade: '1A',
   recommendation_strength: 'Strong recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §2.21 (Pneumonia). Companion: WHO/IMNCI.',
+  reference: 'IAP Standard Treatment Guidelines 2022, 2.21 (Pneumonia). Companion: WHO/IMNCI.',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,8 +32,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const CAP_SOURCES = {
-  'GS-IAP-STG-2022-CAP-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022 §2.21'),
-  'GS-IAP-STG-2022-CAP-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §2.21'),
+  'GS-IAP-STG-2022-CAP-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022, 2.21'),
+  'GS-IAP-STG-2022-CAP-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 2.21'),
 };
 
 const A = 'GS-IAP-STG-2022-CAP-1A';
@@ -121,7 +121,7 @@ export const CAP_PATHWAY = {
 export const CAP_ENGINE = {
   id: 'pneumonia-engine',
   label: 'Community-Acquired Pneumonia Engine',
-  desc: 'IAP STG 2022 §2.21 — CAP: danger signs → severe (admit, O₂ to SpO₂ ≥90%, IV antibiotics) · fast breathing for age (±indrawing), no danger → oral high-dose amoxicillin 80–90 mg/kg/day ×5 d, review 48 h · normal RR, no indrawing → no antibiotic, safety-net',
+  desc: 'IAP STG 2022, 2.21 — CAP: danger signs → severe (admit, O₂ to SpO₂ ≥90%, IV antibiotics) · fast breathing for age (±indrawing), no danger → oral high-dose amoxicillin 80–90 mg/kg/day ×5 d, review 48 h · normal RR, no indrawing → no antibiotic, safety-net',
   group: 'Respiratory',
   builtin: true,
   guideline_source: CAP_GUIDELINE,

@@ -2,7 +2,7 @@
  * Acute Bacterial Meningitis Intelligence Engine — CIEE built-in.
  *
  * Source: IAP Standard Treatment Guidelines 2022 — Acute Bacterial Meningitis
- * (§7.79). Indian Academy of Pediatrics.
+ * (7.79). Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner). Time-critical —
  * antibiotics must NEVER be delayed for the lumbar puncture.
@@ -20,7 +20,7 @@ export const MENINGITIS_GUIDELINE = {
   year: 2022,
   evidence_grade: '1A',
   recommendation_strength: 'Strong recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §7.79 (Acute Bacterial Meningitis).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 7.79 (Acute Bacterial Meningitis).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -33,9 +33,9 @@ const mk = (grade, strength, section) => ({
 });
 
 export const MENINGITIS_SOURCES = {
-  'GS-IAP-STG-2022-MEN-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022 §7.79'),
-  'GS-IAP-STG-2022-MEN-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §7.79'),
-  'GS-IAP-STG-2022-MEN-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §7.79'),
+  'GS-IAP-STG-2022-MEN-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022, 7.79'),
+  'GS-IAP-STG-2022-MEN-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 7.79'),
+  'GS-IAP-STG-2022-MEN-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 7.79'),
 };
 
 const A = 'GS-IAP-STG-2022-MEN-1A';
@@ -121,7 +121,7 @@ export const MENINGITIS_PATHWAY = {
 export const MENINGITIS_ENGINE = {
   id: 'meningitis-engine',
   label: 'Acute Bacterial Meningitis Engine',
-  desc: 'IAP STG 2022 §7.79 — bacterial meningitis: recognise (infants non-specific; non-blanching rash) → stabilise + blood culture/glucose, LP only if safe but NEVER delay antibiotics → empirical ceftriaxone 100 mg/kg/day ± vancomycin + dexamethasone with/just before first dose (neonates age-specific) → add aciclovir if encephalitis, manage ICP/SIADH/seizures → hearing/developmental follow-up + contact prophylaxis',
+  desc: 'IAP STG 2022, 7.79 — bacterial meningitis: recognise (infants non-specific; non-blanching rash) → stabilise + blood culture/glucose, LP only if safe but NEVER delay antibiotics → empirical ceftriaxone 100 mg/kg/day ± vancomycin + dexamethasone with/just before first dose (neonates age-specific) → add aciclovir if encephalitis, manage ICP/SIADH/seizures → hearing/developmental follow-up + contact prophylaxis',
   group: 'Emergency & Critical Care',
   builtin: true,
   guideline_source: MENINGITIS_GUIDELINE,

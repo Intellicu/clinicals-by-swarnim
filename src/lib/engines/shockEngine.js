@@ -36,8 +36,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const SHOCK_SOURCES = {
-  'GS-IAP-STG-2022-SHK-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §Shock'),
-  'GS-IAP-STG-2022-SHK-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §Shock'),
+  'GS-IAP-STG-2022-SHK-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 Shock'),
+  'GS-IAP-STG-2022-SHK-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 Shock'),
 };
 
 const PP = 'GS-IAP-STG-2022-SHK-PP';

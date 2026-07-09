@@ -37,8 +37,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const SE_SOURCES = {
-  'GS-IAP-STG-2022-SE-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §Status Epilepticus'),
-  'GS-IAP-STG-2022-SE-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §Status Epilepticus'),
+  'GS-IAP-STG-2022-SE-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 Status Epilepticus'),
+  'GS-IAP-STG-2022-SE-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 Status Epilepticus'),
 };
 
 const B = 'GS-IAP-STG-2022-SE-1B';

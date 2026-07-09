@@ -2,7 +2,7 @@
  * Neonatal Jaundice Intelligence Engine — CIEE built-in.
  *
  * Source: IAP Standard Treatment Guidelines 2022 — Neonatal Hyperbilirubinaemia
- * / Jaundice (§1.1). Indian Academy of Pediatrics.
+ * / Jaundice (1.1). Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner). Treatment
  * thresholds are read off an HOUR-SPECIFIC bilirubin nomogram (age in hours +
@@ -22,7 +22,7 @@ export const NNJ_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §1.1 (Neonatal Jaundice). Companion: AAP hour-specific nomogram.',
+  reference: 'IAP Standard Treatment Guidelines 2022, 1.1 (Neonatal Jaundice). Companion: AAP hour-specific nomogram.',
 };
 
 const mk = (grade, strength, section) => ({
@@ -35,8 +35,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const NNJ_SOURCES = {
-  'GS-IAP-STG-2022-NNJ-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §1.1'),
-  'GS-IAP-STG-2022-NNJ-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §1.1'),
+  'GS-IAP-STG-2022-NNJ-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 1.1'),
+  'GS-IAP-STG-2022-NNJ-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 1.1'),
 };
 
 const B = 'GS-IAP-STG-2022-NNJ-1B';
@@ -139,7 +139,7 @@ export const NNJ_PATHWAY = {
 export const NNJ_ENGINE = {
   id: 'neonatal-jaundice-engine',
   label: 'Neonatal Jaundice Engine',
-  desc: 'IAP STG 2022 §1.1 — neonatal jaundice: red-flag screen (<24 h onset, unwell, <35 wk, rapid rise, prolonged >2 wk / conjugated) → urgent haemolytic/biliary-atresia work-up · else plot TSB on the hour-specific nomogram → phototherapy if above line (recheck 4–6 h) → prepare exchange transfusion if approaching exchange line or encephalopathy',
+  desc: 'IAP STG 2022, 1.1 — neonatal jaundice: red-flag screen (<24 h onset, unwell, <35 wk, rapid rise, prolonged >2 wk / conjugated) → urgent haemolytic/biliary-atresia work-up · else plot TSB on the hour-specific nomogram → phototherapy if above line (recheck 4–6 h) → prepare exchange transfusion if approaching exchange line or encephalopathy',
   group: 'Neonatology',
   builtin: true,
   guideline_source: NNJ_GUIDELINE,

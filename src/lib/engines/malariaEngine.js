@@ -1,7 +1,7 @@
 /**
  * Malaria Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Malaria (§6.72) with WHO /
+ * Source: IAP Standard Treatment Guidelines 2022 — Malaria (6.72) with WHO /
  * NVBDCP treatment principles. Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
@@ -19,7 +19,7 @@ export const MALARIA_GUIDELINE = {
   year: 2022,
   evidence_grade: '1A',
   recommendation_strength: 'Strong recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §6.72 (Malaria). Companion: WHO / NVBDCP.',
+  reference: 'IAP Standard Treatment Guidelines 2022, 6.72 (Malaria). Companion: WHO / NVBDCP.',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,9 +32,9 @@ const mk = (grade, strength, section) => ({
 });
 
 export const MALARIA_SOURCES = {
-  'GS-IAP-STG-2022-MAL-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022 §6.72'),
-  'GS-IAP-STG-2022-MAL-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §6.72'),
-  'GS-IAP-STG-2022-MAL-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §6.72'),
+  'GS-IAP-STG-2022-MAL-1A': mk('1A', 'Strong recommendation, high-quality evidence', 'IAP STG 2022, 6.72'),
+  'GS-IAP-STG-2022-MAL-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 6.72'),
+  'GS-IAP-STG-2022-MAL-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 6.72'),
 };
 
 const A = 'GS-IAP-STG-2022-MAL-1A';
@@ -112,7 +112,7 @@ export const MALARIA_PATHWAY = {
 export const MALARIA_ENGINE = {
   id: 'malaria-engine',
   label: 'Malaria Engine',
-  desc: 'IAP STG 2022 §6.72 — malaria: confirm by RDT/microscopy + species → severe features? → severe: IV artesunate (3 mg/kg <20 kg / 2.4 mg/kg ≥20 kg at 0/12/24 h then daily) + supportive care, then oral ACT · uncomplicated: falciparum/mixed → ACT + single-dose primaquine; vivax/ovale → chloroquine + 14-day primaquine (G6PD screen first) → adherence, bed nets, reporting',
+  desc: 'IAP STG 2022, 6.72 — malaria: confirm by RDT/microscopy + species → severe features? → severe: IV artesunate (3 mg/kg <20 kg / 2.4 mg/kg ≥20 kg at 0/12/24 h then daily) + supportive care, then oral ACT · uncomplicated: falciparum/mixed → ACT + single-dose primaquine; vivax/ovale → chloroquine + 14-day primaquine (G6PD screen first) → adherence, bed nets, reporting',
   group: 'Infectious Disease',
   builtin: true,
   guideline_source: MALARIA_GUIDELINE,

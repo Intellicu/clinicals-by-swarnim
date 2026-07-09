@@ -1,7 +1,7 @@
 /**
  * Febrile Seizure Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Febrile Seizure (§7.78).
+ * Source: IAP Standard Treatment Guidelines 2022 — Febrile Seizure (7.78).
  * Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner). An actively
@@ -20,7 +20,7 @@ export const FS_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §7.78 (Febrile Seizure).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 7.78 (Febrile Seizure).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -33,8 +33,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const FS_SOURCES = {
-  'GS-IAP-STG-2022-FS-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §7.78'),
-  'GS-IAP-STG-2022-FS-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §7.78'),
+  'GS-IAP-STG-2022-FS-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 7.78'),
+  'GS-IAP-STG-2022-FS-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 7.78'),
 };
 
 const B = 'GS-IAP-STG-2022-FS-1B';
@@ -117,7 +117,7 @@ export const FS_PATHWAY = {
 export const FS_ENGINE = {
   id: 'febrile-seizure-engine',
   label: 'Febrile Seizure Engine',
-  desc: 'IAP STG 2022 §7.78 — febrile seizure: still seizing → treat as status epilepticus first · simple (generalised, <15 min, once/24 h, full recovery) → no routine EEG/imaging/LP unless meningitis suspected, reassure + treat fever source · complex/atypical → investigate + senior review, admit if doubt; exclude meningitis in all',
+  desc: 'IAP STG 2022, 7.78 — febrile seizure: still seizing → treat as status epilepticus first · simple (generalised, <15 min, once/24 h, full recovery) → no routine EEG/imaging/LP unless meningitis suspected, reassure + treat fever source · complex/atypical → investigate + senior review, admit if doubt; exclude meningitis in all',
   group: 'Neurology',
   builtin: true,
   guideline_source: FS_GUIDELINE,

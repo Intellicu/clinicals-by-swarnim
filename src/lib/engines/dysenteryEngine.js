@@ -1,7 +1,7 @@
 /**
  * Acute Dysentery Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Acute Dysentery (§8.91).
+ * Source: IAP Standard Treatment Guidelines 2022 — Acute Dysentery (8.91).
  * Indian Academy of Pediatrics. Unlike watery diarrhoea, antibiotics ARE
  * indicated.
  *
@@ -20,7 +20,7 @@ export const DYS_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §8.91 (Acute Dysentery).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 8.91 (Acute Dysentery).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -33,8 +33,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const DYS_SOURCES = {
-  'GS-IAP-STG-2022-DYS-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §8.91'),
-  'GS-IAP-STG-2022-DYS-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §8.91'),
+  'GS-IAP-STG-2022-DYS-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 8.91'),
+  'GS-IAP-STG-2022-DYS-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 8.91'),
 };
 
 const B = 'GS-IAP-STG-2022-DYS-1B';
@@ -102,7 +102,7 @@ export const DYS_PATHWAY = {
 export const DYS_ENGINE = {
   id: 'dysentery-engine',
   label: 'Acute Dysentery Engine',
-  desc: 'IAP STG 2022 §8.91 — dysentery (bloody diarrhoea): rehydrate (Plan A/B/C) + zinc ×14 days → antibiotics ARE indicated (ciprofloxacin or azithromycin ×3 d) → review 48 h → non-response: consider amoebiasis (add metronidazole) or HUS (pallor/oliguria/low platelets → nephrology engines)',
+  desc: 'IAP STG 2022, 8.91 — dysentery (bloody diarrhoea): rehydrate (Plan A/B/C) + zinc ×14 days → antibiotics ARE indicated (ciprofloxacin or azithromycin ×3 d) → review 48 h → non-response: consider amoebiasis (add metronidazole) or HUS (pallor/oliguria/low platelets → nephrology engines)',
   group: 'General Pediatrics',
   builtin: true,
   guideline_source: DYS_GUIDELINE,

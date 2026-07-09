@@ -1,7 +1,7 @@
 /**
  * Acute Otitis Media (AOM) Intelligence Engine — CIEE built-in.
  *
- * Source: IAP Standard Treatment Guidelines 2022 — Acute Otitis Media (§2.19).
+ * Source: IAP Standard Treatment Guidelines 2022 — Acute Otitis Media (2.19).
  * Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
@@ -19,7 +19,7 @@ export const AOM_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §2.19 (Acute Otitis Media).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 2.19 (Acute Otitis Media).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,8 +32,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const AOM_SOURCES = {
-  'GS-IAP-STG-2022-AOM-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §2.19'),
-  'GS-IAP-STG-2022-AOM-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §2.19'),
+  'GS-IAP-STG-2022-AOM-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 2.19'),
+  'GS-IAP-STG-2022-AOM-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 2.19'),
 };
 
 const B = 'GS-IAP-STG-2022-AOM-1B';
@@ -114,7 +114,7 @@ export const AOM_PATHWAY = {
 export const AOM_ENGINE = {
   id: 'aom-engine',
   label: 'Acute Otitis Media Engine',
-  desc: 'IAP STG 2022 §2.19 — AOM: treat now if <6 mo / <2 y bilateral / otorrhoea / severe pain or high fever / unwell — else watchful waiting with analgesia + 48–72 h delayed prescription → first-line high-dose amoxicillin, step up to co-amoxiclav on failure → mastoiditis watch',
+  desc: 'IAP STG 2022, 2.19 — AOM: treat now if <6 mo / <2 y bilateral / otorrhoea / severe pain or high fever / unwell — else watchful waiting with analgesia + 48–72 h delayed prescription → first-line high-dose amoxicillin, step up to co-amoxiclav on failure → mastoiditis watch',
   group: 'General Pediatrics',
   builtin: true,
   guideline_source: AOM_GUIDELINE,

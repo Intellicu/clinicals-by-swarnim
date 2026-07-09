@@ -2,7 +2,7 @@
  * Iron Deficiency Anaemia (IDA) Intelligence Engine — CIEE built-in.
  *
  * Source: IAP Standard Treatment Guidelines 2022 — Iron Deficiency Anaemia
- * (§10.100). Indian Academy of Pediatrics.
+ * (10.100). Indian Academy of Pediatrics.
  *
  * Run by the shared PathwayExecutionEngine (CIEEEngineRunner).
  *
@@ -19,7 +19,7 @@ export const IDA_GUIDELINE = {
   year: 2022,
   evidence_grade: '1B',
   recommendation_strength: 'Recommendation',
-  reference: 'IAP Standard Treatment Guidelines 2022 §10.100 (Iron Deficiency Anaemia).',
+  reference: 'IAP Standard Treatment Guidelines 2022, 10.100 (Iron Deficiency Anaemia).',
 };
 
 const mk = (grade, strength, section) => ({
@@ -32,8 +32,8 @@ const mk = (grade, strength, section) => ({
 });
 
 export const IDA_SOURCES = {
-  'GS-IAP-STG-2022-IDA-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022 §10.100'),
-  'GS-IAP-STG-2022-IDA-PP': mk('Practice point', 'Practice point', 'IAP STG 2022 §10.100'),
+  'GS-IAP-STG-2022-IDA-1B': mk('1B', 'Strong recommendation, moderate-quality evidence', 'IAP STG 2022, 10.100'),
+  'GS-IAP-STG-2022-IDA-PP': mk('Practice point', 'Practice point', 'IAP STG 2022, 10.100'),
 };
 
 const B = 'GS-IAP-STG-2022-IDA-1B';
@@ -119,7 +119,7 @@ export const IDA_PATHWAY = {
 export const IDA_ENGINE = {
   id: 'iron-deficiency-anaemia-engine',
   label: 'Iron Deficiency Anaemia Engine',
-  desc: 'IAP STG 2022 §10.100 — IDA: severe/decompensated → cautious slow transfusion + investigate · stable → oral elemental iron 3–6 mg/kg/day ×8–12 wk (continue ~3 mo after normalisation) → reassess Hb/retic at 2–4 wk → non-response → reinvestigate (adherence, smear, ferritin, Hb electrophoresis, coeliac screen)',
+  desc: 'IAP STG 2022, 10.100 — IDA: severe/decompensated → cautious slow transfusion + investigate · stable → oral elemental iron 3–6 mg/kg/day ×8–12 wk (continue ~3 mo after normalisation) → reassess Hb/retic at 2–4 wk → non-response → reinvestigate (adherence, smear, ferritin, Hb electrophoresis, coeliac screen)',
   group: 'Haematology',
   builtin: true,
   guideline_source: IDA_GUIDELINE,
