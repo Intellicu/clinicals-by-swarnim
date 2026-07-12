@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { base44 } from '@/api/client';
+import { base44, activeBackend } from '@/api/client';
 import { appParams } from '@/lib/app-params';
+// Base44-only bootstrap dependency — unused on the Supabase backend and
+// removed entirely at decommission (Phase 5).
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
 const AuthContext = createContext();
@@ -18,6 +20,24 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAppState = async () => {
+    // Supabase backend: no platform "public settings" concept — the session
+    // (persisted by supabase-js) is the whole story. Probe it directly.
+    if (activeBackend === 'supabase') {
+      setIsLoadingPublicSettings(false);
+      setAppPublicSettings({ public_settings: {} });
+      try {
+        setIsLoadingAuth(true);
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+        setIsAuthenticated(true);
+      } catch {
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+      return;
+    }
+
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);

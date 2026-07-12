@@ -72,7 +72,9 @@ function columnsFor(records) {
     }
     const cols = columnsFor(records).filter(c => !["id", "created_date", "updated_date"].includes(c.raw));
     sql += `create table if not exists ${table} (\n`;
-    sql += `  id uuid primary key default gen_random_uuid(),\n`;
+    // TEXT ids, not uuid: Base44 ids must be preserved verbatim on import so
+    // cross-entity references (e.g. DoseRule.drug_id -> Drug.id) stay intact.
+    sql += `  id text primary key default gen_random_uuid()::text,\n`;
     sql += `  created_at timestamptz default now(),\n`;
     sql += `  updated_at timestamptz default now()`;
     if (PATIENT_SCOPED.has(entity)) sql += `,\n  owner_id uuid references auth.users(id)`;
