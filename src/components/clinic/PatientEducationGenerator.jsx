@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +8,12 @@ import { Loader2, BookOpen, Languages, Download, Printer, FileText } from 'lucid
 import { base44 } from '@/api/client';
 import { toast } from 'sonner';
 
-export default function PatientEducationGenerator({ diagnosis, treatmentPlan, medications }) {
+export default function PatientEducationGenerator({ diagnosis: diagnosisProp, treatmentPlan, medications }) {
+  // When mounted standalone (no prop), accept a typed diagnosis so the tool is
+  // usable on its own (e.g. the Patient Education Hub "AI Generator" tab).
+  const [diagnosisInput, setDiagnosisInput] = useState('');
+  const diagnosis = diagnosisProp ?? diagnosisInput;
+  const standalone = diagnosisProp == null;
   const [generating, setGenerating] = useState(false);
   const [language, setLanguage] = useState('english');
   const [educationMaterial, setEducationMaterial] = useState(null);
@@ -204,6 +210,16 @@ Describe a clean, parent-friendly infographic layout with icons, colors, and tex
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 space-y-3">
+        {standalone && (
+          <div>
+            <label className="text-xs font-semibold text-slate-700 mb-2 block">Diagnosis / Condition</label>
+            <Input
+              value={diagnosisInput}
+              onChange={(e) => setDiagnosisInput(e.target.value)}
+              placeholder="e.g. Nephrotic syndrome, UTI, CKD stage 3..."
+            />
+          </div>
+        )}
         <div>
           <label className="text-xs font-semibold text-slate-700 mb-2 block">Language</label>
           <Select value={language} onValueChange={setLanguage}>

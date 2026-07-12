@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Search, Users, TrendingUp, CheckCircle2 } from "lucide-react";
 import MaterialAssigner from "@/components/education/MaterialAssigner";
 import EngagementTracker from "@/components/education/EngagementTracker";
+import PatientEducationGenerator from "@/components/clinic/PatientEducationGenerator";
+import { Sparkles } from "lucide-react";
 
 export default function PatientEducationHub() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,7 +78,15 @@ export default function PatientEducationHub() {
             <TrendingUp className="w-4 h-4" />
             All Assignments
           </TabsTrigger>
+          <TabsTrigger value="generate" className="flex-1 gap-2">
+            <Sparkles className="w-4 h-4" />
+            AI Generator
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="generate">
+          <PatientEducationGenerator />
+        </TabsContent>
 
         <TabsContent value="patients">
           <div className="grid md:grid-cols-2 gap-4">
