@@ -14,7 +14,7 @@
 ## Milestones
 - [x] M1 baseline + STATE.md
 - [x] M2 route-level code splitting (NFR-2) — 9.16MB → 0.99MB main chunk (89%↓), 262 lazy chunks, build clean, SW intact
-- [ ] M3 CIEE gap engines: HUS/TMA, Neonatal AKI, Acute PD prescription
+- [x] M3 CIEE gap engines — HUSTMAEngine, NeonatalAKIEngine, AcutePDPrescriptionEngine built (pure-frontend, guideline-cited), wired into PathwayRenderer dispatch + HubNephrologyPathways cards + GlobalSearch. Build clean.
 - [ ] M4 Hindi/regional language in patient education
 - [ ] M5 final verify + push
 

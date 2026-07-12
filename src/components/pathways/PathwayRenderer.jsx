@@ -93,6 +93,9 @@ import RheumatologyEngine from "../engines/RheumatologyEngine";
 import RicketsEngine from "../engines/RicketsEngine";
 import WilmsTumorEngine from "../engines/WilmsTumorEngine";
 import OncologyEngine from "../engines/OncologyEngine";
+import HUSTMAEngine from "../engines/HUSTMAEngine";
+import NeonatalAKIEngine from "../engines/NeonatalAKIEngine";
+import AcutePDPrescriptionEngine from "../engines/AcutePDPrescriptionEngine";
 import CIEEEngineRunner from "@/components/clinical-ai/CIEEEngineRunner";
 import { IGA_IPNA_ENGINE } from "@/lib/engines/igaIpnaEngine";
 import { SSNS_ENGINE } from "@/lib/engines/ssnsEngine";
@@ -343,6 +346,9 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
   if (id === "renal-diet-engine" || id === "diet-engine") return <RenalDietEngine />;
   if (id === "rheumatology-engine") return <RheumatologyEngine />;
   if (id === "rickets-engine") return <RicketsEngine />;
+  if (id === "hus-tma-engine") return <HUSTMAEngine />;
+  if (id === "neonatal-aki-engine") return <NeonatalAKIEngine />;
+  if (id === "acute-pd-engine") return <AcutePDPrescriptionEngine />;
   if (id === "wilms-tumor-engine") return <WilmsTumorEngine />;
   // ── Retired pseudo-engines — content consolidated into appropriate sections ──
   if (["growth-assessment-engine","anthropometry-engine","nutritional-assessment-engine",

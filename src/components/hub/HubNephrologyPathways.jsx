@@ -12,6 +12,18 @@ import { createPageUrl } from "@/utils";
 
 const PATHWAYS = [
   // ── New Deep Diagnostic Engines ───────────────────────────────────────────
+  { name: "HUS / TMA Engine", tag: "Engine", color: "bg-rose-100 text-rose-900", emergency: true,
+    summary: "Thrombotic microangiopathy triad → STEC-HUS vs atypical (complement) HUS vs TTP → complement workup → management. Links to the Eculizumab module for aHUS dosing.",
+    keys: ["Triad: MAHA + thrombocytopenia + AKI", "STEC-HUS (post-diarrhoeal, ~90%) → supportive; avoid antibiotics/anti-motility", "Atypical HUS → eculizumab first-line + meningococcal cover", "Check ADAMTS13 (<10% = TTP); pneumococcal HUS is Coombs+ and FFP is contraindicated"],
+    scenario: "hus-tma-engine" },
+  { name: "Neonatal AKI Engine", tag: "Engine", color: "bg-sky-100 text-sky-900", emergency: false,
+    summary: "Risk factors → modified neonatal KDIGO staging (SCr rise or low urine output) → management, with fluid-overload avoidance and RRT triggers.",
+    keys: ["Neonatal KDIGO: SCr ↑≥0.3 mg/dL/48h or ≥1.5× lowest prior; UOP <1 mL/kg/h", "First-day SCr reflects maternal values — track the trend", "Stop nephrotoxins; avoid fluid overload (mortality driver)", "Acute PD is first-line RRT in neonates"],
+    scenario: "neonatal-aki-engine" },
+  { name: "Acute PD Prescription Engine", tag: "Engine", color: "bg-cyan-100 text-cyan-900", emergency: false,
+    summary: "Weight-based acute peritoneal dialysis prescription — fill volume, cycle/dwell, dextrose, additives and cautions. The low-resource RRT workhorse.",
+    keys: ["Fill: start 10 mL/kg → escalate to 30–40 mL/kg as tolerated", "Cycle 60–90 min; dextrose 1.5/2.5/4.25% titrated to UF", "Heparin 250–500 U/L for fibrin; add K+ once serum K+ normalises", "Watch leak, hydrothorax, hyperglycaemia, peritonitis (cloudy effluent)"],
+    scenario: "acute-pd-engine" },
   { name: "Rickets Diagnostic Engine", tag: "Engine", color: "bg-amber-100 text-amber-900", emergency: false,
     summary: "Full rickets algorithm: ALP low/high → Exclude renal/RTA → PTH+Ca+Pi → Calcipenic (VDDR 1A/1B/2) vs Phosphopenic (XLH/HHRH/Fanconi/HHRH). Burosumab decision built-in. Based on IAP STG 2022 + Haffner Pediatric Nephrology 2022.",
     keys: ["Calcipenic: PTH↑, Ca↓, Pi↓ → 25(OH)D → Nutritional VDD / VDDR 1A / VDDR 1B / VDDR 2A (alopecia)", "Phosphopenic: PTH N/↑, Pi↓, Ca NORMAL → TRP/TmP-GFR → FGF23 → XLH/ADHR/ARHR vs HHRH/Fanconi", "XLH: PHEX gene — Burosumab 0.8 mg/kg SC q2w preferred; alt: Pi + calcitriol", "Low ALP + rickets-like: Hypophosphatasia (ALPL gene) — asfotase alfa, NOT vit D"],
