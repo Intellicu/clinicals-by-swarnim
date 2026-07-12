@@ -3,62 +3,63 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
-import FeedbackInbox from '@/pages/FeedbackInbox';
-import GeneticReportAnalyzer from './pages/GeneticReportAnalyzer';
-import ResearchMethodsHub from './pages/ResearchMethodsHub';
-import AIClinicalPathway from './pages/AIClinicalPathway';
-import PrescriptionWorkflow from './pages/PrescriptionWorkflow';
-import DrugsDosing from './pages/DrugsDosing';
-import AIPrescriber from './pages/AIPrescriber';
-import ClinicalApproaches from './pages/ClinicalApproaches';
-import LabPathways from './pages/LabPathways';
-import EmergencyHub from './pages/EmergencyHub';
-import AdmissionOrders from './pages/AdmissionOrders';
-import DifferentialEngine from './pages/DifferentialEngine';
-import CaseLibrary from './pages/CaseLibrary';
-import DischargeSummary from './pages/DischargeSummary';
-import ResearchOS from './pages/ResearchOS';
-import NutritionHub from './pages/NutritionHub';
-import ClinicalOS from './pages/ClinicalOS';
-import ClinicOPDCockpit from './pages/ClinicOPDCockpit';
-import PatientCockpit from './pages/PatientCockpit';
-import PediatricRheumatology from './pages/PediatricRheumatology';
-import CalculatorsHub from './pages/CalculatorsHub';
-import UrologyNephrologyHub from './pages/UrologyNephrologyHub';
-import RareDiseaseModule from './pages/RareDiseaseModule';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import GuidelinesLibrary from './pages/GuidelinesLibrary';
-import ClinicalWorkspace from './pages/ClinicalWorkspace';
-import GeneralPediatricsHub from './pages/GeneralPediatricsHub';
-import ImagingViewer from './pages/ImagingViewer';
-import PathwayBuilder from './pages/PathwayBuilder';
-import PediatricEndocrinology from './pages/PediatricEndocrinology';
-import TubularDisordersHub from './pages/TubularDisordersHub';
-import AIAgentsHub from './pages/AIAgentsHub';
-import ProcedureHub from './pages/ProcedureHub';
-import SubspecialtiesHub from './pages/SubspecialtiesHub';
-import PathwayApprovalDashboard from './pages/PathwayApprovalDashboard';
-import ClinicalReferenceLibrary from './pages/ClinicalReferenceLibrary';
-import MonitoringTasksDashboard from './pages/MonitoringTasksDashboard';
-import KidneyCarealertInbox from './pages/KidneyCarealertInbox';
-import EngineGenerator from './pages/EngineGenerator';
-import CIEEEngines from './pages/CIEEEngines';
-import DailySummary from './pages/DailySummary';
-import OncologyHub from './pages/OncologyHub';
-import OncologyAdmin from './pages/OncologyAdmin';
-import OncologyPathway from './pages/OncologyPathway';
-import EngineAuditBlueprint from './pages/EngineAuditBlueprint';
-import TDMTrendDashboard from './pages/TDMTrendDashboard';
+const Login = lazy(() => import('@/pages/Login'));
+const Register = lazy(() => import('@/pages/Register'));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const FeedbackInbox = lazy(() => import('@/pages/FeedbackInbox'));
+const GeneticReportAnalyzer = lazy(() => import('./pages/GeneticReportAnalyzer'));
+const ResearchMethodsHub = lazy(() => import('./pages/ResearchMethodsHub'));
+const AIClinicalPathway = lazy(() => import('./pages/AIClinicalPathway'));
+const PrescriptionWorkflow = lazy(() => import('./pages/PrescriptionWorkflow'));
+const DrugsDosing = lazy(() => import('./pages/DrugsDosing'));
+const AIPrescriber = lazy(() => import('./pages/AIPrescriber'));
+const ClinicalApproaches = lazy(() => import('./pages/ClinicalApproaches'));
+const LabPathways = lazy(() => import('./pages/LabPathways'));
+const EmergencyHub = lazy(() => import('./pages/EmergencyHub'));
+const AdmissionOrders = lazy(() => import('./pages/AdmissionOrders'));
+const DifferentialEngine = lazy(() => import('./pages/DifferentialEngine'));
+const CaseLibrary = lazy(() => import('./pages/CaseLibrary'));
+const DischargeSummary = lazy(() => import('./pages/DischargeSummary'));
+const ResearchOS = lazy(() => import('./pages/ResearchOS'));
+const NutritionHub = lazy(() => import('./pages/NutritionHub'));
+const ClinicalOS = lazy(() => import('./pages/ClinicalOS'));
+const ClinicOPDCockpit = lazy(() => import('./pages/ClinicOPDCockpit'));
+const PatientCockpit = lazy(() => import('./pages/PatientCockpit'));
+const PediatricRheumatology = lazy(() => import('./pages/PediatricRheumatology'));
+const CalculatorsHub = lazy(() => import('./pages/CalculatorsHub'));
+const UrologyNephrologyHub = lazy(() => import('./pages/UrologyNephrologyHub'));
+const RareDiseaseModule = lazy(() => import('./pages/RareDiseaseModule'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const GuidelinesLibrary = lazy(() => import('./pages/GuidelinesLibrary'));
+const ClinicalWorkspace = lazy(() => import('./pages/ClinicalWorkspace'));
+const GeneralPediatricsHub = lazy(() => import('./pages/GeneralPediatricsHub'));
+const ImagingViewer = lazy(() => import('./pages/ImagingViewer'));
+const PathwayBuilder = lazy(() => import('./pages/PathwayBuilder'));
+const PediatricEndocrinology = lazy(() => import('./pages/PediatricEndocrinology'));
+const TubularDisordersHub = lazy(() => import('./pages/TubularDisordersHub'));
+const AIAgentsHub = lazy(() => import('./pages/AIAgentsHub'));
+const ProcedureHub = lazy(() => import('./pages/ProcedureHub'));
+const SubspecialtiesHub = lazy(() => import('./pages/SubspecialtiesHub'));
+const PathwayApprovalDashboard = lazy(() => import('./pages/PathwayApprovalDashboard'));
+const ClinicalReferenceLibrary = lazy(() => import('./pages/ClinicalReferenceLibrary'));
+const MonitoringTasksDashboard = lazy(() => import('./pages/MonitoringTasksDashboard'));
+const KidneyCarealertInbox = lazy(() => import('./pages/KidneyCarealertInbox'));
+const EngineGenerator = lazy(() => import('./pages/EngineGenerator'));
+const CIEEEngines = lazy(() => import('./pages/CIEEEngines'));
+const DailySummary = lazy(() => import('./pages/DailySummary'));
+const OncologyHub = lazy(() => import('./pages/OncologyHub'));
+const OncologyAdmin = lazy(() => import('./pages/OncologyAdmin'));
+const OncologyPathway = lazy(() => import('./pages/OncologyPathway'));
+const EngineAuditBlueprint = lazy(() => import('./pages/EngineAuditBlueprint'));
+const TDMTrendDashboard = lazy(() => import('./pages/TDMTrendDashboard'));
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -68,8 +69,15 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
 
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-50">
+    <div className="w-8 h-8 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+  </div>
+);
+
 const AuthenticatedApp = () => {
   return (
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       {/* Public auth routes */}
       <Route path="/login" element={<Login />} />
@@ -145,6 +153,7 @@ const AuthenticatedApp = () => {
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
+    </Suspense>
   );
 };
 

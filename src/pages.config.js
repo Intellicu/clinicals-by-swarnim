@@ -9,9 +9,9 @@
  * 
  * Example file structure:
  * 
- *   import HomePage from './pages/HomePage';
- *   import Dashboard from './pages/Dashboard';
- *   import Settings from './pages/Settings';
+ *   const HomePage = lazy(() => import('./pages/HomePage'));
+ *   const Dashboard = lazy(() => import('./pages/Dashboard'));
+ *   const Settings = lazy(() => import('./pages/Settings'));
  *   
  *   export const PAGES = {
  *       "HomePage": HomePage,
@@ -26,9 +26,10 @@
  * 
  * Example with Layout (wraps all pages):
  *
- *   import Home from './pages/Home';
- *   import Settings from './pages/Settings';
- *   import __Layout from './Layout.jsx';
+ *   const Home = lazy(() => import('./pages/Home'));
+ *   const Settings = lazy(() => import('./pages/Settings'));
+ *   import { lazy } from 'react';
+import __Layout from './Layout.jsx';
  *
  *   export const PAGES = {
  *       "Home": Home,
@@ -47,85 +48,86 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import ABGInterpreter from './pages/ABGInterpreter';
-import AIAssistant from './pages/AIAssistant';
-import AIToolBuilder from './pages/AIToolBuilder';
-import AKIStager from './pages/AKIStager';
-import AnionGap from './pages/AnionGap';
-import Anthropometry from './pages/Anthropometry';
-import AuditLogs from './pages/AuditLogs';
-import BPPercentiles from './pages/BPPercentiles';
-import BillingDashboard from './pages/BillingDashboard';
-import CKDStager from './pages/CKDStager';
-import CKiDGFR from './pages/CKiDGFR';
-import ClinicAnalyticsDashboard from './pages/ClinicAnalyticsDashboard';
-import ClinicDashboard from './pages/ClinicDashboard';
-import ClinicHome from './pages/ClinicHome';
-import ClinicManagement from './pages/ClinicManagement';
-import ClinicWorkflow from './pages/ClinicWorkflow';
-import ClinicWorkspace from './pages/ClinicWorkspace';
-import ClinicalAIHub from './pages/ClinicalAIHub';
-import ClinicalAlgorithms from './pages/ClinicalAlgorithms';
-import ClinicalDashboard from './pages/ClinicalDashboard';
-import ClinicalSupport from './pages/ClinicalSupport';
-import ClinicalToolsHub from './pages/ClinicalToolsHub';
-import ComingSoon from './pages/ComingSoon';
-import ConsultationView from './pages/ConsultationView';
-import CustomToolBuilder from './pages/CustomToolBuilder';
-import DiagnosticQuestionnaire from './pages/DiagnosticQuestionnaire';
-import DietChartGenerator from './pages/DietChartGenerator';
-import DietGenerator from './pages/DietGenerator';
-import DoseCalculator from './pages/DoseCalculator';
-import DrugCalculator from './pages/DrugCalculator';
-import DrugDosing from './pages/DrugDosing';
-import FEMgCalculator from './pages/FEMgCalculator';
-import FENaCalculator from './pages/FENaCalculator';
-import FEUACalculator from './pages/FEUACalculator';
-import FEUreaCalculator from './pages/FEUreaCalculator';
-import FluidCalculator from './pages/FluidCalculator';
-import GuidelineDetail from './pages/GuidelineDetail';
-import Guidelines from './pages/Guidelines';
-import Hub from './pages/Hub';
-import HypertensiveEmergency from './pages/HypertensiveEmergency';
-import KtVCalculator from './pages/KtVCalculator';
-import LabResults from './pages/LabResults';
-import ModuleView from './pages/ModuleView';
-import MonitoringHub from './pages/MonitoringHub';
-import MonitoringPlanBuilder from './pages/MonitoringPlanBuilder';
-import NotificationCenter from './pages/NotificationCenter';
-import OfflineSettings from './pages/OfflineSettings';
-import OsmolarGap from './pages/OsmolarGap';
-import ParentalGuidance from './pages/ParentalGuidance';
-import PatientEducation from './pages/PatientEducation';
-import PatientEducationHub from './pages/PatientEducationHub';
-import PatientHistory from './pages/PatientHistory';
-import PatientManager from './pages/PatientManager';
-import PatientMonitoringDashboard from './pages/PatientMonitoringDashboard';
-import PediatricsHub from './pages/PediatricsHub';
-import PotassiumCalculator from './pages/PotassiumCalculator';
-import PredictionTools from './pages/PredictionTools';
-import Proteinuria from './pages/Proteinuria';
-import RRTAssistant from './pages/RRTAssistant';
-import RRTTemplates from './pages/RRTTemplates';
-import RTAClassifier from './pages/RTAClassifier';
-import ReferenceRanges from './pages/ReferenceRanges';
-import ReferralPortal from './pages/ReferralPortal';
-import ResearchHub from './pages/ResearchHub';
-import SchwartzGFR from './pages/SchwartzGFR';
-import SodiumCalculator from './pages/SodiumCalculator';
-import SpecialtySelector from './pages/SpecialtySelector';
-import StoneRisk from './pages/StoneRisk';
-import TRPCalculator from './pages/TRPCalculator';
-import TTKGCalculator from './pages/TTKGCalculator';
-import TeachingHub from './pages/TeachingHub';
-import Telemedicine from './pages/Telemedicine';
-import UserContentManager from './pages/UserContentManager';
-import VideoTeachingAgent from './pages/VideoTeachingAgent';
-import VoiceAgent from './pages/VoiceAgent';
-import NotificationDashboard from './pages/NotificationDashboard';
-import GeneticReportAnalyzer from './pages/GeneticReportAnalyzer';
-import GlomerularDiseases from './pages/GlomerularDiseases';
-import EnhancedDietGenerator from './pages/EnhancedDietGenerator';
+const ABGInterpreter = lazy(() => import('./pages/ABGInterpreter'));
+const AIAssistant = lazy(() => import('./pages/AIAssistant'));
+const AIToolBuilder = lazy(() => import('./pages/AIToolBuilder'));
+const AKIStager = lazy(() => import('./pages/AKIStager'));
+const AnionGap = lazy(() => import('./pages/AnionGap'));
+const Anthropometry = lazy(() => import('./pages/Anthropometry'));
+const AuditLogs = lazy(() => import('./pages/AuditLogs'));
+const BPPercentiles = lazy(() => import('./pages/BPPercentiles'));
+const BillingDashboard = lazy(() => import('./pages/BillingDashboard'));
+const CKDStager = lazy(() => import('./pages/CKDStager'));
+const CKiDGFR = lazy(() => import('./pages/CKiDGFR'));
+const ClinicAnalyticsDashboard = lazy(() => import('./pages/ClinicAnalyticsDashboard'));
+const ClinicDashboard = lazy(() => import('./pages/ClinicDashboard'));
+const ClinicHome = lazy(() => import('./pages/ClinicHome'));
+const ClinicManagement = lazy(() => import('./pages/ClinicManagement'));
+const ClinicWorkflow = lazy(() => import('./pages/ClinicWorkflow'));
+const ClinicWorkspace = lazy(() => import('./pages/ClinicWorkspace'));
+const ClinicalAIHub = lazy(() => import('./pages/ClinicalAIHub'));
+const ClinicalAlgorithms = lazy(() => import('./pages/ClinicalAlgorithms'));
+const ClinicalDashboard = lazy(() => import('./pages/ClinicalDashboard'));
+const ClinicalSupport = lazy(() => import('./pages/ClinicalSupport'));
+const ClinicalToolsHub = lazy(() => import('./pages/ClinicalToolsHub'));
+const ComingSoon = lazy(() => import('./pages/ComingSoon'));
+const ConsultationView = lazy(() => import('./pages/ConsultationView'));
+const CustomToolBuilder = lazy(() => import('./pages/CustomToolBuilder'));
+const DiagnosticQuestionnaire = lazy(() => import('./pages/DiagnosticQuestionnaire'));
+const DietChartGenerator = lazy(() => import('./pages/DietChartGenerator'));
+const DietGenerator = lazy(() => import('./pages/DietGenerator'));
+const DoseCalculator = lazy(() => import('./pages/DoseCalculator'));
+const DrugCalculator = lazy(() => import('./pages/DrugCalculator'));
+const DrugDosing = lazy(() => import('./pages/DrugDosing'));
+const FEMgCalculator = lazy(() => import('./pages/FEMgCalculator'));
+const FENaCalculator = lazy(() => import('./pages/FENaCalculator'));
+const FEUACalculator = lazy(() => import('./pages/FEUACalculator'));
+const FEUreaCalculator = lazy(() => import('./pages/FEUreaCalculator'));
+const FluidCalculator = lazy(() => import('./pages/FluidCalculator'));
+const GuidelineDetail = lazy(() => import('./pages/GuidelineDetail'));
+const Guidelines = lazy(() => import('./pages/Guidelines'));
+const Hub = lazy(() => import('./pages/Hub'));
+const HypertensiveEmergency = lazy(() => import('./pages/HypertensiveEmergency'));
+const KtVCalculator = lazy(() => import('./pages/KtVCalculator'));
+const LabResults = lazy(() => import('./pages/LabResults'));
+const ModuleView = lazy(() => import('./pages/ModuleView'));
+const MonitoringHub = lazy(() => import('./pages/MonitoringHub'));
+const MonitoringPlanBuilder = lazy(() => import('./pages/MonitoringPlanBuilder'));
+const NotificationCenter = lazy(() => import('./pages/NotificationCenter'));
+const OfflineSettings = lazy(() => import('./pages/OfflineSettings'));
+const OsmolarGap = lazy(() => import('./pages/OsmolarGap'));
+const ParentalGuidance = lazy(() => import('./pages/ParentalGuidance'));
+const PatientEducation = lazy(() => import('./pages/PatientEducation'));
+const PatientEducationHub = lazy(() => import('./pages/PatientEducationHub'));
+const PatientHistory = lazy(() => import('./pages/PatientHistory'));
+const PatientManager = lazy(() => import('./pages/PatientManager'));
+const PatientMonitoringDashboard = lazy(() => import('./pages/PatientMonitoringDashboard'));
+const PediatricsHub = lazy(() => import('./pages/PediatricsHub'));
+const PotassiumCalculator = lazy(() => import('./pages/PotassiumCalculator'));
+const PredictionTools = lazy(() => import('./pages/PredictionTools'));
+const Proteinuria = lazy(() => import('./pages/Proteinuria'));
+const RRTAssistant = lazy(() => import('./pages/RRTAssistant'));
+const RRTTemplates = lazy(() => import('./pages/RRTTemplates'));
+const RTAClassifier = lazy(() => import('./pages/RTAClassifier'));
+const ReferenceRanges = lazy(() => import('./pages/ReferenceRanges'));
+const ReferralPortal = lazy(() => import('./pages/ReferralPortal'));
+const ResearchHub = lazy(() => import('./pages/ResearchHub'));
+const SchwartzGFR = lazy(() => import('./pages/SchwartzGFR'));
+const SodiumCalculator = lazy(() => import('./pages/SodiumCalculator'));
+const SpecialtySelector = lazy(() => import('./pages/SpecialtySelector'));
+const StoneRisk = lazy(() => import('./pages/StoneRisk'));
+const TRPCalculator = lazy(() => import('./pages/TRPCalculator'));
+const TTKGCalculator = lazy(() => import('./pages/TTKGCalculator'));
+const TeachingHub = lazy(() => import('./pages/TeachingHub'));
+const Telemedicine = lazy(() => import('./pages/Telemedicine'));
+const UserContentManager = lazy(() => import('./pages/UserContentManager'));
+const VideoTeachingAgent = lazy(() => import('./pages/VideoTeachingAgent'));
+const VoiceAgent = lazy(() => import('./pages/VoiceAgent'));
+const NotificationDashboard = lazy(() => import('./pages/NotificationDashboard'));
+const GeneticReportAnalyzer = lazy(() => import('./pages/GeneticReportAnalyzer'));
+const GlomerularDiseases = lazy(() => import('./pages/GlomerularDiseases'));
+const EnhancedDietGenerator = lazy(() => import('./pages/EnhancedDietGenerator'));
+import { lazy } from 'react';
 import __Layout from './Layout.jsx';
 
 
