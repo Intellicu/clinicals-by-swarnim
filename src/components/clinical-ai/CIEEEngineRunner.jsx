@@ -359,16 +359,20 @@ export default function CIEEEngineRunner({
             <span className="absolute -left-[30px] top-4 w-4 h-4 rounded-full bg-violet-600 ring-4 ring-violet-100" />
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4">
             <p className="text-[21px] leading-snug font-bold text-slate-900">{node.question || node.action}</p>
-            {!quickView && node.detail && <p className="text-sm text-slate-600 mt-2 leading-relaxed">{node.detail}</p>}
-            {!quickView && Array.isArray(node.points) && node.points.length > 0 && (
-              <ul className="mt-2.5 space-y-1.5">
-                {node.points.map((p, i) => (
-                  <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
-                    <span>{p}</span>
-                  </li>
-                ))}
-              </ul>
+            {!quickView && (node.detail || (Array.isArray(node.points) && node.points.length > 0)) && (
+              <CollapsibleNodeSection icon={BookOpen} title="Details & key points" count={Array.isArray(node.points) ? node.points.length : 0} tone="blue" defaultOpen={false}>
+                {node.detail && <p className="text-sm text-slate-600 leading-relaxed">{node.detail}</p>}
+                {Array.isArray(node.points) && node.points.length > 0 && (
+                  <ul className="mt-2 space-y-1.5">
+                    {node.points.map((p, i) => (
+                      <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CollapsibleNodeSection>
             )}
 
             {isPrescriptionNode(node) && supp.suppressed && (
