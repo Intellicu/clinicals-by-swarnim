@@ -383,24 +383,24 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
           <button
             onClick={() => toggleGroup(group)}
             aria-expanded={open}
-            className={`w-full text-left px-3 py-2.5 rounded-xl border transition-colors
+            className={`w-full text-left px-4 py-3 rounded-xl border transition-colors
               ${open ? "bg-slate-50 border-slate-300" : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"}`}>
-            <span className="flex items-center justify-between gap-2">
-              <span className="flex items-center gap-2 min-w-0">
-                <Badge className={`text-xs flex-shrink-0 ${GROUP_BADGE[group] || "bg-slate-600"}`}>{group}</Badge>
-                <span className="text-xs text-slate-400 flex-shrink-0">{engines.length} engine{engines.length === 1 ? "" : "s"}</span>
-                {engines.some(e => e.ciee) && (
-                  <span className="inline-flex items-center gap-1 text-[9px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded flex-shrink-0">
-                    <Cpu className="w-2.5 h-2.5" /> CIEE
-                  </span>
-                )}
-              </span>
-              <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? "" : "-rotate-90"}`} />
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${GROUP_BADGE[group] || "bg-slate-600"}`} />
+              <span className="text-sm font-bold text-slate-900 truncate">{group}</span>
+              <span className="text-[11px] font-medium text-slate-400 flex-shrink-0">{engines.length}</span>
+              {engines.some(e => e.ciee) && (
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded flex-shrink-0">
+                  <Cpu className="w-2.5 h-2.5" /> CIEE
+                </span>
+              )}
+              <ChevronDown className={`ml-auto w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? "" : "-rotate-90"}`} />
+            </div>
             {!open && (
-              <span className="block text-[11px] text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
-                {engines.map(e => e.label).join(" · ")}
-              </span>
+              <p className="text-[11px] text-slate-500 mt-1 pl-[18px] truncate">
+                {engines.slice(0, 3).map(e => e.label).join(" · ")}
+                {engines.length > 3 && <span className="text-slate-400"> +{engines.length - 3} more</span>}
+              </p>
             )}
           </button>
 

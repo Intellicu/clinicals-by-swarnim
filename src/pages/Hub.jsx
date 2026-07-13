@@ -521,6 +521,22 @@ export default function Hub() {
           </div>
         </div>
 
+        {/* ── Dose Calculator shortcut ── */}
+        <Link to={createPageUrl("DoseCalculator")} className="block">
+          <div className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 flex items-center justify-between shadow active:scale-[0.98] transition-transform">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Calculator className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-white font-bold text-sm">Weight-Based Dose Calculator</p>
+                <p className="text-emerald-100 text-xs">Instant patient drug dosing →</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-emerald-100" />
+          </div>
+        </Link>
+
         {/* ── Quick Actions ── */}
         <TodaySnapshot />
 
