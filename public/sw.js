@@ -26,6 +26,8 @@ self.addEventListener('fetch', (e) => {
   // Never intercept cross-origin or API/auth traffic
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api')) return;
+  // Never intercept dev-server module requests (Vite preview sandbox)
+  if (url.pathname.startsWith('/src/') || url.pathname.startsWith('/@') || url.pathname.startsWith('/node_modules/')) return;
 
   // App navigation: network first, fall back to the cached shell when offline
   if (request.mode === 'navigate') {
