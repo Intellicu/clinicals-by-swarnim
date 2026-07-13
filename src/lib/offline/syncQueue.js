@@ -31,6 +31,22 @@ export function getQueueCount() {
   return readQueue().length;
 }
 
+/** Full queue contents — for the sync manager UI. */
+export function getQueueItems() {
+  return readQueue();
+}
+
+/** Remove a single queued item by its qid. */
+export function removeQueueItem(qid) {
+  writeQueue(readQueue().filter(i => i.qid !== qid));
+}
+
+/** Queue a write directly (used by the offline write middleware). */
+export function queueWrite(op, entityName, data, recordId) {
+  enqueue({ op, entity: entityName, data, ...(recordId ? { record_id: recordId } : {}) });
+  return { queued: true };
+}
+
 export function subscribeQueue(cb) {
   const handler = () => cb(getQueueCount());
   window.addEventListener(EVENT, handler);

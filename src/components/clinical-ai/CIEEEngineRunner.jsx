@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import ProtocolSummaryView from "@/components/pathways/ProtocolSummaryView";
 import PathwayProgressBar from "@/components/pathways/PathwayProgressBar";
+import CollapsibleNodeSection from "@/components/pathways/CollapsibleNodeSection";
 import PDFExportButton from "@/components/export/PDFExportButton";
 import {
   checkPrescriptionSuppressor, generateMonitoringRules,
@@ -437,11 +438,7 @@ export default function CIEEEngineRunner({
 
             {/* Evaluation / investigations — card layout, matching monitoring */}
             {!quickView && Array.isArray(node.investigations) && node.investigations.length > 0 && (
-              <div className="mt-3 bg-blue-50/50 border border-blue-200 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <FlaskConical className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-bold text-blue-800">Evaluation &amp; investigations</span>
-                </div>
+              <CollapsibleNodeSection icon={FlaskConical} title="Evaluation & investigations" count={node.investigations.length} tone="blue">
                 <div className="space-y-1.5">
                   {node.investigations.map((iv, i) => (
                     <div key={i} className="bg-white rounded-lg border border-blue-100 border-l-4 border-l-blue-400 p-2.5">
@@ -450,16 +447,12 @@ export default function CIEEEngineRunner({
                     </div>
                   ))}
                 </div>
-              </div>
+              </CollapsibleNodeSection>
             )}
 
             {/* Monitoring attached to this step */}
             {!quickView && Array.isArray(node.monitoring) && node.monitoring.length > 0 && (
-              <div className="mt-3 bg-indigo-50/50 border border-indigo-200 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Activity className="w-4 h-4 text-indigo-600" />
-                  <span className="text-sm font-bold text-indigo-800">Monitoring schedule</span>
-                </div>
+              <CollapsibleNodeSection icon={Activity} title="Monitoring schedule" count={node.monitoring.length} tone="indigo">
                 <div className="space-y-1.5">
                   {node.monitoring.map((m, i) => (
                     <div key={i} className="bg-white rounded-lg border border-indigo-100 border-l-4 border-l-indigo-400 p-2.5">
@@ -480,16 +473,12 @@ export default function CIEEEngineRunner({
                     </div>
                   ))}
                 </div>
-              </div>
+              </CollapsibleNodeSection>
             )}
 
             {/* Supportive care — structured cards (same clean layout as monitoring) */}
             {!quickView && Array.isArray(node.care) && node.care.length > 0 && (
-              <div className="mt-3 bg-teal-50/50 border border-teal-200 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <ShieldAlert className="w-4 h-4 text-teal-600" />
-                  <span className="text-sm font-bold text-teal-800">Supportive care</span>
-                </div>
+              <CollapsibleNodeSection icon={ShieldAlert} title="Supportive care" count={node.care.length} tone="teal">
                 <div className="space-y-1.5">
                   {node.care.map((c, i) => (
                     <div key={i} className="bg-white rounded-lg border border-teal-100 border-l-4 border-l-teal-400 p-2.5">
@@ -498,7 +487,7 @@ export default function CIEEEngineRunner({
                     </div>
                   ))}
                 </div>
-              </div>
+              </CollapsibleNodeSection>
             )}
 
             {/* Required-confirmation hint when a safety gate is unmet */}

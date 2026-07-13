@@ -22,6 +22,7 @@
 import { base44 as base44Backend } from "./base44Client";
 import { supabaseBackend, isSupabaseConfigured } from "./supabaseClient";
 import { enableOfflineSnapshots } from "@/lib/offline/entitySnapshot";
+import { enableOfflineWrites } from "@/lib/offline/writeQueue";
 
 // The active backend. Name kept as `base44` so the 244 existing call sites and
 // the base44Client cross-cutting layers (grounding, offline snapshots) are
@@ -31,6 +32,9 @@ import { enableOfflineSnapshots } from "@/lib/offline/entitySnapshot";
 //  grounding for Supabase is enforced server-side in the invoke-llm edge fn.)
 if (isSupabaseConfigured) enableOfflineSnapshots(supabaseBackend);
 export const base44 = isSupabaseConfigured ? supabaseBackend : base44Backend;
+
+// Clinical inputs written while offline are queued locally and auto-synced on reconnect.
+enableOfflineWrites(base44);
 
 export const activeBackend = isSupabaseConfigured ? "supabase" : "base44";
 

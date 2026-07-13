@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, HardDrive } from "lucide-react";
 import OfflineDataManager from "../components/OfflineDataManager";
 import OfflineDataPack from "../components/offline/OfflineDataPack";
+import OfflineSyncManager from "../components/offline/OfflineSyncManager";
 
 export default function OfflineSettings() {
   return (
@@ -22,6 +23,7 @@ export default function OfflineSettings() {
           </div>
         </div>
         <div className="space-y-4">
+          <OfflineSyncManager />
           <OfflineDataPack />
           <OfflineDataManager />
         </div>
