@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Printer, Check } from "lucide-react";
 import { toast } from "sonner";
 import PDFExportButton from "@/components/export/PDFExportButton";
+import SaveToDriveButton from "@/components/export/SaveToDriveButton";
 import LetterheadSettingsDialog from "@/components/reports/LetterheadSettingsDialog";
 import { getLetterhead } from "@/lib/reports/letterhead";
 
@@ -50,6 +51,12 @@ export default function ReportActions({ title = "Analysis Report", result, summa
         Print
       </Button>
       <PDFExportButton
+        title={title}
+        subtitle="Clinical analysis report"
+        filename={`${title.replace(/\s+/g, "_")}.pdf`}
+        sections={[{ heading: null, lines: (buildTextSummary(result) || summary || "No analysis data.").split("\n") }]}
+      />
+      <SaveToDriveButton
         title={title}
         subtitle="Clinical analysis report"
         filename={`${title.replace(/\s+/g, "_")}.pdf`}
