@@ -95,6 +95,18 @@ function computeDose(doseStr, { weight, height } = {}) {
     out.push(hi ? `${Math.round(lo)}–${Math.round(hi)} mL` : `${Math.round(lo)} mL`);
   }
 
+  // g/kg (e.g. mannitol 0.5–1 g/kg, IVIG 1–2 g/kg) — "mg/kg" won't match this
+  const perKgG = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*g\/kg/i);
+  if (perKgG && w) {
+    const fmtG = (x) => (x < 1 ? `${parseFloat(x.toFixed(2))} g` : `${parseFloat(x.toFixed(1))} g`);
+    const maxM = doseStr.match(/max[:\s]*([\d.]+)\s*g/i);
+    const maxG = maxM ? parseFloat(maxM[1]) : null;
+    const cap = (x) => (maxG ? Math.min(x, maxG) : x);
+    const lo = cap(parseFloat(perKgG[1]) * w);
+    const hi = perKgG[2] ? cap(parseFloat(perKgG[2]) * w) : null;
+    out.push(hi ? `${fmtG(lo)}–${fmtG(hi)}` : `${fmtG(lo)}`);
+  }
+
   const perM2 = doseStr.match(/([\d.]+)\s*(?:[–-]\s*([\d.]+))?\s*mg\/m/i);
   const bsa = bsaMosteller(weight, height);
   if (perM2 && bsa) {
