@@ -10,6 +10,11 @@ const BACKUP_ENTITIES = [
   'BiopsyPattern',    // biopsy reference patterns
   'ToolLog',          // diagnostic tool logs
   'AnalysisResult',   // AI diagnostic results
+  'Patient',          // patient records
+  'ClinicalEncounter',// treatment / encounter logs
+  'VisitRecord',      // visit records
+  'Prescription',     // prescriptions
+  'PatientDailyLog',  // home monitoring logs
 ];
 
 Deno.serve(async (req) => {

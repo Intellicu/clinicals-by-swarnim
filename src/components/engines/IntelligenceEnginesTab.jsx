@@ -383,12 +383,25 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
           <button
             onClick={() => toggleGroup(group)}
             aria-expanded={open}
-            className="w-full flex items-center justify-between gap-2 px-1 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
-            <span className="flex items-center gap-2">
-              <Badge className={`text-xs ${GROUP_BADGE[group] || "bg-slate-600"}`}>{group}</Badge>
-              <span className="text-xs text-slate-400">({engines.length})</span>
+            className={`w-full text-left px-3 py-2.5 rounded-xl border transition-colors
+              ${open ? "bg-slate-50 border-slate-300" : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"}`}>
+            <span className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-2 min-w-0">
+                <Badge className={`text-xs flex-shrink-0 ${GROUP_BADGE[group] || "bg-slate-600"}`}>{group}</Badge>
+                <span className="text-xs text-slate-400 flex-shrink-0">{engines.length} engine{engines.length === 1 ? "" : "s"}</span>
+                {engines.some(e => e.ciee) && (
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded flex-shrink-0">
+                    <Cpu className="w-2.5 h-2.5" /> CIEE
+                  </span>
+                )}
+              </span>
+              <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? "" : "-rotate-90"}`} />
             </span>
-            <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? "" : "-rotate-90"}`} />
+            {!open && (
+              <span className="block text-[11px] text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
+                {engines.map(e => e.label).join(" · ")}
+              </span>
+            )}
           </button>
 
           {open && (
