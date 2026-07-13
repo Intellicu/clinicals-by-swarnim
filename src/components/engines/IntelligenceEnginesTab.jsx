@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Cpu, ChevronRight, Search, X, BookOpen, ExternalLink } from "lucide-react";
+import { Cpu, ChevronRight, ChevronDown, Search, X, BookOpen, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { base44 } from "@/api/client";
@@ -250,6 +250,15 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
   const [search, setSearch] = useState("");
   const [activeGroup, setActiveGroup] = useState("All");
   const [activeEngine, setActiveEngine] = useState(null);
+  // Collapsible groups — default collapsed so only headings show ("clean" view).
+  // A search query or a specific group filter forces the relevant groups open.
+  const [expandedGroups, setExpandedGroups] = useState(() => new Set());
+  const toggleGroup = (g) => setExpandedGroups(prev => {
+    const next = new Set(prev);
+    next.has(g) ? next.delete(g) : next.add(g);
+    return next;
+  });
+  const isGroupOpen = (g) => !!search.trim() || activeGroup !== "All" || expandedGroups.has(g);
 
   // Fetch current user role for admin-only engine visibility
   const { data: currentUser } = useQuery({
@@ -341,6 +350,20 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
         ))}
       </div>
 
+      {/* Expand / collapse all — only meaningful in the default (unfiltered) view */}
+      {Object.keys(grouped).length > 0 && !search.trim() && activeGroup === "All" && (
+        <div className="flex justify-end -mb-1">
+          <button
+            onClick={() => {
+              const all = orderGroups(Object.keys(grouped));
+              setExpandedGroups(all.every(g => expandedGroups.has(g)) ? new Set() : new Set(all));
+            }}
+            className="text-[11px] font-semibold text-slate-500 hover:text-slate-800 transition-colors">
+            {orderGroups(Object.keys(grouped)).every(g => expandedGroups.has(g)) ? "Collapse all" : "Expand all"}
+          </button>
+        </div>
+      )}
+
       {/* Engine list grouped */}
       {Object.keys(grouped).length === 0 && (
         <p className="text-center text-slate-400 py-8 text-sm">No engines match your search</p>
@@ -348,13 +371,21 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
 
       {orderGroups(Object.keys(grouped)).map((group) => {
         const engines = grouped[group];
+        const open = isGroupOpen(group);
         return (
         <div key={group} className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Badge className={`text-xs ${GROUP_BADGE[group] || "bg-slate-600"}`}>{group}</Badge>
-            <span className="text-xs text-slate-400">({engines.length})</span>
-          </div>
+          <button
+            onClick={() => toggleGroup(group)}
+            aria-expanded={open}
+            className="w-full flex items-center justify-between gap-2 px-1 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+            <span className="flex items-center gap-2">
+              <Badge className={`text-xs ${GROUP_BADGE[group] || "bg-slate-600"}`}>{group}</Badge>
+              <span className="text-xs text-slate-400">({engines.length})</span>
+            </span>
+            <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? "" : "-rotate-90"}`} />
+          </button>
 
+          {open && (
           <div className="space-y-1.5">
             {engines.map(eng => (
               <div key={eng.scenario}>
@@ -407,6 +438,7 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
               </div>
             ))}
           </div>
+          )}
         </div>
         );
       })}
