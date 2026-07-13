@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Copy, Printer, Check } from "lucide-react";
 import { toast } from "sonner";
 import PDFExportButton from "@/components/export/PDFExportButton";
+import LetterheadSettingsDialog from "@/components/reports/LetterheadSettingsDialog";
+import { getLetterhead } from "@/lib/reports/letterhead";
 
 export default function ReportActions({ title = "Analysis Report", result, summary = "" }) {
   const [copied, setCopied] = useState(false);
@@ -38,6 +40,7 @@ export default function ReportActions({ title = "Analysis Report", result, summa
   return (
     <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-200 mt-2">
       <span className="text-xs text-slate-400 mr-auto">Save or share this report</span>
+      <LetterheadSettingsDialog />
       <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8" onClick={handleCopy}>
         {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
         {copied ? "Copied" : "Copy"}
@@ -58,6 +61,13 @@ export default function ReportActions({ title = "Analysis Report", result, summa
 
 function buildPrintHTML(title, result, summary) {
   const ts = new Date().toLocaleString();
+  const lh = getLetterhead();
+  const lhHtml = (lh.clinic_name || lh.doctor_name) ? `
+    <div style="text-align:center;border-bottom:3px double #1e3a5f;padding-bottom:10px;margin-bottom:14px">
+      ${lh.clinic_name ? `<div style="font-size:20px;font-weight:bold;color:#1e3a5f">${lh.clinic_name}</div>` : ""}
+      ${lh.doctor_name ? `<div style="font-size:12px;font-weight:bold;margin-top:2px">${lh.doctor_name}${lh.qualifications ? ", " + lh.qualifications : ""}${lh.reg_number ? " · Reg. No. " + lh.reg_number : ""}</div>` : ""}
+      ${[lh.address, lh.phone, lh.email].filter(Boolean).length ? `<div style="font-size:10px;color:#555;margin-top:2px">${[lh.address, lh.phone, lh.email].filter(Boolean).join(" · ")}</div>` : ""}
+    </div>` : "";
   const css = `
     body{font-family:Arial,sans-serif;font-size:12px;color:#1a1a1a;margin:0;padding:24px}
     h1{font-size:18px;color:#1e3a5f;border-bottom:2px solid #1e3a5f;padding-bottom:6px;margin-bottom:4px}
@@ -119,7 +129,7 @@ function buildPrintHTML(title, result, summary) {
     if (result.traceability_links?.length) body += `<h2>Evidence Traceability</h2><ul>${result.traceability_links.map(t=>`<li><b>${t.recommendation}</b> — ${t.guideline} ${t.section||""} [${t.evidence_grade||""}] (${t.recommendation_strength||""})</li>`).join("")}</ul>`;
   } else { body = `<p>${summary}</p>`; }
 
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><style>${css}</style></head><body><h1>${title}</h1><p class="meta">Generated: ${ts} · ClinicalHub — For clinical use only</p>${body}<div class="disc">⚠ AI clinical decision-support. Verify with a qualified clinician before any clinical action.</div></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><style>${css}</style></head><body>${lhHtml}<h1>${title}</h1><p class="meta">Generated: ${ts} · ClinicalHub — For clinical use only</p>${body}<div class="disc">${lh.footer_note ? lh.footer_note + "<br>" : ""}⚠ AI clinical decision-support. Verify with a qualified clinician before any clinical action.</div></body></html>`;
 }
 
 function row(label, value, cls="gr") { if(!value) return ""; return `<div class="row"><span class="label">${label}:</span><span class="badge ${cls}">${value}</span></div>`; }

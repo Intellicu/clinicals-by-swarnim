@@ -19,6 +19,7 @@ import {
   Pill, AlertTriangle, ExternalLink, Zap,
 } from "lucide-react";
 import ProtocolSummaryView from "@/components/pathways/ProtocolSummaryView";
+import PathwayProgressBar from "@/components/pathways/PathwayProgressBar";
 import PDFExportButton from "@/components/export/PDFExportButton";
 import {
   checkPrescriptionSuppressor, generateMonitoringRules,
@@ -289,6 +290,9 @@ export default function CIEEEngineRunner({
           <ProtocolSummaryView pathway={pathway} sources={sources} currentNodeId={nodeId} completedIds={history.map(h => h.node.id)} />
         </div>
       </details>
+
+      {/* Treatment step progress tracker */}
+      <PathwayProgressBar completed={history.length} total={Object.keys(pathway.nodes).length} done={isTerminal} />
 
       {/* patient parameters for weight/BSA-based dosing */}
       {hasRx && (

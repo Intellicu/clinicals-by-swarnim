@@ -33,6 +33,17 @@
       ],
       "default": "Follow-up"
     },
+    "triage_priority": {
+      "type": "string",
+      "enum": [
+        "Emergency",
+        "Urgent",
+        "Semi-Urgent",
+        "Routine"
+      ],
+      "default": "Routine",
+      "description": "Triage severity flag \u2014 urgent cases are highlighted red and can be filtered/sorted by severity"
+    },
     "reason_for_visit": {
       "type": "string",
       "description": "Chief complaint or reason"

@@ -81,3 +81,31 @@ export function enableOfflineSnapshots(base44) {
     }
   }
 }
+
+/** Write a snapshot for an entity's plain list() call — used by the offline data pack. */
+export function primeSnapshot(name, data) {
+  writeSnapshot(`${SNAPSHOT_PREFIX}${name}_list_${argsKey([])}`, data);
+}
+
+/** Export every stored snapshot (for saving the offline pack to a file). */
+export function exportSnapshots() {
+  const out = {};
+  for (const k of Object.keys(localStorage)) {
+    if (k.startsWith(SNAPSHOT_PREFIX)) {
+      try { out[k] = JSON.parse(localStorage.getItem(k)); } catch { /* skip corrupt entry */ }
+    }
+  }
+  return out;
+}
+
+/** Restore snapshots from an exported pack file. Returns the number restored. */
+export function importSnapshots(map) {
+  let n = 0;
+  for (const [k, v] of Object.entries(map || {})) {
+    if (k.startsWith(SNAPSHOT_PREFIX) && v && Array.isArray(v.d)) {
+      localStorage.setItem(k, JSON.stringify(v));
+      n++;
+    }
+  }
+  return n;
+}

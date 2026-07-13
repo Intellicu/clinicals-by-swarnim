@@ -4,6 +4,7 @@ import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, HardDrive } from "lucide-react";
 import OfflineDataManager from "../components/OfflineDataManager";
+import OfflineDataPack from "../components/offline/OfflineDataPack";
 
 export default function OfflineSettings() {
   return (
@@ -20,7 +21,10 @@ export default function OfflineSettings() {
             <p className="text-sm text-slate-600">Manage locally saved data, backups, and offline availability</p>
           </div>
         </div>
-        <OfflineDataManager />
+        <div className="space-y-4">
+          <OfflineDataPack />
+          <OfflineDataManager />
+        </div>
       </div>
     </div>
   );

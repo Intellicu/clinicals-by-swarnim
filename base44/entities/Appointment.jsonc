@@ -31,6 +31,17 @@
       ],
       "default": "Follow-up"
     },
+    "triage_priority": {
+      "type": "string",
+      "enum": [
+        "Emergency",
+        "Urgent",
+        "Semi-Urgent",
+        "Routine"
+      ],
+      "default": "Routine",
+      "description": "Triage severity flag set at booking. Emergency cases are auto-flagged, highlighted red, and moved to the top of the OPD queue."
+    },
     "doctor_name": {
       "type": "string",
       "description": "Assigned doctor"

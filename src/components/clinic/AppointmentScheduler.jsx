@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { TRIAGE_LEVELS, autoTriage } from './TriageBadge';
 
 export default function AppointmentScheduler({ workspaceId, patients, onScheduled }) {
   const [formData, setFormData] = useState({
@@ -19,8 +20,10 @@ export default function AppointmentScheduler({ workspaceId, patients, onSchedule
     doctor_name: 'Dr. Swarnim',
     duration_minutes: 30,
     chief_complaint: '',
-    notes: ''
+    notes: '',
+    triage_priority: 'Routine'
   });
+  const [triageTouched, setTriageTouched] = useState(false);
 
   const scheduleMutation = useMutation({
     mutationFn: async (data) => {
@@ -37,6 +40,7 @@ export default function AppointmentScheduler({ workspaceId, patients, onSchedule
         duration_minutes: data.duration_minutes,
         chief_complaint: data.chief_complaint,
         notes: data.notes,
+        triage_priority: data.triage_priority || 'Routine',
         status: 'Scheduled'
       });
     },
@@ -71,7 +75,7 @@ export default function AppointmentScheduler({ workspaceId, patients, onSchedule
 
           <div>
             <Label>Appointment Type</Label>
-            <Select value={formData.appointment_type} onValueChange={(val) => setFormData({...formData, appointment_type: val})}>
+            <Select value={formData.appointment_type} onValueChange={(val) => setFormData({...formData, appointment_type: val, triage_priority: triageTouched ? formData.triage_priority : autoTriage(val, formData.chief_complaint)})}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
               </SelectTrigger>
@@ -129,13 +133,34 @@ export default function AppointmentScheduler({ workspaceId, patients, onSchedule
               className="mt-1"
             />
           </div>
+
+          <div>
+            <Label>Triage Priority</Label>
+            <Select value={formData.triage_priority} onValueChange={(val) => { setTriageTouched(true); setFormData({...formData, triage_priority: val}); }}>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TRIAGE_LEVELS.map(t => (
+                  <SelectItem key={t.value} value={t.value}>
+                    <span className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${t.dot}`} />{t.value}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {formData.triage_priority === 'Emergency' && (
+              <p className="text-xs text-red-600 font-semibold mt-1">⚠ Emergency — flagged red and moved to the top of the queue</p>
+            )}
+          </div>
         </div>
 
         <div>
           <Label>Chief Complaint</Label>
           <Textarea
             value={formData.chief_complaint}
-            onChange={(e) => setFormData({...formData, chief_complaint: e.target.value})}
+            onChange={(e) => setFormData({...formData, chief_complaint: e.target.value, triage_priority: triageTouched ? formData.triage_priority : autoTriage(formData.appointment_type, e.target.value)})}
             placeholder="Reason for visit..."
             className="mt-1"
             rows={2}

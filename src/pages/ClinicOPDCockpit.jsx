@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import WorkspaceWizard from "@/components/clinic/WorkspaceWizard";
 import PatientOnboarding from "@/components/clinic/PatientOnboarding";
 import QuickAppointmentBar from "@/components/clinic/QuickAppointmentBar";
+import TriageBadge, { triageRank, TRIAGE_LEVELS } from "@/components/clinic/TriageBadge";
 
 const EMERGENCY_PROTOCOLS = [
   { label: "Hyperkalemia", color: "bg-red-600", path: "EmergencyHub" },
@@ -56,6 +57,7 @@ export default function ClinicOPDCockpit() {
   const [search, setSearch] = useState("");
   const [showWorkspaceWizard, setShowWorkspaceWizard] = useState(false);
   const [showEnroll, setShowEnroll] = useState(false);
+  const [triageFilter, setTriageFilter] = useState("All");
 
   const { data: user } = useQuery({ queryKey: ["currentUser"], queryFn: () => base44.auth.me() });
 
@@ -92,7 +94,9 @@ export default function ClinicOPDCockpit() {
     appointments.filter(a => {
       const d = new Date(a.appointment_date);
       return isSameDay(d, new Date());
-    }).sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date)),
+    }).sort((a, b) =>
+      triageRank(a.triage_priority) - triageRank(b.triage_priority) ||
+      new Date(a.appointment_date) - new Date(b.appointment_date)),
     [appointments]
   );
 
@@ -275,6 +279,17 @@ export default function ClinicOPDCockpit() {
         {/* TODAY'S QUEUE */}
         {view === "queue" && (
           <div className="space-y-2">
+            {/* Triage severity filter */}
+            <div className="flex gap-1.5 flex-wrap">
+              {["All", ...TRIAGE_LEVELS.map(t => t.value)].map(f => (
+                <button key={f} onClick={() => setTriageFilter(f)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-bold border transition-colors ${triageFilter === f
+                    ? (f === "Emergency" ? "bg-red-600 text-white border-red-600" : "bg-blue-600 text-white border-blue-600")
+                    : "bg-white text-slate-600 border-slate-300 hover:border-blue-400"}`}>
+                  {f}
+                </button>
+              ))}
+            </div>
             {loadingApts ? (
               <div className="text-center py-10 text-slate-400 text-sm">Loading queue…</div>
             ) : todayApts.length === 0 ? (
@@ -286,13 +301,14 @@ export default function ClinicOPDCockpit() {
                 </Button>
               </div>
             ) : (
-              todayApts.map((apt, idx) => {
+              (triageFilter === "All" ? todayApts : todayApts.filter(a => (a.triage_priority || "Routine") === triageFilter)).map((apt, idx) => {
                 const pt = patients.find(p => p.id === apt.patient_id);
                 const isActive = apt.status === "In Progress";
                 const isDone = apt.status === "Completed";
+                const isEmergency = apt.triage_priority === "Emergency";
                 return (
                   <div key={apt.id}
-                    className={`bg-white rounded-2xl border-2 transition-all ${isActive ? "border-green-400 shadow-md" : isDone ? "border-slate-100 opacity-70" : "border-slate-200 hover:border-blue-300"}`}>
+                    className={`rounded-2xl border-2 transition-all ${isEmergency && !isDone ? "bg-red-50 border-red-400 shadow-md" : isActive ? "bg-white border-green-400 shadow-md" : isDone ? "bg-white border-slate-100 opacity-70" : "bg-white border-slate-200 hover:border-blue-300"}`}>
                     <div className="p-3">
                       <div className="flex items-center gap-3">
                         {/* Token number */}
@@ -309,6 +325,7 @@ export default function ClinicOPDCockpit() {
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <p className="font-bold text-slate-900 text-sm">{apt.patient_name || pt?.patient_name}</p>
                             <Badge className={`text-xs border-0 ${statusColor(apt.status)}`}>{apt.status}</Badge>
+                            {apt.triage_priority && apt.triage_priority !== "Routine" && <TriageBadge priority={apt.triage_priority} />}
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             {pt?.diagnosis && (
