@@ -16,8 +16,10 @@ import { usePatient } from "@/components/PatientContext";
 import { Button } from "@/components/ui/button";
 import {
   FlaskConical, ShieldAlert, Activity, BookOpen, Flag, ChevronRight, ChevronLeft,
-  Pill, AlertTriangle, ExternalLink,
+  Pill, AlertTriangle, ExternalLink, Zap,
 } from "lucide-react";
+import ProtocolSummaryView from "@/components/pathways/ProtocolSummaryView";
+import PDFExportButton from "@/components/export/PDFExportButton";
 import {
   checkPrescriptionSuppressor, generateMonitoringRules,
   isPrescriptionNode, nodeEvidence,
@@ -142,6 +144,7 @@ export default function CIEEEngineRunner({
   const [monitoring, setMonitoring] = useState([]);
   const [suppressions, setSuppressions] = useState([]);
   const [acks, setAcks] = useState({}); // acknowledged safety gates, keyed `${nodeId}:${i}`
+  const [quickView, setQuickView] = useState(false); // hide non-essential detail — core recommendations only
   // Patient parameters for weight/BSA-based dosing — shared app-wide so the
   // dose calculator and all calculators auto-fill (true round-trip).
   const { patientData, updatePatientData } = usePatient();
@@ -270,7 +273,22 @@ export default function CIEEEngineRunner({
           </p>
           {subtitle && <p className="text-xs text-slate-500 truncate">{subtitle}</p>}
         </div>
+        <button onClick={() => setQuickView(q => !q)}
+          className={`ml-auto flex items-center gap-1 flex-shrink-0 text-[11px] font-bold px-2.5 py-1.5 rounded-full border transition-colors
+            ${quickView ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-slate-600 border-slate-300 hover:border-violet-400'}`}>
+          <Zap className="w-3 h-3" /> Quick View
+        </button>
       </div>
+
+      {/* Protocol summary — collapsible overview of every step in the treatment protocol */}
+      <details className="bg-white border border-slate-200 rounded-xl">
+        <summary className="px-3 py-2.5 text-sm font-semibold text-slate-700 cursor-pointer flex items-center gap-1.5">
+          <BookOpen className="w-4 h-4 text-slate-400" /> Protocol summary — all steps
+        </summary>
+        <div className="p-3 pt-1">
+          <ProtocolSummaryView pathway={pathway} sources={sources} currentNodeId={nodeId} completedIds={history.map(h => h.node.id)} />
+        </div>
+      </details>
 
       {/* patient parameters for weight/BSA-based dosing */}
       {hasRx && (
@@ -324,8 +342,8 @@ export default function CIEEEngineRunner({
             <span className="absolute -left-[30px] top-4 w-4 h-4 rounded-full bg-violet-600 ring-4 ring-violet-100" />
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4">
             <p className="text-[21px] leading-snug font-bold text-slate-900">{node.question || node.action}</p>
-            {node.detail && <p className="text-sm text-slate-600 mt-2 leading-relaxed">{node.detail}</p>}
-            {Array.isArray(node.points) && node.points.length > 0 && (
+            {!quickView && node.detail && <p className="text-sm text-slate-600 mt-2 leading-relaxed">{node.detail}</p>}
+            {!quickView && Array.isArray(node.points) && node.points.length > 0 && (
               <ul className="mt-2.5 space-y-1.5">
                 {node.points.map((p, i) => (
                   <li key={i} className="flex gap-2 text-sm text-slate-700 leading-relaxed">
@@ -414,7 +432,7 @@ export default function CIEEEngineRunner({
             )}
 
             {/* Evaluation / investigations — card layout, matching monitoring */}
-            {Array.isArray(node.investigations) && node.investigations.length > 0 && (
+            {!quickView && Array.isArray(node.investigations) && node.investigations.length > 0 && (
               <div className="mt-3 bg-blue-50/50 border border-blue-200 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-2">
                   <FlaskConical className="w-4 h-4 text-blue-600" />
@@ -432,7 +450,7 @@ export default function CIEEEngineRunner({
             )}
 
             {/* Monitoring attached to this step */}
-            {Array.isArray(node.monitoring) && node.monitoring.length > 0 && (
+            {!quickView && Array.isArray(node.monitoring) && node.monitoring.length > 0 && (
               <div className="mt-3 bg-indigo-50/50 border border-indigo-200 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-2">
                   <Activity className="w-4 h-4 text-indigo-600" />
@@ -462,7 +480,7 @@ export default function CIEEEngineRunner({
             )}
 
             {/* Supportive care — structured cards (same clean layout as monitoring) */}
-            {Array.isArray(node.care) && node.care.length > 0 && (
+            {!quickView && Array.isArray(node.care) && node.care.length > 0 && (
               <div className="mt-3 bg-teal-50/50 border border-teal-200 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-2">
                   <ShieldAlert className="w-4 h-4 text-teal-600" />
@@ -518,7 +536,7 @@ export default function CIEEEngineRunner({
               </button>
             )}
 
-            <EvidenceLine node={node} sources={sources} />
+            {!quickView && <EvidenceLine node={node} sources={sources} />}
             </div>
           </div>
         )}
@@ -590,6 +608,23 @@ export default function CIEEEngineRunner({
             )}
           </div>
         </details>
+      )}
+
+      {/* export consultation summary as a formatted PDF */}
+      {isTerminal && (
+        <div className="flex justify-end">
+          <PDFExportButton
+            title={title}
+            subtitle="Pathway consultation summary"
+            filename={`${title.replace(/\s+/g, '_')}_summary.pdf`}
+            sections={[
+              { heading: 'Executed pathway', lines: history.map((h, i) => `${i + 1}. ${h.suppressed ? '[Blocked] ' : ''}${h.node.question || h.node.action}${h.choiceLabel ? ` — ${h.choiceLabel}` : ''}`) },
+              { heading: 'Outcome', lines: [node.action] },
+              ...(suppressions.length ? [{ heading: 'Prescription suppression log', lines: suppressions.map(ev => `${ev.drug} blocked — ${ev.acmg_class} variant${ev.gene ? ` in ${ev.gene}` : ''}`) }] : []),
+              ...(monitoring.length ? [{ heading: 'Monitoring schedule', lines: monitoring.map(r => `${r.monitoring_parameter} — ${r.frequency}${r.target_value ? ` (target: ${r.target_value})` : ''}`) }] : []),
+            ]}
+          />
+        </div>
       )}
 
       {/* footer action */}

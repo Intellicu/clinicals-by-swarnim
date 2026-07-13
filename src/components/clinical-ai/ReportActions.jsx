@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Printer, Check } from "lucide-react";
 import { toast } from "sonner";
+import PDFExportButton from "@/components/export/PDFExportButton";
 
 export default function ReportActions({ title = "Analysis Report", result, summary = "" }) {
   const [copied, setCopied] = useState(false);
@@ -43,8 +44,14 @@ export default function ReportActions({ title = "Analysis Report", result, summa
       </Button>
       <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8" onClick={handlePrint}>
         <Printer className="w-3.5 h-3.5" />
-        Save PDF
+        Print
       </Button>
+      <PDFExportButton
+        title={title}
+        subtitle="Clinical analysis report"
+        filename={`${title.replace(/\s+/g, "_")}.pdf`}
+        sections={[{ heading: null, lines: (buildTextSummary(result) || summary || "No analysis data.").split("\n") }]}
+      />
     </div>
   );
 }

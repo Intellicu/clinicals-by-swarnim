@@ -2,117 +2,65 @@ import { useEffect, useState } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-
-function readPendingSync() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem('pending_sync') || '[]');
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    localStorage.setItem('pending_sync', '[]');
-    return [];
-  }
-}
+import { getQueueCount, subscribeQueue, flushQueue } from '@/lib/offline/syncQueue';
 
 export default function OfflineSync() {
-  const [isOnline, setIsOnline] = useState(true);
-  const [pendingSync, setPendingSync] = useState(0);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [pending, setPending] = useState(getQueueCount());
+  const [syncing, setSyncing] = useState(false);
+
+  const sync = async () => {
+    if (getQueueCount() === 0) return;
+    setSyncing(true);
+    const { synced, failed } = await flushQueue();
+    setSyncing(false);
+    setPending(getQueueCount());
+    if (synced) toast.success(`${synced} item${synced > 1 ? 's' : ''} synced`);
+    if (failed) toast.error(`${failed} item${failed > 1 ? 's' : ''} could not sync — will retry`);
+  };
 
   useEffect(() => {
-    // Check online status
     const handleOnline = () => {
       setIsOnline(true);
-      toast.success('Back online! Syncing data...');
-      syncPendingData();
+      if (getQueueCount() > 0) toast.success('Back online — syncing queued data…');
+      sync();
     };
-
     const handleOffline = () => {
       setIsOnline(false);
-      toast.info('Working offline - data will sync when reconnected');
+      toast.info('Working offline — entries will sync when reconnected');
     };
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
-    // Initial check
-    setIsOnline(navigator.onLine);
-
-    // Load pending items
-    setPendingSync(readPendingSync().length);
-
+    const unsub = subscribeQueue(setPending);
+    if (navigator.onLine) sync(); // flush anything left over from a previous session
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      unsub();
     };
   }, []);
 
-  const syncPendingData = async () => {
-    const pending = readPendingSync();
-    if (pending.length === 0) return;
-
-    try {
-      // Sync pending visits, measurements, calculations
-      for (const item of pending) {
-        if (item.type === 'visit') {
-          // await base44.entities.VisitRecord.create(item.data);
-        } else if (item.type === 'measurement') {
-          // await base44.entities.Measurement.create(item.data);
-        }
-      }
-      localStorage.setItem('pending_sync', '[]');
-      setPendingSync(0);
-      toast.success(`${pending.length} items synced!`);
-    } catch (error) {
-      toast.error('Sync failed - will retry');
-      console.error('Sync error:', error);
-    }
-  };
-
-  const cacheCoreData = async () => {
-    try {
-      // Cache core app data for offline use
-      const coreData = {
-        timestamp: Date.now(),
-        patientData: localStorage.getItem('clinicalc_patient_data'),
-        guidelines: localStorage.getItem('cached_guidelines'),
-        calculators: ['gfr', 'bp', 'dose', 'fluid', 'anthropometry'],
-        pathways: ['aki', 'nephrotic', 'htn-emergency', 'hyperkalemia', 'hypokalemia'],
-        offlineReady: true
-      };
-      localStorage.setItem('offline_cache', JSON.stringify(coreData));
-      localStorage.setItem('offline_mode_enabled', 'true');
-    } catch (error) {
-      console.error('Cache error:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (isOnline) {
-      cacheCoreData();
-    }
-  }, [isOnline]);
-
-  if (isOnline && pendingSync === 0) return null;
+  if (isOnline && pending === 0) return null;
 
   return (
     <div className="fixed top-16 right-4 z-40 max-w-sm">
-      <Alert className={`${isOnline ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
-        {isOnline ? (
-          <Wifi className="w-4 h-4 text-green-600" />
-        ) : (
-          <WifiOff className="w-4 h-4 text-amber-600" />
-        )}
+      <Alert className={isOnline ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}>
+        {isOnline ? <Wifi className="w-4 h-4 text-green-600" /> : <WifiOff className="w-4 h-4 text-amber-600" />}
         <AlertDescription className={isOnline ? 'text-green-800' : 'text-amber-800'}>
           {isOnline ? (
-            pendingSync > 0 ? (
-              <span className="flex items-center gap-2">
-                <RefreshCw className="w-3 h-3 animate-spin" />
-                Syncing {pendingSync} items...
-              </span>
-            ) : (
-              'Online & synced'
-            )
+            <span className="flex items-center gap-2">
+              {syncing && <RefreshCw className="w-3 h-3 animate-spin" />}
+              {syncing
+                ? `Syncing ${pending} item${pending > 1 ? 's' : ''}…`
+                : `${pending} item${pending > 1 ? 's' : ''} waiting to sync`}
+              {!syncing && (
+                <button onClick={sync} className="underline font-semibold">Sync now</button>
+              )}
+            </span>
+          ) : pending > 0 ? (
+            `Offline — ${pending} entr${pending > 1 ? 'ies' : 'y'} queued, will sync when reconnected`
           ) : (
-            'Offline mode - data will sync when reconnected'
+            'Offline mode — data will sync when reconnected'
           )}
         </AlertDescription>
       </Alert>
