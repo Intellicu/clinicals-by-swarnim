@@ -311,7 +311,7 @@ export const TUBULOPATHY_PATHWAY = {
     'DN-16AME': {
       id: 'DN-16AME', type: 'ACTION', source: B, prescribes: 'dexamethasone',
       action: 'Apparent mineralocorticoid excess — suppress cortisol-driven MR activation.',
-      rx: { drug: 'Dexamethasone + amiloride', dose: 'Low-dose dexamethasone with amiloride; avoid licorice', route: 'Oral', duration: 'Long-term' },
+      rx: { drug: 'Dexamethasone + amiloride', dose: 'Low-dose dexamethasone (titrated to BP and potassium; suppresses ACTH) + amiloride; avoid licorice', route: 'Oral', duration: 'Long-term' },
       next: 'DN-21',
     },
     'DN-16FH': {
@@ -369,7 +369,7 @@ export const TUBULOPATHY_PATHWAY = {
 
     // ── Phase 5 — Isolated hypomagnesaemia ────────────────────────────────
     'DN-19': {
-      id: 'DN-19', type: 'ASSESSMENT', source: B, prescribes: 'magnesium',
+      id: 'DN-19', type: 'ACTION', source: B, prescribes: 'magnesium',
       action: 'Isolated hypomagnesaemia — classify by urinary calcium.',
       points: [
         'High urine Ca (hypercalciuria + nephrocalcinosis) → FHHNC (CLDN16/CLDN19): Mg supplements + thiazide + citrate',
