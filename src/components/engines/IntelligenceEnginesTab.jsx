@@ -102,6 +102,9 @@ export const ENGINES = [
   { label: "Febrile Seizure Engine", desc: "IAP STG 2022, 7.78 — febrile seizure: still seizing → treat as status epilepticus · simple → no routine EEG/imaging/LP unless meningitis suspected, reassure · complex/atypical → investigate + senior review; exclude meningitis in all", scenario: "febrile-seizure-engine", tags: ["febrile seizure", "febrile convulsion", "seizure", "fever", "simple", "complex", "meningitis", "EEG", "LP", "IAP STG", "neurology"], group: "Neurology", ciee: true, adminOnly: true },
   { label: "Neonatal Jaundice Engine", desc: "IAP STG 2022, 1.1 — neonatal jaundice: red-flag screen (<24 h, unwell, <35 wk, rapid rise, prolonged/conjugated) → urgent work-up · else plot TSB on hour-specific nomogram → phototherapy (recheck 4–6 h) → exchange transfusion if above exchange line/encephalopathy", scenario: "neonatal-jaundice-engine", tags: ["neonatal jaundice", "hyperbilirubinemia", "bilirubin", "phototherapy", "exchange transfusion", "nomogram", "kernicterus", "biliary atresia", "G6PD", "IAP STG", "neonatology"], group: "Neonatology", ciee: true, adminOnly: true },
   { label: "Iron Deficiency Anaemia Engine", desc: "IAP STG 2022, 10.100 — IDA: severe/decompensated → cautious slow transfusion + investigate · stable → oral elemental iron 3–6 mg/kg/day ×8–12 wk → reassess Hb/retic 2–4 wk → non-response → reinvestigate (smear, ferritin, Hb electrophoresis, coeliac)", scenario: "iron-deficiency-anaemia-engine", tags: ["iron deficiency", "anaemia", "anemia", "microcytic", "ferritin", "oral iron", "transfusion", "thalassaemia", "IAP STG", "haematology"], group: "Haematology", ciee: true, adminOnly: true },
+  { label: "Diabetic Ketoacidosis Engine", desc: "ISPAD 2022 — paediatric DKA: confirm (hyperglycaemia + pH <7.3/HCO₃ <15 + ketosis) → severity → cautious 10 mL/kg bolus only if shocked → deficit + maintenance over 24–48 h → insulin 0.05–0.1 U/kg/h started 1–2 h after fluids (NO bolus) → potassium & dextrose rules → cerebral-oedema surveillance (mannitol / 3% saline) → SC transition on resolution", scenario: "dka-engine", tags: ["DKA", "diabetic ketoacidosis", "diabetes", "insulin", "ketones", "acidosis", "cerebral oedema", "potassium", "ISPAD", "endocrine", "emergency"], group: "Endocrine & Metabolic", ciee: true, adminOnly: true },
+  { label: "Bronchiolitis Engine", desc: "IAP STG 2022 — bronchiolitis (infant <2 y, viral): clinical diagnosis → severity → SUPPORTIVE care (O₂ for SpO₂ <90–92%, nasal suction, hydration; HFNC/CPAP + PICU for severe) → admission criteria & prevention; routine bronchodilators/steroids/antibiotics/physio NOT recommended", scenario: "bronchiolitis-engine", tags: ["bronchiolitis", "RSV", "wheeze", "infant", "respiratory distress", "HFNC", "supportive", "apnoea", "IAP STG", "respiratory"], group: "Respiratory", ciee: true, adminOnly: true },
+  { label: "Neonatal Sepsis Engine", desc: "IAP STG 2022 / NNF — neonatal sepsis: recognise (non-specific signs + risk factors) → onset (early <72 h vs late) → blood culture + screen ± LP → empirical IV antibiotics within 1 h (early: ampicillin + gentamicin; late: per antibiogram; ceftriaxone avoided) → supportive care → 48–72 h review, de-escalate, set duration", scenario: "neonatal-sepsis-engine", tags: ["neonatal sepsis", "newborn", "EOS", "LOS", "ampicillin", "gentamicin", "cefotaxime", "blood culture", "meningitis", "NNF", "IAP STG", "neonatology"], group: "Neonatology", ciee: true, adminOnly: true },
 
 ];
 
@@ -123,6 +126,7 @@ const GROUP_STYLE = {
   "Neurology": "bg-purple-50 border-purple-200 text-purple-900",
   "Neonatology": "bg-pink-50 border-pink-200 text-pink-900",
   "Haematology": "bg-rose-50 border-rose-200 text-rose-900",
+  "Endocrine & Metabolic": "bg-amber-50 border-amber-200 text-amber-900",
 };
 
 const GROUP_BADGE = {
@@ -143,6 +147,7 @@ const GROUP_BADGE = {
   "Neurology": "bg-purple-600",
   "Neonatology": "bg-pink-600",
   "Haematology": "bg-rose-600",
+  "Endocrine & Metabolic": "bg-amber-600",
 };
 
 // Explicit group display order — Emergency & Electrolytes is shown AFTER
@@ -155,6 +160,7 @@ const GROUP_ORDER = [
   "Neurology",
   "Neonatology",
   "Haematology",
+  "Endocrine & Metabolic",
   "Glomerular Disease",
   "CKD & Genetics",
   "CAKUT & Urology",
