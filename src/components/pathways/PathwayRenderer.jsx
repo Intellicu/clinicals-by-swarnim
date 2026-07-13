@@ -121,6 +121,9 @@ import { FS_ENGINE } from "@/lib/engines/febrileSeizureEngine";
 import { AOM_ENGINE } from "@/lib/engines/aomEngine";
 import { NNJ_ENGINE } from "@/lib/engines/neonatalJaundiceEngine";
 import { IDA_ENGINE } from "@/lib/engines/ironDeficiencyAnaemiaEngine";
+import { DKA_ENGINE } from "@/lib/engines/dkaEngine";
+import { BRONCH_ENGINE } from "@/lib/engines/bronchiolitisEngine";
+import { NNS_ENGINE } from "@/lib/engines/neonatalSepsisEngine";
 
 // All CIEE lib-module engines rendered through the shared runner, keyed by id.
 const CIEE_LIB_ENGINES = Object.fromEntries(
@@ -129,6 +132,7 @@ const CIEE_LIB_ENGINES = Object.fromEntries(
     SNAKEBITE_ENGINE, OPP_ENGINE, CROUP_ENGINE, DENGUE_ENGINE, ENTERIC_ENGINE,
     MALARIA_ENGINE, MENINGITIS_ENGINE, FWF_ENGINE, AWD_ENGINE, DYS_ENGINE,
     CAP_ENGINE, ASTHMA_ENGINE, FS_ENGINE, AOM_ENGINE, NNJ_ENGINE, IDA_ENGINE,
+    DKA_ENGINE, BRONCH_ENGINE, NNS_ENGINE,
   ].map((e) => [e.id, e])
 );
 // IDs that have their own full pathway component
@@ -140,6 +144,7 @@ const HANDLED_IDS = new Set([
   "fever-without-focus-engine","diarrhoea-engine","dysentery-engine",
   "pneumonia-engine","asthma-engine","febrile-seizure-engine","aom-engine",
   "neonatal-jaundice-engine","iron-deficiency-anaemia-engine",
+  "dka-engine","bronchiolitis-engine","neonatal-sepsis-engine",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
