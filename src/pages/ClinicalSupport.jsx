@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+// ClinicalSupport — consolidated pathways, engines & AI diagnostic hub
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
