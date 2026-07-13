@@ -404,6 +404,16 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
             )}
           </button>
 
+          {!open && (
+            <button
+              onClick={() => toggleGroup(group)}
+              className="w-full flex justify-start text-left px-1 -mt-1 pb-1">
+              <p className="w-full text-[11px] leading-snug text-slate-400 line-clamp-2">
+                {engines.map(e => e.label.replace(/\s*Engine$/i, "")).join(" · ")}
+              </p>
+            </button>
+          )}
+
           {open && (
           <div className="space-y-1.5">
             {engines.map(eng => (
