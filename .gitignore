@@ -30,3 +30,4 @@ dist-ssr
 .env
 # Base44 migration data export (contains PHI — never commit)
 migration-export/
+base44/.app.jsonc
