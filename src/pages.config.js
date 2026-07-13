@@ -48,6 +48,9 @@ import __Layout from './Layout.jsx';
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import { lazy } from 'react';
+import __Layout from './Layout.jsx';
+
 const ABGInterpreter = lazy(() => import('./pages/ABGInterpreter'));
 const AIAssistant = lazy(() => import('./pages/AIAssistant'));
 const AIToolBuilder = lazy(() => import('./pages/AIToolBuilder'));
@@ -127,8 +130,6 @@ const NotificationDashboard = lazy(() => import('./pages/NotificationDashboard')
 const GeneticReportAnalyzer = lazy(() => import('./pages/GeneticReportAnalyzer'));
 const GlomerularDiseases = lazy(() => import('./pages/GlomerularDiseases'));
 const EnhancedDietGenerator = lazy(() => import('./pages/EnhancedDietGenerator'));
-import { lazy } from 'react';
-import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
