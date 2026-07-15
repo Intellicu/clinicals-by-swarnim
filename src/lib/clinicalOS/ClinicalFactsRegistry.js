@@ -218,7 +218,7 @@ export const CLINICAL_FACTS = {
   HTN_STAGE1: {
     id: "HTN_STAGE1",
     term: "Stage 1 Hypertension",
-    definition: "≥95th percentile but <99th+12 mmHg (<13y) OR 130–139/80–89 mmHg (≥13y).",
+    definition: "≥95th percentile to <95th percentile + 12 mmHg (<13y) OR 130–139/80–89 mmHg (≥13y).",
     primary_source: "AAP 2017",
     source: "AAP 2017",
     evidence_grade: "A",
@@ -229,7 +229,7 @@ export const CLINICAL_FACTS = {
   HTN_STAGE2: {
     id: "HTN_STAGE2",
     term: "Stage 2 Hypertension",
-    definition: "≥99th percentile + 12 mmHg (<13y) OR ≥140/90 mmHg (≥13y) — requires same-day evaluation.",
+    definition: "≥95th percentile + 12 mmHg (<13y) OR ≥140/90 mmHg (≥13y) — requires same-day evaluation.",
     primary_source: "AAP 2017",
     source: "AAP 2017",
     evidence_grade: "A",
@@ -240,7 +240,7 @@ export const CLINICAL_FACTS = {
   HTN_EMERGENCY: {
     id: "HTN_EMERGENCY",
     term: "Hypertensive Emergency",
-    definition: "Severe hypertension (>99th percentile + 12 mmHg) WITH end-organ damage: encephalopathy, seizures, papilloedema, acute cardiac failure, or AKI.",
+    definition: "Severe hypertension (≥95th percentile + 12 mmHg, or ≥Stage 2) WITH end-organ damage: encephalopathy, seizures, papilloedema, acute cardiac failure, or AKI.",
     primary_source: "AAP 2017",
     source: "AAP 2017 / ESH 2016",
     evidence_grade: "A",

@@ -941,8 +941,8 @@ export const CORE_GUIDELINES = [
     classification: [
       { stage: "Normal", bp: "<90th percentile", action: "Lifestyle, recheck annually" },
       { stage: "Elevated", bp: "90th–<95th percentile", action: "Lifestyle modification × 6 months, then reassess" },
-      { stage: "Stage 1 HTN", bp: "95th–99th percentile", action: "3–6m lifestyle trial; drug if secondary, DM, CKD, or LVH" },
-      { stage: "Stage 2 HTN", bp: ">99th percentile", action: "Same-day evaluation, start medication, urgent secondary cause workup" }
+      { stage: "Stage 1 HTN", bp: "≥95th–<95th percentile + 12 mmHg (or 130/80–139/89 mmHg)", action: "3–6m lifestyle trial; drug if secondary, DM, CKD, or LVH" },
+      { stage: "Stage 2 HTN", bp: "≥95th percentile + 12 mmHg (or ≥140/90 mmHg)", action: "Same-day evaluation, start medication, urgent secondary cause workup" }
     ],
     management: {
       workup: [

@@ -18,11 +18,15 @@ const SYMPTOMS = [
   { id: "family_htn", label: "Family history of hypertension" },
 ];
 
+// AAP 2017 (Flynn et al.) BP classification. For <13y use age/sex/height
+// percentiles; for ≥13y fixed adult-style thresholds apply (whichever is lower
+// defines the stage). Note: Stage 1/2 are anchored to the 95th percentile — the
+// old 99th-percentile cutoff from the 2004 Fourth Report is NOT used.
 const CLASSIFICATIONS = [
-  { label: "Normal (<13y)", cutoff: "<90th percentile for age/sex/height" },
-  { label: "Elevated BP", cutoff: "90th–<95th percentile (or ≥120/80 in ≥13y)" },
-  { label: "Stage 1 HTN", cutoff: "95th–<99th + 12 mmHg" },
-  { label: "Stage 2 HTN", cutoff: "≥99th percentile + 12 mmHg" },
+  { label: "Normal", cutoff: "<90th percentile (<13y) or <120/80 mmHg (≥13y)" },
+  { label: "Elevated BP", cutoff: "≥90th–<95th percentile, or ≥120/80 mmHg (<13y); 120–129/<80 mmHg (≥13y)" },
+  { label: "Stage 1 HTN", cutoff: "≥95th–<95th percentile + 12 mmHg, or 130/80–139/89 mmHg (whichever is lower)" },
+  { label: "Stage 2 HTN", cutoff: "≥95th percentile + 12 mmHg, or ≥140/90 mmHg (whichever is lower)" },
 ];
 
 const SECONDARY_CAUSES = [

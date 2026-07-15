@@ -258,7 +258,7 @@ export const MULTI_ORG_DEFINITIONS = {
       {
         org: "AAP",
         year: 2017,
-        criteria: "<13 years: Normal <90th %ile; Elevated 90–<95th %ile; Stage 1 HTN ≥95th–<99th+12; Stage 2 HTN ≥99th+12 mmHg. ≥13 years: Normal <120/<80; Elevated 120–129/<80; Stage 1 130–139/80–89; Stage 2 ≥140/90.",
+        criteria: "<13 years: Normal <90th %ile; Elevated 90–<95th %ile (or ≥120/80); Stage 1 HTN ≥95th–<95th+12 mmHg (or 130/80–139/89); Stage 2 HTN ≥95th+12 mmHg (or ≥140/90). ≥13 years: Normal <120/<80; Elevated 120–129/<80; Stage 1 130–139/80–89; Stage 2 ≥140/90.",
         thresholds: { normal_p: 90, elevated_p: 95, stage1_p: 95, stage2_p: 99, adolescent_stage1_sys: 130, adolescent_stage2_sys: 140 },
         operational_implications: "Uses sex/age/height-specific percentile tables. Adolescents ≥13y use absolute values mirroring adult ACC/AHA 2017.",
         note: "AAP 2017 is the primary operational guideline. Tables require height percentile input for accurate staging in children <13y.",

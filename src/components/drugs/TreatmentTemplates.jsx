@@ -100,7 +100,7 @@ export const TREATMENT_TEMPLATES = [
       { drug: "Enalapril (if proteinuria present)", dose_formula: "0.1 mg/kg/dose", max: "40 mg/day", freq: "OD–BD", route: "PO", duration: "Long-term", notes: "Add if significant proteinuria. Monitor K+ and creatinine." },
     ],
     monitoring: ["BP at every visit", "Home BP log (if feasible)", "ABPM after treatment initiation", "Echo if Stage 2 HTN"],
-    red_flags: ["BP >99th centile + 12 mmHg → hypertensive urgency", "Headache + blurred vision → emergency"],
+    red_flags: ["BP ≥95th centile + 12 mmHg (Stage 2) → hypertensive urgency", "Headache + blurred vision → emergency"],
   },
   {
     id: "aki_mild",

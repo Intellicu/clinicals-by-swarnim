@@ -171,7 +171,7 @@ export function calculateBPPercentile({ age_years, sex, systolic, diastolic, hei
     management_recommendation: getManagementRecommendation(combinedStage, { age, systolic, diastolic }),
     source: "AAP Clinical Practice Guideline 2017 (Pediatrics 140:e20171904)",
     note: `Height percentile (${height_percentile}th) adjusted. Classification based on higher of SBP (${sysPercentile}th %ile, ${sysStage}) vs DBP (${diaPercentile}th %ile, ${diaStage}). ≥120 SBP or ≥80 DBP = at minimum Elevated BP per AAP 2017. Confirm with full AAP tables.`,
-    aap_operational_note: `AAP 2017 (<13y): Normal <90th %ile; Elevated = 90th–<95th or SBP≥120/DBP≥80; Stage 1 = 95th–<99th; Stage 2 = ≥99th or ≥95th+12 mmHg. Overall stage = higher of SBP or DBP stage.`,
+    aap_operational_note: `AAP 2017 (<13y): Normal <90th %ile; Elevated = 90th–<95th or SBP≥120/DBP≥80; Stage 1 = ≥95th–<95th+12 mmHg (or 130/80–139/89); Stage 2 = ≥95th+12 mmHg (or ≥140/90). Overall stage = higher of SBP or DBP stage.`,
 
     guideline_context: {
       primary: "AAP 2017",

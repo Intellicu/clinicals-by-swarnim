@@ -161,8 +161,8 @@ const APPROACHES = [
       "Ambulatory BP monitoring (ABPM) — white coat vs true HTN"
     ],
     management: [
-      "Stage 1 (95th–99th): lifestyle + treat underlying cause",
-      "Stage 2 (>99th+5): start antihypertensive immediately",
+      "Stage 1 (≥95th–<95th+12 mmHg, or 130/80–139/89): lifestyle + treat underlying cause",
+      "Stage 2 (≥95th+12 mmHg, or ≥140/90): start antihypertensive immediately",
       "1st line: ACE inhibitor (CKD/proteinuric) or calcium channel blocker",
       "Hypertensive emergency: IV labetalol / nicardipine — reduce BP by 25% in first hour",
       "PRES: magnesium, anti-epileptics, BP reduction"

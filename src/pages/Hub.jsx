@@ -459,7 +459,7 @@ export default function Hub() {
   const { data: dbEngineRecords = [] } = useQuery({
     queryKey: ["hub_db_engines"],
     queryFn: () => base44.entities.CustomSection.filter({ created_by_admin: true, section_type: "tool", status: "published" }),
-    staleTime: 30000
+    staleTime: 30000,
   });
 
   const filteredSections = useMemo(() => {
@@ -523,18 +523,18 @@ export default function Hub() {
 
         {/* ── Dose Calculator shortcut ── */}
         <Link to={createPageUrl("DoseCalculator")} className="block">
-          
-
-
-
-
-
-
-
-
-
-
-          
+          <div className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 flex items-center justify-between shadow active:scale-[0.98] transition-transform">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Calculator className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-white font-bold text-sm">Weight-Based Dose Calculator</p>
+                <p className="text-emerald-100 text-xs">Instant patient drug dosing →</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-emerald-100" />
+          </div>
         </Link>
 
         {/* ── Quick Actions ── */}
@@ -557,56 +557,55 @@ export default function Hub() {
           </div>
           <div className="flex gap-2 overflow-x-auto p-2.5" style={{ scrollbarWidth: "none" }}>
             {[
-            { label: "Febrile UTI", desc: "UTI Imaging (ISPN 2023)", color: "bg-cyan-800", scenario: "uti-febrile" },
-            { label: "NS Engine", desc: "Nephrotic Syndrome", color: "bg-violet-600", scenario: "ns-engine" },
-            { label: "IgAN / IgAV", desc: "IPNA 2024", color: "bg-blue-700", scenario: "iga-ipna-engine" },
-            { label: "Rickets Engine", desc: "Calcipenic/Phosphopenic", color: "bg-amber-600", scenario: "rickets-engine" },
-            { label: "Oncology Hub", desc: "ALL·AML·Wilms·RMS·LCH", color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
-            { label: "Hyperkalaemia", desc: "K+ Emergency", color: "bg-orange-600", scenario: "hyperkalemia-deep-engine" },
-            { label: "Hyponatraemia", desc: "Na Correction", color: "bg-cyan-600", scenario: "hyponatremia-engine" },
-            { label: "RPGN Engine", desc: "Crescentic GN", color: "bg-red-700", scenario: "rpgn-deep-engine" },
-            { label: "TMA Engine", desc: "HUS / aHUS", color: "bg-rose-700", scenario: "tma-engine" },
-            { label: "Haematuria", desc: "Haematuria Workup", color: "bg-rose-600", scenario: "hematuria-engine" },
-            { label: "Genetic Engine", desc: "Testing Triggers", color: "bg-violet-700", scenario: "genetic-engine" },
-            { label: "CKD Progression", desc: "Risk Stratification", color: "bg-blue-700", scenario: "ckd-progression-engine" },
-            { label: "Biopsy Engine", desc: "When to Biopsy", color: "bg-amber-700", scenario: "biopsy-engine" },
-            { label: "Met. Acidosis", desc: "AG / RTA Engine", color: "bg-amber-600", scenario: "metabolic-acidosis-engine" },
-            { label: "Hypokalemia", desc: "K+ Deficiency", color: "bg-yellow-600", scenario: "hypokalemia-engine" },
-            { label: "Polyuria / DI", desc: "DI Engine", color: "bg-teal-600", scenario: "polyuria-engine" },
-            { label: "Eculizumab", desc: "Eligibility Engine", color: "bg-purple-700", scenario: "eculizumab-engine" },
-            { label: "C3G Engine", desc: "C3 Glomerulopathy", color: "bg-cyan-700", scenario: "c3g-engine" },
-            { label: "Fabry Engine", desc: "Fabry Disease", color: "bg-violet-800", scenario: "fabry-engine" },
-            { label: "Voiding Dx", desc: "Voiding Dysfunction", color: "bg-teal-700", scenario: "voiding-engine" },
-            { label: "Cystic Kidney", desc: "ADPKD/ARPKD/NPHP", color: "bg-blue-800", scenario: "cystic-kidney-engine" },
-            { label: "CAKUT Engine", desc: "Antenatal/UPJ/Duplex", color: "bg-teal-800", scenario: "cakut-engine" },
-            { label: "PUV Engine", desc: "Urethral Valves", color: "bg-red-800", scenario: "puv-engine" },
-            { label: "AKI Engine", desc: "AKI Diagnostic", color: "bg-red-600", scenario: "aki-engine" },
-            { label: "HNF1B/Alport", desc: "Rare hereditary", color: "bg-green-800", scenario: "hnf1b-alport-engine" },
-            { label: "Hyperoxaluria", desc: "PH1/PH2/PH3", color: "bg-orange-700", scenario: "hyperoxaluria-engine" },
-            { label: "Cystinosis", desc: "Fanconi+cysteamine", color: "bg-blue-700", scenario: "cystinosis-engine" },
-            { label: "HTN Engine", desc: "Pediatric HTN", color: "bg-pink-700", scenario: "htn-engine" },
-            { label: "Tubular Engine", desc: "Fanconi/XLH/NDI", color: "bg-amber-800", scenario: "tubular-engine" },
-            { label: "Stone Engine", desc: "Renal stones full", color: "bg-yellow-700", scenario: "stone-engine" },
-            { label: "Wilms Tumor", desc: "Nephroblastoma", color: "bg-blue-800", scenario: "wilms-tumor-engine" },
-            // DB-generated engines injected below
-            ...dbEngineRecords.map((rec) => ({
-              label: rec.title || rec.content?.label || "Engine",
-              desc: rec.description || rec.content?.desc || "",
-              color: "bg-violet-700",
-              scenario: rec.content?.scenario || "",
-              _fromDb: true
-            })).filter((e) => e.scenario)].
-            map((eng) =>
-            <Link key={eng.scenario} to={eng._link || createPageUrl("ClinicalSupport") + `?tab=pathways&scenario=${eng.scenario}`} className="flex-shrink-0">
+              { label: "Febrile UTI",        desc: "UTI Imaging (ISPN 2023)", color: "bg-cyan-800",  scenario: "uti-febrile" },
+              { label: "NS Engine",          desc: "Nephrotic Syndrome",    color: "bg-violet-600", scenario: "ns-engine" },
+              { label: "IgAN / IgAV",        desc: "IPNA 2024",             color: "bg-blue-700",   scenario: "iga-ipna-engine" },
+              { label: "Rickets Engine",     desc: "Calcipenic/Phosphopenic", color: "bg-amber-600", scenario: "rickets-engine" },
+              { label: "Oncology Hub",       desc: "ALL·AML·Wilms·RMS·LCH",  color: "bg-purple-700", scenario: "oncology-hub", _link: createPageUrl("OncologyHub") },
+              { label: "Hyperkalaemia",      desc: "K+ Emergency",          color: "bg-orange-600", scenario: "hyperkalemia-deep-engine" },
+              { label: "Hyponatraemia",      desc: "Na Correction",         color: "bg-cyan-600",   scenario: "hyponatremia-engine" },
+              { label: "RPGN Engine",        desc: "Crescentic GN",         color: "bg-red-700",    scenario: "rpgn-deep-engine" },
+              { label: "TMA Engine",         desc: "HUS / aHUS",            color: "bg-rose-700",   scenario: "tma-engine" },
+              { label: "Haematuria",         desc: "Haematuria Workup",     color: "bg-rose-600",   scenario: "hematuria-engine" },
+              { label: "Genetic Engine",     desc: "Testing Triggers",      color: "bg-violet-700", scenario: "genetic-engine" },
+              { label: "CKD Progression",    desc: "Risk Stratification",   color: "bg-blue-700",   scenario: "ckd-progression-engine" },
+              { label: "Biopsy Engine",      desc: "When to Biopsy",        color: "bg-amber-700",  scenario: "biopsy-engine" },
+              { label: "Met. Acidosis",      desc: "AG / RTA Engine",       color: "bg-amber-600",  scenario: "metabolic-acidosis-engine" },
+              { label: "Hypokalemia",        desc: "K+ Deficiency",         color: "bg-yellow-600", scenario: "hypokalemia-engine" },
+              { label: "Polyuria / DI",      desc: "DI Engine",             color: "bg-teal-600",   scenario: "polyuria-engine" },
+              { label: "Eculizumab",         desc: "Eligibility Engine",    color: "bg-purple-700", scenario: "eculizumab-engine" },
+              { label: "C3G Engine",         desc: "C3 Glomerulopathy",     color: "bg-cyan-700",   scenario: "c3g-engine" },
+              { label: "Fabry Engine",       desc: "Fabry Disease",          color: "bg-violet-800", scenario: "fabry-engine" },
+              { label: "Voiding Dx",         desc: "Voiding Dysfunction",    color: "bg-teal-700",   scenario: "voiding-engine" },
+              { label: "Cystic Kidney",      desc: "ADPKD/ARPKD/NPHP",      color: "bg-blue-800",   scenario: "cystic-kidney-engine" },
+              { label: "CAKUT Engine",       desc: "Antenatal/UPJ/Duplex",   color: "bg-teal-800",   scenario: "cakut-engine" },
+              { label: "PUV Engine",         desc: "Urethral Valves",        color: "bg-red-800",    scenario: "puv-engine" },
+              { label: "AKI Engine",         desc: "AKI Diagnostic",        color: "bg-red-600",    scenario: "aki-engine" },
+              { label: "HNF1B/Alport",       desc: "Rare hereditary",        color: "bg-green-800",  scenario: "hnf1b-alport-engine" },
+              { label: "Hyperoxaluria",      desc: "PH1/PH2/PH3",           color: "bg-orange-700", scenario: "hyperoxaluria-engine" },
+              { label: "Cystinosis",         desc: "Fanconi+cysteamine",     color: "bg-blue-700",   scenario: "cystinosis-engine" },
+              { label: "HTN Engine",         desc: "Pediatric HTN",          color: "bg-pink-700",   scenario: "htn-engine" },
+              { label: "Tubular Engine",     desc: "Fanconi/XLH/NDI",        color: "bg-amber-800",  scenario: "tubular-engine" },
+              { label: "Stone Engine",       desc: "Renal stones full",      color: "bg-yellow-700", scenario: "stone-engine" },
+              { label: "Wilms Tumor",        desc: "Nephroblastoma",        color: "bg-blue-800",   scenario: "wilms-tumor-engine" },
+              // DB-generated engines injected below
+              ...dbEngineRecords.map(rec => ({
+                label: rec.title || rec.content?.label || "Engine",
+                desc: rec.description || rec.content?.desc || "",
+                color: "bg-violet-700",
+                scenario: rec.content?.scenario || "",
+                _fromDb: true,
+              })).filter(e => e.scenario),
+            ].map((eng) => (
+              <Link key={eng.scenario} to={eng._link || createPageUrl("ClinicalSupport") + `?tab=pathways&scenario=${eng.scenario}`} className="flex-shrink-0" title={eng.desc ? `${eng.label} — ${eng.desc}` : eng.label}>
                 <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-violet-50 active:bg-violet-100 transition-colors w-20">
                   <div className={`w-10 h-10 ${eng.color} rounded-xl flex items-center justify-center shadow-sm`}>
                     <GitBranch className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-xs font-semibold text-slate-700 text-center leading-tight">{eng.label}</span>
-                  <span className="text-xs text-violet-500 text-center leading-tight hidden sm:block">{eng.desc}</span>
+                  <span className="text-[11px] font-semibold text-slate-700 text-center leading-tight line-clamp-2 min-h-[26px] flex items-center">{eng.label}</span>
                 </div>
               </Link>
-            )}
+            ))}
           </div>
         </div>
 
