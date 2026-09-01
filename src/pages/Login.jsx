@@ -19,6 +19,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
+      localStorage.removeItem("guestMode");
       await base44.auth.loginViaEmailPassword(email, password);
       window.location.href = "/";
     } catch (err) {
@@ -29,11 +30,18 @@ export default function Login() {
   };
 
   const handleGoogle = () => {
+    localStorage.removeItem("guestMode");
     base44.auth.loginWithProvider("google", "/");
   };
 
   const handleMicrosoft = () => {
+    localStorage.removeItem("guestMode");
     base44.auth.loginWithProvider("microsoft", "/");
+  };
+
+  const handleGuest = () => {
+    localStorage.setItem("guestMode", "true");
+    window.location.href = "/";
   };
 
   return (
@@ -139,6 +147,16 @@ export default function Login() {
           )}
         </Button>
       </form>
+
+      <div className="text-center mt-4">
+        <button
+          type="button"
+          onClick={handleGuest}
+          className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
+        >
+          Continue as guest
+        </button>
+      </div>
     </AuthLayout>
   );
 }

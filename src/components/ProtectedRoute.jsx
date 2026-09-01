@@ -10,6 +10,11 @@ const DefaultFallback = () => (
 
 export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthenticatedElement }) {
   const { isAuthenticated, isLoadingAuth, authError } = useAuth();
+  const guestMode = typeof window !== 'undefined' && localStorage.getItem('guestMode') === 'true';
+
+  if (guestMode) {
+    return <Outlet />;
+  }
 
   if (isLoadingAuth) {
     return fallback;

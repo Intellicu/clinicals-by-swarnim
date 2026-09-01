@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPageUrl } from "@/utils";
-import { Home, ArrowLeft, Users, Sparkles, Layers } from "lucide-react";
+import { Home, ArrowLeft, Users, Sparkles, Layers, LogIn } from "lucide-react";
 import ContextualBottomBar from "./components/nav/ContextualBottomBar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -254,6 +254,17 @@ export default function Layout({ children, currentPageName }) {
                     <Users className="w-3.5 h-3.5" aria-hidden="true" />
                     <span className="hidden sm:inline ml-1">Clinic Mode</span>
                     <span className="sm:hidden ml-1">Clinic</span>
+                  </Button>
+                </Link>
+              ) : !user ? (
+                <Link to="/login" aria-label="Log in">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-blue-50 border-blue-300 hover:bg-blue-100 text-blue-700 font-semibold text-xs h-9 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                  >
+                    <LogIn className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span className="ml-1">Login</span>
                   </Button>
                 </Link>
               ) : (
