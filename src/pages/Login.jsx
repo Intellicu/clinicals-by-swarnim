@@ -29,14 +29,24 @@ export default function Login() {
     }
   };
 
-  const handleGoogle = () => {
+  const handleGoogle = async () => {
     localStorage.removeItem("guestMode");
-    base44.auth.loginWithProvider("google", "/");
+    setError("");
+    try {
+      await base44.auth.loginWithProvider("google", window.location.origin + "/");
+    } catch (err) {
+      setError("Google login is not available. Please enable it in app settings or use email login.");
+    }
   };
 
-  const handleMicrosoft = () => {
+  const handleMicrosoft = async () => {
     localStorage.removeItem("guestMode");
-    base44.auth.loginWithProvider("microsoft", "/");
+    setError("");
+    try {
+      await base44.auth.loginWithProvider("microsoft", window.location.origin + "/");
+    } catch (err) {
+      setError("Microsoft login is not available. Please enable it in app settings or use email login.");
+    }
   };
 
   const handleGuest = () => {
@@ -148,14 +158,15 @@ export default function Login() {
         </Button>
       </form>
 
-      <div className="text-center mt-4">
-        <button
+      <div className="mt-4">
+        <Button
           type="button"
+          variant="ghost"
+          className="w-full h-11 text-sm font-medium border border-dashed border-border"
           onClick={handleGuest}
-          className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
         >
           Continue as guest
-        </button>
+        </Button>
       </div>
     </AuthLayout>
   );
