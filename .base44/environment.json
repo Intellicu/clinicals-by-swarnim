@@ -1,0 +1,11 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {"name": "VITE_BASE44_APP_ID", "description": "Base44 app id (backend option A)", "requiredAtBoot": false},
+    {"name": "VITE_BASE44_APP_BASE_URL", "description": "Base44 app backend base URL (backend option A)", "requiredAtBoot": false},
+    {"name": "VITE_SUPABASE_URL", "description": "Supabase project URL (backend option B)", "requiredAtBoot": false},
+    {"name": "VITE_SUPABASE_ANON_KEY", "description": "Supabase anon key (backend option B)", "requiredAtBoot": false}
+  ]
+}
