@@ -43,6 +43,7 @@ export const ENGINES = [
   { label: "PUV Engine", desc: "Posterior urethral valves", scenario: "puv-engine", tags: ["PUV", "posterior urethral valve", "bladder", "MCU", "ESRD risk"], group: "CAKUT & Urology" },
   { label: "Febrile UTI — Evaluation & Imaging", desc: "Post-UTI workup · ultrasound (all) · MCU indications · DMSA timing · antibiotics · prophylaxis (ISPN 2023)", scenario: "uti-febrile", tags: ["UTI", "febrile UTI", "VUR", "reflux", "DMSA", "MCU", "VCUG", "ultrasound", "recurrent UTI", "ISPN", "prophylaxis"], group: "CAKUT & Urology", ciee: true },
   { label: "Voiding Dx", desc: "BBD + Uroflow + OAB", scenario: "voiding-engine", tags: ["voiding dysfunction", "BBD", "uroflow", "OAB", "enuresis", "incontinence"], group: "CAKUT & Urology" },
+  { label: "Enuresis Engine", desc: "ICCS 2023 — MNE vs NMNE · red-flag screen · alarm first-line · desmopressin · combination · relapse · desmopressin safety", scenario: "enuresis-engine", tags: ["enuresis", "nocturnal enuresis", "bedwetting", "MNE", "NMNE", "desmopressin", "DDAVP", "enuresis alarm", "ICCS", "incontinence", "nocturnal polyuria"], group: "CAKUT & Urology", ciee: true },
 
   // ── Tubular & Metabolic ──
   { label: "Approach to Tubulopathy Engine", desc: "Phenotype-driven tubulopathy — RTA I–IV · Fanconi (cystinosis/Dent/Lowe/Wilson) · Bartter & Gitelman · mineralocorticoid excess · nephrogenic DI · SIADH/NSIAD · hypomagnesaemia — with targeted genetics, dosing, monitoring & suppressor safety", scenario: "tubulopathy-engine", tags: ["tubulopathy", "RTA", "renal tubular acidosis", "distal RTA", "proximal RTA", "Fanconi", "cystinosis", "Dent", "Lowe", "Bartter", "Gitelman", "Liddle", "nephrogenic diabetes insipidus", "NDI", "SIADH", "hypomagnesaemia", "hypokalemia", "alkalosis", "cysteamine", "indomethacin"], group: "Tubular & Metabolic", ciee: true },
@@ -201,6 +202,7 @@ const ENGINE_GUIDELINE_KEYS = {
   "cakut-engine": ["CAKUT", "Hydronephrosis"],
   "uti-febrile": ["UTI", "VUR", "Vesicoureteral", "ISPN", "Urinary Tract"],
   "voiding-engine": ["Voiding", "Bladder"],
+  "enuresis-engine": ["Enuresis", "Nocturnal", "ICCS", "Bedwetting"],
   "neurogenic-bladder-engine": ["Neurogenic", "Bladder", "CIC", "Spina Bifida"],
   "bladder-diary-engine": ["Voiding", "Bladder", "Uroflow", "Urodynamics"],
   "renal-biopsy-engine": ["Glomerulonephritis", "FSGS", "IgA Nephropathy", "Lupus Nephritis", "Biopsy"],

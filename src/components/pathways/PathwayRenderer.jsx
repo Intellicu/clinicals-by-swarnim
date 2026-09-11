@@ -102,6 +102,7 @@ import { SSNS_ENGINE } from "@/lib/engines/ssnsEngine";
 import { SRNS_ENGINE } from "@/lib/engines/srnsEngine";
 import { NS_COMPLICATIONS_ENGINE } from "@/lib/engines/nsComplicationsEngine";
 import { TUBULOPATHY_ENGINE } from "@/lib/engines/tubulopathyEngine";
+import { ENURESIS_ENGINE } from "@/lib/engines/enuresisEngine";
 import { ANAPHYLAXIS_ENGINE } from "@/lib/engines/anaphylaxisEngine";
 import { STATUS_EPILEPTICUS_ENGINE } from "@/lib/engines/statusEpilepticusEngine";
 import { SHOCK_ENGINE } from "@/lib/engines/shockEngine";
@@ -145,6 +146,7 @@ const HANDLED_IDS = new Set([
   "pneumonia-engine","asthma-engine","febrile-seizure-engine","aom-engine",
   "neonatal-jaundice-engine","iron-deficiency-anaemia-engine",
   "dka-engine","bronchiolitis-engine","neonatal-sepsis-engine",
+  "enuresis-engine",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -254,6 +256,15 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
       initialCtx={{}}
       title={TUBULOPATHY_ENGINE.label}
       subtitle={TUBULOPATHY_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "enuresis-engine") return (
+    <CIEEEngineRunner
+      pathway={ENURESIS_ENGINE.ciee_pathway}
+      sources={ENURESIS_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={ENURESIS_ENGINE.label}
+      subtitle={ENURESIS_ENGINE.guideline_source.guideline_name}
     />
   );
   // ── CIEE lib-module engines (IAP STG 2022 emergency + front-door) ──────────

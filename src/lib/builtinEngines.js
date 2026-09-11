@@ -13,6 +13,7 @@ import { SSNS_ENGINE } from '@/lib/engines/ssnsEngine';
 import { SRNS_ENGINE } from '@/lib/engines/srnsEngine';
 import { NS_COMPLICATIONS_ENGINE } from '@/lib/engines/nsComplicationsEngine';
 import { TUBULOPATHY_ENGINE } from '@/lib/engines/tubulopathyEngine';
+import { ENURESIS_ENGINE } from '@/lib/engines/enuresisEngine';
 
 export const BUILTIN_ENGINES = [
   SSNS_ENGINE,
@@ -20,4 +21,5 @@ export const BUILTIN_ENGINES = [
   NS_COMPLICATIONS_ENGINE,
   IGA_IPNA_ENGINE,
   TUBULOPATHY_ENGINE,
+  ENURESIS_ENGINE,
 ];
