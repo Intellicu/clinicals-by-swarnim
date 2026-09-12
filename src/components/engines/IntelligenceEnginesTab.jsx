@@ -185,6 +185,40 @@ const orderGroups = (groups) => {
 };
 const GROUPS = orderGroups([...new Set(ENGINES.map(e => e.group))]);
 
+// Super-group tabs — Nephrology first, then Emergency, then General Pediatrics
+const SUPER_GROUPS = {
+  "Nephrology": [
+    "Glomerular Disease",
+    "CKD & Genetics",
+    "CAKUT & Urology",
+    "Tubular & Metabolic",
+    "Hypertension",
+    "RRT & Dialysis",
+    "Nutrition & Diet",
+  ],
+  "Emergency & Critical Care": [
+    "Emergency & Critical Care",
+    "Emergency & Electrolytes",
+  ],
+  "General Pediatrics & Subspecialties": [
+    "Infectious Disease",
+    "Respiratory",
+    "General Pediatrics",
+    "Neurology",
+    "Neonatology",
+    "Haematology",
+    "Endocrine & Metabolic",
+    "Rheumatology",
+    "Oncology",
+  ],
+};
+const SUPER_GROUP_ORDER = ["Nephrology", "Emergency & Critical Care", "General Pediatrics & Subspecialties"];
+const SUPER_GROUP_BADGE = {
+  "Nephrology": "bg-indigo-600",
+  "Emergency & Critical Care": "bg-red-600",
+  "General Pediatrics & Subspecialties": "bg-emerald-600",
+};
+
 // Keyword → guideline title fragments for matching from DB
 const ENGINE_GUIDELINE_KEYS = {
   "aki-engine": ["AKI", "Acute Kidney"],
@@ -266,17 +300,18 @@ function GuidelineSidebar({ scenario, guidelines, loading }) {
 
 export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
   const [search, setSearch] = useState("");
-  const [activeGroup, setActiveGroup] = useState("All");
+  const [activeSuperGroup, setActiveSuperGroup] = useState("Nephrology");
   const [activeEngine, setActiveEngine] = useState(null);
-  // Collapsible groups — default collapsed so only headings show ("clean" view).
-  // A search query or a specific group filter forces the relevant groups open.
-  const [expandedGroups, setExpandedGroups] = useState(() => new Set());
-  const toggleGroup = (g) => setExpandedGroups(prev => {
+  // Sub-categories (groups) are open by default so the sub-categories inside
+  // each super-group tab are visible. Users can collapse individual ones.
+  const [collapsedGroups, setCollapsedGroups] = useState(() => new Set());
+  const toggleGroup = (g) => setCollapsedGroups(prev => {
     const next = new Set(prev);
     next.has(g) ? next.delete(g) : next.add(g);
     return next;
   });
-  const isGroupOpen = (g) => !!search.trim() || activeGroup !== "All" || expandedGroups.has(g);
+  const isGroupOpen = (g) => !!search.trim() || !collapsedGroups.has(g);
+  const activeGroups = SUPER_GROUPS[activeSuperGroup] || [];
 
   // Fetch current user role for admin-only engine visibility
   const { data: currentUser } = useQuery({
@@ -309,14 +344,14 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return ENGINES.filter(e => {
-      if (e.adminOnly && !isAdmin) return false; // hide admin-only engines from regular users
-      const matchGroup = activeGroup === "All" || e.group === activeGroup;
+      if (e.adminOnly && !isAdmin) return false;
+      const matchSuper = activeGroups.includes(e.group);
       const matchSearch = !q || e.label.toLowerCase().includes(q) ||
         e.desc.toLowerCase().includes(q) ||
         e.tags.some(t => t.toLowerCase().includes(q));
-      return matchGroup && matchSearch;
+      return matchSuper && matchSearch;
     });
-  }, [search, activeGroup, isAdmin]);
+  }, [search, activeSuperGroup, isAdmin]);
 
   const grouped = useMemo(() => {
     const g = {};
@@ -355,30 +390,43 @@ export default function IntelligenceEnginesTab({ onSelectEngine, onBack }) {
         )}
       </div>
 
-      {/* Group filter pills */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-        {["All", ...GROUPS].map(g => (
-          <button key={g} onClick={() => setActiveGroup(g)}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all
-              ${activeGroup === g
-                ? "bg-slate-800 text-white border-slate-800"
-                : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"}`}>
-            {g}
-          </button>
-        ))}
+      {/* Super-group tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        {SUPER_GROUP_ORDER.map(sg => {
+          const count = ENGINES.filter(e => (!e.adminOnly || isAdmin) && SUPER_GROUPS[sg].includes(e.group)).length;
+          return (
+            <button key={sg} onClick={() => { setActiveSuperGroup(sg); setSearch(""); }}
+              className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all flex items-center gap-2
+                ${activeSuperGroup === sg
+                  ? "bg-slate-800 text-white border-slate-800"
+                  : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"}`}>
+              <span className={`w-2 h-2 rounded-full ${SUPER_GROUP_BADGE[sg] || "bg-slate-500"}`} />
+              {sg}
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full
+                ${activeSuperGroup === sg ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"}`}>{count}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Expand / collapse all — only meaningful in the default (unfiltered) view */}
-      {Object.keys(grouped).length > 0 && !search.trim() && activeGroup === "All" && (
-        <div className="flex justify-end -mb-1">
-          <button
-            onClick={() => {
-              const all = orderGroups(Object.keys(grouped));
-              setExpandedGroups(all.every(g => expandedGroups.has(g)) ? new Set() : new Set(all));
-            }}
-            className="text-[11px] font-semibold text-slate-500 hover:text-slate-800 transition-colors">
-            {orderGroups(Object.keys(grouped)).every(g => expandedGroups.has(g)) ? "Collapse all" : "Expand all"}
-          </button>
+      {/* Active super-group label + expand / collapse all */}
+      {Object.keys(grouped).length > 0 && (
+        <div className="flex items-center justify-between -mb-1">
+          <div className="flex items-center gap-1.5">
+            <span className={`w-2.5 h-2.5 rounded-full ${SUPER_GROUP_BADGE[activeSuperGroup] || "bg-slate-500"}`} />
+            <span className="text-xs font-bold text-slate-700">{activeSuperGroup}</span>
+            <span className="text-[11px] text-slate-400">· {filtered.length} engine{filtered.length !== 1 ? "s" : ""}</span>
+          </div>
+          {!search.trim() && (
+            <button
+              onClick={() => {
+                const all = orderGroups(Object.keys(grouped));
+                setCollapsedGroups(all.every(g => collapsedGroups.has(g)) ? new Set() : new Set(all));
+              }}
+              className="text-[11px] font-semibold text-slate-500 hover:text-slate-800 transition-colors">
+              {orderGroups(Object.keys(grouped)).every(g => collapsedGroups.has(g)) ? "Expand all" : "Collapse all"}
+            </button>
+          )}
         </div>
       )}
 
