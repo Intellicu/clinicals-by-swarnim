@@ -103,6 +103,11 @@ import { SRNS_ENGINE } from "@/lib/engines/srnsEngine";
 import { NS_COMPLICATIONS_ENGINE } from "@/lib/engines/nsComplicationsEngine";
 import { TUBULOPATHY_ENGINE } from "@/lib/engines/tubulopathyEngine";
 import { ENURESIS_ENGINE } from "@/lib/engines/enuresisEngine";
+import { CKDMBD_ENGINE } from "@/lib/engines/ckdMbdEngine";
+import { IMMUNOCOMPROMISED_VACCINE_ENGINE } from "@/lib/engines/immunocompromisedVaccineEngine";
+import { HYPERTENSIVE_EMERGENCY_ENGINE } from "@/lib/engines/hypertensiveEmergencyEngine";
+import { CKD_GROWTH_FAILURE_ENGINE } from "@/lib/engines/ckdGrowthFailureEngine";
+import { CKD_TRANSITION_ENGINE } from "@/lib/engines/ckdTransitionEngine";
 import { ANAPHYLAXIS_ENGINE } from "@/lib/engines/anaphylaxisEngine";
 import { STATUS_EPILEPTICUS_ENGINE } from "@/lib/engines/statusEpilepticusEngine";
 import { SHOCK_ENGINE } from "@/lib/engines/shockEngine";
@@ -147,6 +152,8 @@ const HANDLED_IDS = new Set([
   "neonatal-jaundice-engine","iron-deficiency-anaemia-engine",
   "dka-engine","bronchiolitis-engine","neonatal-sepsis-engine",
   "enuresis-engine",
+  "ckd-mbd-engine","immunocompromised-vaccine-engine",
+  "hypertensive-emergency-engine","ckd-growth-failure-engine","ckd-transition-engine",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -265,6 +272,51 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
       initialCtx={{}}
       title={ENURESIS_ENGINE.label}
       subtitle={ENURESIS_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "ckd-mbd-engine") return (
+    <CIEEEngineRunner
+      pathway={CKDMBD_ENGINE.ciee_pathway}
+      sources={CKDMBD_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={CKDMBD_ENGINE.label}
+      subtitle={CKDMBD_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "immunocompromised-vaccine-engine") return (
+    <CIEEEngineRunner
+      pathway={IMMUNOCOMPROMISED_VACCINE_ENGINE.ciee_pathway}
+      sources={IMMUNOCOMPROMISED_VACCINE_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={IMMUNOCOMPROMISED_VACCINE_ENGINE.label}
+      subtitle={IMMUNOCOMPROMISED_VACCINE_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "hypertensive-emergency-engine") return (
+    <CIEEEngineRunner
+      pathway={HYPERTENSIVE_EMERGENCY_ENGINE.ciee_pathway}
+      sources={HYPERTENSIVE_EMERGENCY_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={HYPERTENSIVE_EMERGENCY_ENGINE.label}
+      subtitle={HYPERTENSIVE_EMERGENCY_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "ckd-growth-failure-engine") return (
+    <CIEEEngineRunner
+      pathway={CKD_GROWTH_FAILURE_ENGINE.ciee_pathway}
+      sources={CKD_GROWTH_FAILURE_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={CKD_GROWTH_FAILURE_ENGINE.label}
+      subtitle={CKD_GROWTH_FAILURE_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "ckd-transition-engine") return (
+    <CIEEEngineRunner
+      pathway={CKD_TRANSITION_ENGINE.ciee_pathway}
+      sources={CKD_TRANSITION_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={CKD_TRANSITION_ENGINE.label}
+      subtitle={CKD_TRANSITION_ENGINE.guideline_source.guideline_name}
     />
   );
   // ── CIEE lib-module engines (IAP STG 2022 emergency + front-door) ──────────

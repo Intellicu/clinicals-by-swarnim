@@ -14,6 +14,11 @@ import { SRNS_ENGINE } from '@/lib/engines/srnsEngine';
 import { NS_COMPLICATIONS_ENGINE } from '@/lib/engines/nsComplicationsEngine';
 import { TUBULOPATHY_ENGINE } from '@/lib/engines/tubulopathyEngine';
 import { ENURESIS_ENGINE } from '@/lib/engines/enuresisEngine';
+import { CKDMBD_ENGINE } from '@/lib/engines/ckdMbdEngine';
+import { IMMUNOCOMPROMISED_VACCINE_ENGINE } from '@/lib/engines/immunocompromisedVaccineEngine';
+import { HYPERTENSIVE_EMERGENCY_ENGINE } from '@/lib/engines/hypertensiveEmergencyEngine';
+import { CKD_GROWTH_FAILURE_ENGINE } from '@/lib/engines/ckdGrowthFailureEngine';
+import { CKD_TRANSITION_ENGINE } from '@/lib/engines/ckdTransitionEngine';
 
 export const BUILTIN_ENGINES = [
   SSNS_ENGINE,
@@ -22,4 +27,9 @@ export const BUILTIN_ENGINES = [
   IGA_IPNA_ENGINE,
   TUBULOPATHY_ENGINE,
   ENURESIS_ENGINE,
+  CKDMBD_ENGINE,
+  IMMUNOCOMPROMISED_VACCINE_ENGINE,
+  HYPERTENSIVE_EMERGENCY_ENGINE,
+  CKD_GROWTH_FAILURE_ENGINE,
+  CKD_TRANSITION_ENGINE,
 ];
