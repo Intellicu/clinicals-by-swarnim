@@ -34,7 +34,6 @@ function CategoryStrip({ category, onSelect }) {
     queryFn: () => base44.entities.Drug.filter({
       formulary_category: category.key,
       is_duplicate_hidden: { $ne: true },
-      is_prescribable: { $ne: false },
     }, "generic_name", 30),
     staleTime: 5 * 60 * 1000,
   });
