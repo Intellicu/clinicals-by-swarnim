@@ -108,6 +108,7 @@ import { IMMUNOCOMPROMISED_VACCINE_ENGINE } from "@/lib/engines/immunocompromise
 import { HYPERTENSIVE_EMERGENCY_ENGINE } from "@/lib/engines/hypertensiveEmergencyEngine";
 import { CKD_GROWTH_FAILURE_ENGINE } from "@/lib/engines/ckdGrowthFailureEngine";
 import { CKD_TRANSITION_ENGINE } from "@/lib/engines/ckdTransitionEngine";
+import { CKD_CYSTIC_ENGINE } from "@/lib/engines/cysticKidneyDiseaseEngine";
 import { ANAPHYLAXIS_ENGINE } from "@/lib/engines/anaphylaxisEngine";
 import { STATUS_EPILEPTICUS_ENGINE } from "@/lib/engines/statusEpilepticusEngine";
 import { SHOCK_ENGINE } from "@/lib/engines/shockEngine";
@@ -154,6 +155,7 @@ const HANDLED_IDS = new Set([
   "enuresis-engine",
   "ckd-mbd-engine","immunocompromised-vaccine-engine",
   "hypertensive-emergency-engine","ckd-growth-failure-engine","ckd-transition-engine",
+  "cystic-kidney-disease-engine",
   "uti-febrile","hemolytic-uremic","tumor-lysis","lupus-nephritis","post-strep-gn",
   "hyponatremia","hypercalcemia","transplant-rejection","dialysis-catheter-infection",
   "ckd-mbd","renal-stone","bladder-dysfunction","rta-diagnosis","tubular-function",
@@ -317,6 +319,15 @@ export default function PathwayRenderer({ scenarioId, scenario, onAIPrompt, isAd
       initialCtx={{}}
       title={CKD_TRANSITION_ENGINE.label}
       subtitle={CKD_TRANSITION_ENGINE.guideline_source.guideline_name}
+    />
+  );
+  if (id === "cystic-kidney-disease-engine") return (
+    <CIEEEngineRunner
+      pathway={CKD_CYSTIC_ENGINE.ciee_pathway}
+      sources={CKD_CYSTIC_ENGINE.ciee_sources}
+      initialCtx={{}}
+      title={CKD_CYSTIC_ENGINE.label}
+      subtitle={CKD_CYSTIC_ENGINE.guideline_source.guideline_name}
     />
   );
   // ── CIEE lib-module engines (IAP STG 2022 emergency + front-door) ──────────

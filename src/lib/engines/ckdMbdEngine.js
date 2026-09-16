@@ -73,10 +73,10 @@ export const CKDMBD_PATHWAY = {
     // ── Phase 2 — Baseline labs ────────────────────────────────────────────
     'MB-02': {
       id: 'MB-02', type: 'ACTION', source: B,
-      action: 'Baseline CKD-MBD panel: serum calcium (corrected for albumin), phosphate, intact PTH (iPTH), total alkaline phosphatase (ALP), 25-OH vitamin D. Also check bicarbonate (acidosis worsens bone disease). In G3: every 6–12 months. G4: every 3–6 months. G5/G5D: every 1–3 months. 25-OH-D: at least yearly.',
+      action: 'Baseline CKD-MBD panel: serum calcium (corrected for albumin), phosphate, intact PTH (iPTH), total alkaline phosphatase (ALP), 25-OH vitamin D. Also check bicarbonate (acidosis worsens bone disease). In G3: every 6–12 months. G4: every 3–6 months. G5/G5D: every 1–3 months. 25-OH-D: at least yearly. AGE-BANDED NORMAL PHOSPHATE reference for titration (children run higher than adults — do NOT apply adult thresholds): 0–1 year: 4.8–8.2 mg/dL · 1–5 years: 4.5–6.8 mg/dL · 6–12 years: 3.6–5.8 mg/dL · 13–20 years: 2.3–4.5 mg/dL · Adult: 2.5–4.5 mg/dL. Titrate binder therapy toward the age-specific upper limit, not the adult reference range.',
       monitoring: [
         { parameter: 'Serum calcium (albumin-corrected)', frequency: 'G3 q6–12mo · G4 q3–6mo · G5 q1–3mo', target: 'Age-appropriate normal range', alert: 'Ca <8.4 or >10.2 mg/dL', alert_action: 'Adjust binder/calcium supplement; check ECG for QT' },
-        { parameter: 'Serum phosphate', frequency: 'G3 q6–12mo · G4 q3–6mo · G5 q1–3mo', target: 'Normal range (toward normal for age)', alert: 'Ph >5.5 mg/dL (adults) or above age ULN', alert_action: 'Dietary phosphate restriction + phosphate binder' },
+        { parameter: 'Serum phosphate (age-banded)', frequency: 'G3 q6–12mo · G4 q3–6mo · G5 q1–3mo', target: '0–1y:4.8–8.2 · 1–5y:4.5–6.8 · 6–12y:3.6–5.8 · 13–20y:2.3–4.5 mg/dL', alert: 'Above age-specific upper limit', alert_action: 'Dietary phosphate restriction + phosphate binder' },
         { parameter: 'Intact PTH (iPTH)', frequency: 'G3 q6–12mo · G4 q3–6mo · G5 q1–3mo', target: 'G3:35–70 · G4:70–110 · G5:2–9× ULN (pg/mL)', alert: 'iPTH outside target range', alert_action: 'Escalate to SHPT pathway' },
         { parameter: '25-OH vitamin D', frequency: 'Yearly', target: '>30 ng/mL (>75 nmol/L)', alert: '<30 ng/mL', alert_action: 'Cholecalciferol/ergocalciferol supplementation' },
       ],

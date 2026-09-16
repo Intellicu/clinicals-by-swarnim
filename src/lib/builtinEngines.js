@@ -19,6 +19,7 @@ import { IMMUNOCOMPROMISED_VACCINE_ENGINE } from '@/lib/engines/immunocompromise
 import { HYPERTENSIVE_EMERGENCY_ENGINE } from '@/lib/engines/hypertensiveEmergencyEngine';
 import { CKD_GROWTH_FAILURE_ENGINE } from '@/lib/engines/ckdGrowthFailureEngine';
 import { CKD_TRANSITION_ENGINE } from '@/lib/engines/ckdTransitionEngine';
+import { CKD_CYSTIC_ENGINE } from '@/lib/engines/cysticKidneyDiseaseEngine';
 
 export const BUILTIN_ENGINES = [
   SSNS_ENGINE,
@@ -32,4 +33,5 @@ export const BUILTIN_ENGINES = [
   HYPERTENSIVE_EMERGENCY_ENGINE,
   CKD_GROWTH_FAILURE_ENGINE,
   CKD_TRANSITION_ENGINE,
+  CKD_CYSTIC_ENGINE,
 ];

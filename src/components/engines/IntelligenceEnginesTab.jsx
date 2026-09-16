@@ -34,7 +34,8 @@ export const ENGINES = [
   { label: "Genetic Engine", desc: "When to test + which panel", scenario: "genetic-engine", tags: ["genetics", "gene panel", "WES", "SRNS", "Alport", "COL4"], group: "CKD & Genetics" },
   { label: "Alport/HNF1B", desc: "COL4 + most missed diagnosis", scenario: "alport-hnf1b-engine", tags: ["Alport", "HNF1B", "hereditary", "COL4A5", "deafness"], group: "CKD & Genetics" },
   { label: "Fabry Engine", desc: "Alpha-Gal A deficiency → ERT", scenario: "fabry-engine", tags: ["Fabry", "GLA", "lysosomal", "ERT", "migalastat", "angiokeratoma"], group: "CKD & Genetics" },
-  { label: "Cystic Kidney", desc: "ADPKD/ARPKD/NPHP/BBS", scenario: "cystic-kidney-engine", tags: ["ADPKD", "ARPKD", "nephronophthisis", "cystic", "BBS", "PKD1"], group: "CKD & Genetics" },
+  { label: "Approach to Cystic Kidney Disease", desc: "ERKNet/ESPN — differential (ARPKD vs ADPKD vs NPHP vs HNF1B vs MCDK) · ADPKD age-based US criteria & BP/proteinuria targets · ARPKD hepatic surveillance · NPHP work-up", scenario: "cystic-kidney-disease-engine", tags: ["ADPKD", "ARPKD", "nephronophthisis", "cystic", "BBS", "PKD1", "PKD2", "HNF1B", "MCDK", "polycystic kidney"], group: "CKD & Genetics", ciee: true },
+  { label: "Cystic Kidney (legacy reference)", desc: "ADPKD/ARPKD/NPHP/BBS quick reference", scenario: "cystic-kidney-engine", tags: ["ADPKD", "ARPKD", "nephronophthisis", "cystic", "BBS", "PKD1"], group: "CKD & Genetics" },
   { label: "Hyperoxaluria", desc: "PH1/PH2/PH3 + lumasiran", scenario: "hyperoxaluria-engine", tags: ["hyperoxaluria", "PH1", "oxalate", "lumasiran", "stones"], group: "CKD & Genetics" },
   { label: "Cystinosis", desc: "Fanconi + cysteamine", scenario: "cystinosis-engine", tags: ["cystinosis", "Fanconi", "cysteamine", "leukocyte cystine"], group: "CKD & Genetics" },
 
@@ -238,6 +239,7 @@ const ENGINE_GUIDELINE_KEYS = {
   "nephrocalcinosis-stone-engine": ["Nephrocalcinosis", "Stone", "Urolithiasis", "Hypercalciuria"],
   "fabry-engine": ["Fabry"],
   "cystic-kidney-engine": ["ADPKD", "ARPKD", "Cystic Kidney", "Nephronophthisis"],
+  "cystic-kidney-disease-engine": ["ADPKD", "ARPKD", "Cystic Kidney", "Nephronophthisis", "HNF1B", "MCDK"],
   "cakut-engine": ["CAKUT", "Hydronephrosis"],
   "uti-febrile": ["UTI", "VUR", "Vesicoureteral", "ISPN", "Urinary Tract"],
   "voiding-engine": ["Voiding", "Bladder"],
