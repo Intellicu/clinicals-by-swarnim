@@ -247,10 +247,9 @@ function DrugSearchPanel({ onAdd, alreadyAdded }) {
     if (!q || q.length < 2) { setResults([]); setSearched(false); return; }
     setLoading(true);
     try {
-      // Fetch prescribable, non-hidden drugs matching the query
+      // Fetch non-hidden drugs matching the query
       const all = await base44.entities.Drug.filter({
         is_duplicate_hidden: { $ne: true },
-        is_prescribable: { $ne: false },
       }, "generic_name", 100);
       const q2 = q.toLowerCase();
       const filtered = all.filter(d =>
