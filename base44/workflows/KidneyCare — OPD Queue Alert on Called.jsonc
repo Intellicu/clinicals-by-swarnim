@@ -1,0 +1,37 @@
+{
+  "name": "KidneyCare \u2014 OPD Queue Alert on Called",
+  "description": "When an OPD patient is called, send a monitoring summary notification if they have recent KidneyCare alerts.",
+  "trigger": {
+    "condition": "${ ((.trigger.data.status == \"Called\") and (.trigger.changed_fields | index(\"status\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "OPDQueue"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "kidneycare_opd_queue_alert_on_called",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "kidneycare_opd_alert",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "kidneycare_opd_alert"
+  }
+}
